@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-brand-primary: #0071E3;
+  --color-brand-secondary: #EE6611;
+  --color-brand-dark: #181818;
+  --color-brand-light: #E4E9ED;
+}
+
 :root {
   --font-sans: 'SF Pro Display', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --background: oklch(1 0 0);
@@ -119,10 +126,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
   }
+
   html {
     font-family: var(--font-sans);
   }
