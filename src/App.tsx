@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Dashboard from './pages/dashboard';
-import Layout from './layout';
-import Login from './pages/login';
-import Homepage from './pages/homepage';
-
+import Layout from './pages/admin/layout';
+import Login from './pages/auth/login';
+import Homepage from './pages/guest/homepage';
+import Dashboard from './pages/admin/dashboard';
+import Error404 from './pages/404';
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <Routes>
@@ -24,6 +25,8 @@ const App: React.FC = () => {
       <Route path="/" element={
         <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
       } />
+
+      <Route path="/*" element={<Error404 />} />
     </Routes>
   )
 }
