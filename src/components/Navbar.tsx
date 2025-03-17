@@ -23,7 +23,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
       </header>
       :
       <header className='flex items-center bg-brand-background max-h-16'>
-        <div className='border-r border-b border-white w-60 max-h-16 grid place-content-center !p-3'>
+        <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
           <img src={InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
         </div>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
