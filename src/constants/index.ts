@@ -1,0 +1,1 @@
+export const UserAvatar:string = "https://github.com/shadcn.png";

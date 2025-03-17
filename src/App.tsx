@@ -7,7 +7,7 @@ import Dashboard from './pages/admin/dashboard';
 import Error404 from './pages/404';
 const App: React.FC = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   return (
     <Routes>
