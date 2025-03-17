@@ -1,5 +1,6 @@
 import React from 'react';
 import Logo from '../assets/logo.png';
+import InsightnerLogo from '/insightnerLogo.svg';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,
@@ -21,15 +22,15 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         </nav>
       </header>
       :
-      <header className='flex items-center bg-brand-background'>
-        {/* <div className='border-r-2 border-b-2 border-white h-12 p-3 w-60'>
-          <img src={Logo} alt="logo" className='filter invert mx-auto border-2 border-teal-400' />
-        </div> */}
-        <nav className='w-full h-full flex justify-between items-center p-3'>
+      <header className='flex items-center bg-brand-background max-h-16'>
+        <div className='border-r border-b border-white w-60 max-h-16 grid place-content-center !p-3'>
+          <img src={InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
+        </div>
+        <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>Dashboard</h2>
           <ul className='flex gap-5 items-center'>
             <li>
-              <Button className='bg-brand-secondary text-white font-semibold rounded-full hover:bg-brand-secondary/90 duration-300 cursor-pointer'>Create New Event</Button>
+              <Button className='bg-brand-secondary text-white font-semibold rounded-full h-6 hover:bg-brand-secondary/90 duration-300 cursor-pointer'>Create New Event</Button>
             </li>
             <li className='flex gap-2 items-center'>
               <Avatar className='w-10 h-10'>
