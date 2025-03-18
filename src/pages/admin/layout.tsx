@@ -8,7 +8,7 @@ const Layout: React.FC = () => {
 
             <section className="flex flex-1">
                 <aside className='w-52 lg:w-56'></aside>
-                <div className='flex-1 p-10'>
+                <div className='flex-1 p-5 md:p-10'>
                     <Outlet />
                 </div>
             </section>
