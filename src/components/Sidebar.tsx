@@ -15,7 +15,7 @@ const Sidebar: React.FC = () => {
             <ul className='flex flex-col gap-2'>
                 {SidebarItems.map((item) => (
                     <li key={item.label}>
-                        <Link to={item.path} className={`flex items-center gap-3 p-3 hover:bg-brand-light-gray rounded-md ${path.pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
+                        <Link to={item.path} className={`flex items-center gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${path.pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
                             <item.icon className='size-5' />
                             {item.label}
                         </Link>
