@@ -1,1 +1,46 @@
-export const UserAvatar:string = "https://github.com/shadcn.png";
+import { BrainCircuit, ChartPie, HandHeart, Images, LayoutDashboard, NotebookPen, Trophy, Users } from "lucide-react";
+
+export const UserAvatar: string = "https://github.com/shadcn.png";
+
+export const SidebarItems = [
+    {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        path: "/dashboard",
+    },
+    {
+        label: "All Events",
+        icon: Trophy,
+        path: "/all-events",
+    },
+    {
+        label: "All Attendees",
+        icon: Users,
+        path: "/all-attendees",
+    },
+    {
+        label: "All Sponsors",
+        icon: HandHeart,
+        path: "/all-sponsors",
+    },
+    {
+        label: "All Reports",
+        icon: NotebookPen,
+        path: "/all-reports",
+    },
+    {
+        label: "All Charts",
+        icon: ChartPie,
+        path: "/all-charts",
+    },
+    {
+        label: "All Photos",
+        icon: Images,
+        path: "/all-photos",
+    },
+    {
+        label: "AI Transcriber",
+        icon: BrainCircuit,
+        path: "/ai-transcriber",
+    }
+];
