@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import DummyCardImage from '@/assets/dummyCardImg.png';
 import React from 'react';
-import { MapPin } from 'lucide-react';
 import EventCard from '@/components/EventCard';
 
 const Dashboard: React.FC = () => {

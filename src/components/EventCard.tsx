@@ -116,8 +116,8 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     <div className='mt-2 flex flex-col gap-2 justify-between'>
                         <div className='flex gap-2 justify-between'>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-fit text-center'>Report</Link>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Transcriber</Link>
+                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-1/3 min-w-fit text-center'>Report</Link>
+                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-2/3 min-w-fit text-center'>Transcriber</Link>
                         </div>
                         <div className='flex gap-2 justify-between'>
                             <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Photos</Link>
