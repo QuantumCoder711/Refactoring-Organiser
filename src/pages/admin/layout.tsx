@@ -8,9 +8,9 @@ const Layout: React.FC = () => {
         <main className='h-screen overflow-hidden w-full flex flex-col flex-1'>
             <Navbar isAuthenticated={true} />
 
-            <section className="flex flex-1">
+            <section className="flex flex-1 overflow-hidden">
                 <Sidebar />
-                <div className='flex-1 p-5 md:p-10'>
+                <div className='flex-1 p-5 overflow-y-scroll md:p-10'>
                     <Outlet />
                 </div>
             </section>

@@ -13,7 +13,7 @@ const Sidebar: React.FC = () => {
     }
 
     return (
-        <aside className={`${isOpen ? 'w-52 lg:w-56 p-3 pt-5' : 'w-0'} relative z-20 bg-brand-background h-full transition-all duration-300`}>
+        <aside className={`${isOpen ? 'w-52 lg:w-56 p-3 pt-5' : 'w-0'} sticky left-0 z-20 bg-brand-background h-full transition-all duration-300`}>
             <ul className={`flex flex-col gap-2 overflow-hidden ${isOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
                 {SidebarItems.map((item) => (
                     <li key={item.label}>

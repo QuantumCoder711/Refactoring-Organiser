@@ -34,15 +34,60 @@ const Dashboard: React.FC = () => {
             <Button className='btn'>View All</Button>
           </div>
 
-          <div className='mt-5'>
-            <EventCard
-              title='Telecom Summit & Awards 2025! (Webinar)'
-              location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-              date='15-Feb-2025'
-              image={DummyCardImage}
-              imageAlt='Event Image'
-              isLive={true}
-            />
+          <div className='mt-5 flex gap-10'>
+            <div className='max-w-[405px]'>
+              <EventCard
+                title='Telecom Summit & Awards 2025! (Webinar)'
+                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
+                date='15-Feb-2025'
+                image={DummyCardImage}
+                imageAlt='Event Image'
+                isLive={true}
+              />
+            </div>
+
+            <div className='max-w-[405px]'>
+              <EventCard
+                title='Telecom Summit & Awards 2025! (Webinar)'
+                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
+                date='15-Feb-2025'
+                image={DummyCardImage}
+                imageAlt='Event Image'
+                // isLive={true}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Past Events */}
+        <div className='mt-8'>
+          <div className='flex justify-between items-center'>
+            <h2 className='text-xl font-semibold'>Past Events</h2>
+            <Button className='btn'>View All</Button>
+          </div>
+
+          <div className='mt-5 flex gap-10'>
+            <div className='max-w-[405px]'>
+              <EventCard
+                title='Telecom Summit & Awards 2025! (Webinar)'
+                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
+                date='15-Feb-2025'
+                image={DummyCardImage}
+                imageAlt='Event Image'
+                // isLive={true}
+              />
+            </div>
+
+            <div className='max-w-[405px]'>
+              <EventCard
+                title='Telecom Summit & Awards 2025! (Webinar)'
+                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
+                date='15-Feb-2025'
+                image={DummyCardImage}
+                imageAlt='Event Image'
+                // isLive={true}
+              />
+            </div>
           </div>
         </div>
 
