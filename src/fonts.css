@@ -1,5 +1,4 @@
 /* SF Pro Display Font Family */
-
 @font-face {
   font-family: 'SF Pro Display';
   src: url('./assets/fonts/sf-pro/SFProDisplay-Regular.woff2') format('woff2');
@@ -124,4 +123,20 @@
   src: url('./assets/fonts/sf-pro/SFProDisplay-UltralightItalic.woff2') format('woff2');
   font-weight: 200;
   font-style: italic;
+}
+
+
+/* Date Stamp Font */
+@font-face {
+  font-family: 'Date Stamp';
+  src: url('./assets/fonts/date-stamp/date-stamp-regular.otf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Date Stamp';
+  src: url('./assets/fonts/date-stamp/date-stamp-bold.otf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
 }
