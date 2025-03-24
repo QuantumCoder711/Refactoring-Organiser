@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
               date='15-Feb-2025'
               image={DummyCardImage}
               imageAlt='Event Image'
-              // isLive={true}
+              isLive={true}
             />
           </div>
         </div>
