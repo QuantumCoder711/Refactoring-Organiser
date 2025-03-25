@@ -30,6 +30,7 @@ const Sidebar: React.FC = () => {
                     </Link>
                 </li>
             </ul>
+            
             {/* <Button onClick={handleSidebarClose} className={`rounded-full fixed p-2 shadow-blur bg-white hover:bg-brand-light-gray cursor-pointer duration-300 z-50 w-fit ${isOpen ? 'left-52 top-1/2' : 'left-20 top-12'}`}> */}
             <Button onClick={handleSidebarClose} className={`rounded-full fixed p-2 shadow-blur bg-white hover:bg-brand-light-gray cursor-pointer transition-all duration-500 z-50 w-fit ${isOpen ? 'inset-x-46 lg:inset-x-[200px] right-2 top-1/2 rotate-y-180' : 'left-20 rotate-y-0 top-12'}`}>
                 <img src={Panel} alt="Sidebar Icon" width={32} className="min-w-8" />

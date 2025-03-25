@@ -27,67 +27,18 @@ const AllEvents: React.FC = () => {
             </div>
 
             {/* Upcoming Events */}
-            {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-10'>
-                <div className='w-fit'>
-                    <EventCard
-                        title='Telecom Summit & Awards 2025! (Webinar)'
-                        location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                        date='15-Feb-2025'
-                        image={DummyCardImage}
-                        imageAlt='Event Image'
-                        isLive={true}
-                    />
-                </div>
-                <div className='w-fit'>
-                    <EventCard
-                        title='Telecom Summit & Awards 2025! (Webinar)'
-                        location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                        date='15-Feb-2025'
-                        image={DummyCardImage}
-                        imageAlt='Event Image'
-                        isLive={true}
-                    />
-                </div>
-                {/* <div className='w-full'>
-                    <EventCard
-                        title='Telecom Summit & Awards 2025! (Webinar)'
-                        location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                        date='15-Feb-2025'
-                        image={DummyCardImage}
-                        imageAlt='Event Image'
-                        // isLive={true}
-                    />
-                </div>
-                <div className='w-full'>
-                    <EventCard
-                        title='Telecom Summit & Awards 2025! (Webinar)'
-                        location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                        date='15-Feb-2025'
-                        image={DummyCardImage}
-                        imageAlt='Event Image'
-                        // isLive={true}
-                    />
-                </div>
-                <div className='w-full'>
-                    <EventCard
-                        title='Telecom Summit & Awards 2025! (Webinar)'
-                        location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                        date='15-Feb-2025'
-                        image={DummyCardImage}
-                        imageAlt='Event Image'
-                        // isLive={true}
-                    />
-                </div> */}
+            {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-6'>
+
+                <EventCard
+                    title='Telecom Summit & Awards 2025! (Webinar)'
+                    location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
+                    date='15-Feb-2025'
+                    image={DummyCardImage}
+                    imageAlt='Event Image'
+                    isLive={true}
+                    uuid='123'
+                />
             </div>}
-
-
-
-
-
-
-
-
-
 
 
             {/* Past Events */}
@@ -98,6 +49,7 @@ const AllEvents: React.FC = () => {
                     date='15-Feb-2025'
                     image={DummyCardImage}
                     imageAlt='Event Image'
+                    uuid='1236'
                 // isLive={true}
                 />
             </div>}

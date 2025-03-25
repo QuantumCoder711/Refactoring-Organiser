@@ -10,6 +10,7 @@ interface EventCardProps {
     image: string;
     imageAlt: string;
     isLive?: boolean;
+    uuid: string;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -18,6 +19,7 @@ const EventCard: React.FC<EventCardProps> = ({
     date,
     image,
     imageAlt,
+    uuid,
     isLive = false
 }) => {
     const renderProgressBar = (value: number, total: number) => (
@@ -40,7 +42,7 @@ const EventCard: React.FC<EventCardProps> = ({
     );
 
     return (
-        <div className={`${isLive ? 'w-full max-w-xl' : 'w-64'} flex rounded-xl shadow-blur-lg relative`}>
+        <div className={`${isLive ? 'w-full max-w-lg' : 'w-64'} flex rounded-xl shadow-blur-lg relative`}>
             <div className="h-64 flex flex-col">
                 <div className='flex-1 overflow-hidden relative w-64'>
                     <Button 
@@ -85,7 +87,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     {!isLive && (
                         <div className='border-t border-white grid grid-cols-3 gap-1 pt-2'>
-                            <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>View Event</Link>
+                            <Link to={`/all-events/view/${uuid}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>View Event</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>All Attendees</Link>
                             <div className='col-span-3 flex w-full gap-1 justify-center'>
@@ -97,7 +99,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     {isLive && (
                         <div className='border-t border-white flex justify-between gap-2 pt-1'>
-                            <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>View</Link>
+                            <Link to={`/all-events/view/${uuid}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>View</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Edit</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Attendees</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Agenda</Link>

@@ -12,6 +12,7 @@ import AiTranscriber from './pages/admin/ai-transcriber';
 import AllCharts from './pages/admin/all-charts';
 import AllPhotos from './pages/admin/all-photos';
 import AllReports from './pages/admin/all-reports';
+import ViewEvent from './pages/admin/all-events/view-event';
 
 const App: React.FC = () => {
 
@@ -35,6 +36,7 @@ const App: React.FC = () => {
         <Route path="/all-charts" element={<AllCharts />} />
         <Route path="/all-photos" element={<AllPhotos />} />
         <Route path="/all-reports" element={<AllReports />} />
+        <Route path="/all-events/view/:id" element={<ViewEvent />} />
       </Route>
 
       <Route path="/" element={
