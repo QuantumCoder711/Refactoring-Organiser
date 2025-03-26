@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import DummyCardImage from "@/assets/dummyCardImg.png";
-
+import GoogleMap from "@/components/GoogleMap";
 const ViewEvent: React.FC = () => {
 
     const { id } = useParams<{ id: string }>();
@@ -42,9 +42,15 @@ const ViewEvent: React.FC = () => {
                 <p className='text-sm text-brand-dark-gray'>3rd - 5th floor, Huda City Centre Metro Station, Sector 29, Gurugram, Haryana 122002, India</p>
 
                 {/* Map Component */}
-                <div className='h-60 mt-3 rounded-lg border-2 border-amber-400'>
-
+                <div className='h-60 mt-3 rounded-lg shadow-blur'>
+                    <GoogleMap latitude={28.4595} longitude={77.0265}/>
                 </div>
+            </div>
+
+            {/* Agenda Details */}
+            <div className='p-5 border-t border-white'>
+                <h3 className='font-semibold'>Agenda</h3>
+                <p className='text-sm text-brand-dark-gray'>Lorem ipsum dolor sit amet consectetur. Orci justo parturient vitae pellentesque urna. Eu diam accumsan blandit nibh elementum venenatis. Nulla posuere donec risus et accumsan aliquam volutpat integer id. Proin massa quis commodo viverra nisi et. Elementum hac sed nisl lacus tristique faucibus dignissim. Suspendisse habitant nisi diam viverra et. Rhoncus nunc faucibus senectus feugiat iaculis integer commodo. Volutpat id tellus mi leo rhoncus. Metus diam eleifend ornare vitae. Vestibulum non risus mi cras turpis at et. Fermentum at adipiscing ut habitasse sociis consectetur. Volutpat nunc ultricies amet aliquet mauris augue nunc faucibus condimentum. Mauris nunc et turpis malesuada arcu nunc metus.</p>
             </div>
         </div>
     )
