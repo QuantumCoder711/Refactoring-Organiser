@@ -1,5 +1,5 @@
 import React from 'react';
-import Logo from '../assets/logo.png';
+import Logo from '../assets/logo_black_text.svg';
 import InsightnerLogo from '/insightnerLogo.svg';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,6 +8,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { UserAvatar } from '@/constants';
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -16,9 +17,20 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   return (
     !isAuthenticated ?
-      <header>
+      <header className='flex justify-between p-3'>
         <nav className='w-full flex justify-between items-center'>
-          <img src={Logo} alt="logo" />
+          <Link to="/">
+            <img src={Logo} alt="logo" />
+          </Link>
+
+          <ul className='flex gap-5 items-center'>
+            <li>
+              <Link to="#">Explore Events</Link>
+            </li>
+            <li>
+              <Link to="/login">Login</Link>
+            </li>
+          </ul>
         </nav>
       </header>
       :

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Layout from './pages/admin/layout';
-import Login from './pages/auth/login';
+import Login from './pages/guest/login';
 import Homepage from './pages/guest/homepage';
 import Dashboard from './pages/admin/dashboard';
 import Error404 from './pages/404';
@@ -13,17 +13,18 @@ import AllCharts from './pages/admin/all-charts';
 import AllPhotos from './pages/admin/all-photos';
 import AllReports from './pages/admin/all-reports';
 import ViewEvent from './pages/admin/all-events/view-event';
+import GuestLayout from './pages/guest/layout';
 
 const App: React.FC = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <Routes>
-      <Route path="/" element={<Homepage />} />
-      <Route path="/login" element={
-        isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-      } />
+      <Route element={<GuestLayout />}>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+      </Route>
 
       <Route element={
         isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
