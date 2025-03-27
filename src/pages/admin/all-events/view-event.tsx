@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import DummyCardImage from "@/assets/dummyCardImg.png";
 import GoogleMap from "@/components/GoogleMap";
+import { UserAvatar } from '@/constants';
 const ViewEvent: React.FC = () => {
 
     const { id } = useParams<{ id: string }>();
@@ -42,15 +43,58 @@ const ViewEvent: React.FC = () => {
                 <p className='text-sm text-brand-dark-gray'>3rd - 5th floor, Huda City Centre Metro Station, Sector 29, Gurugram, Haryana 122002, India</p>
 
                 {/* Map Component */}
-                <div className='h-60 mt-3 rounded-lg shadow-blur'>
-                    <GoogleMap latitude={28.4595} longitude={77.0265}/>
+                <div className='h-40 mt-3 rounded-lg shadow-blur'>
+                    <GoogleMap latitude={28.4595} longitude={77.0265} />
                 </div>
             </div>
 
             {/* Agenda Details */}
             <div className='p-5 border-t border-white'>
                 <h3 className='font-semibold'>Agenda</h3>
-                <p className='text-sm text-brand-dark-gray'>Lorem ipsum dolor sit amet consectetur. Orci justo parturient vitae pellentesque urna. Eu diam accumsan blandit nibh elementum venenatis. Nulla posuere donec risus et accumsan aliquam volutpat integer id. Proin massa quis commodo viverra nisi et. Elementum hac sed nisl lacus tristique faucibus dignissim. Suspendisse habitant nisi diam viverra et. Rhoncus nunc faucibus senectus feugiat iaculis integer commodo. Volutpat id tellus mi leo rhoncus. Metus diam eleifend ornare vitae. Vestibulum non risus mi cras turpis at et. Fermentum at adipiscing ut habitasse sociis consectetur. Volutpat nunc ultricies amet aliquet mauris augue nunc faucibus condimentum. Mauris nunc et turpis malesuada arcu nunc metus.</p>
+
+                {/* Day 1 Agenda Details */}
+                <div>
+                    <span className="text-sm p-1 px-2 block font-semibold mt-5 rounded-md bg-white">Day 1 (Friday, 17th Jan 2025)</span>
+
+                    {/* Hourly Agenda Details */}
+                    <div className='mt-2 px-2'>
+                        {/* 1st hour agenda details */}
+                        <div>
+                            <span className='font-medium text-sm'>12:00AM-07:00AM</span>
+                            <p className='text-sm font-light'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+
+                            {/* Speaker Details (If there are any speakers) */}
+                            <div className='grid grid-cols-4 gap-4'>
+                                {/* Speaker 1 */}
+                                <div className='flex gap-2 items-center mt-2'>
+                                    <img src={UserAvatar} width={36} height={36} alt="Speaker Avatar" className='rounded-full' />
+                                    <div className='flex flex-col'>
+                                        <h4 className='leading-none font-semibold text-sm overflow-hidden text-ellipsis text-nowrap'>John Doe</h4>
+                                        <span className='leading-none text-xs overflow-hidden text-ellipsis text-nowrap'>Klout Club</span>
+                                        <span className='leading-none text-xs font-light overflow-hidden text-ellipsis text-nowrap'>CEO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Event Speakers */}
+            <div className='p-5 border-t border-white'>
+                <h3 className='font-semibold'>Speakers</h3>
+
+                {/* Speaker List */}
+                <div className='grid grid-cols-4 gap-4'>
+                    <div className='text-sm text-center max-w-28 border-2'>
+                        <img src={UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto' />
+                        <h4 className='font-semibold leading-none'>Udit Tiwari</h4>
+                        <p className='leading-none'>Klout Club</p>
+                        <p className='leading-none font-light'>CEO</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     )
