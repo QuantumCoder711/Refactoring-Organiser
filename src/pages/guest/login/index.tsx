@@ -13,7 +13,7 @@ const Login:React.FC = () => {
     <div className='h-full w-full grid place-content-center'>
         <div className='w-96 p-5 shadow-blur rounded-lg'>
             <h1 className='text-2xl font-semibold text-center'>Login</h1>
-
+      
             <form className='mt-8'>
               
             </form>

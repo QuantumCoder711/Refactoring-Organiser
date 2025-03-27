@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
 import Panel from "@/assets/panel.svg";
-import Logo from "@/assets/logo_black_text.svg";
+import Logo from "@/assets/logo.svg";
 
 const Sidebar: React.FC = () => {
     const path = useLocation();

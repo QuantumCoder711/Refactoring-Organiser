@@ -1,6 +1,6 @@
 import React from 'react';
-import Logo from '../assets/logo_black_text.svg';
-import InsightnerLogo from '/insightnerLogo.svg';
+import Logo from '@/assets/logo.svg';
+import InsightnerLogo from '@/assets/insightnerLogo.svg';
 import { Button } from '@/components/ui/button';
 import {
   Avatar,

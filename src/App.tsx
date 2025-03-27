@@ -17,7 +17,7 @@ import GuestLayout from './pages/guest/layout';
 
 const App: React.FC = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   return (
     <Routes>
