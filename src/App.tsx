@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Layout from './pages/admin/layout';
 import Login from './pages/guest/login';
@@ -17,7 +17,15 @@ import GuestLayout from './pages/guest/layout';
 
 const App: React.FC = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // const token = localStorage.getItem('klout-organiser-token');
+    // if(token) {
+    //   setIsAuthenticated(true);
+    // }
+    console.log(isAuthenticated);
+  }, [isAuthenticated]);
 
   return (
     <Routes>

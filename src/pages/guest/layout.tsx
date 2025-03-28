@@ -8,6 +8,9 @@ const GuestLayout: React.FC = () => {
             <section className='flex-1'>
                 <Outlet />
             </section>
+            <footer className='w-full h-10 bg-brand-primary text-white text-center flex items-center justify-center'>
+                <p className='text-sm'>© 2025 Event Management System. All rights reserved.</p>
+            </footer>
         </main>
     )
 }
