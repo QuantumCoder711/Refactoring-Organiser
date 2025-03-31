@@ -3,15 +3,13 @@ import { Input } from '@/components/ui/input';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { domain } from '@/constants';
 import { toast } from 'sonner';
 import { CircleCheckBig, CircleX } from 'lucide-react';
 import useAuthStore from '@/store/authStore';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { setIsAuthenticated, setKloutOrganiserToken } = useAuthStore();
+  const { login } = useAuthStore();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -27,9 +25,7 @@ const Login: React.FC = () => {
     }));
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleLogin = async () => {
     if (!formData.email || !formData.password) {
       toast("Please fill in all required fields", {
         className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -39,39 +35,26 @@ const Login: React.FC = () => {
     }
 
     setIsLoading(true);
-    
+
     try {
-      const response = await axios.post(
-        `${domain}/api/login`, 
-        formData, 
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-      
-      if (response.data.status === 200) {
-        setIsAuthenticated(true);
-        setKloutOrganiserToken(response.data.token);
-        
-        toast(response.data.message, {
+      const response = await login(formData.email, formData.password);
+
+      if (response.status === 200) {
+        toast(response.message, {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheckBig className='size-5' />
         });
-        
+
         navigate('/dashboard');
       } else {
-        toast(response.data.message || "Login Failed", {
+        toast(response.message || "Login Failed", {
           className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleX className='size-5' />
         });
       }
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error) && error.response?.data?.message 
-        ? error.response.data.message 
-        : "Something went wrong";
-        
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+
       toast(errorMessage, {
         className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
         icon: <CircleX className='size-5' />
@@ -114,19 +97,18 @@ const Login: React.FC = () => {
               required
             />
           </div>
-          
-          <div className='max-w-64 w-full text-left px-3'>
-            <Link to='#' className='text-brand-primary text-xs'>Forgot Password?</Link>
-          </div>
-
-          <Button 
-            type="submit" 
-            className='w-64 btn !mt-5'
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </Button>
         </form>
+        <div className='max-w-64 w-full text-left px-3'>
+          <Link to='#' className='text-brand-primary text-xs'>Forgot Password?</Link>
+        </div>
+
+        <Button
+          onClick={handleLogin}
+          className='w-64 btn !mt-5 mx-auto'
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </Button>
 
         <p className='text-center mt-5 text-xs'>
           Don't have an account? <Link to='#' className='text-brand-primary'>Signup Here</Link>

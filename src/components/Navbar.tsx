@@ -10,11 +10,32 @@ import {
 import { UserAvatar } from '@/constants';
 import { Link } from 'react-router-dom';
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import useAuthStore from '@/store/authStore';
+import { useNavigate } from 'react-router-dom';
+
 interface NavbarProps {
   isAuthenticated: boolean;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    useAuthStore.setState({
+      isAuthenticated: false,
+      kloutOrganiserToken: null,
+    });
+    navigate('/login');
+  }
+
   return (
     !isAuthenticated ?
       <header className='flex justify-between p-3'>
@@ -44,12 +65,26 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
             <li>
               <Button className='bg-brand-secondary text-white font-semibold rounded-full h-6 hover:bg-brand-secondary/90 duration-300 cursor-pointer'>Create New Event</Button>
             </li>
-            <li className='flex gap-2 items-center'>
-              <Avatar className='w-10 h-10'>
-                <AvatarImage src={UserAvatar} alt="User" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <span className='font-semibold text-sm'>John Doe</span>
+            <li className=''>
+              <DropdownMenu>
+                <DropdownMenuTrigger className='flex gap-2 items-center cursor-pointer focus:outline-none'>
+                  <Avatar className='w-10 h-10'>
+                    <AvatarImage src={UserAvatar} alt="User" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <span className='font-semibold text-sm'>John Doe</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className='w-40'>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
+                  <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
+                  <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
+                  <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className='cursor-pointer !text-destructive'>Logout</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </li>
           </ul>
         </nav>

@@ -1,23 +1,38 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { login, LoginResponse } from "@/api/auth";
 
 interface AuthStore {
   isAuthenticated: boolean;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
   kloutOrganiserToken: string | null;
-  setKloutOrganiserToken: (kloutOrganiserToken: string | null) => void;
+  login: (email: string, password: string) => Promise<LoginResponse>;
+  logout: () => void;
 }
 
 const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       isAuthenticated: false,
-      setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       kloutOrganiserToken: null,
-      setKloutOrganiserToken: (kloutOrganiserToken) => set({ kloutOrganiserToken }),
+      login: async (email: string, password: string) => {
+        const response = await login(email, password);
+        if (response.status === 200) {
+          set({ 
+            isAuthenticated: true,
+            kloutOrganiserToken: response.token 
+          });
+        }
+        return response;
+      },
+      logout: () => {
+        set({ 
+          isAuthenticated: false,
+          kloutOrganiserToken: null 
+        });
+      }
     }),
     {
-      name: "auth-storage", // unique name for localStorage key
+      name: "auth-storage",
     }
   )
 );
