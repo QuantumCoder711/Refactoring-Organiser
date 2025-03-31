@@ -14,18 +14,11 @@ import AllPhotos from './pages/admin/all-photos';
 import AllReports from './pages/admin/all-reports';
 import ViewEvent from './pages/admin/all-events/view-event';
 import GuestLayout from './pages/guest/layout';
+import useAuthStore from './store/authStore';
 
 const App: React.FC = () => {
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // const token = localStorage.getItem('klout-organiser-token');
-    // if(token) {
-    //   setIsAuthenticated(true);
-    // }
-    console.log(isAuthenticated);
-  }, [isAuthenticated]);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <Routes>
