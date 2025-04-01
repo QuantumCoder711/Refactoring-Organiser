@@ -1,11 +1,6 @@
 import { domain } from "@/constants";
 import axios from "axios";
-
-export interface LoginResponse {
-  status: number;
-  message: string;
-  token: string;
-}
+import { LoginResponse, ProfileResponse } from "@/types/api-responses";
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
     try {
@@ -22,6 +17,24 @@ export const login = async (email: string, password: string): Promise<LoginRespo
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Login failed");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const getProfile = async (token: string): Promise<ProfileResponse> => {
+    try {
+        const response = await axios.post(`${domain}/api/profile`, {}, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return response.data.user;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to fetch profile");
         }
         throw new Error("An unexpected error occurred");
     }
