@@ -27,12 +27,10 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
 
   const handleLogout = () => {
-    useAuthStore.setState({
-      isAuthenticated: false,
-      kloutOrganiserToken: null,
-    });
+    logout();
     navigate('/login');
   }
 
