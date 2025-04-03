@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import useAuthStore from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
-
+import { getImageUrl } from '@/lib/utils';
 interface NavbarProps {
   isAuthenticated: boolean;
 }
@@ -28,6 +28,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
+  const user = useAuthStore(state => state.user);
 
   const handleLogout = () => {
     logout();
@@ -55,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
       :
       <header className='flex items-center bg-brand-background max-h-16'>
         <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
-          <img src={InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
+          <img src={user?.company_logo ? getImageUrl(user?.company_logo) : InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
         </div>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>Dashboard</h2>

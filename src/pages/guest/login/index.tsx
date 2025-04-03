@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { CircleCheckBig, CircleX } from 'lucide-react';
+import { CircleCheckBig, CircleX, Eye, EyeClosed } from 'lucide-react';
 import useAuthStore from '@/store/authStore';
 
 const Login: React.FC = () => {
@@ -16,6 +16,7 @@ const Login: React.FC = () => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -86,16 +87,19 @@ const Login: React.FC = () => {
 
           <div className='w-full max-w-64 mx-auto flex flex-col gap-2'>
             <Label htmlFor="password">Password <span className="text-brand-secondary">*</span></Label>
-            <Input
-              id="password"
-              name="password"
-              type='password'
-              placeholder='Enter your password'
-              className='max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none'
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
+            <div className='relative'>
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder='Enter your password'
+                className='max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none'
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+              />
+              {showPassword ? <Eye onClick={() => setShowPassword(!showPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' /> : <EyeClosed onClick={() => setShowPassword(!showPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' />}
+            </div>
           </div>
         </form>
         <div className='max-w-64 w-full text-left px-3'>

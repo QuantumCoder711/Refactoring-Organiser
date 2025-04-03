@@ -19,4 +19,56 @@ export interface UserType {
     company_name: string;
     designation_name: string;
     deleted_at: string | null;
-}  
+}
+
+export interface EventType {
+    id: number;
+    uuid: string;
+    user_id: number;
+    slug: string;
+    title: string;
+    description: string;
+    event_date: string;
+    location: string;
+    start_time: string;
+    start_time_type: string;
+    end_time: string;
+    end_time_type: string;
+    image: string;
+    event_venue_name: string;
+    event_venue_address_1: string;
+    event_venue_address_2: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
+    google_map_link: string;
+    created_at: string;
+    updated_at: string;
+    status: number;
+    end_minute_time: string;
+    start_minute_time: string;
+    qr_code: string;
+    start_time_format: string;
+    feedback: number;
+    event_start_date: string;
+    event_end_date: string;
+    why_attend_info: string | null;
+    more_information: string | null;
+    t_and_conditions: string | null;
+    pdf_path: string | null;
+    video_url: string | null;
+    printer_count: number | null;
+    view_agenda_by: number;
+    event_otp: string;
+    paid_event: number;
+    event_fee: string;
+    total_attendee: number;
+    total_accepted: number;
+    total_not_accepted: number;
+    total_rejected: number;
+    total_checkedin: number;
+    total_checkedin_speaker: number;
+    total_checkedin_sponsor: number;
+    total_pending_delegate: number;
+}

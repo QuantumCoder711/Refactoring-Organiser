@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
+import Footer from '@/components/Footer';
 
 const Layout: React.FC = () => {
     return (
@@ -10,8 +11,11 @@ const Layout: React.FC = () => {
 
             <section className="flex flex-1 overflow-hidden">
                 <Sidebar />
-                <div className='flex-1 p-5 overflow-y-scroll md:p-10'>
-                    <Outlet />
+                <div className='flex-1 flex flex-col overflow-y-scroll'>
+                    <div className='p-5 md:p-10 flex-1'>
+                        <Outlet />
+                    </div>
+                    <Footer />
                 </div>
             </section>
         </main>
