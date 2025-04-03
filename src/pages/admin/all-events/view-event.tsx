@@ -6,6 +6,7 @@ import { UserAvatar } from '@/constants';
 const ViewEvent: React.FC = () => {
 
     const { id } = useParams<{ id: string }>();
+    console.log(id);
 
     return (
         <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>

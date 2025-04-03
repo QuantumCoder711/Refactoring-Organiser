@@ -36,6 +36,7 @@ const Dashboard: React.FC = () => {
           <div className='mt-5 flex gap-10'>
             <div className='max-w-[405px]'>
               <EventCard
+              uuid='1'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
@@ -47,6 +48,7 @@ const Dashboard: React.FC = () => {
 
             <div className='max-w-[405px]'>
               <EventCard
+              uuid='2'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
@@ -68,6 +70,7 @@ const Dashboard: React.FC = () => {
           <div className='mt-5 flex gap-10'>
             <div className='max-w-[405px]'>
               <EventCard
+              uuid='3'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
@@ -79,6 +82,7 @@ const Dashboard: React.FC = () => {
 
             <div className='max-w-[405px]'>
               <EventCard
+              uuid='4'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
