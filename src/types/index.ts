@@ -72,3 +72,44 @@ export interface EventType {
     total_checkedin_sponsor: number;
     total_pending_delegate: number;
 }
+
+export interface AttendeeType {
+    title: string;
+    id: number;
+    uuid: string;
+    user_id: number;
+    event_id: number;
+    first_name: string;
+    last_name: string;
+    email_id: string;
+    phone_number: string;
+    website: string;
+    linkedin_page_link: string;
+    employee_size: string;
+    company_turn_over: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    image: string | null;
+    virtual_business_card: string | null;
+    profile_completed: number;
+    alternate_mobile_number: string;
+    alternate_email: string | null;
+    company_name: string;
+    industry: string;
+    job_title: string;
+    event_invitation: number;
+    user_invitation_request: number;
+    check_in: number;
+    check_in_second: number | null;
+    check_in_third: number | null;
+    check_in_forth: number | null;
+    check_in_fifth: number | null;
+    check_in_time: string | null;
+    check_in_second_time: string | null;
+    check_in_third_time: string | null;
+    check_in_forth_time: string | null;
+    check_in_fifth_time: string | null;
+    not_invited: number;
+    award_winner: number;
+}

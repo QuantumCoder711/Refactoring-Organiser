@@ -1,4 +1,4 @@
-import { EventType, UserType } from "./index";
+import { AttendeeType, EventType, UserType } from "./index";
 
 export interface LoginResponse {
     status: number;
@@ -20,5 +20,11 @@ export interface EventResponse {
     status: number;
     message: string;
     data: EventType[];
+}
+
+export interface AllEventsAttendeesResponse {
+    status: number;
+    message: string;
+    total_attendees: AttendeeType[];
 }
 // Add more API response types here as needed 

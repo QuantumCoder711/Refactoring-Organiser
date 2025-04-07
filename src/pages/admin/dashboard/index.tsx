@@ -2,15 +2,21 @@ import { Button } from '@/components/ui/button';
 import DummyCardImage from '@/assets/dummyCardImg.png';
 import React from 'react';
 import EventCard from '@/components/EventCard';
+import useEventStore from '@/store/eventStore';
+import useAttendeeStore from '@/store/attendeeStore';
 
 const Dashboard: React.FC = () => {
+
+  const {events} = useEventStore();
+  const {allEventsAttendees} = useAttendeeStore();
+
   return (
     <div>
       {/* Events Information */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
         {[
-          { title: 'Total Events', value: '10' },
-          { title: 'Total Attendees', value: '10' },
+          { title: 'Total Events', value: events.length },
+          { title: 'Total Attendees', value: allEventsAttendees.length },
           { title: 'Total Sponsers', value: '10' },
           { title: 'Upcoming Events', value: '10' }
         ].map((card, index) => (

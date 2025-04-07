@@ -5,7 +5,7 @@ import { EventResponse } from "@/types/api-responses";
 // Fetching All Events List
 export const getAllEvents = async(token: string): Promise<EventResponse> => {
     try {
-        const response = await axios.post(`${domain}/api/events`, {}, {
+        const response = await axios.post(`${domain}/api/eventslist`, {}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
