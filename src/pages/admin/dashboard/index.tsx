@@ -1,16 +1,17 @@
-import { Button } from '@/components/ui/button';
-import DummyCardImage from '@/assets/dummyCardImg.png';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import EventCard from '@/components/EventCard';
 import useEventStore from '@/store/eventStore';
 import useAttendeeStore from '@/store/attendeeStore';
 import useSponsorStore from '@/store/sponsorStore';
+import { filterEvents, getImageUrl } from '@/lib/utils';
 
 const Dashboard: React.FC = () => {
   const { events } = useEventStore();
   const { allEventsAttendees } = useAttendeeStore();
   const { allEventsSponsors } = useSponsorStore();
 
+  const { upcomingEvents, pastEvents } = filterEvents(events);
   return (
     <div>
       {/* Events Information */}
@@ -19,7 +20,7 @@ const Dashboard: React.FC = () => {
           { title: 'Total Events', value: events.length },
           { title: 'Total Attendees', value: allEventsAttendees.length },
           { title: 'Total Sponsers', value: allEventsSponsors.length },
-          { title: 'Upcoming Events', value: '10' }
+          { title: 'Upcoming Events', value: upcomingEvents.length }
         ].map((card, index) => (
           <div
             key={index}
@@ -41,29 +42,20 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className='mt-5 flex gap-10'>
-            <div className='max-w-[405px]'>
-              <EventCard
-                uuid='1'
-                title='Telecom Summit & Awards 2025! (Webinar)'
-                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                date='15-Feb-2025'
-                image={DummyCardImage}
-                imageAlt='Event Image'
-                isLive={true}
-              />
-            </div>
-
-            <div className='max-w-[405px]'>
-              <EventCard
-                uuid='2'
-                title='Telecom Summit & Awards 2025! (Webinar)'
-                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                date='15-Feb-2025'
-                image={DummyCardImage}
-                imageAlt='Event Image'
-              // isLive={true}
-              />
-            </div>
+            {upcomingEvents.map((event) => (
+              <div key={event.uuid} className='max-w-[405px]'>
+                <EventCard
+                  uuid={event.uuid}
+                  title={event.title}
+                  location={event.event_venue_address_2}
+                  date={event.event_date}
+                  image={getImageUrl(event.image)}
+                  imageAlt={event.title}
+                  isLive={false}
+                />
+              </div>
+            ))
+            }
           </div>
         </div>
 
@@ -75,29 +67,19 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className='mt-5 flex gap-10'>
-            <div className='max-w-[405px]'>
-              <EventCard
-                uuid='3'
-                title='Telecom Summit & Awards 2025! (Webinar)'
-                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                date='15-Feb-2025'
-                image={DummyCardImage}
-                imageAlt='Event Image'
-              // isLive={true}
-              />
-            </div>
-
-            <div className='max-w-[405px]'>
-              <EventCard
-                uuid='4'
-                title='Telecom Summit & Awards 2025! (Webinar)'
-                location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                date='15-Feb-2025'
-                image={DummyCardImage}
-                imageAlt='Event Image'
-              // isLive={true}
-              />
-            </div>
+            {pastEvents.map((event) => (
+              <div key={event.uuid} className='max-w-[405px]'>
+                <EventCard
+                  uuid={event.uuid}
+                  title={event.title}
+                  location={event.event_venue_address_2}
+                  date={event.event_date}
+                  image={getImageUrl(event.image)}
+                  imageAlt={event.title}
+                  isLive={false}
+                />
+              </div>
+            ))}
           </div>
         </div>
 

@@ -41,6 +41,22 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
     );
 
+    // Format date from YYYY-MM-DD to DD-MMM-YYYY
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            const day = date.getDate();
+            const month = date.toLocaleString('default', { month: 'short' });
+            const year = date.getFullYear();
+            
+            return `${day}-${month}-${year}`;
+        } catch (error) {
+            return dateString; // Return original if parsing fails
+        }
+    };
+
     return (
         <div className={`${isLive ? 'w-full max-w-lg' : 'w-64'} flex rounded-xl shadow-blur-lg relative`}>
             <div className="h-64 flex flex-col">
@@ -59,7 +75,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     <div className='h-1/2 bottom-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
                         <div className='w-full h-full flex justify-between items-end p-2'>
                             <span className='rounded-full border text-white text-xs h-[15px] w-20 grid place-content-center'>
-                                {date}
+                                {formatDate(date)}
                             </span>
                             {isLive && (
                                 <span className='text-xs text-green-500 font-date-stamp uppercase'>
