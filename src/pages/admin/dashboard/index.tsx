@@ -4,7 +4,7 @@ import EventCard from '@/components/EventCard';
 import useEventStore from '@/store/eventStore';
 import useAttendeeStore from '@/store/attendeeStore';
 import useSponsorStore from '@/store/sponsorStore';
-import { filterEvents, getImageUrl } from '@/lib/utils';
+import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 
 const Dashboard: React.FC = () => {
   const { events } = useEventStore();
@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
                   date={event.event_date}
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
-                  isLive={false}
+                  isLive={isEventLive(event)}
                 />
               </div>
             ))
@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
                   date={event.event_date}
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
-                  isLive={false}
+                  isLive={isEventLive(event)}
                 />
               </div>
             ))}
