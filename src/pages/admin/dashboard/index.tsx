@@ -4,11 +4,12 @@ import React from 'react';
 import EventCard from '@/components/EventCard';
 import useEventStore from '@/store/eventStore';
 import useAttendeeStore from '@/store/attendeeStore';
+import useSponsorStore from '@/store/sponsorStore';
 
 const Dashboard: React.FC = () => {
-
-  const {events} = useEventStore();
-  const {allEventsAttendees} = useAttendeeStore();
+  const { events } = useEventStore();
+  const { allEventsAttendees } = useAttendeeStore();
+  const { allEventsSponsors } = useSponsorStore();
 
   return (
     <div>
@@ -17,7 +18,7 @@ const Dashboard: React.FC = () => {
         {[
           { title: 'Total Events', value: events.length },
           { title: 'Total Attendees', value: allEventsAttendees.length },
-          { title: 'Total Sponsers', value: '10' },
+          { title: 'Total Sponsers', value: allEventsSponsors.length },
           { title: 'Upcoming Events', value: '10' }
         ].map((card, index) => (
           <div
@@ -42,7 +43,7 @@ const Dashboard: React.FC = () => {
           <div className='mt-5 flex gap-10'>
             <div className='max-w-[405px]'>
               <EventCard
-              uuid='1'
+                uuid='1'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
@@ -54,13 +55,13 @@ const Dashboard: React.FC = () => {
 
             <div className='max-w-[405px]'>
               <EventCard
-              uuid='2'
+                uuid='2'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
                 image={DummyCardImage}
                 imageAlt='Event Image'
-                // isLive={true}
+              // isLive={true}
               />
             </div>
           </div>
@@ -76,25 +77,25 @@ const Dashboard: React.FC = () => {
           <div className='mt-5 flex gap-10'>
             <div className='max-w-[405px]'>
               <EventCard
-              uuid='3'
+                uuid='3'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
                 image={DummyCardImage}
                 imageAlt='Event Image'
-                // isLive={true}
+              // isLive={true}
               />
             </div>
 
             <div className='max-w-[405px]'>
               <EventCard
-              uuid='4'
+                uuid='4'
                 title='Telecom Summit & Awards 2025! (Webinar)'
                 location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
                 date='15-Feb-2025'
                 image={DummyCardImage}
                 imageAlt='Event Image'
-                // isLive={true}
+              // isLive={true}
               />
             </div>
           </div>

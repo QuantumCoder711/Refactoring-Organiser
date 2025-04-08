@@ -113,3 +113,5 @@ export interface AttendeeType {
     not_invited: number;
     award_winner: number;
 }
+
+export interface SponsorType extends AttendeeType { }
