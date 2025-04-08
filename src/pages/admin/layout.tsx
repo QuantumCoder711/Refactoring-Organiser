@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
@@ -8,11 +8,14 @@ import useAttendeeStore from '@/store/attendeeStore';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import useSponsorStore from '@/store/sponsorStore';
+import { filterEvents } from '@/lib/utils';
 
 const Layout: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const token = useAuthStore((state) => state.token);
     const { getAllEvents } = useEventStore();
+    const { events } = useEventStore();
+    const { upcomingEvents, pastEvents } = filterEvents(events);
     const { getAllEventsAttendees } = useAttendeeStore();
     const { getAllEventsSponsors } = useSponsorStore();
 
@@ -25,6 +28,10 @@ const Layout: React.FC = () => {
         }
         setLoading(false);
     }, [token]);
+
+    useEffect(()=>{
+        console.log(upcomingEvents, pastEvents);
+    }, [upcomingEvents, pastEvents]);
 
     if(loading) {
         return (
