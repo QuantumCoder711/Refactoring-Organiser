@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className='mt-5 flex gap-10'>
-            {upcomingEvents.map((event) => (
+            {upcomingEvents.slice(0, 3).map((event) => (
               <div key={event.uuid} className='max-w-[405px]'>
                 <EventCard
                   uuid={event.uuid}
@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className='mt-5 flex gap-10'>
-            {pastEvents.map((event) => (
+            {pastEvents.slice(0, 3).map((event) => (
               <div key={event.uuid} className='max-w-[405px]'>
                 <EventCard
                   uuid={event.uuid}
