@@ -6,7 +6,7 @@ interface EventStore {
     events: EventType[];
     setEvents: (events: EventType[]) => void;
     getAllEvents: (token: string) => Promise<void>;
-    getEventById: (id: number) => EventType | null;
+    getEventBySlug: (slug: string | undefined) => EventType | null;
 }
 
 const useEventStore = create<EventStore>((set, get) => ({
@@ -16,9 +16,9 @@ const useEventStore = create<EventStore>((set, get) => ({
         const response = await getAllEvents(token);
         set({ events: response.data });
     },
-    getEventById: (id: number) => {
+    getEventBySlug: (slug: string | undefined) => {
         const { events } = get();
-        return events.find(event => event.id === id) || null;
+        return events.find(event => event.slug === slug) || null;
     }
 }));
 

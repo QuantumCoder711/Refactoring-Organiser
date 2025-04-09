@@ -1,23 +1,24 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import DummyCardImage from "@/assets/dummyCardImg.png";
 import GoogleMap from "@/components/GoogleMap";
 import { UserAvatar } from '@/constants';
 import { Button } from '@/components/ui/button';
-import { isEventLive } from '@/lib/utils';
+import { isEventLive, isEventUpcoming, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { Badge } from '@/components/ui/badge';
 
 const ViewEvent: React.FC = () => {
 
-    const { id } = useParams<{ id: string }>();
-    const event = useEventStore.getState().getEventById(Number(id));
+    const { slug } = useParams<{ slug: string | undefined }>();
+    const event = useEventStore.getState().getEventBySlug(slug);
+    const isLive = isEventLive(event);
+    const isUpcoming = isEventUpcoming(event);
     
 
     return (
         <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>
-            <h1 className='text-2xl font-bold text-center p-5'>Telecom Powerhouse Summit 2025</h1>
-            <img src={DummyCardImage} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+            <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
+            <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
             {/* Time */}
             <div className='text-xs flex gap-2.5 mt-5 justify-center'>
                 <span className='border border-brand-light-gray px-3 rounded-md'>Fri, 14 Jan-20 Feb, 2025</span>
@@ -25,14 +26,21 @@ const ViewEvent: React.FC = () => {
             </div>
 
             <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
-                <Button className='btn-rounded h-6'>View QR Code</Button>
-                <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                {isLive && (
+                    <>
+                        <Button className='btn-rounded h-6'>View QR Code</Button>
+                        <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                    </>
+                )}
+                {isUpcoming && (
+                    <Button className='btn-rounded h-6'>View QR Code</Button>
+                )}
             </div>
 
             {/* Description */}
             <div className='border-t mt-3 p-5 border-white'>
                 <h3 className='font-semibold'>Description</h3>
-                <p className='text-sm mt-2 text-brand-dark-gray'>Lorem ipsum dolor sit amet consectetur. Orci justo parturient vitae pellentesque urna. Eu diam accumsan blandit nibh elementum venenatis. Nulla posuere donec risus et accumsan aliquam volutpat integer id. Proin massa quis commodo viverra nisi et. Elementum hac sed nisl lacus tristique faucibus dignissim. Suspendisse habitant nisi diam viverra et. Rhoncus nunc faucibus senectus feugiat iaculis integer commodo. Volutpat id tellus mi leo rhoncus. Metus diam eleifend ornare vitae. Vestibulum non risus mi cras turpis at et. Fermentum at adipiscing ut habitasse sociis consectetur. Volutpat nunc ultricies amet aliquet mauris augue nunc faucibus condimentum. Mauris nunc et turpis malesuada arcu nunc metus.</p>
+                <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
             </div>
 
 
@@ -40,11 +48,11 @@ const ViewEvent: React.FC = () => {
             <div className='p-5 border-t border-white flex justify-between'>
                 <div className='w-1/2'>
                     <h3 className='font-semibold'>Event OTP</h3>
-                    <p className='text-sm text-brand-dark-gray'>696969</p>
+                    <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
                 </div>
                 <div className='w-1/2 border-l border-white pl-5'>
                     <h3 className='font-semibold'>View Agenda By</h3>
-                    <p className='text-sm text-brand-dark-gray'>All</p>
+                    <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by}</p>
                 </div>
             </div>
 

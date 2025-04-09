@@ -1,12 +1,15 @@
 import EventCard from '@/components/EventCard';
 import { Button } from '@/components/ui/button';
-import React, { useState } from 'react'
-import DummyCardImage from '@/assets/dummyCardImg.png';
+import React, { useState } from 'react';
+import useEventStore from '@/store/eventStore';
+import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 
 const AllEvents: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+    const { events } = useEventStore();
 
+    const { upcomingEvents, pastEvents } = filterEvents(events);
 
     return (
         <div>
@@ -29,29 +32,34 @@ const AllEvents: React.FC = () => {
             {/* Upcoming Events */}
             {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-6'>
 
-                <EventCard
-                    title='Telecom Summit & Awards 2025! (Webinar)'
-                    location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                    date='15-Feb-2025'
-                    image={DummyCardImage}
-                    imageAlt='Event Image'
-                    isLive={true}
-                    uuid='123'
-                />
+                {upcomingEvents.map((event) => (
+                    <EventCard
+                        key={event.uuid}
+                        title={event.title}
+                        location={event.event_venue_address_2}
+                        date={event.event_date}
+                        image={getImageUrl(event.image)}
+                        imageAlt={event.title}
+                        isLive={isEventLive(event)}
+                        slug={event.slug}
+                    />
+                ))}
             </div>}
 
 
             {/* Past Events */}
             {activeTab === 'past' && <div className='mt-5'>
-                <EventCard
-                    title='Telecom Summit & Awards 2025! (Webinar)'
-                    location='Hotel Le-Meridien Hotel(Sovereign - 1), New-Delhi'
-                    date='15-Feb-2025'
-                    image={DummyCardImage}
-                    imageAlt='Event Image'
-                    uuid='1236'
-                // isLive={true}
-                />
+                {pastEvents.map((event) => (
+                    <EventCard
+                        key={event.uuid}
+                        title={event.title}
+                        location={event.event_venue_address_2}
+                        date={event.event_date}
+                        image={getImageUrl(event.image)}
+                        imageAlt={event.title}
+                        slug={event.slug}
+                    />
+                ))}
             </div>}
         </div>
     )

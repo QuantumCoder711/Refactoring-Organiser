@@ -45,7 +45,7 @@ const Dashboard: React.FC = () => {
             {upcomingEvents.slice(0, 3).map((event) => (
               <div key={event.uuid} className='max-w-[405px]'>
                 <EventCard
-                  uuid={event.uuid}
+                  slug={event.slug}
                   title={event.title}
                   location={event.event_venue_address_2}
                   date={event.event_date}
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
             {pastEvents.slice(0, 3).map((event) => (
               <div key={event.uuid} className='max-w-[405px]'>
                 <EventCard
-                  uuid={event.uuid}
+                  slug={event.slug}
                   title={event.title}
                   location={event.event_venue_address_2}
                   date={event.event_date}

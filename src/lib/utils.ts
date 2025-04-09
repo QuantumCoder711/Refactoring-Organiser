@@ -36,7 +36,8 @@ export const filterEvents = (events: EventType[]): { upcomingEvents: EventType[]
   return { upcomingEvents, pastEvents };
 };
 
-export const isEventLive = (event: EventType): boolean => {
+export const isEventLive = (event: EventType | null): boolean => {
+  if (!event) return false;
   if (!event.event_date) return false;
   
   const now = new Date();
@@ -64,4 +65,22 @@ export const isEventLive = (event: EventType): boolean => {
   
   // Event is live if current time is between start and end times
   return now >= eventStart && now <= eventEnd;
+}
+
+export const isEventUpcoming = (event: EventType | null): boolean => {
+  if (!event) return false;
+  if (!event.event_date) return false;
+  
+  const now = new Date();
+  const eventDate = new Date(event.event_date);
+  
+  // Set both dates to midnight for date comparison
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  
+  const eventDay = new Date(eventDate);
+  eventDay.setHours(0, 0, 0, 0);
+  
+  // Event is upcoming if it's after today
+  return eventDay > today;
 }
