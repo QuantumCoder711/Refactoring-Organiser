@@ -3,10 +3,16 @@ import { useParams } from 'react-router-dom';
 import DummyCardImage from "@/assets/dummyCardImg.png";
 import GoogleMap from "@/components/GoogleMap";
 import { UserAvatar } from '@/constants';
+import { Button } from '@/components/ui/button';
+import { isEventLive } from '@/lib/utils';
+import useEventStore from '@/store/eventStore';
+import { Badge } from '@/components/ui/badge';
+
 const ViewEvent: React.FC = () => {
 
     const { id } = useParams<{ id: string }>();
-    console.log(id);
+    const event = useEventStore.getState().getEventById(Number(id));
+    
 
     return (
         <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>
@@ -14,8 +20,13 @@ const ViewEvent: React.FC = () => {
             <img src={DummyCardImage} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
             {/* Time */}
             <div className='text-xs flex gap-2.5 mt-5 justify-center'>
-                <span className='border border-brand-light-gray px-3 rounded-lg'>Fri, 14 Jan-20 Feb, 2025</span>
-                <span className='border border-brand-light-gray px-3 rounded-lg'>09:00 AM - 05:00 PM</span>
+                <span className='border border-brand-light-gray px-3 rounded-md'>Fri, 14 Jan-20 Feb, 2025</span>
+                <span className='border border-brand-light-gray px-3 rounded-md'>09:00 AM - 05:00 PM</span>
+            </div>
+
+            <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                <Button className='btn-rounded h-6'>View QR Code</Button>
+                <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
             </div>
 
             {/* Description */}

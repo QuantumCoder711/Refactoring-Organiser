@@ -21,6 +21,7 @@ import {
 import useAuthStore from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '@/lib/utils';
+
 interface NavbarProps {
   isAuthenticated: boolean;
 }
@@ -62,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <h2 className='text-xl font-semibold'>Dashboard</h2>
           <ul className='flex gap-5 items-center'>
             <li>
-              <Button className='bg-brand-secondary text-white font-semibold rounded-full h-6 hover:bg-brand-secondary/90 duration-300 cursor-pointer'>Create New Event</Button>
+              <Button className='btn-rounded !px-3'>Create New Event</Button>
             </li>
             <li className=''>
               <DropdownMenu>

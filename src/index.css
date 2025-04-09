@@ -147,6 +147,10 @@
   .btn {
     @apply bg-brand-primary px-5 h-8 text-white transition-all hover:bg-brand-primary-dark cursor-pointer duration-300;
   }
+
+  .btn-rounded {
+    @apply bg-brand-secondary px-5 h-6 py-1 rounded-full text-white transition-all hover:bg-brand-secondary cursor-pointer duration-300;
+  }
 }
 
 .shadow-blur {
