@@ -7,13 +7,23 @@ import { isEventLive, isEventUpcoming, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { Badge } from '@/components/ui/badge';
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+
+
 const ViewEvent: React.FC = () => {
 
-    const { slug } = useParams<{ slug: string | undefined }>();
-    const event = useEventStore.getState().getEventBySlug(slug);
+    const { slug } = useParams<{ slug: string }>();
+    const event = useEventStore((state) => state.getEventBySlug(slug));
+
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
-    
 
     return (
         <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>
@@ -33,7 +43,23 @@ const ViewEvent: React.FC = () => {
                     </>
                 )}
                 {isUpcoming && (
-                    <Button className='btn-rounded h-6'>View QR Code</Button>
+                    <div className='col-span-2 flex justify-center'>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button className='btn-rounded h-6'>View QR Code</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                    <DialogDescription className="text-center">
+                                        <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                                        <Button className='btn mx-auto mt-6'>Download</Button>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+
+                    </div>
                 )}
             </div>
 
