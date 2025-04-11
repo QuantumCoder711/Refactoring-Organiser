@@ -72,15 +72,19 @@ export const isEventUpcoming = (event: EventType | null): boolean => {
   if (!event.event_date) return false;
   
   const now = new Date();
+  
+  // Parse event start time
+  const startTimeParts = `${event.start_time}:${event.start_minute_time} ${event.start_time_type}`.match(/(\d+):(\d+) (AM|PM)/i);
+  
+  if (!startTimeParts) return false;
+  
+  // Create event datetime object
   const eventDate = new Date(event.event_date);
+  let startHours = parseInt(startTimeParts[1]);
+  if (startTimeParts[3].toUpperCase() === 'PM' && startHours < 12) startHours += 12;
+  if (startTimeParts[3].toUpperCase() === 'AM' && startHours === 12) startHours = 0;
+  eventDate.setHours(startHours, parseInt(startTimeParts[2]), 0, 0);
   
-  // Set both dates to midnight for date comparison
-  const today = new Date(now);
-  today.setHours(0, 0, 0, 0);
-  
-  const eventDay = new Date(eventDate);
-  eventDay.setHours(0, 0, 0, 0);
-  
-  // Event is upcoming if it's after today
-  return eventDay > today;
+  // Event is upcoming if it's after current time
+  return now < eventDate;
 }
