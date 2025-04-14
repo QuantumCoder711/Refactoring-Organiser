@@ -34,4 +34,13 @@ export interface AllEventsSponsorsResponse {
     data: SponsorType[];
     totalsponsors: number;
 }
+
+export interface SingleEventAttendeesResponse {
+    status: number;
+    message: string;
+    data: AttendeeType[];
+    excel_data: AttendeeType[];
+    total_attendees: number;
+}
+
 // Add more API response types here as needed 

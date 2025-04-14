@@ -15,6 +15,7 @@ import AllReports from './pages/admin/all-reports';
 import ViewEvent from './pages/admin/all-events/view-event';
 import GuestLayout from './pages/guest/layout';
 import useAuthStore from './store/authStore';
+import Attendees from './pages/admin/all-events/attendees';
 
 const App: React.FC = () => {
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
       <Route element={
         isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
       }>
+        {/* Surface Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/all-attendees" element={<AllAttendees />} />
@@ -38,7 +40,10 @@ const App: React.FC = () => {
         <Route path="/all-charts" element={<AllCharts />} />
         <Route path="/all-photos" element={<AllPhotos />} />
         <Route path="/all-reports" element={<AllReports />} />
+
+        {/* Deep Routes */}
         <Route path="/all-events/view/:slug" element={<ViewEvent />} />
+        <Route path="/all-events/attendees/:slug" element={<Attendees />} />
       </Route>
 
       <Route path="/" element={
