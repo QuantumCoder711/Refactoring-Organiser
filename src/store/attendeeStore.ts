@@ -1,6 +1,6 @@
-import { deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
+import { customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
 import { AttendeeType } from "@/types";
-import { DeleteAttendeeResponse } from "@/types/api-responses";
+import { CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
 import { create } from "zustand";
 
 interface AttendeeStore {
@@ -10,6 +10,7 @@ interface AttendeeStore {
     getSingleEventAttendees: (token: string, uuid: string) => Promise<void>;
     loading: boolean;
     deleteAttendee: (id: number, token: string) => Promise<DeleteAttendeeResponse>;
+    customCheckIn: (uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
 }
 
 const useAttendeeStore = create<AttendeeStore>((set) => ({
@@ -55,6 +56,24 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             } else {
                 set({ loading: false });
                 throw new Error(response.message);
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Custom Check In
+    customCheckIn: async (uuid: string, event_id: number, user_id: number, token: string) => {
+        try {
+            set({ loading: true });
+            const response = await customCheckIn(token, uuid, event_id, user_id);
+            if (response.status === 200) {
+                set((state) => ({
+                    allEventsAttendees: state.allEventsAttendees.map(attendee => attendee.uuid === uuid ? { ...attendee, check_in: 1 } : attendee)
+                }));
             }
             return response;
         } catch (error) {

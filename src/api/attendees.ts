@@ -1,6 +1,6 @@
 import { domain } from "@/constants";
 import axios from "axios";
-import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse } from "@/types/api-responses";
+import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse, CustomCheckInResponse } from "@/types/api-responses";
 
 // All Attendees List of All Events
 export const getAllEventsAttendees = async (token: string): Promise<AllEventsAttendeesResponse> => {
@@ -53,6 +53,29 @@ export const deleteAttendee = async (token: string, id: number): Promise<DeleteA
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to delete attendee");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+
+// Custom Check In
+export const customCheckIn = async (token: string, uuid: string, event_id: number, user_id: number): Promise<CustomCheckInResponse> => {
+    try {
+        const response = await axios.post(`${domain}/api/manual-check-in`, {
+            attendee_uuid: uuid,
+            event_id,
+            user_id
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to custom check in");
         }
         throw new Error("An unexpected error occurred");
     }

@@ -141,6 +141,17 @@
   html {
     font-family: var(--font-sans);
   }
+
+  /*   
+  ::-webkit-scrollbar {
+    width: 0;
+    display: none;
+  }
+  
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  } */
 }
 
 @layer utilities {
@@ -150,6 +161,10 @@
 
   .btn-rounded {
     @apply bg-brand-secondary px-5 h-6 py-1 rounded-full text-white transition-all hover:bg-brand-secondary cursor-pointer duration-300;
+  }
+
+  .input {
+    @apply max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none;
   }
 }
 

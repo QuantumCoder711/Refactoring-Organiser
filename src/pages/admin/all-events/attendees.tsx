@@ -39,14 +39,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import useAuthStore from '@/store/authStore';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 
 const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
-  const { token } = useAuthStore(state => state);
-  const { allEventsAttendees, loading, deleteAttendee } = useAttendeeStore(state => state);
+  const { token, user } = useAuthStore(state => state);
+  const { allEventsAttendees, loading, deleteAttendee, customCheckIn } = useAttendeeStore(state => state);
 
   const buttons: string[] = [
     "Add Attendee",
@@ -59,9 +68,27 @@ const Attendees: React.FC = () => {
   ];
 
   const handleDeleteAttendee = async (id: number) => {
-    if(token) {
+    if (token) {
       const response = await deleteAttendee(id, token);
-      if(response.status === 200) {
+      if (response.status === 200) {
+        toast(response.message, {
+          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleCheck className='size-5' />
+        });
+      } else {
+        toast(response.message, {
+          className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleX className='size-5' />
+        });
+      }
+    }
+  }
+
+
+  const handleCustomCheckIn = async (uuid: string) => {
+    if (token && event && user) {
+      const response = await customCheckIn(uuid, event?.id, user?.id, token);
+      if (response.status === 200) {
         toast(response.message, {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className='size-5' />
@@ -110,24 +137,70 @@ const Attendees: React.FC = () => {
           <span className='font-semibold text-sm'>Search Result: {allEventsAttendees.length}</span>
         </div>
 
-        <Table className='mt-[68px]'>
+        {/* Filters Bar */}
+        <div className='flex w-full gap-2.5 mt-4'>
+          {/* Search By Name */}
+          <Input
+            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+            placeholder='Search by name' />
+
+          {/* Search By Company */}
+          <Input
+            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+            placeholder='Search by company' />
+
+          {/* Search By Designation */}
+          <Input
+            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+            placeholder='Search by designation' />
+
+          {/* Filter By Check-In */}
+          <Select>
+            <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectValue placeholder="Check-IN" />
+            </SelectTrigger>
+            <SelectContent className='!text-sm !font-semibold'>
+              <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
+              <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Filter By Role */}
+          <Select>
+            <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectValue placeholder="Role" />
+            </SelectTrigger>
+            <SelectContent className='!text-sm !font-semibold'>
+              <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
+              <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
+              <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
+              <SelectItem value="panelist" className='cursor-pointer'>Panelist</SelectItem>
+              <SelectItem value="moderator" className='cursor-pointer'>Moderator</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'>Delete</Button>
+
+        </div>
+
+        <Table className='mt-4'>
           <TableCaption>A list of your recent invoices.</TableCaption>
-          <TableHeader className='bg-brand-light-gray rounded-[10px]'>
-            <TableRow>
-              <TableHead className="text-left min-w-10"><Checkbox className='bg-white border-brand-dark-gray cursor-pointer' /></TableHead>
-              <TableHead className="text-left min-w-10">Sr.No</TableHead>
-              <TableHead className="text-left min-w-10">Name</TableHead>
-              <TableHead className="text-left min-w-10">Desig...</TableHead>
-              <TableHead className="text-left min-w-10">Comp...</TableHead>
-              <TableHead className="text-left min-w-10">Email</TableHead>
-              <TableHead className="text-left min-w-10">A. Email</TableHead>
-              <TableHead className="text-left min-w-10">Mobile</TableHead>
-              <TableHead className="text-left min-w-10">A. Mo...</TableHead>
-              <TableHead className="text-left min-w-10">Role</TableHead>
-              <TableHead className="text-left min-w-10">Award...</TableHead>
-              <TableHead className="text-left min-w-10">Check...</TableHead>
-              <TableHead className="text-left min-w-10">Check...</TableHead>
-              <TableHead className="text-left min-w-10">Actions</TableHead>
+          <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+            <TableRow className='!text-base'>
+              <TableHead className="text-left min-w-10 !px-2"><Checkbox className='bg-white border-brand-dark-gray cursor-pointer' /></TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">A. Email</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Check-IN(1st)</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Check-IN(2nd)</TableHead>
+              <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -150,7 +223,7 @@ const Attendees: React.FC = () => {
 
                   {/* For Viewing the Event */}
                   <Dialog>
-                    <DialogTrigger className='cursor-pointer'><Eye width={12} height={9} /></DialogTrigger>
+                    <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} /></DialogTrigger>
                     <DialogContent className="max-w-md p-6">
                       <DialogHeader className="space-y-2">
                         <DialogTitle className="text-2xl font-bold text-brand-primary">
@@ -195,12 +268,12 @@ const Attendees: React.FC = () => {
                   </Dialog>
 
                   {/* Edit Event */}
-                  <Link to="#" className=''><SquarePen size={8.5} /></Link>
+                  <Link to="#" className=''><SquarePen width={9.78} height={9.5} /></Link>
 
                   {/* Custom Check-In User */}
                   <AlertDialog>
                     <AlertDialogTrigger className='cursor-pointer'>
-                      <UserCheck width={12} height={9} className='fill-brand-primary stroke-brand-primary' />
+                      <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary' />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
@@ -211,16 +284,15 @@ const Attendees: React.FC = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white'>Continue</AlertDialogAction>
+                        <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
 
-
                   {/* Delete Attendee */}
                   <AlertDialog>
                     <AlertDialogTrigger className='cursor-pointer'>
-                      <Trash width={7} height={9} className='fill-brand-secondary stroke-brand-secondary' />
+                      <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary' />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>

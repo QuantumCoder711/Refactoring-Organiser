@@ -78,7 +78,7 @@ const Login: React.FC = () => {
               name="email"
               type='email'
               placeholder='Enter your email'
-              className='max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none'
+              className='input'
               value={formData.email}
               onChange={handleInputChange}
               required
@@ -93,7 +93,7 @@ const Login: React.FC = () => {
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
-                className='max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none'
+                className='input'
                 value={formData.password}
                 onChange={handleInputChange}
                 required
