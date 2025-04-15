@@ -1,6 +1,6 @@
 import { domain } from "@/constants";
 import axios from "axios";
-import { AllEventsAttendeesResponse, SingleEventAttendeesResponse } from "@/types/api-responses";
+import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse } from "@/types/api-responses";
 
 // All Attendees List of All Events
 export const getAllEventsAttendees = async (token: string): Promise<AllEventsAttendeesResponse> => {
@@ -40,4 +40,20 @@ export const getSingleEventAttendees = async (token: string, uuid: string): Prom
 }
 
 
-
+// Delete Attendee
+export const deleteAttendee = async (token: string, id: number): Promise<DeleteAttendeeResponse> => {
+    try {
+        const response = await axios.delete(`${domain}/api/attendees/${id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to delete attendee");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}

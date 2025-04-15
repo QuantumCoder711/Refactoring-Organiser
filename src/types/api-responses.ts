@@ -43,4 +43,9 @@ export interface SingleEventAttendeesResponse {
     total_attendees: number;
 }
 
+
+export interface DeleteAttendeeResponse {
+    status: number;
+    message: string;
+}
 // Add more API response types here as needed 
