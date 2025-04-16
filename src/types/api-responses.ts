@@ -53,4 +53,9 @@ export interface CustomCheckInResponse {
     status: number;
     message: string;
 }
+
+export interface BulkDeleteAttendeesResponse {
+    message: string;
+    status: number;
+}
 // Add more API response types here as needed 

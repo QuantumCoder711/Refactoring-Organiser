@@ -1,6 +1,6 @@
-import { customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
+import { bulkDeleteAttendees, customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
 import { AttendeeType } from "@/types";
-import { CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
+import { BulkDeleteAttendeesResponse, CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
 import { create } from "zustand";
 
 interface AttendeeStore {
@@ -11,6 +11,7 @@ interface AttendeeStore {
     loading: boolean;
     deleteAttendee: (id: number, token: string) => Promise<DeleteAttendeeResponse>;
     customCheckIn: (uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
+    bulkDeleteAttendees: (token: string, ids: number[]) => Promise<BulkDeleteAttendeesResponse>;
 }
 
 const useAttendeeStore = create<AttendeeStore>((set) => ({
@@ -73,6 +74,24 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             if (response.status === 200) {
                 set((state) => ({
                     allEventsAttendees: state.allEventsAttendees.map(attendee => attendee.uuid === uuid ? { ...attendee, check_in: 1 } : attendee)
+                }));
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Bulk Delete Attendees
+    bulkDeleteAttendees: async (token: string, ids: number[]) => {
+        try {
+            set({ loading: true });
+            const response = await bulkDeleteAttendees(token, ids);
+            if (response.status === 200) {
+                set((state) => ({
+                    allEventsAttendees: state.allEventsAttendees.filter(attendee => !ids.includes(attendee.id))
                 }));
             }
             return response;

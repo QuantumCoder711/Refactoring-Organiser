@@ -1,5 +1,5 @@
 import useAttendeeStore from '@/store/attendeeStore';
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
@@ -50,12 +50,36 @@ import {
 } from "@/components/ui/select";
 
 
-
 const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
   const { token, user } = useAuthStore(state => state);
-  const { allEventsAttendees, loading, deleteAttendee, customCheckIn } = useAttendeeStore(state => state);
+  const { allEventsAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees } = useAttendeeStore(state => state);
+
+  // Filter states
+  const [nameFilter, setNameFilter] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
+  const [designationFilter, setDesignationFilter] = useState('');
+  const [checkInFilter, setCheckInFilter] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('');
+
+  // Add selected attendees state
+  const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
+
+  // Filtered attendees
+  const filteredAttendees = useMemo(() => {
+    return allEventsAttendees.filter(attendee => {
+      const nameMatch = `${attendee.first_name} ${attendee.last_name}`.toLowerCase().includes(nameFilter.toLowerCase());
+      const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
+      const designationMatch = attendee.job_title?.toLowerCase().includes(designationFilter.toLowerCase()) ?? false;
+      const checkInMatch = checkInFilter === '' || 
+        (checkInFilter === '1' && attendee.check_in === 1) || 
+        (checkInFilter === '0' && attendee.check_in === 0);
+      const roleMatch = roleFilter === '' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
+
+      return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
+    });
+  }, [allEventsAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
   const buttons: string[] = [
     "Add Attendee",
@@ -102,6 +126,47 @@ const Attendees: React.FC = () => {
     }
   }
 
+  // Handle checkbox selection
+  const handleSelectAttendee = (id: number, isSelected: boolean) => {
+    setSelectedAttendees(prev => {
+      const newSet = new Set(prev);
+      if (isSelected) {
+        newSet.add(id);
+      } else {
+        newSet.delete(id);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle select all
+  const handleSelectAll = (isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedAttendees(new Set(filteredAttendees.map(attendee => attendee.id)));
+    } else {
+      setSelectedAttendees(new Set());
+    }
+  };
+
+  // Handle delete selected
+  const handleDeleteSelected = async () => {
+    const selectedIds = Array.from(selectedAttendees);
+    if (token && selectedIds.length > 0) {
+      const response = await bulkDeleteAttendees(token, selectedIds);
+      if (response.status === 200) {
+        toast(response.message, {
+          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleCheck className='size-5' />
+        });
+      } else {
+        toast(response.message, {
+          className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleX className='size-5' />
+        });
+      }
+    }
+  };
+
   if (loading) return <Wave />
 
   return (
@@ -134,7 +199,7 @@ const Attendees: React.FC = () => {
           <span className='rounded-sm !w-[83px] !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm'>10/Page <ChevronDown /></span>
           <span className='font-semibold text-sm'>Total Attendees: {allEventsAttendees.length}</span>
           <span className='font-semibold text-sm'>CheckIn 1st: {allEventsAttendees.length}</span>
-          <span className='font-semibold text-sm'>Search Result: {allEventsAttendees.length}</span>
+          <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
         </div>
 
         {/* Filters Bar */}
@@ -142,20 +207,29 @@ const Attendees: React.FC = () => {
           {/* Search By Name */}
           <Input
             className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by name' />
+            placeholder='Search by name'
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+          />
 
           {/* Search By Company */}
           <Input
             className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by company' />
+            placeholder='Search by company'
+            value={companyFilter}
+            onChange={(e) => setCompanyFilter(e.target.value)}
+          />
 
           {/* Search By Designation */}
           <Input
             className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by designation' />
+            placeholder='Search by designation'
+            value={designationFilter}
+            onChange={(e) => setDesignationFilter(e.target.value)}
+          />
 
           {/* Filter By Check-In */}
-          <Select>
+          <Select value={checkInFilter} onValueChange={setCheckInFilter}>
             <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
               <SelectValue placeholder="Check-IN" />
             </SelectTrigger>
@@ -166,7 +240,7 @@ const Attendees: React.FC = () => {
           </Select>
 
           {/* Filter By Role */}
-          <Select>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
               <SelectValue placeholder="Role" />
             </SelectTrigger>
@@ -179,7 +253,13 @@ const Attendees: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Button className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'>Delete</Button>
+          <Button 
+            className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
+            onClick={handleDeleteSelected}
+            disabled={selectedAttendees.size === 0}
+          >
+            Delete
+          </Button>
 
         </div>
 
@@ -187,7 +267,13 @@ const Attendees: React.FC = () => {
           <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
             <TableRow className='!text-base'>
-              <TableHead className="text-left min-w-10 !px-2"><Checkbox className='bg-white border-brand-dark-gray cursor-pointer' /></TableHead>
+              <TableHead className="text-left min-w-10 !px-2">
+                <Checkbox 
+                  className='bg-white border-brand-dark-gray cursor-pointer'
+                  checked={selectedAttendees.size === filteredAttendees.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
               <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
@@ -204,9 +290,15 @@ const Attendees: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allEventsAttendees.map((attendee: AttendeeType, index: number) => (
+            {filteredAttendees.map((attendee: AttendeeType, index: number) => (
               <TableRow key={attendee.id}>
-                <TableCell className="text-left min-w-10"><Checkbox className='bg-white border-brand-dark-gray cursor-pointer' /></TableCell>
+                <TableCell className="text-left min-w-10">
+                  <Checkbox 
+                    className='bg-white border-brand-dark-gray cursor-pointer'
+                    checked={selectedAttendees.has(attendee.id)}
+                    onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
+                  />
+                </TableCell>
                 <TableCell className="text-left min-w-10 font-medium">{index + 1}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.first_name + " " + attendee.last_name}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.job_title}</TableCell>
@@ -216,7 +308,7 @@ const Attendees: React.FC = () => {
                 <TableCell className="text-left min-w-10">{attendee.phone_number}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.alternate_mobile_number}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.status}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.award_winner}</TableCell>
+                <TableCell className="text-left min-w-10">{attendee.award_winner === 1 ? "Yes" : "No"}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.check_in}</TableCell>
                 <TableCell className="text-left min-w-10">{attendee.check_in}</TableCell>
                 <TableCell className="text-left min-w-10 flex items-center gap-1.5">

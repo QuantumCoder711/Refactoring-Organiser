@@ -1,6 +1,6 @@
 import { domain } from "@/constants";
 import axios from "axios";
-import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse, CustomCheckInResponse } from "@/types/api-responses";
+import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse, CustomCheckInResponse, BulkDeleteAttendeesResponse } from "@/types/api-responses";
 
 // All Attendees List of All Events
 export const getAllEventsAttendees = async (token: string): Promise<AllEventsAttendeesResponse> => {
@@ -80,3 +80,24 @@ export const customCheckIn = async (token: string, uuid: string, event_id: numbe
         throw new Error("An unexpected error occurred");
     }
 }
+
+
+// Bulk Delete Attendees
+export const bulkDeleteAttendees = async (token: string, ids: number[]): Promise<BulkDeleteAttendeesResponse> => {
+    try {
+        const response = await axios.post(`${domain}/api/delete-multiple-attendees`, {ids},{
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to bulk delete attendees");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+
