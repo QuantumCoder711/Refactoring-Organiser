@@ -1,10 +1,11 @@
 import useAttendeeStore from '@/store/attendeeStore';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
+import { dateDifference } from '@/lib/utils';
 
 import {
   Table,
@@ -56,6 +57,17 @@ const Attendees: React.FC = () => {
   const { token, user } = useAuthStore(state => state);
   const { allEventsAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees } = useAttendeeStore(state => state);
 
+  // Date Difference State
+  const [dateDiff, setDateDiff] = useState<number>(0);
+
+  // Calculate date difference when event changes
+  useEffect(() => {
+    if (event?.event_start_date && event?.event_end_date) {
+      const diff = dateDifference(event.event_start_date, event.event_end_date);
+      setDateDiff(diff);
+    }
+  }, [event]);
+
   // Filter states
   const [nameFilter, setNameFilter] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
@@ -81,6 +93,7 @@ const Attendees: React.FC = () => {
     });
   }, [allEventsAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
+  // Buttons
   const buttons: string[] = [
     "Add Attendee",
     "Send Reminder",
@@ -91,6 +104,7 @@ const Attendees: React.FC = () => {
     "Thank You message"
   ];
 
+  // Handle delete attendee
   const handleDeleteAttendee = async (id: number) => {
     if (token) {
       const response = await deleteAttendee(id, token);
@@ -108,7 +122,7 @@ const Attendees: React.FC = () => {
     }
   }
 
-
+  // Handle custom check-in
   const handleCustomCheckIn = async (uuid: string) => {
     if (token && event && user) {
       const response = await customCheckIn(uuid, event?.id, user?.id, token);
@@ -167,6 +181,78 @@ const Attendees: React.FC = () => {
     }
   };
 
+  // Generate check-in columns based on date difference
+  const renderCheckInColumns = () => {
+    const columns = [];
+    if (dateDiff >= 0) {
+      columns.push(
+        <TableHead key="check-in-1" className="text-left min-w-10 !px-2">Check-IN(1st)</TableHead>
+      );
+    }
+    if (dateDiff >= 1) {
+      columns.push(
+        <TableHead key="check-in-2" className="text-left min-w-10 !px-2">Check-IN(2nd)</TableHead>
+      );
+    }
+    if (dateDiff >= 2) {
+      columns.push(
+        <TableHead key="check-in-3" className="text-left min-w-10 !px-2">Check-IN(3rd)</TableHead>
+      );
+    }
+    if (dateDiff >= 3) {
+      columns.push(
+        <TableHead key="check-in-4" className="text-left min-w-10 !px-2">Check-IN(4th)</TableHead>
+      );
+    }
+    if (dateDiff >= 4) {
+      columns.push(
+        <TableHead key="check-in-5" className="text-left min-w-10 !px-2">Check-IN(5th)</TableHead>
+      );
+    }
+    return columns;
+  };
+
+  // Generate check-in data cells based on date difference
+  const renderCheckInData = (attendee: AttendeeType) => {
+    const cells = [];
+    if (dateDiff >= 0) {
+      cells.push(
+        <TableCell key="check-in-1" className="text-left min-w-10">
+          {attendee.check_in !== null && attendee.check_in !== undefined ? attendee.check_in : "-"}
+        </TableCell>
+      );
+    }
+    if (dateDiff >= 1) {
+      cells.push(
+        <TableCell key="check-in-2" className="text-left min-w-10">
+          {attendee.check_in_second !== null && attendee.check_in_second !== undefined ? attendee.check_in_second : "-"}
+        </TableCell>
+      );
+    }
+    if (dateDiff >= 2) {
+      cells.push(
+        <TableCell key="check-in-3" className="text-left min-w-10">
+          {attendee.check_in_third !== null && attendee.check_in_third !== undefined ? attendee.check_in_third : "-"}
+        </TableCell>
+      );
+    }
+    if (dateDiff >= 3) {
+      cells.push(
+        <TableCell key="check-in-4" className="text-left min-w-10">
+          {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ? attendee.check_in_forth : "-"}
+        </TableCell>
+      );
+    }
+    if (dateDiff >= 4) {
+      cells.push(
+        <TableCell key="check-in-5" className="text-left min-w-10">
+          {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ? attendee.check_in_fifth : "-"}
+        </TableCell>
+      );
+    }
+    return cells;
+  };
+
   if (loading) return <Wave />
 
   return (
@@ -183,6 +269,13 @@ const Attendees: React.FC = () => {
           <Button className='btn !rounded-[10px] !px-3'>QR Code</Button>
         </div>
       </div>
+
+      {/* Add Date Difference Display */}
+      {dateDiff > 0 && (
+        <div className="mt-4 text-sm text-gray-600">
+          Event Duration: {dateDiff} {dateDiff === 1 ? 'day' : 'days'}
+        </div>
+      )}
 
       {/* Buttons Row */}
       <div className='flex gap-3.5 mt-6'>
@@ -284,8 +377,7 @@ const Attendees: React.FC = () => {
               <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Check-IN(1st)</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Check-IN(2nd)</TableHead>
+              {renderCheckInColumns()}
               <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -300,17 +392,36 @@ const Attendees: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell className="text-left min-w-10 font-medium">{index + 1}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.first_name + " " + attendee.last_name}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.job_title}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.company_name}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.email_id}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.alternate_email}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.phone_number}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.alternate_mobile_number}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.status}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.award_winner === 1 ? "Yes" : "No"}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.check_in}</TableCell>
-                <TableCell className="text-left min-w-10">{attendee.check_in}</TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.job_title || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.company_name || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.email_id || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.alternate_email || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.phone_number || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.alternate_mobile_number || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.status || "-"}
+                </TableCell>
+                <TableCell className="text-left min-w-10">
+                  {attendee.award_winner !== null && attendee.award_winner !== undefined 
+                    ? (attendee.award_winner === 1 ? "Yes" : "No") 
+                    : "-"}
+                </TableCell>
+                {renderCheckInData(attendee)}
                 <TableCell className="text-left min-w-10 flex items-center gap-1.5">
 
                   {/* For Viewing the Event */}
