@@ -87,7 +87,7 @@ const Attendees: React.FC = () => {
       const checkInMatch = checkInFilter === '' || 
         (checkInFilter === '1' && attendee.check_in === 1) || 
         (checkInFilter === '0' && attendee.check_in === 0);
-      const roleMatch = roleFilter === '' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
+      const roleMatch = roleFilter === '' || roleFilter === 'all' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
 
       return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
     });
@@ -156,6 +156,7 @@ const Attendees: React.FC = () => {
   // Handle select all
   const handleSelectAll = (isSelected: boolean) => {
     if (isSelected) {
+      // Only select the currently filtered attendees
       setSelectedAttendees(new Set(filteredAttendees.map(attendee => attendee.id)));
     } else {
       setSelectedAttendees(new Set());
@@ -168,6 +169,8 @@ const Attendees: React.FC = () => {
     if (token && selectedIds.length > 0) {
       const response = await bulkDeleteAttendees(token, selectedIds);
       if (response.status === 200) {
+        // Clear selected attendees after successful deletion
+        setSelectedAttendees(new Set());
         toast(response.message, {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className='size-5' />
@@ -338,6 +341,7 @@ const Attendees: React.FC = () => {
               <SelectValue placeholder="Role" />
             </SelectTrigger>
             <SelectContent className='!text-sm !font-semibold'>
+              <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
               <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
               <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
               <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
@@ -363,7 +367,7 @@ const Attendees: React.FC = () => {
               <TableHead className="text-left min-w-10 !px-2">
                 <Checkbox 
                   className='bg-white border-brand-dark-gray cursor-pointer'
-                  checked={selectedAttendees.size === filteredAttendees.length}
+                  checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
