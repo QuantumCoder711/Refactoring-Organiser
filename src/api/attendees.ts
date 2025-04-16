@@ -24,7 +24,7 @@ export const getAllEventsAttendees = async (token: string): Promise<AllEventsAtt
 // Single Event Attendees
 export const getSingleEventAttendees = async (token: string, uuid: string): Promise<SingleEventAttendeesResponse> => {
     try {
-        const response = await axios.get(`${domain}/api/totalattendees/${uuid}`, {
+        const response = await axios.post(`${domain}/api/totalattendees/${uuid}`, {}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`

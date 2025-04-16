@@ -55,7 +55,7 @@ const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
   const { token, user } = useAuthStore(state => state);
-  const { allEventsAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees } = useAttendeeStore(state => state);
+  const { singleEventAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees, getSingleEventAttendees } = useAttendeeStore(state => state);
 
   // Date Difference State
   const [dateDiff, setDateDiff] = useState<number>(0);
@@ -67,6 +67,13 @@ const Attendees: React.FC = () => {
       setDateDiff(diff);
     }
   }, [event]);
+
+  // Fetch attendees when component mounts or event changes
+  useEffect(() => {
+    if (event?.uuid && token) {
+      getSingleEventAttendees(token, event.uuid);
+    }
+  }, [event?.uuid, token, getSingleEventAttendees]);
 
   // Filter states
   const [nameFilter, setNameFilter] = useState('');
@@ -80,7 +87,7 @@ const Attendees: React.FC = () => {
 
   // Filtered attendees
   const filteredAttendees = useMemo(() => {
-    return allEventsAttendees.filter(attendee => {
+    return singleEventAttendees.filter(attendee => {
       const nameMatch = `${attendee.first_name} ${attendee.last_name}`.toLowerCase().includes(nameFilter.toLowerCase());
       const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
       const designationMatch = attendee.job_title?.toLowerCase().includes(designationFilter.toLowerCase()) ?? false;
@@ -91,7 +98,7 @@ const Attendees: React.FC = () => {
 
       return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
     });
-  }, [allEventsAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
+  }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
   // Buttons
   const buttons: string[] = [
@@ -293,8 +300,8 @@ const Attendees: React.FC = () => {
         {/* Details Row */}
         <div className='flex gap-3.5'>
           <span className='rounded-sm !w-[83px] !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm'>10/Page <ChevronDown /></span>
-          <span className='font-semibold text-sm'>Total Attendees: {allEventsAttendees.length}</span>
-          <span className='font-semibold text-sm'>CheckIn 1st: {allEventsAttendees.length}</span>
+          <span className='font-semibold text-sm'>Total Attendees: {singleEventAttendees.length}</span>
+          <span className='font-semibold text-sm'>CheckIn 1st: {singleEventAttendees.length}</span>
           <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
         </div>
 

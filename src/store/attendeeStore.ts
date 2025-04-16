@@ -51,7 +51,7 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             const response = await deleteAttendee(token, id);
             if (response.status === 200) {
                 set((state) => ({
-                    allEventsAttendees: state.allEventsAttendees.filter(attendee => attendee.id !== id),
+                    singleEventAttendees: state.singleEventAttendees.filter(attendee => attendee.id !== id),
                     loading: false
                 }));
             } else {
@@ -73,7 +73,9 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             const response = await customCheckIn(token, uuid, event_id, user_id);
             if (response.status === 200) {
                 set((state) => ({
-                    allEventsAttendees: state.allEventsAttendees.map(attendee => attendee.uuid === uuid ? { ...attendee, check_in: 1 } : attendee)
+                    singleEventAttendees: state.singleEventAttendees.map(attendee => 
+                        attendee.uuid === uuid ? { ...attendee, check_in: 1 } : attendee
+                    )
                 }));
             }
             return response;
@@ -91,7 +93,7 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             const response = await bulkDeleteAttendees(token, ids);
             if (response.status === 200) {
                 set((state) => ({
-                    allEventsAttendees: state.allEventsAttendees.filter(attendee => !ids.includes(attendee.id))
+                    singleEventAttendees: state.singleEventAttendees.filter(attendee => !ids.includes(attendee.id))
                 }));
             }
             return response;
