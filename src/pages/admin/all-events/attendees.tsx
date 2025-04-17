@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference } from '@/lib/utils';
+import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
 
 import {
   Table,
@@ -231,35 +231,55 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 0) {
       cells.push(
         <TableCell key="check-in-1" className="text-left min-w-10">
-          {attendee.check_in !== null && attendee.check_in !== undefined ? attendee.check_in : "-"}
+          {attendee.check_in !== null && attendee.check_in !== undefined ? 
+            (attendee.check_in === 1 ? 
+              (attendee.check_in_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_time)}</> : "Checked In") : 
+              "-") : 
+            "-"}
         </TableCell>
       );
     }
     if (dateDiff >= 1) {
       cells.push(
         <TableCell key="check-in-2" className="text-left min-w-10">
-          {attendee.check_in_second !== null && attendee.check_in_second !== undefined ? attendee.check_in_second : "-"}
+          {attendee.check_in_second !== null && attendee.check_in_second !== undefined ? 
+            (attendee.check_in_second === 1 ? 
+              (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_second_time)}</> : "Checked In") : 
+              "-") : 
+            "-"}
         </TableCell>
       );
     }
     if (dateDiff >= 2) {
       cells.push(
         <TableCell key="check-in-3" className="text-left min-w-10">
-          {attendee.check_in_third !== null && attendee.check_in_third !== undefined ? attendee.check_in_third : "-"}
+          {attendee.check_in_third !== null && attendee.check_in_third !== undefined ? 
+            (attendee.check_in_third === 1 ? 
+              (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_third_time)}</> : "Checked In") : 
+              "-") : 
+            "-"}
         </TableCell>
       );
     }
     if (dateDiff >= 3) {
       cells.push(
         <TableCell key="check-in-4" className="text-left min-w-10">
-          {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ? attendee.check_in_forth : "-"}
+          {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ? 
+            (attendee.check_in_forth === 1 ? 
+              (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_forth_time)}</> : "Checked In") : 
+              "-") : 
+            "-"}
         </TableCell>
       );
     }
     if (dateDiff >= 4) {
       cells.push(
         <TableCell key="check-in-5" className="text-left min-w-10">
-          {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ? attendee.check_in_fifth : "-"}
+          {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ? 
+            (attendee.check_in_fifth === 1 ? 
+              (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_fifth_time)}</> : "Checked In") : 
+              "-") : 
+            "-"}
         </TableCell>
       );
     }
@@ -372,7 +392,7 @@ const Attendees: React.FC = () => {
         </div>
 
         <Table className='mt-4'>
-          <TableCaption>A list of your recent invoices.</TableCaption>
+          {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
           <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
             <TableRow className='!text-base'>
               <TableHead className="text-left min-w-10 !px-2">
@@ -489,7 +509,7 @@ const Attendees: React.FC = () => {
                   <Link to="#" className=''><SquarePen width={9.78} height={9.5} /></Link>
 
                   {/* Custom Check-In User */}
-                  <AlertDialog>
+                  {isEventLive(event) && <AlertDialog>
                     <AlertDialogTrigger className='cursor-pointer'>
                       <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary' />
                     </AlertDialogTrigger>
@@ -505,7 +525,7 @@ const Attendees: React.FC = () => {
                         <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
-                  </AlertDialog>
+                  </AlertDialog>}
 
                   {/* Delete Attendee */}
                   <AlertDialog>
