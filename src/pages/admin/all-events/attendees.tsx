@@ -100,6 +100,9 @@ const Attendees: React.FC = () => {
     });
   }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
+  // Check if any filter is active
+  const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' || checkInFilter !== '' || (roleFilter !== '' && roleFilter !== 'all');
+
   // Buttons
   const buttons: string[] = [
     "Add Attendee",
@@ -301,8 +304,10 @@ const Attendees: React.FC = () => {
         <div className='flex gap-3.5'>
           <span className='rounded-sm !w-[83px] !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm'>10/Page <ChevronDown /></span>
           <span className='font-semibold text-sm'>Total Attendees: {singleEventAttendees.length}</span>
-          <span className='font-semibold text-sm'>CheckIn 1st: {singleEventAttendees.length}</span>
-          <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
+          {/* <span className='font-semibold text-sm'>CheckIn 1st: {singleEventAttendees.length}</span> */}
+          {isFilterActive && (
+            <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
+          )}
         </div>
 
         {/* Filters Bar */}
@@ -364,7 +369,6 @@ const Attendees: React.FC = () => {
           >
             Delete
           </Button>
-
         </div>
 
         <Table className='mt-4'>
