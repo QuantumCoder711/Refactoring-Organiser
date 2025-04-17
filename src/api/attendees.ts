@@ -99,5 +99,3 @@ export const bulkDeleteAttendees = async (token: string, ids: number[]): Promise
         throw new Error("An unexpected error occurred");
     }
 }
-
-

@@ -1,6 +1,6 @@
 import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
@@ -10,7 +10,7 @@ import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
 import {
   Table,
   TableBody,
-  TableCaption,
+  // TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -55,6 +55,7 @@ const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
   const { token, user } = useAuthStore(state => state);
+  const navigate = useNavigate();
   const { singleEventAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees, getSingleEventAttendees } = useAttendeeStore(state => state);
 
   // Date Difference State
@@ -86,18 +87,22 @@ const Attendees: React.FC = () => {
   const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
 
   // Filtered attendees
-  const filteredAttendees = useMemo(() => {
-    return singleEventAttendees.filter(attendee => {
+  const [filteredAttendees, setFilteredAttendees] = useState<typeof singleEventAttendees>([]);
+
+  useEffect(() => {
+    const filtered = singleEventAttendees.filter(attendee => {
       const nameMatch = `${attendee.first_name} ${attendee.last_name}`.toLowerCase().includes(nameFilter.toLowerCase());
       const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
       const designationMatch = attendee.job_title?.toLowerCase().includes(designationFilter.toLowerCase()) ?? false;
-      const checkInMatch = checkInFilter === '' || 
-        (checkInFilter === '1' && attendee.check_in === 1) || 
+      const checkInMatch = checkInFilter === '' ||
+        (checkInFilter === '1' && attendee.check_in === 1) ||
         (checkInFilter === '0' && attendee.check_in === 0);
       const roleMatch = roleFilter === '' || roleFilter === 'all' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
 
       return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
     });
+    
+    setFilteredAttendees(filtered);
   }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
   // Check if any filter is active
@@ -231,10 +236,10 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 0) {
       cells.push(
         <TableCell key="check-in-1" className="text-left min-w-10">
-          {attendee.check_in !== null && attendee.check_in !== undefined ? 
-            (attendee.check_in === 1 ? 
-              (attendee.check_in_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_time)}</> : "Checked In") : 
-              "-") : 
+          {attendee.check_in !== null && attendee.check_in !== undefined ?
+            (attendee.check_in === 1 ?
+              (attendee.check_in_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_time)}</> : "Checked In") :
+              "-") :
             "-"}
         </TableCell>
       );
@@ -242,10 +247,10 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 1) {
       cells.push(
         <TableCell key="check-in-2" className="text-left min-w-10">
-          {attendee.check_in_second !== null && attendee.check_in_second !== undefined ? 
-            (attendee.check_in_second === 1 ? 
-              (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_second_time)}</> : "Checked In") : 
-              "-") : 
+          {attendee.check_in_second !== null && attendee.check_in_second !== undefined ?
+            (attendee.check_in_second === 1 ?
+              (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_second_time)}</> : "Checked In") :
+              "-") :
             "-"}
         </TableCell>
       );
@@ -253,10 +258,10 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 2) {
       cells.push(
         <TableCell key="check-in-3" className="text-left min-w-10">
-          {attendee.check_in_third !== null && attendee.check_in_third !== undefined ? 
-            (attendee.check_in_third === 1 ? 
-              (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_third_time)}</> : "Checked In") : 
-              "-") : 
+          {attendee.check_in_third !== null && attendee.check_in_third !== undefined ?
+            (attendee.check_in_third === 1 ?
+              (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_third_time)}</> : "Checked In") :
+              "-") :
             "-"}
         </TableCell>
       );
@@ -264,10 +269,10 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 3) {
       cells.push(
         <TableCell key="check-in-4" className="text-left min-w-10">
-          {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ? 
-            (attendee.check_in_forth === 1 ? 
-              (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_forth_time)}</> : "Checked In") : 
-              "-") : 
+          {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ?
+            (attendee.check_in_forth === 1 ?
+              (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_forth_time)}</> : "Checked In") :
+              "-") :
             "-"}
         </TableCell>
       );
@@ -275,10 +280,10 @@ const Attendees: React.FC = () => {
     if (dateDiff >= 4) {
       cells.push(
         <TableCell key="check-in-5" className="text-left min-w-10">
-          {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ? 
-            (attendee.check_in_fifth === 1 ? 
-              (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_fifth_time)}</> : "Checked In") : 
-              "-") : 
+          {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ?
+            (attendee.check_in_fifth === 1 ?
+              (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_fifth_time)}</> : "Checked In") :
+              "-") :
             "-"}
         </TableCell>
       );
@@ -293,7 +298,7 @@ const Attendees: React.FC = () => {
 
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-5'>
-          <Button className='btn !bg-brand-background !text-black'><ChevronLeft />Back</Button>
+          <Button className='btn !bg-brand-background !text-black' onClick={() => navigate(-1)}><ChevronLeft />Back</Button>
           <h1 className='text-xl font-semibold'>{event?.title}</h1>
         </div>
 
@@ -382,7 +387,7 @@ const Attendees: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Button 
+          <Button
             className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
             onClick={handleDeleteSelected}
             disabled={selectedAttendees.size === 0}
@@ -396,7 +401,7 @@ const Attendees: React.FC = () => {
           <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
             <TableRow className='!text-base'>
               <TableHead className="text-left min-w-10 !px-2">
-                <Checkbox 
+                <Checkbox
                   className='bg-white border-brand-dark-gray cursor-pointer'
                   checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
                   onCheckedChange={handleSelectAll}
@@ -420,7 +425,7 @@ const Attendees: React.FC = () => {
             {filteredAttendees.map((attendee: AttendeeType, index: number) => (
               <TableRow key={attendee.id}>
                 <TableCell className="text-left min-w-10">
-                  <Checkbox 
+                  <Checkbox
                     className='bg-white border-brand-dark-gray cursor-pointer'
                     checked={selectedAttendees.has(attendee.id)}
                     onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
@@ -452,8 +457,8 @@ const Attendees: React.FC = () => {
                   {attendee.status || "-"}
                 </TableCell>
                 <TableCell className="text-left min-w-10">
-                  {attendee.award_winner !== null && attendee.award_winner !== undefined 
-                    ? (attendee.award_winner === 1 ? "Yes" : "No") 
+                  {attendee.award_winner !== null && attendee.award_winner !== undefined
+                    ? (attendee.award_winner === 1 ? "Yes" : "No")
                     : "-"}
                 </TableCell>
                 {renderCheckInData(attendee)}
