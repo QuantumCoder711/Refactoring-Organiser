@@ -86,14 +86,18 @@ const Attendees: React.FC = () => {
   // Add selected attendees state
   const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
 
-  // Filtered attendees
-  const [filteredAttendees, setFilteredAttendees] = useState<typeof singleEventAttendees>([]);
-
-  useEffect(() => {
-    const filtered = singleEventAttendees.filter(attendee => {
-      const nameMatch = `${attendee.first_name} ${attendee.last_name}`.toLowerCase().includes(nameFilter.toLowerCase());
+  
+  const filteredAttendees = useMemo(() => {
+    return singleEventAttendees.filter(attendee => {
+      const nameMatch = `${attendee.first_name || ''} ${attendee.last_name || ''}`.toLowerCase().includes(nameFilter.toLowerCase());
       const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
-      const designationMatch = attendee.job_title?.toLowerCase().includes(designationFilter.toLowerCase()) ?? false;
+      
+      // Handle null designation (job_title)
+      const designationMatch = designationFilter === '' || 
+        (attendee.job_title ? 
+          attendee.job_title.toLowerCase().includes(designationFilter.toLowerCase()) : 
+          designationFilter === '');
+      
       const checkInMatch = checkInFilter === '' ||
         (checkInFilter === '1' && attendee.check_in === 1) ||
         (checkInFilter === '0' && attendee.check_in === 0);
@@ -101,8 +105,6 @@ const Attendees: React.FC = () => {
 
       return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
     });
-    
-    setFilteredAttendees(filtered);
   }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
   // Check if any filter is active
