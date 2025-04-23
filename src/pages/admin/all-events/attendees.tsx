@@ -111,14 +111,14 @@ const Attendees: React.FC = () => {
   const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' || checkInFilter !== '' || (roleFilter !== '' && roleFilter !== 'all');
 
   // Buttons
-  const buttons: string[] = [
-    "Add Attendee",
-    "Send Reminder",
-    "Send Poll",
-    "Send in App Message",
-    "Pending User Request",
-    "Send Template Message",
-    "Thank You message"
+  const links = [
+    { name: "Add Attendee", url: `/all-events/add-attendee/${slug}` },
+    { name: "Send Reminder", url: "#" },
+    { name: "Send Poll", url: "#" },
+    { name: "Send in App Message", url: "#" },
+    { name: "Pending User Request", url: "#" },
+    { name: "Send Template Message", url: "#" },
+    { name: "Thank You message", url: "#" }
   ];
 
   // Handle delete attendee
@@ -319,8 +319,14 @@ const Attendees: React.FC = () => {
 
       {/* Buttons Row */}
       <div className='flex gap-3.5 mt-6'>
-        {buttons.map((button, index) => (
-          button === "Add Attendee" ? <Button key={index} className='btn !rounded-[10px] !px-3 !h-[30px]'>{button}</Button> : <Button key={index} className='btn !bg-brand-background !text-black font-semibold !rounded-[10px] !px-3 !h-[30px]'>{button}</Button>
+        {links.map((link, index) => (
+          <Link 
+            key={index} 
+            to={link.url} 
+            className={`btn ${link.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] text-sm grid place-content-center`}
+          >
+            {link.name}
+          </Link>
         ))}
       </div>
 

@@ -16,6 +16,7 @@ import ViewEvent from './pages/admin/all-events/view-event';
 import GuestLayout from './pages/guest/layout';
 import useAuthStore from './store/authStore';
 import Attendees from './pages/admin/all-events/attendees';
+import AddAttendee from './pages/admin/all-events/add-attendee';
 
 const App: React.FC = () => {
 
@@ -44,6 +45,7 @@ const App: React.FC = () => {
         {/* Deep Routes */}
         <Route path="/all-events/view/:slug" element={<ViewEvent />} />
         <Route path="/all-events/attendees/:slug" element={<Attendees />} />
+        <Route path="/all-events/add-attendee/:slug" element={<AddAttendee />} />
       </Route>
 
       <Route path="/" element={
