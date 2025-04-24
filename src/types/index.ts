@@ -114,4 +114,16 @@ export interface AttendeeType {
     award_winner: number;
 }
 
+export interface CompanyType {
+    id: number;
+    parent_id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface JobTitleType extends CompanyType { }
+
+export interface IndustryType extends CompanyType { }
+
 export interface SponsorType extends AttendeeType { }

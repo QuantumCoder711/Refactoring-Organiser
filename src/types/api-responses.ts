@@ -43,7 +43,6 @@ export interface SingleEventAttendeesResponse {
     total_attendees: number;
 }
 
-
 export interface DeleteAttendeeResponse {
     status: number;
     message: string;
