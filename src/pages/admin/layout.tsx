@@ -8,6 +8,7 @@ import useAttendeeStore from '@/store/attendeeStore';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import useSponsorStore from '@/store/sponsorStore';
+import useExtrasStore from '@/store/extrasStore';
 
 const Layout: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -15,16 +16,25 @@ const Layout: React.FC = () => {
     const { getAllEvents } = useEventStore();
     const { getAllEventsAttendees } = useAttendeeStore();
     const { getAllEventsSponsors } = useSponsorStore();
+    const { fetchExtras } = useExtrasStore();
 
     useLayoutEffect(() => {
         setLoading(true);
         if (token) {
-            getAllEvents(token);
-            getAllEventsAttendees(token);
-            getAllEventsSponsors(token);
+            // Load all data in parallel
+            Promise.all([
+                getAllEvents(token),
+                getAllEventsAttendees(token),
+                getAllEventsSponsors(token),
+                fetchExtras()
+            ])
+            .finally(() => {
+                setLoading(false);
+            });
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
-    }, [token]);
+    }, [token, getAllEvents, getAllEventsAttendees, getAllEventsSponsors, fetchExtras]);
 
     if(loading) {
         return (

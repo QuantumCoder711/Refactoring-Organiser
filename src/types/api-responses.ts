@@ -57,4 +57,9 @@ export interface BulkDeleteAttendeesResponse {
     message: string;
     status: number;
 }
-// Add more API response types here as needed 
+
+export interface AddAttendeeResponse {    
+    "status": number,
+    "message": string;
+}
+// Add more API response types here as needed

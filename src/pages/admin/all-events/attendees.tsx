@@ -1,6 +1,6 @@
 import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
@@ -49,13 +49,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import GoBack from '@/components/GoBack';
 
 
 const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
   const { token, user } = useAuthStore(state => state);
-  const navigate = useNavigate();
   const { singleEventAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees, getSingleEventAttendees } = useAttendeeStore(state => state);
 
   // Date Difference State
@@ -300,7 +300,7 @@ const Attendees: React.FC = () => {
 
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-5'>
-          <Button className='btn !bg-brand-background !text-black' onClick={() => navigate(-1)}><ChevronLeft />Back</Button>
+          <GoBack />
           <h1 className='text-xl font-semibold'>{event?.title}</h1>
         </div>
 
