@@ -1,6 +1,14 @@
 import { domain } from "@/constants";
 import axios from "axios";
-import { AllEventsAttendeesResponse, SingleEventAttendeesResponse, DeleteAttendeeResponse, CustomCheckInResponse, BulkDeleteAttendeesResponse, AddAttendeeResponse } from "@/types/api-responses";
+import {
+    AllEventsAttendeesResponse,
+    SingleEventAttendeesResponse,
+    DeleteAttendeeResponse,
+    CustomCheckInResponse,
+    BulkDeleteAttendeesResponse,
+    AddAttendeeResponse,
+    AddBulkAttendeeResponse
+} from "@/types/api-responses";
 
 // All Attendees List of All Events
 export const getAllEventsAttendees = async (token: string): Promise<AllEventsAttendeesResponse> => {
@@ -85,7 +93,7 @@ export const customCheckIn = async (token: string, uuid: string, event_id: numbe
 // Bulk Delete Attendees
 export const bulkDeleteAttendees = async (token: string, ids: number[]): Promise<BulkDeleteAttendeesResponse> => {
     try {
-        const response = await axios.post(`${domain}/api/delete-multiple-attendees`, {ids},{
+        const response = await axios.post(`${domain}/api/delete-multiple-attendees`, { ids }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -113,6 +121,23 @@ export const addAttendee = async (token: string, attendeeData: FormData): Promis
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to add attendee");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const bulkUploadAttendees = async (token: string, uuid: string, file: File): Promise<AddBulkAttendeeResponse> => {
+    try {
+        const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, {file}, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to bulk upload attendees");
         }
         throw new Error("An unexpected error occurred");
     }

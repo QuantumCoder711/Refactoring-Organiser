@@ -62,4 +62,17 @@ export interface AddAttendeeResponse {
     "status": number,
     "message": string;
 }
+
+export interface AddBulkAttendeeResponse {
+    status: number;
+    message: string;
+    inserted_records: number;
+    duplicate_entries: number;
+    invalid_data: Array<{
+        email: string;
+        phone_number: number;
+        reason: string;
+    }> | [];
+}
+
 // Add more API response types here as needed

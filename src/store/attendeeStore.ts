@@ -1,6 +1,6 @@
-import { addAttendee, bulkDeleteAttendees, customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
+import { addAttendee, bulkDeleteAttendees, bulkUploadAttendees, customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
 import { AttendeeType } from "@/types";
-import { AddAttendeeResponse, BulkDeleteAttendeesResponse, CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
+import { AddAttendeeResponse, AddBulkAttendeeResponse, BulkDeleteAttendeesResponse, CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
 import { create } from "zustand";
 
 interface AttendeeStore {
@@ -13,6 +13,7 @@ interface AttendeeStore {
     customCheckIn: (uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
     bulkDeleteAttendees: (token: string, ids: number[]) => Promise<BulkDeleteAttendeesResponse>;
     addAttendee: (token: string, uuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
+    bulkUploadAttendees: (token: string, uuid: string, file: File) => Promise<AddBulkAttendeeResponse>;
 }
 
 const useAttendeeStore = create<AttendeeStore>((set) => ({
@@ -110,6 +111,29 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
         try {
             set({ loading: true });
             const response = await addAttendee(token, attendeeData);
+            if (response.status === 200) {
+                // Refresh the attendees list for this event
+                await getSingleEventAttendees(token, uuid)
+                    .then(eventAttendeesResponse => {
+                        set({ singleEventAttendees: eventAttendeesResponse.data });
+                    });
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Bulk Upload Attendees
+    bulkUploadAttendees: async (token: string, uuid: string, file: File) => {
+        try {
+            set({ loading: true });
+
+            // Call the API with token
+            const response = await bulkUploadAttendees(token, uuid, file);
+
             if (response.status === 200) {
                 // Refresh the attendees list for this event
                 await getSingleEventAttendees(token, uuid)
