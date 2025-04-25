@@ -2,7 +2,7 @@ import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
+import { ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
@@ -113,7 +113,7 @@ const Attendees: React.FC = () => {
   // Buttons
   const links = [
     { name: "Add Attendee", url: `/all-events/add-attendee/${slug}` },
-    { name: "Send Reminder", url: "#" },
+    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/choose-template-messages/${slug}` },
     { name: "Send Poll", url: "#" },
     { name: "Send in App Message", url: "#" },
     { name: "Pending User Request", url: "#" },
@@ -323,7 +323,7 @@ const Attendees: React.FC = () => {
           <Link 
             key={index} 
             to={link.url} 
-            className={`btn ${link.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] text-sm grid place-content-center`}
+            className={`btn ${link.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
           >
             {link.name}
           </Link>
@@ -331,7 +331,7 @@ const Attendees: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className='bg-brand-background rounded-lg p-5 mt-[74px] shadow-blur'>
+      <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
 
         {/* Details Row */}
         <div className='flex gap-3.5'>

@@ -17,6 +17,10 @@ import GuestLayout from './pages/guest/layout';
 import useAuthStore from './store/authStore';
 import Attendees from './pages/admin/all-events/attendees';
 import AddAttendee from './pages/admin/all-events/add-attendee';
+import MessageTemplateLayout from './pages/admin/template-messages/layout';
+import SendReminder from './pages/admin/template-messages/send-reminder';
+import VisitBoothReminder from './pages/admin/template-messages/visit-booth-reminder';
+import AllMessageTemplates from './pages/admin/template-messages/all-message-templates';
 
 const App: React.FC = () => {
 
@@ -32,7 +36,7 @@ const App: React.FC = () => {
       <Route element={
         isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
       }>
-        {/* Surface Routes */}
+        {/* Sidebar Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/all-attendees" element={<AllAttendees />} />
@@ -42,10 +46,20 @@ const App: React.FC = () => {
         <Route path="/all-photos" element={<AllPhotos />} />
         <Route path="/all-reports" element={<AllReports />} />
 
-        {/* Deep Routes */}
+        {/* Sidebar Inner Routes */}
         <Route path="/all-events/view/:slug" element={<ViewEvent />} />
         <Route path="/all-events/attendees/:slug" element={<Attendees />} />
         <Route path="/all-events/add-attendee/:slug" element={<AddAttendee />} />
+
+        {/* Message Template Select Route */}
+        <Route path="/all-events/event/choose-template-messages/:slug" element={<AllMessageTemplates />} />
+
+        {/* Template Messages Routes */}
+        <Route path="/all-events/event/template-messages" element={<MessageTemplateLayout />}>
+          <Route path="send-reminder/:slug" element={<SendReminder />} />
+          <Route path="visit-booth-reminder/:slug" element={<VisitBoothReminder />} />
+        </Route>
+
       </Route>
 
       <Route path="/" element={
