@@ -6,11 +6,12 @@ import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { roles } from '@/constants';
-import { getImageUrl } from '@/lib/utils';
+import { formatDateTime, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface MessageTemplateLayoutProps {
   handleSubmit: () => void;
@@ -60,13 +61,17 @@ const MessageTemplateLayout: React.FC<MessageTemplateLayoutProps> = (props) => {
     setAllSelected(!allSelected);
   };
 
+  const handleSubmit = () => {
+    console.log("Hello");
+  }
+
   return (
     <div>
       <div className="flex items-center gap-7">
         <GoBack /> <h1 className='text-xl font-semibold'>{event?.title}</h1>
       </div>
       <div className='mt-8 flex gap-4 h-full'>
-        <div className='bg-brand-background rounded-[10px] h-full w-full p-5'>
+        <div className='bg-brand-background rounded-[10px] min-h-full w-full p-5'>
 
           {/* SelectBoxes */}
           <h2 className='font-semibold'>Select Roles</h2>
@@ -127,15 +132,33 @@ const MessageTemplateLayout: React.FC<MessageTemplateLayoutProps> = (props) => {
           {/* MessageBox */}
           <div className='mt-[30px]'>
             <Input type='text' className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold' placeholder='Subject *' />
-            <div id="editor" className='!h-96 border bg-white rounded-[10px] rounded-t-none'></div>
+            <div id="editor" className='h-44 border bg-white rounded-[10px] rounded-t-none'></div>
           </div>
 
           {/* Send Button */}
-          <Button className='btn !mt-5' onClick={()=>props.handleSubmit()}>Send</Button>
+          <Button className='btn !mt-5' onClick={handleSubmit}>Send</Button>
         </div>
 
-        <div className='min-w-[300px] h-full bg-brand-background rounded-[10px] p-3'>
+        <div className='min-w-[300px] flex flex-col gap-4 h-full bg-brand-background rounded-[10px] p-3'>
           <img src={getImageUrl(event?.image)} alt={event?.title} className='rounded-[10px]' />
+          <h3 className='font-semibold text-nowrap text-ellipsis overflow-hidden text-xl'>{event?.title}</h3>
+          <Separator className='bg-white w-full' />
+          <div className='flex flex-col gap-4'>
+            <div className='flex flex-col gap-2'>
+              <h3 className='font-semibold'>Date</h3>
+              <p>{formatDateTime(event?.event_date as string)}</p>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <h3 className='font-semibold'>Time</h3>
+              <p>{formatDateTime(event?.event_date as string)}</p>
+            </div>
+
+            <div className='flex flex-col gap-2'>
+              <h3 className='font-semibold'>Location</h3>
+              <p className='max-w-[300px]'>{event?.event_venue_address_1}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div >

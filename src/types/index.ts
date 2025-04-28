@@ -127,3 +127,25 @@ export interface JobTitleType extends CompanyType { }
 export interface IndustryType extends CompanyType { }
 
 export interface SponsorType extends AttendeeType { }
+
+export interface SendReminder {
+    event_uuid: string;
+    send_to: string;
+    send_method: string;
+    subject: string;
+    message: string;
+    start_date: string;
+    delivery_schedule: string;
+    start_date_time: string;
+    start_date_type: string;
+    end_date: string;
+    end_date_time: string;
+    end_date_type: string;
+    no_of_times: number;
+    hour_interval: number;
+    status: number;
+}
+
+export interface SendSameDayReminder extends SendReminder{
+    check_in: number;
+}

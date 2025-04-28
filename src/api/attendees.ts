@@ -28,7 +28,6 @@ export const getAllEventsAttendees = async (token: string): Promise<AllEventsAtt
     }
 }
 
-
 // Single Event Attendees
 export const getSingleEventAttendees = async (token: string, uuid: string): Promise<SingleEventAttendeesResponse> => {
     try {
@@ -47,7 +46,6 @@ export const getSingleEventAttendees = async (token: string, uuid: string): Prom
     }
 }
 
-
 // Delete Attendee
 export const deleteAttendee = async (token: string, id: number): Promise<DeleteAttendeeResponse> => {
     try {
@@ -65,7 +63,6 @@ export const deleteAttendee = async (token: string, id: number): Promise<DeleteA
         throw new Error("An unexpected error occurred");
     }
 }
-
 
 // Custom Check In
 export const customCheckIn = async (token: string, uuid: string, event_id: number, user_id: number): Promise<CustomCheckInResponse> => {
@@ -88,7 +85,6 @@ export const customCheckIn = async (token: string, uuid: string, event_id: numbe
         throw new Error("An unexpected error occurred");
     }
 }
-
 
 // Bulk Delete Attendees
 export const bulkDeleteAttendees = async (token: string, ids: number[]): Promise<BulkDeleteAttendeesResponse> => {
@@ -126,6 +122,7 @@ export const addAttendee = async (token: string, attendeeData: FormData): Promis
     }
 }
 
+// Bulk Upload Attendees
 export const bulkUploadAttendees = async (token: string, uuid: string, file: File): Promise<AddBulkAttendeeResponse> => {
     try {
         const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, {file}, {
