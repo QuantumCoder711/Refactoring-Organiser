@@ -76,7 +76,7 @@ const MessageTemplateLayout: React.FC = () => {
           </div>
 
           <h2 className='font-semibold mt-[30px]'>Send By</h2>
-          <RadioGroup defaultValue="email" className='flex gap-5'>
+          <RadioGroup defaultValue="email" className='flex gap-5 mt-[15px]'>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="email" id="email" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'/>
               <Label htmlFor="email" className='cursor-pointer'>Email</Label>
