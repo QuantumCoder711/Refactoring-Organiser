@@ -18,7 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { statuses } from "@/constants";
+import { roles } from "@/constants";
 import useExtrasStore from "@/store/extrasStore";
 import useAttendeeStore from "@/store/attendeeStore";
 import useAuthStore from "@/store/authStore";
@@ -677,7 +677,7 @@ const AddAttendee: React.FC = () => {
                                     onValueChange={(value: string) => setFormData(prev => ({ ...prev, status: value }))}
                                     placeholder="Select Status"
                                     options={[
-                                        ...statuses.map(status => ({ value: status, label: status })),
+                                        ...roles.map(status => ({ value: status, label: status })),
                                         { value: 'others', label: 'Others' }
                                     ]}
                                     required

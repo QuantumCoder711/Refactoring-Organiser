@@ -45,7 +45,7 @@ export const SidebarItems = [
     }
 ];
 
-export const statuses: string[] = ["Speaker", "Panelist", "Sponsor", "Delegate", "Moderator"];
+export const roles: string[] = ["Speaker", "Panelist", "Sponsor", "Delegate", "Moderator"];
 
 export const domain: string = import.meta.env.VITE_API_URL;
 export const googleMapsApiKey: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
