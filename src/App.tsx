@@ -20,7 +20,11 @@ import AddAttendee from './pages/admin/all-events/add-attendee';
 import MessageTemplateLayout from './pages/admin/template-messages/layout';
 import SendReminder from './pages/admin/template-messages/send-reminder';
 import VisitBoothReminder from './pages/admin/template-messages/visit-booth-reminder';
-import AllMessageTemplates from './pages/admin/template-messages/all-message-templates';
+import AllMessageTemplates from './pages/admin/template-messages';
+import SessionReminder from './pages/admin/template-messages/session-reminder';
+import SendSameDayReminder from './pages/admin/template-messages/send-same-day-reminder';
+import DayTwoReminder from './pages/admin/template-messages/day-two-reminder';
+import DayTwoSameDayReminder from './pages/admin/template-messages/day-two-same-day-reminder';
 
 const App: React.FC = () => {
 
@@ -58,6 +62,10 @@ const App: React.FC = () => {
         <Route path="/all-events/event/template-messages" element={<MessageTemplateLayout />}>
           <Route path="send-reminder/:slug" element={<SendReminder />} />
           <Route path="visit-booth-reminder/:slug" element={<VisitBoothReminder />} />
+          <Route path="session-reminder/:slug" element={<SessionReminder />} />
+          <Route path="send-same-day-reminder/:slug" element={<SendSameDayReminder />} />
+          <Route path="day-two-reminder/:slug" element={<DayTwoReminder />} />
+          <Route path="day-two-same-day-reminder/:slug" element={<DayTwoSameDayReminder />} />
         </Route>
 
       </Route>
