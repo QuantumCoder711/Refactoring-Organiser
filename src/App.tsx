@@ -5,7 +5,7 @@ import useAuthStore from '@/store/authStore';
 // Layouts
 import Layout from '@/pages/admin/layout';
 import GuestLayout from '@/pages/guest/layout';
-import MessageTemplateLayout from '@/pages/admin/template-messages/layout';
+// import MessageTemplateLayout from '@/pages/admin/all-template-messages/layout';
 
 // Guest Pages
 import Login from '@/pages/guest/login';
@@ -27,16 +27,11 @@ import Attendees from '@/pages/admin/all-events/attendees';
 import AddAttendee from '@/pages/admin/all-events/add-attendee';
 
 // Message Template Pages
-import AllMessageTemplates from '@/pages/admin/template-messages';
-import SendReminder from '@/pages/admin/template-messages/send-reminder';
-import VisitBoothReminder from '@/pages/admin/template-messages/visit-booth-reminder';
-import SessionReminder from '@/pages/admin/template-messages/session-reminder';
-import SendSameDayReminder from '@/pages/admin/template-messages/send-same-day-reminder';
-import DayTwoReminder from '@/pages/admin/template-messages/day-two-reminder';
-import DayTwoSameDayReminder from '@/pages/admin/template-messages/day-two-same-day-reminder';
+import AllTemplateMessages from '@/pages/admin/all-template-messages';
 
 // Error Page
 import Error404 from '@/pages/404';
+import TemplateMessage from './pages/admin/all-template-messages/template-message';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -87,19 +82,10 @@ const App: React.FC = () => {
           <Route path="view/:slug" element={<ViewEvent />} />
           <Route path="attendees/:slug" element={<Attendees />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
-          
+
           {/* Message Template Routes */}
-          <Route path="event">
-            <Route path="choose-template-messages/:slug" element={<AllMessageTemplates />} />
-            <Route path="template-messages" element={<MessageTemplateLayout />}>
-              <Route path="send-reminder/:slug" element={<SendReminder />} />
-              <Route path="visit-booth-reminder/:slug" element={<VisitBoothReminder />} />
-              <Route path="session-reminder/:slug" element={<SessionReminder />} />
-              <Route path="send-same-day-reminder/:slug" element={<SendSameDayReminder />} />
-              <Route path="day-two-reminder/:slug" element={<DayTwoReminder />} />
-              <Route path="day-two-same-day-reminder/:slug" element={<DayTwoSameDayReminder />} />
-            </Route>
-          </Route>
+          <Route path="event/all-template-messages/:slug" element={<AllTemplateMessages />} />
+          <Route path="event/all-template-messages/:template/:slug" element={<TemplateMessage />} />
         </Route>
       </Route>
 

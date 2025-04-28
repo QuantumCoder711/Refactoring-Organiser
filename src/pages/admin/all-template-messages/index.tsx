@@ -10,44 +10,44 @@ import DayTwoReminderIcon from '@/assets/template-message-icons/day-two-reminder
 import DayTwoSameDayReminderIcon from '@/assets/template-message-icons/day-two-same-day-reminder.svg';
 import { ArrowRight } from 'lucide-react';
 
-const AllMessageTemplates: React.FC = () => {
+const AllTemplateMessages: React.FC = () => {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
 
   const templates = [
     {
       title: "Send Reminder",
-      path: `/all-events/event/template-messages/send-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/send-reminder/${slug}`,
       icon: SendReminderIcon,
       paragraph: "Send a follow-up reminder message to all your guests. Ideally, send it one day before the event."
     },
     {
       title: "Send Same Day Reminder",
-      path: `/all-events/event/template-messages/send-same-day-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/send-same-day-reminder/${slug}`,
       icon: SendSameDayReminderIcon,
       paragraph: "Send a follow-up reminder message to all your guests on the day of the event. Ideally, send it at 7:00 AM in the morning."
     },
     {
       title: "Session Reminder",
-      path: `/all-events/event/template-messages/session-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/session-reminder/${slug}`,
       icon: SessionReminderIcon,
       paragraph: "Send reminders to all your checked-in guests about the start of a session."
     },
     {
       title: "Visit Booth Reminder",
-      path: `/all-events/event/template-messages/visit-booth-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/visit-booth-reminder/${slug}`,
       icon: VisitBoothReminderIcon,
       paragraph: "Send a notification to all your checked-in guests to visit the booth stalls."
     },
     {
       title: "Day Two Reminder",
-      path: `/all-events/event/template-messages/day-two-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/day-two-reminder/${slug}`,
       icon: DayTwoReminderIcon,
       paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it the evening before the event."
     },
     {
       title: "Day Two Same Day Reminder",
-      path: `/all-events/event/template-messages/day-two-same-day-reminder/${slug}`,
+      path: `/all-events/event/all-template-messages/day-two-same-day-reminder/${slug}`,
       icon: DayTwoSameDayReminderIcon,
       paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it at 7 AM on the morning of Day 2."
     }
@@ -83,4 +83,4 @@ const AllMessageTemplates: React.FC = () => {
   );
 };
 
-export default AllMessageTemplates;
+export default AllTemplateMessages;

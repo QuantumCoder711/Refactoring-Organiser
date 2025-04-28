@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Logo from '@/assets/logo.svg';
 import InsightnerLogo from '@/assets/insightnerLogo.svg';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 import { UserAvatar } from '@/constants';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import {
   DropdownMenu,
@@ -30,6 +30,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
   const user = useAuthStore(state => state.user);
+  const location = useLocation();
+
+  useEffect(() => {
+    
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();

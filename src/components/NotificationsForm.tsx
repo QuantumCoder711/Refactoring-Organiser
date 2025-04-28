@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import "quill/dist/quill.snow.css";
 import Quill from "quill";
 import GoBack from '@/components/GoBack';
@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
-interface MessageTemplateLayoutProps {
+interface NotifcationsFormProps {
   handleSubmit: () => void;
   sendBy: "email" | "whatsapp" | "both";
   messageBoxType: "simplex" | "complex";
@@ -21,7 +21,7 @@ interface MessageTemplateLayoutProps {
   sendTo?: "everyone" | "checkedIn" | "nonCheckedIn";
 }
 
-const MessageTemplateLayout: React.FC<MessageTemplateLayoutProps> = (props) => {
+const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const { slug } = useParams<{ slug: string }>();
   const { getEventBySlug } = useEventStore(state => state);
   const event = getEventBySlug(slug);
@@ -165,4 +165,4 @@ const MessageTemplateLayout: React.FC<MessageTemplateLayoutProps> = (props) => {
   )
 }
 
-export default MessageTemplateLayout;
+export default NotifcationsForm;
