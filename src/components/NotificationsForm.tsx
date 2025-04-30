@@ -32,16 +32,16 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const [sendTo, setSendTo] = useState<"everyone" | "checkedIn" | "nonCheckedIn">("everyone");
   const [subject, setSubject] = useState("");
 
-  const quillRef = useRef<Quill | null>(null);
+  const quillRef = useRef<HTMLDivElement | null>(null);
 
   // Initialize Quill editor
   useEffect(() => {
-    if (!quillRef.current) {
-      quillRef.current = new Quill('#editor', {
+    if (quillRef.current) {
+      new Quill(quillRef.current, {
         theme: "snow"
       });
     }
-  }, []);
+  }, [sendBy]);
 
   // Update allSelected state when selectedRoles changes
   useEffect(() => {
@@ -72,7 +72,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       sendBy,
       sendTo,
       subject,
-      message: quillRef.current?.root.innerHTML
+      // message: quillRef.current?.root.innerHTML
     });
   }
 
@@ -111,27 +111,27 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
 
           {/* Send By Options */}
           <h2 className='font-semibold mt-[30px]'>Send By</h2>
-          <RadioGroup 
-            value={sendBy} 
-            onValueChange={(value: "email" | "whatsapp") => setSendBy(value)} 
+          <RadioGroup
+            value={sendBy}
+            onValueChange={(value: "email" | "whatsapp") => setSendBy(value)}
             className='flex gap-5 mt-[15px]'
           >
             {(props.sendBy === "email" || props.sendBy === "both") && (
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="email" 
-                  id="email" 
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' 
+                <RadioGroupItem
+                  value="email"
+                  id="email"
+                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                 />
                 <Label htmlFor="email" className='cursor-pointer'>Email</Label>
               </div>
             )}
             {(props.sendBy === "whatsapp" || props.sendBy === "both") && (
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="whatsapp" 
-                  id="whatsapp" 
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' 
+                <RadioGroupItem
+                  value="whatsapp"
+                  id="whatsapp"
+                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                 />
                 <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
               </div>
@@ -168,7 +168,9 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                   className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
                   placeholder='Subject *'
                 />
-                <div id="editor" className={`h-44 border bg-white rounded-[10px] rounded-t-none`}></div>
+                <div>
+                  <div ref={quillRef} className={`h-44 border bg-white rounded-[10px] rounded-t-none`}></div>
+                </div>
               </>
             ) : (
               <>
