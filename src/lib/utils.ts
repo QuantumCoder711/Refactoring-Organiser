@@ -134,3 +134,8 @@ export const createImage = (url: File | undefined | null): string => {
 
   return UserAvatar;
 };
+
+export const getToken = (): string | null => {
+  const token = localStorage.getItem("klout-organiser-storage");
+  return token ? JSON.parse(token).state.token : null;
+}

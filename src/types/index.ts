@@ -128,8 +128,9 @@ export interface IndustryType extends CompanyType { }
 
 export interface SponsorType extends AttendeeType { }
 
-export interface SendReminder {
-    event_uuid: string;
+
+export interface MessageTemplate {
+    event_id: string;
     send_to: string;
     send_method: string;
     subject: string;
@@ -144,8 +145,15 @@ export interface SendReminder {
     no_of_times: number;
     hour_interval: number;
     status: number;
-}
-
-export interface SendSameDayReminder extends SendReminder{
     check_in: number;
 }
+
+export interface SendReminder extends Omit<MessageTemplate, 'check_in'> {}
+
+export interface SendSameDayReminder extends MessageTemplate {}
+
+export interface SessionReminder extends MessageTemplate {}
+
+export interface VisitBoothReminder extends MessageTemplate {}
+
+export interface DayTwoReminder extends MessageTemplate {}

@@ -11,9 +11,9 @@
     const matchingTemplate = templates.find(template => template.path.includes(templateName));
 
     return (
-      <div>
+      <div className='w-full h-full'>
         <NotifcationsForm 
-          message={matchingTemplate?.message || 'This is a reminder message for the event.'}
+          message={'Template'}
           sendBy={matchingTemplate?.sendBy as "email" | "whatsapp" | "both"}
           sendTo={matchingTemplate?.sendTo || false}
         />
