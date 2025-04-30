@@ -41,7 +41,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         theme: "snow"
       });
     }
-  }, [sendBy]);
+  }, [quillRef, sendBy==="email"]);
 
   // Update allSelected state when selectedRoles changes
   useEffect(() => {
