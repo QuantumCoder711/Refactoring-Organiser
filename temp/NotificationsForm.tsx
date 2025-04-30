@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Quill from "quill";
 import { useParams } from 'react-router-dom';
 import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
 import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -14,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 interface NotifcationsFormProps {
+  onSubmit: () => void;
   sendBy: "email" | "whatsapp" | "both";
   message: string;
   sendTo?: boolean | false;
@@ -24,19 +26,14 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const { getEventBySlug } = useEventStore(state => state);
   const event = getEventBySlug(slug);
 
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
-  const [allSelected, setAllSelected] = useState(false);
-  const [sendBy, setSendBy] = useState<"email" | "whatsapp">(
-    props.sendBy === "both" ? "email" : props.sendBy
-  );
-  const [sendTo, setSendTo] = useState<"everyone" | "checkedIn" | "nonCheckedIn">("everyone");
-  const [subject, setSubject] = useState("");
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
 
+  const [allSelected, setAllSelected] = useState(false);
   const quillRef = useRef<Quill | null>(null);
 
   // Initialize Quill editor
   useEffect(() => {
-    if (!quillRef.current) {
+    if (quillRef.current) {
       quillRef.current = new Quill('#editor', {
         theme: "snow"
       });
@@ -65,16 +62,9 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
     setAllSelected(!allSelected);
   };
 
-  const handleSubmit = async () => {
-    // Add your submit logic here
-    console.log({
-      selectedRoles,
-      sendBy,
-      sendTo,
-      subject,
-      message: quillRef.current?.root.innerHTML
-    });
-  }
+  const handleSubmit = async () => { console.log("Hello") }
+
+  // if(loading) return <Wave />
 
   return (
     <div>
@@ -104,44 +94,33 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                   onCheckedChange={() => handleRoleChange(role)}
                   className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
                 />
+
                 <Label htmlFor={role} className='cursor-pointer'>{role}</Label>
               </div>
             ))}
           </div>
 
-          {/* Send By Options */}
+          {/* Send By Options (WhatsApp/Email) */}
           <h2 className='font-semibold mt-[30px]'>Send By</h2>
-          <RadioGroup 
-            value={sendBy} 
-            onValueChange={(value: "email" | "whatsapp") => setSendBy(value)} 
-            className='flex gap-5 mt-[15px]'
-          >
+          <RadioGroup defaultValue={props.sendBy === "whatsapp" ? "whatsapp" : "email"} className='flex gap-5 mt-[15px]'>
             {(props.sendBy === "email" || props.sendBy === "both") && (
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="email" 
-                  id="email" 
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' 
-                />
+                <RadioGroupItem value="email" id="email" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
                 <Label htmlFor="email" className='cursor-pointer'>Email</Label>
               </div>
             )}
             {(props.sendBy === "whatsapp" || props.sendBy === "both") && (
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="whatsapp" 
-                  id="whatsapp" 
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' 
-                />
+                <RadioGroupItem value="whatsapp" id="whatsapp" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
                 <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
               </div>
             )}
           </RadioGroup>
 
-          {/* Send To Options */}
+          {/* Send To Options (All/Checked In/Not Checked In) */}
           {props.sendTo && <div>
             <h2 className='font-semibold mt-[30px]'>Send To</h2>
-            <RadioGroup value={sendTo} onValueChange={(value: "everyone" | "checkedIn" | "nonCheckedIn") => setSendTo(value)} className='flex gap-5 mt-[15px]'>
+            <RadioGroup defaultValue="everyone" className='flex gap-5 mt-[15px]'>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
                 <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
@@ -159,23 +138,12 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
 
           {/* MessageBox */}
           <div className='mt-[30px]'>
-            {sendBy === "email" ? (
-              <>
-                <Input
-                  type='text'
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
-                  placeholder='Subject *'
-                />
-                <div id="editor" className={`h-44 border bg-white rounded-[10px] rounded-t-none`}></div>
-              </>
-            ) : (
-              <>
-                <h3 className='font-semibold mb-[15px]'>Your Message</h3>
-                <div className='p-5 bg-white rounded-[10px]'>{props.message}</div>
-              </>
-            )}
+            {props.sendBy === "email" ?<>
+              <Input type='text' className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold' placeholder='Subject *' />
+              <div id="editor" className={`h-44 border bg-white rounded-[10px] rounded-t-none`}></div>
+            </>:
+            <h3 className='font-semibold mb-[15px]'>Your Message</h3>
+            }
           </div>
 
           {/* Send Button */}
@@ -191,10 +159,12 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
               <h3 className='font-semibold'>Date</h3>
               <p>{formatDateTime(event?.event_date as string)}</p>
             </div>
+
             <div className='flex flex-col gap-2'>
               <h3 className='font-semibold'>Time</h3>
               <p>{formatDateTime(event?.event_date as string)}</p>
             </div>
+
             <div className='flex flex-col gap-2'>
               <h3 className='font-semibold'>Location</h3>
               <p className='max-w-[300px]'>{event?.event_venue_address_1}</p>
@@ -202,8 +172,8 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div >
+  )
 }
 
 export default NotifcationsForm;

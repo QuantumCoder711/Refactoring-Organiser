@@ -1,57 +1,12 @@
 import GoBack from '@/components/GoBack';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
-import SendReminderIcon from '@/assets/template-message-icons/send-reminder.svg';
-import VisitBoothReminderIcon from '@/assets/template-message-icons/visit-booth-reminder.svg';
-import SessionReminderIcon from '@/assets/template-message-icons/session-reminder.svg';
-import SendSameDayReminderIcon from '@/assets/template-message-icons/send-same-day-reminder.svg';
-import DayTwoReminderIcon from '@/assets/template-message-icons/day-two-reminder.svg';
-import DayTwoSameDayReminderIcon from '@/assets/template-message-icons/day-two-same-day-reminder.svg';
 import { ArrowRight } from 'lucide-react';
+import { templates } from './templatesData';
 
 const AllTemplateMessages: React.FC = () => {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
-
-  const templates = [
-    {
-      title: "Send Reminder",
-      path: `/all-events/event/all-template-messages/send-reminder/${slug}`,
-      icon: SendReminderIcon,
-      paragraph: "Send a follow-up reminder message to all your guests. Ideally, send it one day before the event."
-    },
-    {
-      title: "Send Same Day Reminder",
-      path: `/all-events/event/all-template-messages/send-same-day-reminder/${slug}`,
-      icon: SendSameDayReminderIcon,
-      paragraph: "Send a follow-up reminder message to all your guests on the day of the event. Ideally, send it at 7:00 AM in the morning."
-    },
-    {
-      title: "Session Reminder",
-      path: `/all-events/event/all-template-messages/session-reminder/${slug}`,
-      icon: SessionReminderIcon,
-      paragraph: "Send reminders to all your checked-in guests about the start of a session."
-    },
-    {
-      title: "Visit Booth Reminder",
-      path: `/all-events/event/all-template-messages/visit-booth-reminder/${slug}`,
-      icon: VisitBoothReminderIcon,
-      paragraph: "Send a notification to all your checked-in guests to visit the booth stalls."
-    },
-    {
-      title: "Day Two Reminder",
-      path: `/all-events/event/all-template-messages/day-two-reminder/${slug}`,
-      icon: DayTwoReminderIcon,
-      paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it the evening before the event."
-    },
-    {
-      title: "Day Two Same Day Reminder",
-      path: `/all-events/event/all-template-messages/day-two-same-day-reminder/${slug}`,
-      icon: DayTwoSameDayReminderIcon,
-      paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it at 7 AM on the morning of Day 2."
-    }
-  ];
 
   return (
     <div className=''>
@@ -62,7 +17,7 @@ const AllTemplateMessages: React.FC = () => {
         {templates.map((template, index) => (
           <div
             key={index}
-            onClick={() => navigate(template.path)}
+            onClick={() => navigate(`${template.path}/${slug}`)}
             className="bg-brand-background p-4 rounded-[10px] h-52 cursor-pointer group flex flex-col justify-between"
           >
             <div className='flex flex-col gap-2'>
