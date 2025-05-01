@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Quill from "quill";
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import "quill/dist/quill.snow.css";
 import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MessageTemplate } from '@/types';
 import { toast } from 'sonner';
-import { CircleX, CircleCheck } from 'lucide-react';
+import { CircleX, CircleCheck, ChevronRight } from 'lucide-react';
 import { dayTwoReminder, dayTwoSameDayReminder, sendReminder, sendSameDayReminder, sessionReminder, visitBoothReminder } from '@/api/messageTemplates';
 import Wave from './Wave';
 import useAuthStore from '@/store/authStore';
@@ -228,8 +228,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         <GoBack /> <h1 className='text-xl font-semibold'>{event?.title}</h1>
       </div>
       <div className='mt-8 flex gap-4 h-full'>
-        <div className='bg-brand-background rounded-[10px] min-h-full w-full p-5'>
-
+        <div className='bg-brand-background rounded-[10px] flex-1 w-full p-5 flex flex-col'>
           {/* SelectBoxes */}
           <h2 className='font-semibold'>Select Roles</h2>
           <div className='flex gap-5 mt-[15px] flex-wrap'>
@@ -284,63 +283,65 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
             )}
           </RadioGroup>
 
-          {/* Send To Options */}
-          {props.sendTo && (
-            <div>
-              <h2 className='font-semibold mt-[30px]'>Send To</h2>
-              <RadioGroup
-                value={formData.check_in == 2 ? "everyone" : formData.check_in == 1 ? "checkedIn" : "nonCheckedIn"}
-                onValueChange={handleCheckIn}
-                className='flex gap-5 mt-[15px]'
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
-                  <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="checkedIn" id="checkedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
-                  <Label htmlFor="checkedIn" className='cursor-pointer'>Checked In</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
-                  <Label htmlFor="nonCheckedIn" className='cursor-pointer'>Non-Checked In</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          )}
-
-          {/* MessageBox */}
-          <div className='mt-[30px]'>
-            {formData.send_method === "email" ? (
-              <>
-                <Input
-                  type='text'
-                  value={formData.subject}
-                  onChange={handleSubjectChange}
-                  className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
-                  placeholder='Subject *'
-                />
-                <div>
-                  <div ref={quillRef} className={`!h-40 border bg-white rounded-[10px] rounded-t-none`}></div>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className='font-semibold mb-[15px]'>Your Message</h3>
-                <div className='p-5 bg-white rounded-[10px]' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
-              </>
+          <div className='w-full flex-1 flex flex-col'>
+            {/* Send To Options */}
+            {props.sendTo && (
+              <div>
+                <h2 className='font-semibold mt-[30px]'>Send To</h2>
+                <RadioGroup
+                  value={formData.check_in == 2 ? "everyone" : formData.check_in == 1 ? "checkedIn" : "nonCheckedIn"}
+                  onValueChange={handleCheckIn}
+                  className='flex gap-5 mt-[15px]'
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                    <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="checkedIn" id="checkedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                    <Label htmlFor="checkedIn" className='cursor-pointer'>Checked In</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                    <Label htmlFor="nonCheckedIn" className='cursor-pointer'>Non-Checked In</Label>
+                  </div>
+                </RadioGroup>
+              </div>
             )}
-          </div>
 
-          {/* Send Button */}
-          <Button className='btn !mt-5' onClick={handleSubmit}>Send</Button>
+            {/* MessageBox */}
+            <div className='mt-[30px] flex-1 flex flex-col'>
+              {formData.send_method === "email" ? (
+                <>
+                  <Input
+                    type='text'
+                    value={formData.subject}
+                    onChange={handleSubjectChange}
+                    className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
+                    placeholder='Subject *'
+                  />
+                  <div className='flex-1 flex flex-col'>
+                    <div ref={quillRef} className={`flex-1 border bg-white rounded-[10px] rounded-t-none`}></div>
+                  </div>
+                </>
+              ) : (
+                <div className='flex-1 flex flex-col'>
+                  <h3 className='font-semibold mb-[15px]'>Your Message</h3>
+                  <div className='p-5 bg-white rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
+                </div>
+              )}
+            </div>
+
+            {/* Send Button */}
+            <Button className='btn !mt-5 w-fit' onClick={handleSubmit}>Send</Button>
+          </div>
         </div>
 
-        <div className='min-w-[300px] flex flex-col gap-4 h-full bg-brand-background rounded-[10px] p-3'>
+        <div className='w-[300px] flex flex-col gap-4 min-h-full bg-brand-background rounded-[10px] p-3'>
           <img src={getImageUrl(event?.image)} alt={event?.title} className='rounded-[10px]' />
           <h3 className='font-semibold text-nowrap text-ellipsis overflow-hidden text-xl'>{event?.title}</h3>
           <Separator className='bg-white w-full' />
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col flex-1 gap-4'>
             <div className='flex flex-col gap-2'>
               <h3 className='font-semibold'>Date</h3>
               <p>{formatDateTime(event?.event_date as string)}</p>
@@ -349,9 +350,16 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
               <h3 className='font-semibold'>Time</h3>
               <p>{formatDateTime(event?.event_date as string)}</p>
             </div>
-            <div className='flex flex-col gap-2'>
-              <h3 className='font-semibold'>Location</h3>
-              <p className='max-w-[300px]'>{event?.event_venue_address_1}</p>
+
+            <div className='flex flex-1 flex-col justify-between'>
+              <div className='flex flex-col flex-1 gap-2'>
+                <h3 className='font-semibold'>Location</h3>
+                <p className='max-w-[300px]'>{event?.event_venue_address_1}</p>
+              </div>
+
+              <Link to={`/all-events/view/${slug}`} className='w-fit mx-auto mt-4 mb-2'>
+                <Button className='btn !w-[200px]'>View Event Details <ChevronRight height={10} width={5} /></Button>
+              </Link>
             </div>
           </div>
         </div>

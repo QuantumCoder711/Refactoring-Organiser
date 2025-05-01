@@ -31,14 +31,17 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const user = useAuthStore(state => state.user);
   const location = useLocation();
   const { pathname } = location;
-  const [heading, setHeading] = React.useState(pathname.split('/')[pathname.split('/').length - 2]);
+  const [heading, setHeading] = React.useState<string>('');
 
   useEffect(() => {
-    sidebarItems.forEach((item) => {
-      if (pathname.includes(item.path)) {
-        setHeading(item.label);
-      }
-    });
+    const label = sidebarItems.find(item => item.path === pathname)?.label;
+
+    setHeading(label || pathname.split('/')[pathname.split('/').length - 2]
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+    );
+
   }, [location.pathname]);
 
   const handleLogout = () => {
