@@ -13,7 +13,7 @@
     return (
       <div className='w-full h-full'>
         <NotifcationsForm 
-          message={'Template'}
+          message={matchingTemplate?.message}
           sendBy={matchingTemplate?.sendBy as "email" | "whatsapp" | "both"}
           sendTo={matchingTemplate?.sendTo || false}
         />

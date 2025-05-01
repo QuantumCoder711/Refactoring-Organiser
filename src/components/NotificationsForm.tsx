@@ -6,7 +6,7 @@ import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { roles } from '@/constants';
-import { formatDateTime, getImageUrl } from '@/lib/utils';
+import { formatDateTime, formatTemplateMessage, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
@@ -17,10 +17,11 @@ import { toast } from 'sonner';
 import { CircleX, CircleCheck } from 'lucide-react';
 import { dayTwoReminder, dayTwoSameDayReminder, sendReminder, sendSameDayReminder, sessionReminder, visitBoothReminder } from '@/api/messageTemplates';
 import Wave from './Wave';
+import useAuthStore from '@/store/authStore';
 
 interface NotifcationsFormProps {
   sendBy: "email" | "whatsapp" | "both";
-  message: string;
+  message: string | undefined;
   sendTo?: boolean | false;
 }
 
@@ -30,16 +31,20 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const event = getEventBySlug(slug);
   const [loading, setLoading] = useState(false);
 
+  const { user } = useAuthStore(state => state);
+
   const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
   const [allSelected, setAllSelected] = useState(true); // Initialize as true since all roles are selected by default
   const quillRef = useRef<HTMLDivElement | null>(null);
+
+  console.log("The event is: ", event);
 
   const [formData, setFormData] = useState<MessageTemplate>({
     event_id: event?.uuid as string,
     send_to: selectedRoles.join(','),
     send_method: props.sendBy === 'both' ? 'email' : props.sendBy,
     subject: '',
-    message: props.message,
+    message: props.message || "Template",
     start_date: event?.event_start_date as string,
     delivery_schedule: 'now', // For now
     start_date_time: event?.start_time as string,
@@ -55,12 +60,25 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
 
   // Initialize Quill editor
   useEffect(() => {
-    if (quillRef.current) {
-      new Quill(quillRef.current, {
-        theme: "snow"
+    if (quillRef.current && formData.send_method === "email") {
+      const quill = new Quill(quillRef.current, {
+        theme: "snow",
+        placeholder: "Type your message here...",
       });
+
+      quill.on('text-change', () => {
+        setFormData(prev => ({
+          ...prev,
+          message: quill.root.innerHTML
+        }));
+      });
+
+      // // Set initial content if message exists
+      // if (formData.message) {
+      //   quill.root.innerHTML = formData.message;
+      // }
     }
-  }, [quillRef, formData.send_method === "email"]);
+  }, [quillRef, formData.send_method === "email", loading]);
 
   // Update formData when selectedRoles changes
   useEffect(() => {
@@ -108,10 +126,19 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   };
 
   const handleSendMethodChange = (value: "email" | "whatsapp") => {
-    setFormData(prev => ({
-      ...prev,
-      send_method: value
-    }));
+    if (value === "email") {
+      setFormData(prev => ({
+        ...prev,
+        send_method: value,
+        message: "",
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        send_method: value,
+        message: props.message || "Template",
+      }));
+    }
   };
 
   const handleCheckIn = (value: "everyone" | "checkedIn" | "nonCheckedIn") => {
@@ -142,7 +169,6 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
     // Get the template name from URL
     const pathname = window.location.pathname;
     const templateName = pathname.split('/')[pathname.split('/').length - 2];
-    console.log(templateName);
     try {
       let response;
       switch (templateName) {
@@ -169,10 +195,17 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
           throw new Error('Unknown template type');
       }
 
-      toast("Message sent successfully!", {
-        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-        icon: <CircleCheck className='size-5' />
-      });
+      if (response.status === 200) {
+        toast("Message sent successfully!", {
+          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleCheck className='size-5' />
+        });
+      } else {
+        toast(response.message || "Something went wrong!!!", {
+          className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleX className='size-5' />
+        });
+      }
     } catch (error) {
       toast(error instanceof Error ? error.message : "Failed to send message", {
         className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -180,6 +213,10 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       });
     } finally {
       setLoading(false);
+      setFormData({
+        ...formData,
+        subject: "",
+      });
     }
   };
 
@@ -290,7 +327,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
             ) : (
               <>
                 <h3 className='font-semibold mb-[15px]'>Your Message</h3>
-                <div className='p-5 bg-white rounded-[10px]'>{formData.message}</div>
+                <div className='p-5 bg-white rounded-[10px]' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
               </>
             )}
           </div>

@@ -1,5 +1,5 @@
 import { domain, UserAvatar } from "@/constants";
-import { EventType } from "@/types";
+import { EventType, UserType } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -138,4 +138,18 @@ export const createImage = (url: File | undefined | null): string => {
 export const getToken = (): string | null => {
   const token = localStorage.getItem("klout-organiser-storage");
   return token ? JSON.parse(token).state.token : null;
+}
+
+export const formatTemplateMessage = (message: string, event: EventType | null, user: UserType | null): string => {
+  if(!event || !user) return message;
+  
+  const { company_name } = user;
+  const { title, event_venue_name, event_start_date, start_time, start_minute_time, start_time_type } = event;
+
+  return message
+    .replace("{title}", title || '')
+    .replace("{company_name}", company_name || '')
+    .replace("{event_venue_name}", event_venue_name || '')
+    .replace("{event_start_date}", event_start_date || '')
+    .replace("{start_time}", `${start_time}:${start_minute_time} ${start_time_type}` || '');
 }
