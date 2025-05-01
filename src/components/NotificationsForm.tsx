@@ -37,8 +37,6 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const [allSelected, setAllSelected] = useState(true); // Initialize as true since all roles are selected by default
   const quillRef = useRef<HTMLDivElement | null>(null);
 
-  console.log("The event is: ", event);
-
   const [formData, setFormData] = useState<MessageTemplate>({
     event_id: event?.uuid as string,
     send_to: selectedRoles.join(','),
