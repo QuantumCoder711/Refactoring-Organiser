@@ -7,9 +7,8 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { UserAvatar } from '@/constants';
+import { sidebarItems, UserAvatar } from '@/constants';
 import { Link, useLocation } from 'react-router-dom';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import useAuthStore from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '@/lib/utils';
@@ -31,9 +30,15 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const { logout } = useAuthStore();
   const user = useAuthStore(state => state.user);
   const location = useLocation();
+  const { pathname } = location;
+  const [heading, setHeading] = React.useState(pathname.split('/')[pathname.split('/').length - 2]);
 
   useEffect(() => {
-    
+    sidebarItems.forEach((item) => {
+      if (pathname.includes(item.path)) {
+        setHeading(item.label);
+      }
+    });
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -65,7 +70,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <img src={user?.company_logo ? getImageUrl(user?.company_logo) : InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
         </div>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
-          <h2 className='text-xl font-semibold'>Dashboard</h2>
+          <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
             <li>
               <Button className='btn-rounded !px-3'>Create New Event</Button>

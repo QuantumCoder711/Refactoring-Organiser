@@ -1,4 +1,4 @@
-import { SidebarItems } from '@/constants';
+import { sidebarItems } from '@/constants';
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,7 @@ const Sidebar: React.FC = () => {
     return (
         <aside className={`${isOpen ? 'w-52 lg:w-56 p-3 pt-5' : 'w-0'} sticky left-0 z-20 bg-brand-background h-full transition-all duration-300`}>
             <ul className={`flex flex-col gap-2 relative h-full overflow-hidden ${isOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-                {SidebarItems.map((item) => (
+                {sidebarItems.map((item) => (
                     <li key={item.label}>
                         <Link to={item.path} className={`flex items-center gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${path.pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
                             <item.icon className='size-5' />

@@ -2,7 +2,7 @@ import { BrainCircuit, ChartPie, HandHeart, Images, LayoutDashboard, NotebookPen
 
 export const UserAvatar: string = "https://github.com/shadcn.png";
 
-export const SidebarItems = [
+export const sidebarItems = [
     {
         label: "Dashboard",
         icon: LayoutDashboard,
