@@ -85,7 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                     <AvatarImage src={UserAvatar} alt="User" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
-                  <span className='font-semibold text-sm'>John Doe</span>
+                  <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className='w-40'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>

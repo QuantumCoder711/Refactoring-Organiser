@@ -51,6 +51,17 @@ import {
 } from "@/components/ui/select";
 import GoBack from '@/components/GoBack';
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+
 
 const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -80,25 +91,29 @@ const Attendees: React.FC = () => {
   const [nameFilter, setNameFilter] = useState('');
   const [companyFilter, setCompanyFilter] = useState('');
   const [designationFilter, setDesignationFilter] = useState('');
-  const [checkInFilter, setCheckInFilter] = useState<string>('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
+  const [checkInFilter, setCheckInFilter] = useState<string>('all');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
 
   // Add selected attendees state
   const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
 
-  
+  // Add pagination state
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const filteredAttendees = useMemo(() => {
+    setCurrentPage(1);
     return singleEventAttendees.filter(attendee => {
       const nameMatch = `${attendee.first_name || ''} ${attendee.last_name || ''}`.toLowerCase().includes(nameFilter.toLowerCase());
       const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
-      
+
       // Handle null designation (job_title)
-      const designationMatch = designationFilter === '' || 
-        (attendee.job_title ? 
-          attendee.job_title.toLowerCase().includes(designationFilter.toLowerCase()) : 
+      const designationMatch = designationFilter === '' ||
+        (attendee.job_title ?
+          attendee.job_title.toLowerCase().includes(designationFilter.toLowerCase()) :
           designationFilter === '');
-      
-      const checkInMatch = checkInFilter === '' ||
+
+      const checkInMatch = checkInFilter === '' || checkInFilter === 'all' ||
         (checkInFilter === '1' && attendee.check_in === 1) ||
         (checkInFilter === '0' && attendee.check_in === 0);
       const roleMatch = roleFilter === '' || roleFilter === 'all' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
@@ -107,8 +122,32 @@ const Attendees: React.FC = () => {
     });
   }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
 
+  // Calculate paginated data
+  const paginatedAttendees = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAttendees.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAttendees, currentPage, itemsPerPage]);
+
+  // Calculate total pages
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredAttendees.length / itemsPerPage);
+  }, [filteredAttendees.length, itemsPerPage]);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   // Check if any filter is active
-  const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' || checkInFilter !== '' || (roleFilter !== '' && roleFilter !== 'all');
+  const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' || 
+                         (checkInFilter !== '' && checkInFilter !== 'all') || 
+                         (roleFilter !== '' && roleFilter !== 'all');
 
   // Buttons
   const links = [
@@ -320,9 +359,9 @@ const Attendees: React.FC = () => {
       {/* Buttons Row */}
       <div className='flex gap-3.5 mt-6'>
         {links.map((link, index) => (
-          <Link 
-            key={index} 
-            to={link.url} 
+          <Link
+            key={index}
+            to={link.url}
             className={`btn ${link.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
           >
             {link.name}
@@ -335,7 +374,21 @@ const Attendees: React.FC = () => {
 
         {/* Details Row */}
         <div className='flex gap-3.5'>
-          <span className='rounded-sm !w-[83px] !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm'>10/Page <ChevronDown /></span>
+
+          {/* Select Box for pagination */}
+          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+            <SelectTrigger className="rounded-sm !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+              <SelectValue placeholder={`${itemsPerPage}/Page`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="25">25</SelectItem>
+              <SelectItem value="50">50</SelectItem>
+              <SelectItem value="100">100</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* <span className=''>10/Page <ChevronDown /></span> */}
           <span className='font-semibold text-sm'>Total Attendees: {singleEventAttendees.length}</span>
           {/* <span className='font-semibold text-sm'>CheckIn 1st: {singleEventAttendees.length}</span> */}
           {isFilterActive && (
@@ -372,9 +425,12 @@ const Attendees: React.FC = () => {
           {/* Filter By Check-In */}
           <Select value={checkInFilter} onValueChange={setCheckInFilter}>
             <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Check-IN" />
+              <SelectValue placeholder="Check-IN">
+                {checkInFilter === 'all' ? 'Check-IN' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Check-IN'}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className='!text-sm !font-semibold'>
+              <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
               <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
               <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
             </SelectContent>
@@ -383,10 +439,17 @@ const Attendees: React.FC = () => {
           {/* Filter By Role */}
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Role" />
+              <SelectValue placeholder="Role">
+                {roleFilter === 'all' ? 'Role' : 
+                 roleFilter === 'delegate' ? 'Delegate' :
+                 roleFilter === 'speaker' ? 'Speaker' :
+                 roleFilter === 'sponsor' ? 'Sponsor' :
+                 roleFilter === 'panelist' ? 'Panelist' :
+                 roleFilter === 'moderator' ? 'Moderator' : 'Role'}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className='!text-sm !font-semibold'>
-              <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
+              <SelectItem value="all" className='cursor-pointer'>All Roles</SelectItem>
               <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
               <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
               <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
@@ -430,7 +493,7 @@ const Attendees: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAttendees.map((attendee: AttendeeType, index: number) => (
+            {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
               <TableRow key={attendee.id}>
                 <TableCell className="text-left min-w-10">
                   <Checkbox
@@ -439,7 +502,7 @@ const Attendees: React.FC = () => {
                     onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
                   />
                 </TableCell>
-                <TableCell className="text-left min-w-10 font-medium">{index + 1}</TableCell>
+                <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell className="text-left min-w-10">
                   {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
                 </TableCell>
@@ -564,7 +627,102 @@ const Attendees: React.FC = () => {
             ))}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        <Pagination className='mt-[26px] flex justify-end'>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious 
+                onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              />
+            </PaginationItem>
+            
+            {/* Show first page */}
+            {totalPages > 0 && (
+              <PaginationItem>
+                <PaginationLink 
+                  isActive={currentPage === 1}
+                  onClick={() => handlePageChange(1)}
+                  className="cursor-pointer"
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+            )}
+            
+            {/* Show ellipsis if needed */}
+            {currentPage > 3 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            
+            {/* Show current page and adjacent pages */}
+            {totalPages > 1 && currentPage > 2 && (
+              <PaginationItem>
+                <PaginationLink 
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="cursor-pointer"
+                >
+                  {currentPage - 1}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+            
+            {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationLink 
+                  isActive={true}
+                  className="cursor-pointer"
+                >
+                  {currentPage}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+            
+            {totalPages > 2 && currentPage < totalPages - 1 && (
+              <PaginationItem>
+                <PaginationLink 
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  className="cursor-pointer"
+                >
+                  {currentPage + 1}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+            
+            {/* Show ellipsis if needed */}
+            {currentPage < totalPages - 2 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            
+            {/* Show last page */}
+            {totalPages > 1 && (
+              <PaginationItem>
+                <PaginationLink 
+                  isActive={currentPage === totalPages}
+                  onClick={() => handlePageChange(totalPages)}
+                  className="cursor-pointer"
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+            
+            <PaginationItem>
+              <PaginationNext 
+                onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+
       </div>
+
     </div>
   )
 }
