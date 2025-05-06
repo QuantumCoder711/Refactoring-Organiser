@@ -1,4 +1,4 @@
-import { domain } from "@/constants";
+import { domain, token } from "@/constants";
 import axios from "axios";
 import { EventResponse } from "@/types/api-responses";
 
@@ -16,6 +16,24 @@ export const getAllEvents = async(token: string): Promise<EventResponse> => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to fetch events");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+// Deleting Event
+export const deleteEvent = async (id: number) => {
+    try {
+        const response = await axios.delete(`${domain}/api/events/${id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if(axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to delete event");
         }
         throw new Error("An unexpected error occurred");
     }

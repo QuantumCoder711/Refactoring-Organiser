@@ -52,6 +52,7 @@ const Dashboard: React.FC = () => {
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
                   isLive={isEventLive(event)}
+                  id={event.id}
                 />
               </div>
             ))
@@ -77,6 +78,7 @@ const Dashboard: React.FC = () => {
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
                   isLive={isEventLive(event)}
+                  id={event.id}
                 />
               </div>
             ))}

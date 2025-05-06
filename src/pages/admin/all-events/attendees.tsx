@@ -349,15 +349,8 @@ const Attendees: React.FC = () => {
         </div>
       </div>
 
-      {/* Add Date Difference Display */}
-      {dateDiff > 0 && (
-        <div className="mt-4 text-sm text-gray-600">
-          Event Duration: {dateDiff} {dateDiff === 1 ? 'day' : 'days'}
-        </div>
-      )}
-
       {/* Buttons Row */}
-      <div className='flex gap-3.5 mt-6'>
+      <div className='flex gap-3.5 mt-6 flex-wrap'>
         {links.map((link, index) => (
           <Link
             key={index}

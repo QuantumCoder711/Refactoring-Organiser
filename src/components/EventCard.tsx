@@ -1,7 +1,22 @@
 import { MapPin, Trash } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import Wave from './Wave';
+import useEventStore from '@/store/eventStore';
 
 interface EventCardProps {
     title: string;
@@ -11,6 +26,7 @@ interface EventCardProps {
     imageAlt: string;
     isLive?: boolean;
     slug: string;
+    id: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -20,16 +36,20 @@ const EventCard: React.FC<EventCardProps> = ({
     image,
     imageAlt,
     slug,
+    id,
     isLive = false
 }) => {
+    const [loading, setLoading] = useState<boolean>(false);
+const {deleteEvent} = useEventStore(state=>state)
     const renderProgressBar = (value: number, total: number) => (
         <div className='h-1 w-full mt-0.5 bg-brand-light rounded-full'>
-            <div 
-                className='h-full bg-brand-secondary rounded-full' 
+            <div
+                className='h-full bg-brand-secondary rounded-full'
                 style={{ width: `${(value / total) * 100}%` }}
             />
         </div>
     );
+
 
     const renderStatItem = (label: string, value: string | number, total?: number) => (
         <div className='text-xs border-b border-brand-light py-1 pb-2'>
@@ -44,33 +64,72 @@ const EventCard: React.FC<EventCardProps> = ({
     // Format date from YYYY-MM-DD to DD-MMM-YYYY
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
-        
+
         try {
             const date = new Date(dateString);
             const day = date.getDate();
             const month = date.toLocaleString('default', { month: 'short' });
             const year = date.getFullYear();
-            
+
             return `${day}-${month}-${year}`;
         } catch (error) {
             return dateString; // Return original if parsing fails
         }
     };
 
+    const handleDeleteEvent = async () => {
+        if (id) {
+            setLoading(true);
+            try {
+                const response = await deleteEvent(id);
+                if (response.status === 200) {
+                    toast(response.message || "Event deleted successfully", {
+                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider"
+                    });
+                }
+            } catch (error: any) {
+                toast(error.message || "Failed to delete event", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider"
+                });
+            } finally {
+                setLoading(false);
+            }
+        }
+    }
+
+    if(loading) return <Wave />
+
     return (
         <div className={`${isLive ? 'w-full max-w-lg' : 'w-64'} flex rounded-xl shadow-blur-lg relative`}>
             <div className="h-64 flex flex-col">
                 <div className='flex-1 overflow-hidden relative w-64'>
-                    <Button 
-                        className='absolute w-8 h-8 bg-brand-secondary hover:bg-brand-secondary cursor-pointer rounded-full z-50 top-2 right-2'
-                        aria-label="Delete event"
-                    >
-                        <Trash />
-                    </Button>
-                    <img 
-                        src={image} 
-                        alt={imageAlt} 
-                        className='w-full h-full object-cover rounded-t-xl' 
+
+
+                    <AlertDialog>
+                        <AlertDialogTrigger
+                            className='absolute grid place-content-center text-white w-8 h-8 bg-brand-secondary hover:bg-brand-secondary cursor-pointer rounded-full z-50 top-2 right-2'
+                            >
+                            <Trash size={16}/>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Do you really want to delete {title} ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete {title} 
+                                    and remove it's data from the event.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                                <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={handleDeleteEvent}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <img
+                        src={image}
+                        alt={imageAlt}
+                        className='w-full h-full object-cover rounded-t-xl'
                     />
                     <div className='h-1/2 bottom-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
                         <div className='w-full h-full flex justify-between items-end p-2'>
