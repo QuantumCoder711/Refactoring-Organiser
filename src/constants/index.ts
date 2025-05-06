@@ -45,6 +45,29 @@ export const sidebarItems = [
     }
 ];
 
+export const navbarLinks = [
+    {
+        label: "Home",
+        path: "/",
+    },
+    {
+        label: "Events",
+        path: "#",
+    },
+    {
+        label: "Feature",
+        path: "#",
+    },
+    {
+        label: "Download",
+        path: "#",
+    },
+    {
+        label: "Organiser Login",
+        path: "/login",
+    },
+]
+
 export const roles: string[] = ["Speaker", "Panelist", "Sponsor", "Delegate", "Moderator"];
 
 export const domain: string = import.meta.env.VITE_API_URL;

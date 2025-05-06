@@ -7,7 +7,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { sidebarItems, UserAvatar } from '@/constants';
+import { navbarLinks, sidebarItems, UserAvatar } from '@/constants';
 import { Link, useLocation } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -57,13 +57,17 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
             <img src={Logo} alt="logo" />
           </Link>
 
-          <ul className='flex gap-5 items-center'>
-            <li>
-              <Link to="#">Explore Events</Link>
-            </li>
-            <li>
-              <Link to="/login">Login</Link>
-            </li>
+          <ul className='flex gap-7 items-center'>
+            {
+              navbarLinks.map((link, index) => (
+                <li key={index}>
+                  {link.path === "/login" ?
+                    <Link to={link.path} className='px-4 py-2.5 rounded-full border border-black'>Organiser Login</Link> :
+                    <Link to={link.path}>{link.label}</Link>
+                  }
+                </li>
+              ))
+            }
           </ul>
         </nav>
       </header>
