@@ -2,7 +2,7 @@ import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
+import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';

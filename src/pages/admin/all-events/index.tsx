@@ -42,6 +42,7 @@ const AllEvents: React.FC = () => {
                         imageAlt={event.title}
                         isLive={isEventLive(event)}
                         slug={event.slug}
+                        id={event.id}
                     />
                 ))}
             </div>}
@@ -58,6 +59,7 @@ const AllEvents: React.FC = () => {
                         image={getImageUrl(event.image)}
                         imageAlt={event.title}
                         slug={event.slug}
+                        id={event.id}
                     />
                 ))}
             </div>}

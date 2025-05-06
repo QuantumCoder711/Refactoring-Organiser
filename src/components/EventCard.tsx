@@ -40,7 +40,7 @@ const EventCard: React.FC<EventCardProps> = ({
     isLive = false
 }) => {
     const [loading, setLoading] = useState<boolean>(false);
-const {deleteEvent} = useEventStore(state=>state)
+    const { deleteEvent } = useEventStore(state => state)
     const renderProgressBar = (value: number, total: number) => (
         <div className='h-1 w-full mt-0.5 bg-brand-light rounded-full'>
             <div
@@ -97,7 +97,7 @@ const {deleteEvent} = useEventStore(state=>state)
         }
     }
 
-    if(loading) return <Wave />
+    if (loading) return <Wave />
 
     return (
         <div className={`${isLive ? 'w-full max-w-lg' : 'w-64'} flex rounded-xl shadow-blur-lg relative`}>
@@ -108,14 +108,14 @@ const {deleteEvent} = useEventStore(state=>state)
                     <AlertDialog>
                         <AlertDialogTrigger
                             className='absolute grid place-content-center text-white w-8 h-8 bg-brand-secondary hover:bg-brand-secondary cursor-pointer rounded-full z-50 top-2 right-2'
-                            >
-                            <Trash size={16}/>
+                        >
+                            <Trash size={16} />
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Do you really want to delete {title} ?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete {title} 
+                                    This action cannot be undone. This will permanently delete {title}
                                     and remove it's data from the event.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
