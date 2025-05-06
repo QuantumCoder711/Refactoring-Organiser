@@ -66,7 +66,7 @@ export const navbarLinks = [
         label: "Organiser Login",
         path: "/login",
     },
-]
+];
 
 export const roles: string[] = ["Speaker", "Panelist", "Sponsor", "Delegate", "Moderator"];
 
