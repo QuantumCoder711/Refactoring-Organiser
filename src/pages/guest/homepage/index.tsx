@@ -40,6 +40,12 @@ const Homepage: React.FC = () => {
         <PrivacySection />
         <Linea />
       </div>
+
+      {/* Launch Event Section */}
+      {/* <div className='flex flex-col lg:flex-1 min-h-fit'>
+        <PrivacySection />
+        <Linea />
+      </div> */}
     </div>
   )
 }
