@@ -29,11 +29,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.479.0",
-<<<<<<< HEAD
-    "motion": "^12.10.0",
-=======
     "motion": "^12.10.2",
->>>>>>> homepage
     "next-themes": "^0.4.6",
     "quill": "^2.0.3",
     "react": "^19.0.0",
