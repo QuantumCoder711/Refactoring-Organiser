@@ -21,6 +21,18 @@ import useAuthStore from '@/store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '@/lib/utils';
 
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { AlignRight } from 'lucide-react';
+
 interface NavbarProps {
   isAuthenticated: boolean;
 }
@@ -57,7 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
             <img src={Logo} alt="logo" />
           </Link>
 
-          <ul className='flex gap-7 items-center'>
+          <ul className='hidden sm:flex gap-7 items-center'>
             {
               navbarLinks.map((link, index) => (
                 <li key={index}>
@@ -69,6 +81,28 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
               ))
             }
           </ul>
+
+          {/* Hamburger Menu */}
+          <div className='sm:hidden'>
+            <Drawer direction='right'>
+              <DrawerTrigger asChild>
+                <Button className='cursor-pointer'><AlignRight size={24} /></Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+                  <DrawerDescription>This action cannot be undone.</DrawerDescription>
+                </DrawerHeader>
+                <DrawerFooter>
+                  <Button>Submit</Button>
+                  <DrawerClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          </div>
+
         </nav>
       </header>
       :
