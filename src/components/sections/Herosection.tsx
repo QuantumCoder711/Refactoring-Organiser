@@ -8,17 +8,17 @@ import QrCode from "@/assets/qr-code.svg";
 
 const Herosection: React.FC = () => {
   return (
-    <section className='w-full h-full flex items-center gap-24 justify-center p-5'>
+    <section className='w-full h-fit lg:h-full flex flex-col-reverse lg:flex-row items-center lg:gap-24 justify-center max-w-[1205px] mx-auto p-5'>
 
         {/* Text Div */}
-        <div className='flex flex-col gap-9 w-1/2'>
+        <div className='flex flex-col gap-9 w-full mt-[68px] lg:mt-0 lg:w-1/2 text-center lg:text-left'>
             <h1 className='text-5xl font-bold'>Make Business Networking Effortless with <span className='text-brand-primary'>Klout Club</span></h1>
-            <p className='text-2xl'>Klout Club helps you create smarter events — with instant QR check-in, real-time networking, AI photos, and professional connections that last beyond the event. Start free, set up in minutes.</p>
-            <Button className='btn !rounded-full !max-w-fit !text-lg !font-semibold !h-12'>Get Started -  It's Free</Button>
+            <p className='text-2xl '>Klout Club helps you create smarter events — with instant QR check-in, real-time networking, AI photos, and professional connections that last beyond the event. Start free, set up in minutes.</p>
+            <Button className='btn !rounded-full !max-w-fit !text-lg !font-semibold !h-12 mx-auto lg:mx-0'>Get Started -  It's Free</Button>
         </div>
 
         {/* Image Div with Feature Icons */}
-        <div className='w-1/2 relative flex justify-center'>
+        <div className='w-full lg:w-1/2 relative flex justify-center mt-11 lg:mt-0'>
             {/* Center user image */}
             <div className='relative flex items-center justify-center'>
                 <img src={KloutUser} alt="Klout User" className="z-10" width={320} />
