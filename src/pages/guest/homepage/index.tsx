@@ -1,6 +1,8 @@
 import Linea from '@/components/Linea';
+import DownloadOptions from '@/components/sections/DownloadOptions';
 import Features from '@/components/sections/Features';
 import Herosection from '@/components/sections/Herosection';
+import LaunchEvent from '@/components/sections/LaunchEvent';
 import PrivacySection from '@/components/sections/PrivacySection';
 import TlsSection from '@/components/sections/TlsSection';
 import ToolsSection from '@/components/sections/ToolsSection';
@@ -42,10 +44,15 @@ const Homepage: React.FC = () => {
       </div>
 
       {/* Launch Event Section */}
-      {/* <div className='flex flex-col lg:flex-1 min-h-fit'>
-        <PrivacySection />
+      <div className='flex flex-col lg:flex-1 min-h-fit'>
+        <LaunchEvent />
         <Linea />
-      </div> */}
+      </div>
+
+      {/* Download Options Section */}
+      <div className='flex flex-col lg:flex-1 min-h-fit'>
+        <DownloadOptions />
+      </div>
     </div>
   )
 }
