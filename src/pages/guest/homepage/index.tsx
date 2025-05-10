@@ -52,7 +52,6 @@ const Homepage: React.FC = () => {
       {/* Download Options Section */}
       <div className='flex flex-col lg:flex-1 min-h-fit'>
         <DownloadOptions />
-        <Linea />
       </div>
     </div>
   )
