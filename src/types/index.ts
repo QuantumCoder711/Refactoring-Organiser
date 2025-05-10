@@ -129,7 +129,7 @@ export interface IndustryType extends CompanyType { }
 export interface SponsorType extends AttendeeType { }
 
 
-export interface MessageTemplate {
+export interface MessageTemplateType {
     event_id: string;
     send_to: string;
     send_method: string;
@@ -148,12 +148,34 @@ export interface MessageTemplate {
     check_in: number;
 }
 
-export interface SendReminder extends Omit<MessageTemplate, 'check_in'> {}
+export interface SendReminderType extends Omit<MessageTemplateType, 'check_in'> {}
 
-export interface SendSameDayReminder extends MessageTemplate {}
+export interface SendSameDayReminderType extends MessageTemplateType {}
 
-export interface SessionReminder extends MessageTemplate {}
+export interface SessionReminderType extends MessageTemplateType {}
 
-export interface VisitBoothReminder extends MessageTemplate {}
+export interface VisitBoothReminderType extends MessageTemplateType {}
 
-export interface DayTwoReminder extends MessageTemplate {}
+export interface DayTwoReminderType extends MessageTemplateType {}
+
+
+export interface AgendaType {
+    id: number;
+    uuid: string;
+    event_id: number;
+    title: string;
+    description: string;
+    tag_speakers: string;
+    event_date: string;
+    start_time: string;
+    start_time_type: string;
+    end_time: string;
+    end_time_type: string;
+    image_path: string | null;
+    created_at: string;
+    updated_at: string;
+    start_minute_time: string;
+    end_minute_time: string;
+    position: number;
+    speakers: AttendeeType[] | [];
+}

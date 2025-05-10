@@ -1,4 +1,4 @@
-import { AttendeeType, EventType, UserType, SponsorType } from "./index";
+import { AttendeeType, EventType, UserType, SponsorType, AgendaType } from "./index";
 
 export interface LoginResponse {
     status: number;
@@ -78,6 +78,12 @@ export interface AddBulkAttendeeResponse {
         phone_number: number;
         reason: string;
     }> | [];
+}
+
+export interface GetEventAgendasResponse {
+    status: number;
+    message: string;
+    data: AgendaType[] | [];
 }
 
 // Add more API response types here as needed

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import GoogleMap from "@/components/GoogleMap";
 import { UserAvatar } from '@/constants';
@@ -15,6 +15,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import useAgendaStore from '@/store/agendaStore';
+import Wave from '@/components/Wave';
 
 
 const ViewEvent: React.FC = () => {
@@ -22,8 +24,22 @@ const ViewEvent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore((state) => state.getEventBySlug(slug));
 
+    const { agendas, loading, getEventAgendas } = useAgendaStore(state => state);
+
+    useEffect(() => {
+        if(event?.id) {
+            getEventAgendas(event.id);
+        }
+    }, [event, getEventAgendas]);
+
+    console.log(agendas);
+
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
+
+    if(loading) {
+        return <Wave />
+    }
 
     return (
         <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>
