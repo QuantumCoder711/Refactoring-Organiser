@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { MessageTemplate } from '@/types';
+import { MessageTemplateType } from '@/types';
 import { toast } from 'sonner';
 import { CircleX, CircleCheck, ChevronRight } from 'lucide-react';
 import { dayTwoReminder, dayTwoSameDayReminder, sendReminder, sendSameDayReminder, sessionReminder, visitBoothReminder } from '@/api/messageTemplates';
@@ -37,7 +37,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const [allSelected, setAllSelected] = useState(true); // Initialize as true since all roles are selected by default
   const quillRef = useRef<HTMLDivElement | null>(null);
 
-  const [formData, setFormData] = useState<MessageTemplate>({
+  const [formData, setFormData] = useState<MessageTemplateType>({
     event_id: event?.uuid as string,
     send_to: selectedRoles.join(','),
     send_method: props.sendBy === 'both' ? 'email' : props.sendBy,
@@ -65,7 +65,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       });
 
       quill.on('text-change', () => {
-        setFormData(prev => ({
+        setFormData((prev:MessageTemplateType) => ({
           ...prev,
           message: quill.root.innerHTML
         }));
