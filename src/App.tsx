@@ -31,7 +31,8 @@ import AllTemplateMessages from '@/pages/admin/all-template-messages';
 
 // Error Page
 import Error404 from '@/pages/404';
-import TemplateMessage from './pages/admin/all-template-messages/template-message';
+import TemplateMessage from '@/pages/admin/all-template-messages/template-message';
+import Profile from '@/pages/admin/profile';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -69,6 +70,7 @@ const App: React.FC = () => {
       >
         {/* Main Routes */}
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="all-events" element={<AllEvents />} />
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-sponsors" element={<AllSponsors />} />

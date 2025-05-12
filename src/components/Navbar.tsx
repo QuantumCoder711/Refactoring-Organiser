@@ -47,12 +47,21 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
   useEffect(() => {
     const label = sidebarItems.find(item => item.path === pathname)?.label;
+    const segments = pathname.split('/');
+    if (segments.length === 2) {
+      setHeading(label || pathname.split('/')[pathname.split('/').length - 1]
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+      );
 
-    setHeading(label || pathname.split('/')[pathname.split('/').length - 2]
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-    );
+    } else {
+      setHeading(label || pathname.split('/')[pathname.split('/').length - 2]
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+      );
+    }
 
   }, [location.pathname]);
 
@@ -128,7 +137,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <DropdownMenuContent className='w-40'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
+                  <Link to="/profile">
+                    <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
+                  </Link>
                   <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem>
