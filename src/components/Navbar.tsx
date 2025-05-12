@@ -123,7 +123,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
             <li>
-              <Button className='btn-rounded !px-3'>Create New Event</Button>
+              <Link to={"/add-event"}>
+                <Button className='btn-rounded !px-3'>Create New Event</Button>
+              </Link>
             </li>
             <li className=''>
               <DropdownMenu>

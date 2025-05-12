@@ -141,8 +141,8 @@ export const getToken = (): string | null => {
 }
 
 export const formatTemplateMessage = (message: string, event: EventType | null, user: UserType | null): string => {
-  if(!event || !user) return message;
-  
+  if (!event || !user) return message;
+
   const { company_name } = user;
   const { title, event_venue_name, event_start_date, start_time, start_minute_time, start_time_type } = event;
 
@@ -152,4 +152,37 @@ export const formatTemplateMessage = (message: string, event: EventType | null, 
     .replace("{event_venue_name}", event_venue_name || '')
     .replace("{event_start_date}", event_start_date || '')
     .replace("{start_time}", `${start_time}:${start_minute_time} ${start_time_type}` || '');
+}
+
+export const beautifyDate = (date: Date) => {
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'short' });
+  const year = date.getFullYear();
+  return `${day}, ${month}, ${year}`;
+};
+
+export const beautifyTime = (time: string): string => {
+  // Handle different time formats
+  let date: Date;
+  
+  if (time.includes(':')) {
+    // Handle "HH:MM" or "H:MM" format
+    const [hours, minutes] = time.split(':').map(Number);
+    date = new Date();
+    date.setHours(hours, minutes);
+  } else {
+    // Handle timestamp
+    date = new Date(parseInt(time));
+  }
+
+  if (isNaN(date.getTime())) {
+    return 'Invalid time';
+  }
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  return `${hours}:${minutes} ${ampm}`;
 }

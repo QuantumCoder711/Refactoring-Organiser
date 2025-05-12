@@ -20,19 +20,20 @@ import AiTranscriber from '@/pages/admin/ai-transcriber';
 import AllCharts from '@/pages/admin/all-charts';
 import AllPhotos from '@/pages/admin/all-photos';
 import AllReports from '@/pages/admin/all-reports';
+import Profile from '@/pages/admin/profile';
 
 // Event Related Pages
 import ViewEvent from '@/pages/admin/all-events/view-event';
 import Attendees from '@/pages/admin/all-events/attendees';
 import AddAttendee from '@/pages/admin/all-events/add-attendee';
+import AddEvent from '@/pages/admin/all-events/add-event';
 
 // Message Template Pages
 import AllTemplateMessages from '@/pages/admin/all-template-messages';
+import TemplateMessage from '@/pages/admin/all-template-messages/template-message';
 
 // Error Page
 import Error404 from '@/pages/404';
-import TemplateMessage from '@/pages/admin/all-template-messages/template-message';
-import Profile from '@/pages/admin/profile';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -72,6 +73,7 @@ const App: React.FC = () => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
         <Route path="all-events" element={<AllEvents />} />
+        <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-sponsors" element={<AllSponsors />} />
         <Route path="ai-transcriber" element={<AiTranscriber />} />
