@@ -27,6 +27,7 @@ import ViewEvent from '@/pages/admin/all-events/view-event';
 import Attendees from '@/pages/admin/all-events/attendees';
 import AddAttendee from '@/pages/admin/all-events/add-attendee';
 import AddEvent from '@/pages/admin/all-events/add-event';
+import UpdateEvent from '@/pages/admin/all-events/update-event';
 
 // Message Template Pages
 import AllTemplateMessages from '@/pages/admin/all-template-messages';
@@ -85,6 +86,7 @@ const App: React.FC = () => {
         <Route path="all-events">
           <Route path="view/:slug" element={<ViewEvent />} />
           <Route path="attendees/:slug" element={<Attendees />} />
+          <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
 
           {/* Message Template Routes */}

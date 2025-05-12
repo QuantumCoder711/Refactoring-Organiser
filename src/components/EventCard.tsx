@@ -15,7 +15,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Wave from './Wave';
+import Wave from '@/components/Wave';
 import useEventStore from '@/store/eventStore';
 
 interface EventCardProps {
@@ -163,7 +163,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     {!isLive && (
                         <div className='border-t border-white grid grid-cols-3 gap-1 pt-2'>
                             <Link to={`/all-events/view/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>View Event</Link>
-                            <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
+                            <Link to={'/all-events/update-event/${slug}'} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
                             <Link to={`/all-events/attendees/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>All Attendees</Link>
                             <div className='col-span-3 flex w-full gap-1 justify-center'>
                                 <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Send Invitations</Link>
