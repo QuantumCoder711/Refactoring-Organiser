@@ -1,8 +1,8 @@
 import { domain, token } from "@/constants";
-import { DayTwoReminder, SendReminder, SendSameDayReminder, SessionReminder, VisitBoothReminder } from "@/types";
+import { DayTwoReminderType, SendReminderType, SendSameDayReminderType, SessionReminderType, VisitBoothReminderType } from "@/types";
 import axios from "axios";
 
-export const sendReminder = async (formData: SendReminder) => {
+export const sendReminder = async (formData: SendReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/notifications`, formData, {
             headers: {
@@ -20,7 +20,7 @@ export const sendReminder = async (formData: SendReminder) => {
     }
 }
 
-export const sendSameDayReminder = async (formData: SendSameDayReminder) => {
+export const sendSameDayReminder = async (formData: SendSameDayReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/notifications-samedayinvitation`, formData, {
             headers: {
@@ -38,7 +38,7 @@ export const sendSameDayReminder = async (formData: SendSameDayReminder) => {
     }
 };
 
-export const sessionReminder = async (formData: SessionReminder) => {
+export const sessionReminder = async (formData: SessionReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/session-reminder`, formData, {
             headers: {
@@ -57,7 +57,7 @@ export const sessionReminder = async (formData: SessionReminder) => {
     }
 }
 
-export const visitBoothReminder = async (formData: VisitBoothReminder) => {
+export const visitBoothReminder = async (formData: VisitBoothReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/reminder-to-visit-booth`, formData, {
             headers: {
@@ -76,7 +76,7 @@ export const visitBoothReminder = async (formData: VisitBoothReminder) => {
     }
 }
 
-export const dayTwoReminder = async (formData: DayTwoReminder) => {
+export const dayTwoReminder = async (formData: DayTwoReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/day-two-reminder`, formData, {
             headers: {
@@ -95,7 +95,7 @@ export const dayTwoReminder = async (formData: DayTwoReminder) => {
     }
 }
 
-export const dayTwoSameDayReminder = async (formData: DayTwoReminder) => {
+export const dayTwoSameDayReminder = async (formData: DayTwoReminderType) => {
     try {
         const response = await axios.post(`${domain}/api/day_two_same_day_reminder`, formData, {
             headers: {
