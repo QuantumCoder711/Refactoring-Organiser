@@ -7,18 +7,77 @@ import Template1 from "@/assets/templates/template1.png";
 import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
-import { beautifyDate, beautifyTime, getRandomOTP } from '@/lib/utils';
-import { MapPin } from 'lucide-react';
+import { beautifyDate, getRandomOTP } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { AddEventType } from '@/types';
 
 const AddEvent: React.FC = () => {
 
     const templates: string[] = [Template1, Template1, Template1, Template1, Template1];
-    const [selectedStartDate, setSelectedStartDate] = useState(new Date());
-    const [selectedStartTime, setSelectedStartTime] = useState<string>(new Date().getTime().toString());
-    const [selectedEndDate, setSelectedEndDate] = useState(new Date());
-    const [selectedEndTime, setSelectedEndTime] = useState<string>(new Date().getTime().toString());
-    const [otp, setOtp] = useState<string>(getRandomOTP());
+
+    const [formData, setFormData] = useState<AddEventType>({
+        title: "",
+        image: null,
+        description: "",
+        event_start_date: "",
+        event_end_date: "",
+        event_date: "",
+        start_time: "",
+        start_minute_time: "",
+        start_time_type: "",
+        end_time: "",
+        end_minute_time: "",
+        end_time_type: "",
+        status: 1,
+        feedback: 1,
+        event_otp: getRandomOTP(),
+        view_agenda_by: 0,
+        google_map_link: "",
+        event_fee: "0",
+        paid_event: 0
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSwitchChange = (checked: boolean, name: string) => {
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: checked ? 1 : 0,
+            event_fee: checked ? prevState.event_fee : "0"
+        }));
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setFormData(prevState => ({
+            ...prevState,
+            image: file
+        }));
+    };
+
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, timeType: 'start' | 'end') => {
+        const [hours, minutes] = e.target.value.split(':');
+        const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+        const formattedHours = parseInt(hours) % 12 || 12;
+
+        setFormData(prevState => ({
+            ...prevState,
+            [`${timeType}_time`]: formattedHours.toString(),
+            [`${timeType}_minute_time`]: minutes,
+            [`${timeType}_time_type`]: ampm
+        }));
+    };
+
+    const handleSubmit = async () => {
+        // Handle form submission
+        console.log(formData);
+    };
 
     return (
         <div className='relative w-full'>
@@ -26,16 +85,18 @@ const AddEvent: React.FC = () => {
                 <GoBack />
             </div>
 
-            <div className='border-2 border-red-500 max-w-[700px] mx-auto p-8 bg-brand-background'>
+            <div className='max-w-[700px] mx-auto p-8 bg-brand-background'>
                 {/* Event Name */}
                 <div className="flex flex-col gap-2 w-full">
-                    <Label className="font-semibold" htmlFor='event_name'>
+                    <Label className="font-semibold" htmlFor='title'>
                         Event Name <span className="text-brand-secondary">*</span>
                     </Label>
                     <Input
-                        id="event_name"
-                        name='event_name'
+                        id="title"
+                        name='title'
                         type="text"
+                        value={formData.title}
+                        onChange={handleInputChange}
                         className='input !h-12 min-w-full text-base'
                     />
                 </div>
@@ -45,36 +106,54 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col w-full gap-5'>
                         {/* Event Type */}
                         <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor='event_type'>
+                            <Label className="font-semibold" htmlFor='paid_event'>
                                 Event Type <span className="text-brand-secondary">*</span>
                             </Label>
-                            <div className='input !h-12 min-w-full flex items-center text-base px-4'>
+                            <div className='input !h-12 min-w-full flex items-center text-base pl-4 !py-1.5'>
                                 <div className='flex gap-4 items-center text-brand-dark-gray'>
-                                    <Label htmlFor="event_type_switch" className='cursor-pointer'>Free</Label>
+                                    <Label htmlFor="paid_event" className='cursor-pointer'>Free</Label>
 
                                     <Switch
-                                        id="event_type_switch"
+                                        id="paid_event"
+                                        checked={formData.paid_event === 1}
+                                        onCheckedChange={(checked) => handleSwitchChange(checked, 'paid_event')}
                                         className="data-[state=checked]:bg-brand-primary"
                                     />
 
-                                    <Label htmlFor="event_type_switch" className='cursor-pointer'>Paid</Label>
+                                    <Label htmlFor="paid_event" className='cursor-pointer'>Paid</Label>
+
                                 </div>
+                                {formData.paid_event === 1 && <div className='flex flex-1 border-l border-brand-dark-gray !ml-4'>
+                                    <div className='relative w-full'>
+                                        <Input
+                                            id='event_fee'
+                                            name='event_fee'
+                                            type='number'
+                                            value={formData.event_fee}
+                                            placeholder='Event Fee'
+                                            onChange={handleInputChange}
+                                            className='input !h-11 focus-visible:!ring-0 focus-visible:!ring-offset-0 w-full text-base'
+                                        />
+                                    </div>
+                                </div>}
                             </div>
                         </div>
 
                         {/* Banner Image */}
                         <div className="flex flex-col gap-2">
-                            <Label className="font-semibold" htmlFor="image">Profile Picture</Label>
+                            <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
                             <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
-                                <p className="w-full text-nowrap overflow-hidden text-ellipsis">No file Chosen</p>
+                                <p className="w-full text-nowrap overflow-hidden text-ellipsis">
+                                    {formData.image ? (formData.image as File).name : "No file Chosen"}
+                                </p>
                                 <Input
                                     id="image"
                                     name="image"
                                     type='file'
                                     accept="image/*"
+                                    onChange={handleFileChange}
                                     className='input absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
-                                // onChange={handleFileChange}
                                 />
                             </div>
                         </div>
@@ -88,7 +167,7 @@ const AddEvent: React.FC = () => {
                     <img
                         height={237}
                         width={237}
-                        src={UserAvatar}
+                        src={formData.image instanceof File ? URL.createObjectURL(formData.image) : UserAvatar}
                         className='max-h-[237px] min-w-[237px] bg-brand-light-gray rounded-[10px]' />
                 </div>
 
@@ -103,7 +182,7 @@ const AddEvent: React.FC = () => {
                 <div className='flex justify-between items-center mt-[26px] gap-9'>
                     <div className='flex gap-[18px] items-center flex-1'>
                         <Label className='font-semibold text-nowrap'>Text Size: </Label>
-                        <Slider defaultValue={[33]} max={100} step={1} />
+                        <Slider defaultValue={[33]} className='cursor-pointer' max={100} step={1} />
                     </div>
                     <div className='w-fit flex gap-[18px]'>
                         <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
@@ -119,6 +198,8 @@ const AddEvent: React.FC = () => {
                     <Textarea
                         id="description"
                         name='description'
+                        value={formData.description}
+                        onChange={handleInputChange}
                         className='input min-w-full !h-32 text-base'
                     />
                 </div>
@@ -136,20 +217,26 @@ const AddEvent: React.FC = () => {
                             <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                 <Input
                                     type='date'
+                                    name='event_start_date'
+                                    value={formData.event_start_date}
+                                    onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
-                                    onChange={(e) => setSelectedStartDate(new Date(e.target.value))}
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(selectedStartDate)}</p>
+                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_start_date))}</p>
                             </div>
 
                             {/* For Time */}
                             <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
                                 <Input
                                     type='time'
+                                    name='start_time'
+                                    value={`${formData.start_time}:${formData.start_minute_time}`}
+                                    onChange={(e) => handleTimeChange(e, 'start')}
                                     className='w-full custom-input h-full absolute opacity-0'
-                                    onChange={(e) => setSelectedStartTime(e.target.value)}
                                 />
-                                <p className='h-full px-3 flex items-center text-nowrap'>{beautifyTime(selectedStartTime)}</p>
+                                <p className='h-full px-3 flex items-center text-nowrap'>
+                                    {`${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -165,20 +252,26 @@ const AddEvent: React.FC = () => {
                             <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                 <Input
                                     type='date'
+                                    name='event_end_date'
+                                    value={formData.event_end_date}
+                                    onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
-                                    onChange={(e) => setSelectedEndDate(new Date(e.target.value))}
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(selectedEndDate)}</p>
+                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_end_date))}</p>
                             </div>
 
                             {/* For Time */}
                             <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
                                 <Input
                                     type='time'
+                                    name='end_time'
+                                    value={`${formData.end_time}:${formData.end_minute_time}`}
+                                    onChange={(e) => handleTimeChange(e, 'end')}
                                     className='w-full custom-input h-full absolute opacity-0'
-                                    onChange={(e) => setSelectedEndTime(e.target.value)}
                                 />
-                                <p className='h-full px-3 flex items-center text-nowrap'>{beautifyTime(selectedEndTime)}</p>
+                                <p className='h-full px-3 flex items-center text-nowrap'>
+                                    {`${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -186,12 +279,16 @@ const AddEvent: React.FC = () => {
 
                 {/* Location */}
                 <div className='flex flex-col gap-2 mt-5'>
-                    <Label className='font-semibold'>
+                    <Label className='font-semibold' htmlFor='google_map_link'>
                         Location <span className="text-brand-secondary">*</span>
                     </Label>
                     <div className='relative'>
                         <Input
+                            id='google_map_link'
+                            name='google_map_link'
                             type='text'
+                            value={formData.google_map_link}
+                            onChange={handleInputChange}
                             placeholder='Enter Location'
                             className='input !h-12 min-w-full text-base'
                         />
@@ -214,7 +311,7 @@ const AddEvent: React.FC = () => {
 
                     {/* View Agenda By */}
                     <div className="flex flex-col gap-2 w-full">
-                        <Label className="font-semibold" htmlFor='event_type'>
+                        <Label className="font-semibold" htmlFor='view_agenda_by'>
                             View Agenda By <span className="text-brand-secondary">*</span>
                         </Label>
                         <div className='input !h-12 min-w-full flex items-center text-base px-4'>
@@ -223,6 +320,8 @@ const AddEvent: React.FC = () => {
 
                                 <Switch
                                     id="view_agenda_by"
+                                    checked={formData.view_agenda_by === 1}
+                                    onCheckedChange={(checked) => handleSwitchChange(checked, 'view_agenda_by')}
                                     className="data-[state=checked]:bg-brand-primary"
                                 />
 
@@ -235,13 +334,23 @@ const AddEvent: React.FC = () => {
                 <div className='flex mt-5 gap-2 flex-col'>
                     <Label className='font-semibold'>Event OTP</Label>
                     <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                        <Input value={otp} className='input !h-full min-w-full absolute text-base z-10' />
+                        <Input
+                            value={formData.event_otp}
+                            onChange={handleInputChange}
+                            name='event_otp'
+                            className='input !h-full min-w-full absolute text-base z-10'
+                        />
                         <Button
-                            onClick={() => setOtp(getRandomOTP())}
-                            className='btn-rounded !h-[40px] !rounded-[10px] z-20'>Generate</Button>
+                            onClick={() => setFormData(prev => ({ ...prev, event_otp: getRandomOTP() }))}
+                            className='btn-rounded !h-[40px] !rounded-[10px] z-20'
+                        >
+                            Generate
+                        </Button>
                     </div>
                 </div>
             </div>
+
+            <Button onClick={handleSubmit}>Submit</Button>
         </div>
     )
 }

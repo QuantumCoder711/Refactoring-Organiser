@@ -73,6 +73,28 @@ export interface EventType {
     total_pending_delegate: number;
 }
 
+export interface AddEventType {
+    title: string;
+    image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
+    description: string;
+    event_start_date: string;
+    event_end_date: string;
+    event_date: string;
+    google_map_link: string;
+    start_time: string; // New field for formatted start time (e.g., '16:05')
+    start_minute_time: string; // New field for start time minute part (e.g., '05')
+    start_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+    end_time: string; // New field for formatted end time (e.g., '17:05')
+    end_minute_time: string; // New field for end time minute part (e.g., '05')
+    end_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+    status: number;
+    feedback: number;
+    event_otp: string;
+    view_agenda_by: number;
+    event_fee: string;
+    paid_event: number;
+}
+
 export interface AttendeeType {
     title: string;
     id: number;
@@ -148,15 +170,15 @@ export interface MessageTemplateType {
     check_in: number;
 }
 
-export interface SendReminderType extends Omit<MessageTemplateType, 'check_in'> {}
+export interface SendReminderType extends Omit<MessageTemplateType, 'check_in'> { }
 
-export interface SendSameDayReminderType extends MessageTemplateType {}
+export interface SendSameDayReminderType extends MessageTemplateType { }
 
-export interface SessionReminderType extends MessageTemplateType {}
+export interface SessionReminderType extends MessageTemplateType { }
 
-export interface VisitBoothReminderType extends MessageTemplateType {}
+export interface VisitBoothReminderType extends MessageTemplateType { }
 
-export interface DayTwoReminderType extends MessageTemplateType {}
+export interface DayTwoReminderType extends MessageTemplateType { }
 
 
 export interface AgendaType {
