@@ -7,8 +7,9 @@ import Template1 from "@/assets/templates/template1.png";
 import React, { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
-import { beautifyDate, beautifyTime } from '@/lib/utils';
+import { beautifyDate, beautifyTime, getRandomOTP } from '@/lib/utils';
 import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const AddEvent: React.FC = () => {
 
@@ -17,6 +18,7 @@ const AddEvent: React.FC = () => {
     const [selectedStartTime, setSelectedStartTime] = useState<string>(new Date().getTime().toString());
     const [selectedEndDate, setSelectedEndDate] = useState(new Date());
     const [selectedEndTime, setSelectedEndTime] = useState<string>(new Date().getTime().toString());
+    const [otp, setOtp] = useState<string>(getRandomOTP());
 
     return (
         <div className='relative w-full'>
@@ -193,6 +195,50 @@ const AddEvent: React.FC = () => {
                             placeholder='Enter Location'
                             className='input !h-12 min-w-full text-base'
                         />
+                    </div>
+                </div>
+
+                {/* Printers Count */}
+                <div className='flex items-center justify-between gap-5 mt-5'>
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='printers_count'>
+                            No. of Printers <span className="text-brand-secondary">*</span>
+                        </Label>
+                        <Input
+                            id="printers_count"
+                            name='printers_count'
+                            type="number"
+                            className='input !h-12 min-w-full text-base'
+                        />
+                    </div>
+
+                    {/* View Agenda By */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='event_type'>
+                            View Agenda By <span className="text-brand-secondary">*</span>
+                        </Label>
+                        <div className='input !h-12 min-w-full flex items-center text-base px-4'>
+                            <div className='flex gap-4 items-center text-brand-dark-gray'>
+                                <Label htmlFor="view_agenda_by" className='cursor-pointer'>All</Label>
+
+                                <Switch
+                                    id="view_agenda_by"
+                                    className="data-[state=checked]:bg-brand-primary"
+                                />
+
+                                <Label htmlFor="view_agenda_by" className='cursor-pointer'>Checked In</Label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='flex mt-5 gap-2 flex-col'>
+                    <Label className='font-semibold'>Event OTP</Label>
+                    <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                        <Input value={otp} className='input !h-full min-w-full absolute text-base z-10' />
+                        <Button
+                            onClick={() => setOtp(getRandomOTP())}
+                            className='btn-rounded !h-[40px] !rounded-[10px] z-20'>Generate</Button>
                     </div>
                 </div>
             </div>

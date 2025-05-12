@@ -164,7 +164,7 @@ export const beautifyDate = (date: Date) => {
 export const beautifyTime = (time: string): string => {
   // Handle different time formats
   let date: Date;
-  
+
   if (time.includes(':')) {
     // Handle "HH:MM" or "H:MM" format
     const [hours, minutes] = time.split(':').map(Number);
@@ -185,4 +185,8 @@ export const beautifyTime = (time: string): string => {
   hours = hours % 12;
   hours = hours ? hours : 12;
   return `${hours}:${minutes} ${ampm}`;
+}
+
+export const getRandomOTP = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
