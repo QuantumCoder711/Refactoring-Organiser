@@ -1,13 +1,14 @@
-import { deleteEvent, getAllEvents } from "@/api/events";
+import { addEvent, deleteEvent, getAllEvents } from "@/api/events";
 import { create } from "zustand";
-import { EventType } from "@/types";
-import { DeleteEventResponse } from "@/types/api-responses";
+import { AddEventType, EventType } from "@/types";
+import { AddEventResponse, DeleteEventResponse } from "@/types/api-responses";
 
 interface EventStore {
     events: EventType[];
     setEvents: (events: EventType[]) => void;
     getAllEvents: (token: string) => Promise<void>;
     getEventBySlug: (slug: string | undefined) => EventType | null;
+    addEvent: (event: AddEventType) => Promise<AddEventResponse>;
     deleteEvent: (id: number) => Promise<DeleteEventResponse>;
 }
 
@@ -21,6 +22,21 @@ const useEventStore = create<EventStore>((set, get) => ({
     getEventBySlug: (slug: string | undefined) => {
         const { events } = get();
         return events.find(event => event.slug === slug) || null;
+    },
+    addEvent: async (event: AddEventType) => {
+        try {
+            console.log("The event from store is: ", event);
+            const response = await addEvent(event);
+            if (response.status === 200) {
+                // Add the new event to the store
+                set((state) => ({
+                    events: [...state.events, response.data]
+                }));
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        }
     },
     deleteEvent: async (id: number) => {
         try {

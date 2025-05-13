@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { googleMapsApiKey } from '../constants';
+import React, { useEffect, useRef } from 'react';
 
 interface GoogleMapProps {
+  isLoaded: boolean;
   latitude: number;
   longitude: number;
   zoom?: number;
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({
+  isLoaded,
   latitude,
   longitude,
   zoom = 15,
@@ -15,99 +16,54 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markerRef = useRef<google.maps.Marker | null>(null);
-  const [position, setPosition] = useState({ lat: latitude, lng: longitude });
 
   useEffect(() => {
-    // Load Google Maps API script
-    const loadGoogleMapsApi = () => {
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      window.initMap = initializeMap;
-      document.head.appendChild(script);
+    if (!isLoaded || !mapRef.current || !window.google || !window.google.maps) return;
 
-      return () => {
-        window.initMap = () => {};
-        document.head.removeChild(script);
-      };
-    };
+    const position = { lat: latitude, lng: longitude };
 
-    // Initialize the map
-    const initializeMap = () => {
-      if (mapRef.current && !mapInstanceRef.current) {
-        mapInstanceRef.current = new google.maps.Map(mapRef.current, {
-          center: position,
-          zoom: zoom,
-          draggable: true,
-        });
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        center: position,
+        zoom,
+      });
 
-        // Add a draggable marker at the specified location
-        markerRef.current = new google.maps.Marker({
-          position: position,
-          map: mapInstanceRef.current,
-          draggable: true,
-          animation: google.maps.Animation.DROP,
-          title: 'Drag me!'
-        });
+      markerRef.current = new window.google.maps.Marker({
+        map: mapInstanceRef.current,
+        position,
+        draggable: true,
+      });
 
-        // Add event listener for marker drag end
-        google.maps.event.addListener(markerRef.current, 'dragend', (event: any) => {
-          const newPosition = {
-            lat: event.latLng.lat(),
-            lng: event.latLng.lng()
-          };
-          setPosition(newPosition);
-        });
-      }
-    };
-
-    // If the Google Maps API is already loaded, initialize the map directly
-    if (window.google && window.google.maps) {
-      initializeMap();
-    } else {
-      loadGoogleMapsApi();
-    }
-
-    // Update map when props change
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setCenter(position);
-      mapInstanceRef.current.setZoom(zoom);
-    }
-
-    // Update marker when position changes
-    if (markerRef.current) {
-      markerRef.current.setPosition(position);
-    }
-
-    // Cleanup function
-    return () => {
-      if (window.google && mapInstanceRef.current) {
-        // Clean up map instance if needed
-        if (markerRef.current) {
-          google.maps.event.clearListeners(markerRef.current, 'dragend');
-          markerRef.current = null;
+      markerRef.current.addListener('dragend', (event:any) => {
+        const newLat = event.latLng?.lat();
+        const newLng = event.latLng?.lng();
+        if (newLat !== undefined && newLng !== undefined) {
+          console.log('New coordinates:', { lat: newLat, lng: newLng });
         }
-        mapInstanceRef.current = null;
+      });
+    } else {
+      mapInstanceRef.current.setCenter(position);
+      markerRef.current?.setPosition(position);
+    }
+
+    return () => {
+      if (markerRef.current) {
+        window.google.maps.event.clearInstanceListeners(markerRef.current);
+        markerRef.current = null;
       }
+      mapInstanceRef.current = null;
     };
-  }, [latitude, longitude, zoom, position]);
+  }, [isLoaded, latitude, longitude, zoom]);
+
+  if (!isLoaded) return <div>Loading map...</div>;
 
   return (
-    <div 
-      ref={mapRef} 
-      className={`w-full h-full rounded-lg`}
-      aria-label="Google Map"
+    <div
+      ref={mapRef}
+      className="w-full h-full rounded-lg"
+      style={{ minHeight: '240px' }}
     />
   );
 };
-
-// Add the global window type for TypeScript
-declare global {
-  interface Window {
-    initMap: () => void;
-    google: any;
-  }
-}
 
 export default GoogleMap;

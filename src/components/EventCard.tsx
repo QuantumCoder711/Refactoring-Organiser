@@ -163,7 +163,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     {!isLive && (
                         <div className='border-t border-white grid grid-cols-3 gap-1 pt-2'>
                             <Link to={`/all-events/view/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>View Event</Link>
-                            <Link to={'/all-events/update-event/${slug}'} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
+                            <Link to={`/all-events/update-event/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
                             <Link to={`/all-events/attendees/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>All Attendees</Link>
                             <div className='col-span-3 flex w-full gap-1 justify-center'>
                                 <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Send Invitations</Link>
@@ -175,7 +175,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     {isLive && (
                         <div className='border-t border-white flex justify-between gap-2 pt-1'>
                             <Link to={`/all-events/view/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>View</Link>
-                            <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Edit</Link>
+                            <Link to={`/all-events/update-event/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Edit</Link>
                             <Link to={`/all-events/attendees/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Attendees</Link>
                             <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Agenda</Link>
                         </div>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import GoogleMap from "@/components/GoogleMap";
-import { UserAvatar } from '@/constants';
+import { googleMapsApiKey, UserAvatar } from '@/constants';
 import { Button } from '@/components/ui/button';
 import { isEventLive, isEventUpcoming, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
@@ -17,9 +17,15 @@ import {
 } from "@/components/ui/dialog";
 import useAgendaStore from '@/store/agendaStore';
 import Wave from '@/components/Wave';
+import { useLoadScript } from '@react-google-maps/api';
 
 
 const ViewEvent: React.FC = () => {
+
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey,
+        libraries: ['places'],
+    })
 
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore((state) => state.getEventBySlug(slug));
@@ -27,17 +33,15 @@ const ViewEvent: React.FC = () => {
     const { agendas, loading, getEventAgendas } = useAgendaStore(state => state);
 
     useEffect(() => {
-        if(event?.id) {
+        if (event?.id) {
             getEventAgendas(event.id);
         }
     }, [event, getEventAgendas]);
 
-    console.log(agendas);
-
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
 
-    if(loading) {
+    if (loading) {
         return <Wave />
     }
 
@@ -106,7 +110,7 @@ const ViewEvent: React.FC = () => {
 
                 {/* Map Component */}
                 <div className='h-40 mt-3 rounded-lg shadow-blur'>
-                    <GoogleMap latitude={28.4595} longitude={77.0265} />
+                    <GoogleMap isLoaded={isLoaded} latitude={28.4595} longitude={77.0265} />
                 </div>
             </div>
 

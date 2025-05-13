@@ -2,30 +2,48 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { UserAvatar } from '@/constants';
+import { googleMapsApiKey, UserAvatar } from '@/constants';
 import Template1 from "@/assets/templates/template1.png";
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { beautifyDate, getRandomOTP } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { AddEventType } from '@/types';
+import { useLoadScript, Autocomplete } from '@react-google-maps/api';
+import GoogleMap from './GoogleMap';
 import useEventStore from '@/store/eventStore';
+import { toast } from 'sonner';
+import { CircleCheck, CircleX } from 'lucide-react';
+import Wave from './Wave';
 
 interface EventFormProps {
-    slug?: string;
+    data?: AddEventType;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ slug }) => {
+const EventForm: React.FC<EventFormProps> = ({ data }) => {
+
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey,
+        libraries: ['places'],
+    });
+
+    const [loading,setLoading] = useState<boolean>(false);
+
+    const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+    const [coords, setCoords] = useState<{ lat: number, lng: number }>({
+        lat: 0,
+        lng: 0
+    });
+
     const templates: string[] = [Template1, Template1, Template1, Template1, Template1];
 
-    const event = useEventStore((state) => state.getEventBySlug(slug));
+    // const event = useEventStore((state) => state.getEventBySlug(slug));
 
     const [formData, setFormData] = useState<AddEventType>({
         title: "",
         image: null,
         description: "",
         event_start_date: "",
-        event_end_date: "",
         event_date: "",
         start_time: "",
         start_minute_time: "",
@@ -39,15 +57,57 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
         view_agenda_by: 0,
         google_map_link: "",
         event_fee: "0",
-        paid_event: 0
+        paid_event: 0,
+        printer_count: 0,
+        pincode: '',
+        state: '',
+        city: '',
+        country: '',
+        event_venue_name: '',
+        event_venue_address_1: '',
+        event_venue_address_2: '',
     });
 
     useEffect(() => {
-        if (slug) {
-            // Event will go here
-            // setFormData(event);
+        if (data) {
+            setFormData(data);
         }
-    }, [slug]);
+    }, [data]);
+
+    useEffect(()=>{
+        console.log(formData)
+    }, [formData]);
+
+    const handlePlaceSelect = () => {
+        if (autocomplete) {
+            const place = autocomplete.getPlace();
+            console.log(place);
+
+            if (place && place.address_components) {
+                const addressComponents = place.address_components as google.maps.GeocoderAddressComponent[];
+
+                setFormData(prevState => ({
+                    ...prevState,
+                    event_venue_name: place.name as string,
+                    event_venue_address_1: place.formatted_address as string,
+                    event_venue_address_2: place.vicinity as string,
+                    google_map_link: place.url as string,
+                    pincode: addressComponents[addressComponents.length - 1]?.long_name as string,
+                    country: addressComponents[addressComponents.length - 2]?.long_name as string,
+                    state: addressComponents[addressComponents.length - 3]?.long_name as string,
+                    city: addressComponents[addressComponents.length - 4]?.long_name as string,
+                }));
+            }
+
+            if (place.geometry?.location) {
+                console.log(place.geometry.location.lat(), place.geometry.location.lng())
+                setCoords({
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng()
+                });
+            }
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -87,17 +147,76 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
     };
 
     const handleSubmit = async () => {
-        if (slug) {
+        if (data) {
             // Event will update
         } else {
             // Event will Add
+            setLoading(true);
+            try {
+                const response = await useEventStore.getState().addEvent(formData);
+                if (response.status === 200) {
+                    toast(response.message, {
+                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleCheck className='size-5' />
+                    });
+                } else {
+                    toast(response.message, {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                }
+            } catch (error) {
+                console.error("Error adding event:", error);
+                toast("An error occurred while adding the event", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            } finally {
+                setFormData({
+                    title: "",
+                    image: null,
+                    description: "",
+                    event_start_date: "",
+                    event_date: "",
+                    google_map_link: "",
+                    start_time: "",
+                    start_minute_time: "",
+                    start_time_type: "",
+                    end_time: "",
+                    end_minute_time: "",
+                    end_time_type: "",
+                    status: 1,
+                    feedback: 1,
+                    event_otp: getRandomOTP(),
+                    view_agenda_by: 0,
+                    event_fee: "0",
+                    paid_event: 0,
+                    printer_count: 0,
+                    pincode: '',
+                    state: '',
+                    city: '',
+                    country: '',
+                    event_venue_name: '',
+                    event_venue_address_1: '',
+                    event_venue_address_2: '',
+                });
+                setCoords({
+                    lat: 0,
+                    lng: 0
+                });
+                setLoading(false);
+            }
         }
     };
+
+    if(loading) {
+        return <Wave />
+    }
 
     return (
         <div className=''>
 
-            <div className='max-w-[700px] mx-auto p-8 bg-brand-background'>
+            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background'>
                 {/* Event Name */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='title'>
@@ -180,7 +299,7 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
                         height={237}
                         width={237}
                         src={formData.image instanceof File ? URL.createObjectURL(formData.image) : UserAvatar}
-                        className='max-h-[237px] min-w-[237px] bg-brand-light-gray rounded-[10px]' />
+                        className='max-h-[237px] min-w-[237px] object-cover bg-brand-light-gray rounded-[10px]' />
                 </div>
 
                 {/* Templates Images */}
@@ -264,12 +383,12 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
                             <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                 <Input
                                     type='date'
-                                    name='event_end_date'
-                                    value={formData.event_end_date}
+                                    name='event_date'
+                                    value={formData.event_date}
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_end_date))}</p>
+                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_date))}</p>
                             </div>
 
                             {/* For Time */}
@@ -295,28 +414,52 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
                         Location <span className="text-brand-secondary">*</span>
                     </Label>
                     <div className='relative'>
-                        <Input
-                            id='google_map_link'
-                            name='google_map_link'
-                            type='text'
-                            value={formData.google_map_link}
-                            onChange={handleInputChange}
-                            placeholder='Enter Location'
-                            className='input !h-12 min-w-full text-base'
-                        />
+                        {isLoaded ? (
+                            <Autocomplete
+                                onLoad={autocomplete => setAutocomplete(autocomplete)}
+                                onPlaceChanged={handlePlaceSelect}
+                            >
+                                <Input
+                                    id='google_map_link'
+                                    name='google_map_link'
+                                    type='text'
+                                    value={formData.google_map_link}
+                                    onChange={handleInputChange}
+                                    placeholder='Enter Location'
+                                    className='input !h-12 min-w-full text-base'
+                                />
+                            </Autocomplete>
+                        ) : (
+                            <Input
+                                id='google_map_link'
+                                name='google_map_link'
+                                type='text'
+                                value={formData.google_map_link}
+                                onChange={handleInputChange}
+                                placeholder='Enter Location'
+                                className='input !h-12 min-w-full text-base'
+                            />
+                        )}
+
                     </div>
+
+                    <div className='w-full h-60'>
+                        <GoogleMap isLoaded={isLoaded} latitude={coords.lat} longitude={coords.lng} />
+                    </div>
+
                 </div>
 
                 {/* Printers Count */}
                 <div className='flex items-center justify-between gap-5 mt-5'>
                     <div className="flex flex-col gap-2 w-full">
-                        <Label className="font-semibold" htmlFor='printers_count'>
+                        <Label className="font-semibold" htmlFor='printer_count'>
                             No. of Printers <span className="text-brand-secondary">*</span>
                         </Label>
                         <Input
-                            id="printers_count"
-                            name='printers_count'
+                            id="printer_count"
+                            name='printer_count'
                             type="number"
+                            onChange={handleInputChange}
                             className='input !h-12 min-w-full text-base'
                         />
                     </div>
@@ -361,7 +504,7 @@ const EventForm: React.FC<EventFormProps> = ({ slug }) => {
                     </div>
                 </div>
 
-                <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-80 mx-auto'>{slug ? 'Update' : 'Submit'}</Button>
+                <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-80 mx-auto'>{data ? 'Update' : 'Submit'}</Button>
             </div>
         </div>
     )

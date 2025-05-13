@@ -58,6 +58,11 @@ export interface BulkDeleteAttendeesResponse {
     status: number;
 }
 
+export interface AddEventResponse {
+    status: number;
+    message: string;
+}
+
 export interface AddAttendeeResponse {    
     status: number,
     message: string;
