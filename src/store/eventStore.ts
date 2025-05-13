@@ -25,7 +25,6 @@ const useEventStore = create<EventStore>((set, get) => ({
     },
     addEvent: async (event: AddEventType) => {
         try {
-            console.log("The event from store is: ", event);
             const response = await addEvent(event);
             if (response.status === 200) {
                 // Add the new event to the store
