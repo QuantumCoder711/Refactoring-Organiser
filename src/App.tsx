@@ -35,6 +35,10 @@ import TemplateMessage from '@/pages/admin/all-template-messages/template-messag
 
 // Error Page
 import Error404 from '@/pages/404';
+import AllAgendas from '@/pages/admin/all-events/all-agendas';
+import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user-request';
+import AddAgenda from '@/pages/admin/all-events/add-agenda';
+import UpdateProfile from '@/pages/admin/profile/update-profile';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -82,6 +86,11 @@ const App: React.FC = () => {
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
 
+        <Route path="update-profile" element={<UpdateProfile />} />
+
+        <Route path="all-agendas/:slug" element={<AllAgendas />} />
+        <Route path="add-agenda/:slug" element={<AddAgenda />} />
+
         {/* Event Related Routes */}
         <Route path="all-events">
           <Route path="view/:slug" element={<ViewEvent />} />
@@ -92,6 +101,7 @@ const App: React.FC = () => {
           {/* Message Template Routes */}
           <Route path="event/all-template-messages/:slug" element={<AllTemplateMessages />} />
           <Route path="event/all-template-messages/:template/:slug" element={<TemplateMessage />} />
+          <Route path="event/all-template-messages/pending-user-request/:slug" element={<PendingUserRequest />} />
         </Route>
       </Route>
 

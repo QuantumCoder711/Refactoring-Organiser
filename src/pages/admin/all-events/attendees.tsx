@@ -145,19 +145,15 @@ const Attendees: React.FC = () => {
   };
 
   // Check if any filter is active
-  const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' || 
-                         (checkInFilter !== '' && checkInFilter !== 'all') || 
-                         (roleFilter !== '' && roleFilter !== 'all');
+  const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' ||
+    (checkInFilter !== '' && checkInFilter !== 'all') ||
+    (roleFilter !== '' && roleFilter !== 'all');
 
   // Buttons
   const links = [
     { name: "Add Attendee", url: `/all-events/add-attendee/${slug}` },
-    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/all-template-messages/${slug}` },
-    { name: "Send Poll", url: "#" },
-    { name: "Send in App Message", url: "#" },
-    { name: "Pending User Request", url: "#" },
-    { name: "Send Template Message", url: "#" },
-    { name: "Thank You message", url: "#" }
+    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/all-template-messages/${slug}` }, ,
+    { name: "Pending User Request", url: `/all-events/event/all-template-messages/pending-user-request/${slug}` },
   ];
 
   // Handle delete attendee
@@ -354,10 +350,10 @@ const Attendees: React.FC = () => {
         {links.map((link, index) => (
           <Link
             key={index}
-            to={link.url}
-            className={`btn ${link.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
+            to={link?.url as string}
+            className={`btn ${link?.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
           >
-            {link.name}
+            {link?.name}
           </Link>
         ))}
       </div>
@@ -433,12 +429,12 @@ const Attendees: React.FC = () => {
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
               <SelectValue placeholder="Role">
-                {roleFilter === 'all' ? 'Role' : 
-                 roleFilter === 'delegate' ? 'Delegate' :
-                 roleFilter === 'speaker' ? 'Speaker' :
-                 roleFilter === 'sponsor' ? 'Sponsor' :
-                 roleFilter === 'panelist' ? 'Panelist' :
-                 roleFilter === 'moderator' ? 'Moderator' : 'Role'}
+                {roleFilter === 'all' ? 'Role' :
+                  roleFilter === 'delegate' ? 'Delegate' :
+                    roleFilter === 'speaker' ? 'Speaker' :
+                      roleFilter === 'sponsor' ? 'Sponsor' :
+                        roleFilter === 'panelist' ? 'Panelist' :
+                          roleFilter === 'moderator' ? 'Moderator' : 'Role'}
               </SelectValue>
             </SelectTrigger>
             <SelectContent className='!text-sm !font-semibold'>
@@ -625,16 +621,16 @@ const Attendees: React.FC = () => {
         <Pagination className='mt-[26px] flex justify-end'>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
+              <PaginationPrevious
                 onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
                 className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />
             </PaginationItem>
-            
+
             {/* Show first page */}
             {totalPages > 0 && (
               <PaginationItem>
-                <PaginationLink 
+                <PaginationLink
                   isActive={currentPage === 1}
                   onClick={() => handlePageChange(1)}
                   className="cursor-pointer"
@@ -643,18 +639,18 @@ const Attendees: React.FC = () => {
                 </PaginationLink>
               </PaginationItem>
             )}
-            
+
             {/* Show ellipsis if needed */}
             {currentPage > 3 && (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
             )}
-            
+
             {/* Show current page and adjacent pages */}
             {totalPages > 1 && currentPage > 2 && (
               <PaginationItem>
-                <PaginationLink 
+                <PaginationLink
                   onClick={() => handlePageChange(currentPage - 1)}
                   className="cursor-pointer"
                 >
@@ -662,10 +658,10 @@ const Attendees: React.FC = () => {
                 </PaginationLink>
               </PaginationItem>
             )}
-            
+
             {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
               <PaginationItem>
-                <PaginationLink 
+                <PaginationLink
                   isActive={true}
                   className="cursor-pointer"
                 >
@@ -673,10 +669,10 @@ const Attendees: React.FC = () => {
                 </PaginationLink>
               </PaginationItem>
             )}
-            
+
             {totalPages > 2 && currentPage < totalPages - 1 && (
               <PaginationItem>
-                <PaginationLink 
+                <PaginationLink
                   onClick={() => handlePageChange(currentPage + 1)}
                   className="cursor-pointer"
                 >
@@ -684,18 +680,18 @@ const Attendees: React.FC = () => {
                 </PaginationLink>
               </PaginationItem>
             )}
-            
+
             {/* Show ellipsis if needed */}
             {currentPage < totalPages - 2 && (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
             )}
-            
+
             {/* Show last page */}
             {totalPages > 1 && (
               <PaginationItem>
-                <PaginationLink 
+                <PaginationLink
                   isActive={currentPage === totalPages}
                   onClick={() => handlePageChange(totalPages)}
                   className="cursor-pointer"
@@ -704,9 +700,9 @@ const Attendees: React.FC = () => {
                 </PaginationLink>
               </PaginationItem>
             )}
-            
+
             <PaginationItem>
-              <PaginationNext 
+              <PaginationNext
                 onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
                 className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />

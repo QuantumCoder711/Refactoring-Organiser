@@ -4,6 +4,9 @@ import SessionReminderIcon from '@/assets/template-message-icons/session-reminde
 import SendSameDayReminderIcon from '@/assets/template-message-icons/send-same-day-reminder.svg';
 import DayTwoReminderIcon from '@/assets/template-message-icons/day-two-reminder.svg';
 import DayTwoSameDayReminderIcon from '@/assets/template-message-icons/day-two-same-day-reminder.svg';
+import SendPoll from "@/assets/template-message-icons/send-poll.svg";
+import SendInApp from "@/assets/template-message-icons/send-in-app.svg";
+import ThankYou from "@/assets/template-message-icons/thank-you.svg";
 
 export const templates = [
   {
@@ -59,5 +62,32 @@ export const templates = [
     sendBy: "whatsapp",
     sendTo: true,
     paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it at 7 AM on the morning of Day 2."
-  }
+  },
+  {
+    title: "Send Poll",
+    path: `/all-events/event/all-template-messages/send-poll`,
+    icon: SendPoll,
+    message: ` <p>Hi <strong>User</strong>, <br /> <br />Hope you're enjoying the <strong>{currentEvent.title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />Thank you for your time! <br /> <br />Regards, Team <strong>{user?.company_name}</strong> <br /></p>`,
+    sendBy: "whatsapp",
+    sendTo: true,
+    paragraph: "Use the Send Poll feature to share a poll link via WhatsApp with all checked-in attendees—boost engagement instantly!"
+  },
+  {
+    title: "Send In-App Message",
+    path: `/all-events/event/all-template-messages/send-in-app-message`,
+    icon: SendInApp,
+    message: `<p>App Messge</p>`,
+    sendBy: "whatsapp",
+    sendTo: true,
+    paragraph: "Send custom in-app messages to checked-in or non-checked-in event delegates instantly on the Klout Club app!"
+  },
+  {
+    title: "Thank You Message",
+    path: `/all-events/event/all-template-messages/thank-you-message`,
+    icon: ThankYou,
+    message: `<p>Thank you for being part of <strong> {currentEvent.title} </strong><br /> <br />It was a privilege to host you at this distinguished gathering of Senior Leaders and industry Trailblazers from diverse Sectors. <br /> <br />We hope you found the conference insightful and impactful, gaining valuable perspectives to drive innovation and excellence in your field. <br /> <br />Your active participation made the event truly memorable, and we are excited about staying connected and welcoming you to future editions of <strong> {currentEvent.title} </strong>and other events organised by <strong>{user?.company_name}</strong>  <br /> <br />Warm regards, <br />Team <strong>{user?.company_name}</strong></p>`,
+    sendBy: "whatsapp",
+    sendTo: true,
+    paragraph: "Send a quick thank you via WhatsApp to all checked-in delegates—make your appreciation personal and instant!"
+  },
 ];

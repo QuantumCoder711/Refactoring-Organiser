@@ -4,6 +4,7 @@ import { UserAvatar } from '@/constants';
 import { getImageUrl } from '@/lib/utils';
 import useAuthStore from '@/store/authStore';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Profile: React.FC = () => {
 
@@ -35,7 +36,9 @@ const Profile: React.FC = () => {
                     <p className='text-brand-dark-gray'>{user?.mobile_number}</p>
                     <p className='text-brand-dark-gray'>{user?.address + " " + user?.pincode}</p>
                 </div>
-                <Button className='btn !h-12 !text-base w-full mt-[30px]'>Edit Profile</Button>
+                <Link to="/update-profile">
+                    <Button className='btn !h-12 !text-base w-full mt-[30px]'>Edit Profile</Button>
+                </Link>
             </div>
         </div>
     )

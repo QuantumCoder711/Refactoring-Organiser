@@ -29,20 +29,10 @@ export const sidebarItems = [
         path: "/all-reports",
     },
     {
-        label: "All Charts",
-        icon: ChartPie,
-        path: "/all-charts",
+        label: "Tutorials",
+        icon: NotebookPen,
+        path: "/tutorials",
     },
-    {
-        label: "All Photos",
-        icon: Images,
-        path: "/all-photos",
-    },
-    {
-        label: "AI Transcriber",
-        icon: BrainCircuit,
-        path: "/ai-transcriber",
-    }
 ];
 
 export const navbarLinks = [
