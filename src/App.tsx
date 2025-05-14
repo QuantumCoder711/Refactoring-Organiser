@@ -16,7 +16,6 @@ import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
 import AllAttendees from '@/pages/admin/all-attendees';
 import AllSponsors from '@/pages/admin/all-sponsors';
-import AiTranscriber from '@/pages/admin/ai-transcriber';
 import AllCharts from '@/pages/admin/all-charts';
 import AllPhotos from '@/pages/admin/all-photos';
 import AllReports from '@/pages/admin/all-reports';
@@ -39,6 +38,12 @@ import AllAgendas from '@/pages/admin/all-events/all-agendas';
 import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user-request';
 import AddAgenda from '@/pages/admin/all-events/add-agenda';
 import UpdateProfile from '@/pages/admin/profile/update-profile';
+import Tutorials from './pages/admin/tutorials';
+import MailReport from './pages/admin/all-reports/mail-report';
+import WhatsAppReport from './pages/admin/all-reports/whatsapp-report';
+import Charts from './pages/admin/all-reports/charts';
+import AiPhotos from './pages/admin/all-reports/ai-photos';
+import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -81,10 +86,10 @@ const App: React.FC = () => {
         <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-sponsors" element={<AllSponsors />} />
-        <Route path="ai-transcriber" element={<AiTranscriber />} />
         <Route path="all-charts" element={<AllCharts />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
+        <Route path='tutorials' element={<Tutorials />} />
 
         <Route path="update-profile" element={<UpdateProfile />} />
 
@@ -102,6 +107,14 @@ const App: React.FC = () => {
           <Route path="event/all-template-messages/:slug" element={<AllTemplateMessages />} />
           <Route path="event/all-template-messages/:template/:slug" element={<TemplateMessage />} />
           <Route path="event/all-template-messages/pending-user-request/:slug" element={<PendingUserRequest />} />
+        </Route>
+
+        <Route path='all-reports'>
+          <Route path='mail-report/:slug' element={<MailReport />} />
+          <Route path='whatsapp-report/:slug' element={<WhatsAppReport />} />
+          <Route path='charts/:slug' element={<Charts />} />
+          <Route path='ai-transcriber/:slug' element={<AiTranscriber />} />
+          <Route path='ai-photos/:slug' element={<AiPhotos />} />
         </Route>
       </Route>
 

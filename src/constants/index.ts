@@ -1,4 +1,4 @@
-import { BrainCircuit, ChartPie, HandHeart, Images, LayoutDashboard, NotebookPen, Trophy, Users } from "lucide-react";
+import { HandHeart, LayoutDashboard, NotebookPen, Trophy, Users, Youtube } from "lucide-react";
 
 export const UserAvatar: string = "https://github.com/shadcn.png";
 
@@ -30,7 +30,7 @@ export const sidebarItems = [
     },
     {
         label: "Tutorials",
-        icon: NotebookPen,
+        icon: Youtube,
         path: "/tutorials",
     },
 ];
