@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Download, FileUp, FileText } from 'lucide-react';
+import { FileUp, FileText } from 'lucide-react';
 import { UserAvatar } from '@/constants';
 import {
     Pagination,
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/pagination";
 
 const AiPhotos: React.FC = () => {
-    const [files, setFiles] = useState<File[]>([]);
+    const [,setFiles] = useState<File[]>([]);
     const [bulkFile, setBulkFile] = useState<File | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const imagesPerPage = 15;

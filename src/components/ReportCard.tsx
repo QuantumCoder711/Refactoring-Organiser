@@ -1,7 +1,6 @@
 import { Brain, BrainCircuit, ChartPie, Mail, MapPin, MessageCircleMore } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
 
 interface ReportCardProps {
     title: string;

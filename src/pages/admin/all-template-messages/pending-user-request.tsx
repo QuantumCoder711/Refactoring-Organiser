@@ -2,7 +2,7 @@ import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, Plus, FileInput, ArrowDownToLine } from 'lucide-react';
+import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, ArrowDownToLine } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
@@ -90,9 +90,9 @@ const PendingUserRequest: React.FC = () => {
     // Filter states
     const [nameFilter, setNameFilter] = useState('');
     const [companyFilter, setCompanyFilter] = useState('');
-    const [designationFilter, setDesignationFilter] = useState('');
-    const [checkInFilter, setCheckInFilter] = useState<string>('all');
-    const [roleFilter, setRoleFilter] = useState<string>('all');
+    const [designationFilter, ] = useState('');
+    const [checkInFilter, ] = useState<string>('all');
+    const [roleFilter, ] = useState<string>('all');
 
     // Add selected attendees state
     const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
@@ -191,16 +191,6 @@ const PendingUserRequest: React.FC = () => {
             }
             return newSet;
         });
-    };
-
-    // Handle select all
-    const handleSelectAll = (isSelected: boolean) => {
-        if (isSelected) {
-            // Only select the currently filtered attendees
-            setSelectedAttendees(new Set(filteredAttendees.map(attendee => attendee.id)));
-        } else {
-            setSelectedAttendees(new Set());
-        }
     };
 
     // Handle delete selected

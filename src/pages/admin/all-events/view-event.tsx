@@ -30,7 +30,7 @@ const ViewEvent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore((state) => state.getEventBySlug(slug));
 
-    const { agendas, loading, getEventAgendas } = useAgendaStore(state => state);
+    const { loading, getEventAgendas } = useAgendaStore(state => state);
 
     useEffect(() => {
         if (event?.id) {

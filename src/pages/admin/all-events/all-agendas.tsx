@@ -95,10 +95,10 @@ const AllAgendas: React.FC = () => {
 
     // Filter states
     const [nameFilter, setNameFilter] = useState('');
-    const [companyFilter, setCompanyFilter] = useState('');
-    const [designationFilter, setDesignationFilter] = useState('');
-    const [checkInFilter, setCheckInFilter] = useState<string>('all');
-    const [roleFilter, setRoleFilter] = useState<string>('all');
+    const [companyFilter, ] = useState('');
+    const [designationFilter, ] = useState('');
+    const [checkInFilter, ] = useState<string>('all');
+    const [roleFilter, ] = useState<string>('all');
 
     // Add selected attendees state
     const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());

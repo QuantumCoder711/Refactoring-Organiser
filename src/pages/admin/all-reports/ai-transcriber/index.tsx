@@ -1,37 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import GoBack from '@/components/GoBack';
-
-import { useDropzone } from "react-dropzone";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Download, FileUp, FileText } from 'lucide-react';
-import { UserAvatar } from '@/constants';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
 const AiTranscriber: React.FC = () => {
 
   const [form, setForm] = useState<{ file: File | null, video_url: string }>({ file: null, video_url: '' });
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const imagesPerPage = 15;
-  const totalImages = 100; // Replace with actual total number of images
-  const totalPages = Math.ceil(totalImages / imagesPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Here you would typically fetch the images for the new page
-  };
 
   return (
     <div className='relative w-full h-full'>

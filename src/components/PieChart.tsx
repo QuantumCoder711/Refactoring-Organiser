@@ -4,7 +4,6 @@ import { Label, Pie, PieChart } from "recharts"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,

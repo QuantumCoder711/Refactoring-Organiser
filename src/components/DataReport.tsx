@@ -27,13 +27,13 @@ const DataReport: React.FC<DataReportProps> = ({ type }) => {
     const event = getEventBySlug(slug);
 
     const [selectedStatus, setSelectedStatus] = useState<"sent" | "delivered" | "read" | "failed">("sent");
-    const [dateDiff, setDateDiff] = useState<number>(0);
+    const [,setDateDiff] = useState<number>(0);
     const [filters, setFilters] = useState({
         name: '',
         mail: ''
     });
 
-    const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
+    const [selectedAttendees] = useState<Set<number>>(new Set());
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
