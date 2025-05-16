@@ -1,4 +1,4 @@
-import { addEvent, deleteEvent, getAllEvents } from "@/api/events";
+import { addEvent, deleteEvent, getAllEvents, updateEvent } from "@/api/events";
 import { create } from "zustand";
 import { AddEventType, EventType } from "@/types";
 import { AddEventResponse, DeleteEventResponse } from "@/types/api-responses";
@@ -9,6 +9,7 @@ interface EventStore {
     getAllEvents: (token: string) => Promise<void>;
     getEventBySlug: (slug: string | undefined) => EventType | null;
     addEvent: (event: AddEventType) => Promise<AddEventResponse>;
+    updateEvent: (id: string, event: AddEventType) => Promise<AddEventResponse>;
     deleteEvent: (id: number) => Promise<DeleteEventResponse>;
 }
 
@@ -25,11 +26,41 @@ const useEventStore = create<EventStore>((set, get) => ({
     },
     addEvent: async (event: AddEventType) => {
         try {
-            const response = await addEvent(event);
+            // Get token from localStorage
+            const tokenData = localStorage.getItem("klout-organiser-storage");
+            const token = tokenData ? JSON.parse(tokenData).state.token : null;
+
+            if (!token) {
+                throw new Error("Authentication token not found");
+            }
+
+            const response = await addEvent(event, token);
             if (response.status === 200) {
                 // Add the new event to the store
                 set((state) => ({
                     events: [...state.events, response.data]
+                }));
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
+    updateEvent: async (id: string, event: AddEventType) => {
+        try {
+            // Get token from localStorage
+            const tokenData = localStorage.getItem("klout-organiser-storage");
+            const token = tokenData ? JSON.parse(tokenData).state.token : null;
+
+            if (!token) {
+                throw new Error("Authentication token not found");
+            }
+
+            const response = await updateEvent(id, event, token);
+            if (response.status === 200) {
+                // Update the event in the store
+                set((state) => ({
+                    events: state.events.map(e => String(e.id) === id ? response.data : e)
                 }));
             }
             return response;
