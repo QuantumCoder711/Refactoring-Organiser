@@ -1,23 +1,54 @@
 import { create } from "zustand";
 import { AgendaType } from "@/types";
-import { GetEventAgendasResponse } from "@/types/api-responses";
-import { getEventAgendas } from "@/api/agendas";
+import { deleteAgenda, getEventAgendas, importAgenda } from "@/api/agendas";
+import { BasicResponse, GetEventAgendasResponse } from "@/types/api-responses";
 
-interface AgendaStore {
-    agendas: AgendaType[];
-    loading: boolean;
-    getEventAgendas: (id: number | undefined) => Promise<GetEventAgendasResponse>;
+interface EventAgendas {
+    event_id: number | null;
+    agendas: AgendaType[]
 }
 
-const useAgendaStore = create<AgendaStore>((set) => ({
-    agendas: [],
+interface AgendaStore {
+    allEventAgendas: EventAgendas[];
+    loading: boolean;
+    getEventAgendas: (id: number | undefined) => Promise<AgendaType[] | undefined>;
+    deleteAgenda: (uuid: string) => Promise<BasicResponse>;
+    importAgenda: (event_id: number, new_event_id: number, date: string) => Promise<GetEventAgendasResponse>;
+}
+
+const useAgendaStore = create<AgendaStore>((set, get) => ({
+    allEventAgendas: [],
     loading: false,
     getEventAgendas: async (id: number | undefined) => {
-        if(!id) return { status: 400, message: "Event Id is required", data: [] };
+        if (!id) return undefined;
+        const existingAgendas = get().allEventAgendas.find(ea => ea.event_id === id);
+        if (existingAgendas?.event_id) return existingAgendas.agendas;
+
         try {
             set({ loading: true });
             const response = await getEventAgendas(id);
-            set({ agendas: response.data });
+            set((state) => ({
+                allEventAgendas: [...state.allEventAgendas, { event_id: id, agendas: response.data }]
+            }));
+            return response.data;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+    deleteAgenda: async (uuid: string) => {
+        try {
+            set({ loading: true });
+            const response = await deleteAgenda(uuid);
+            if (response.status === 200) {
+                set((state) => ({
+                    allEventAgendas: state.allEventAgendas.map(ea => ({
+                        ...ea,
+                        agendas: ea.agendas ? ea.agendas.filter(agenda => agenda.uuid !== uuid) : []
+                    }))
+                }));
+            }
             return response;
         } catch (error) {
             throw error;
@@ -25,6 +56,22 @@ const useAgendaStore = create<AgendaStore>((set) => ({
             set({ loading: false });
         }
     },
+    importAgenda: async (event_id: number, new_event_id: number, date: string) => {
+        try {
+            set({ loading: true });
+            const response = await importAgenda(event_id, new_event_id, date);
+            if (response.status === 200) {
+                set(() => ({
+                    allEventAgendas: [...response.data]
+                }));
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    }
 }));
 
 export default useAgendaStore;

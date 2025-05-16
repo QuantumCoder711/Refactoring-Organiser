@@ -44,6 +44,7 @@ import WhatsAppReport from './pages/admin/all-reports/whatsapp-report';
 import Charts from './pages/admin/all-reports/charts';
 import AiPhotos from './pages/admin/all-reports/ai-photos';
 import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
+import EditAgenda from './pages/admin/all-events/edit-agenda';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -95,6 +96,7 @@ const App: React.FC = () => {
 
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
+        <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />
 
         {/* Event Related Routes */}
         <Route path="all-events">

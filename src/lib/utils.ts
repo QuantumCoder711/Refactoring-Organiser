@@ -1,5 +1,5 @@
 import { domain, UserAvatar } from "@/constants";
-import { EventType, UserType } from "@/types";
+import { AgendaType, EventType, UserType } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -189,4 +189,9 @@ export const beautifyTime = (time: string): string => {
 
 export const getRandomOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+export const getStartEndTime = (event: EventType | AgendaType | null): string => {
+  if (!event) return '';
+  return `${event.start_time}:${event.start_minute_time} ${event.start_time_type} - ${event.end_time}:${event.end_minute_time} ${event.end_time_type}`;
 }
