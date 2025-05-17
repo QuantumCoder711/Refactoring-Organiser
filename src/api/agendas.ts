@@ -20,6 +20,46 @@ export const getEventAgendas = async (id: number): Promise<GetEventAgendasRespon
     }
 }
 
+export const getAgendaByUuid = async (uuid: string) => {
+    try {
+        const response = await axios.get(`${domain}/api/agendas/${uuid}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to fetch agenda");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const updateAgenda = async (uuid: string, formData: any) => {
+    try {
+        // Add _method: PUT to the form data for Laravel API
+        const updatedFormData = {
+            ...formData,
+            _method: 'PUT'
+        };
+
+        const response = await axios.post(`${domain}/api/agendas/${uuid}`, updatedFormData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to update agenda");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
 export const deleteAgenda = async (uuid: string) => {
     try {
         const response = await axios.delete(`${domain}/api/agendas/${uuid}`, {

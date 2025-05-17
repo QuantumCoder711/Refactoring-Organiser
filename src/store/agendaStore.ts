@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AgendaType } from "@/types";
-import { deleteAgenda, getEventAgendas, importAgenda } from "@/api/agendas";
+import { deleteAgenda, getAgendaByUuid, getEventAgendas, importAgenda, updateAgenda } from "@/api/agendas";
 import { BasicResponse, GetEventAgendasResponse } from "@/types/api-responses";
 
 interface EventAgendas {
@@ -11,7 +11,10 @@ interface EventAgendas {
 interface AgendaStore {
     allEventAgendas: EventAgendas[];
     loading: boolean;
+    currentAgenda: AgendaType | null;
     getEventAgendas: (id: number | undefined) => Promise<AgendaType[] | undefined>;
+    getAgendaByUuid: (uuid: string) => Promise<AgendaType | null>;
+    updateAgenda: (uuid: string, formData: any) => Promise<BasicResponse>;
     deleteAgenda: (uuid: string) => Promise<BasicResponse>;
     importAgenda: (event_id: number, new_event_id: number, date: string) => Promise<GetEventAgendasResponse>;
 }
@@ -19,6 +22,7 @@ interface AgendaStore {
 const useAgendaStore = create<AgendaStore>((set, get) => ({
     allEventAgendas: [],
     loading: false,
+    currentAgenda: null,
     getEventAgendas: async (id: number | undefined) => {
         if (!id) return undefined;
         const existingAgendas = get().allEventAgendas.find(ea => ea.event_id === id);
@@ -31,6 +35,45 @@ const useAgendaStore = create<AgendaStore>((set, get) => ({
                 allEventAgendas: [...state.allEventAgendas, { event_id: id, agendas: response.data }]
             }));
             return response.data;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+    getAgendaByUuid: async (uuid: string) => {
+        try {
+            set({ loading: true });
+            const response = await getAgendaByUuid(uuid);
+            if (response.status === 200) {
+                set({ currentAgenda: response.data });
+                return response.data;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching agenda:", error);
+            return null;
+        } finally {
+            set({ loading: false });
+        }
+    },
+    updateAgenda: async (uuid: string, formData: any) => {
+        try {
+            set({ loading: true });
+            const response = await updateAgenda(uuid, formData);
+            if (response.status === 200) {
+                // Update the agenda in the store
+                set((state) => ({
+                    allEventAgendas: state.allEventAgendas.map(ea => ({
+                        ...ea,
+                        agendas: ea.agendas.map(agenda =>
+                            agenda.uuid === uuid ? { ...agenda, ...formData } : agenda
+                        )
+                    })),
+                    currentAgenda: null // Reset current agenda
+                }));
+            }
+            return response;
         } catch (error) {
             throw error;
         } finally {
