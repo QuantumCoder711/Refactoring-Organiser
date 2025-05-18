@@ -1,12 +1,12 @@
-import DataReport from '@/components/DataReport';
+import WhatsAppReport from '@/components/WhatsAppReport';
 import React from 'react'
 
-const WhatsAppReport: React.FC = () => {
+const WhatsAppReportPage: React.FC = () => {
   return (
     <div>
-        <DataReport type='whatsapp'/>
+        <WhatsAppReport />
     </div>
   )
 }
 
-export default WhatsAppReport;
+export default WhatsAppReportPage;

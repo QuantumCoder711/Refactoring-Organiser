@@ -126,6 +126,35 @@ export const formatDateTime = (dateString: string): string => {
   // Return formatted date string
   return `(${hours}:${minutes}:${seconds} ${ampm}) ${day}/${month}/${year}`;
 };
+// Helper function to format date time
+export const formatDateTimeReport = (dateString: string): string => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+
+  // Get month name (short version)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[date.getMonth()];
+
+  // Get day
+  const day = date.getDate();
+
+  // Get year
+  const year = date.getFullYear();
+
+  // Get hours in 12-hour format
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  // Get minutes and seconds
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+
+  // Return formatted date string
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+};
 
 export const createImage = (url: File | undefined | null): string => {
   if (url instanceof File) {

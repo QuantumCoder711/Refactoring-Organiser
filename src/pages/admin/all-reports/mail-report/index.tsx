@@ -1,12 +1,12 @@
-import DataReport from '@/components/DataReport';
+import MailReport from '@/components/MailReport';
 import React from 'react'
 
-const MailReport: React.FC = () => {
+const MailReportPage: React.FC = () => {
   return (
     <div>
-      <DataReport type='mail'/>
+      <MailReport />
     </div>
   )
 }
 
-export default MailReport;
+export default MailReportPage;
