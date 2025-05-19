@@ -1,111 +1,65 @@
-"use client"
-
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card"
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-    { month: "January", desktop: 186, mobile: 80 },
-    { month: "February", desktop: 305, mobile: 200 },
-    { month: "March", desktop: 237, mobile: 120 },
-    { month: "April", desktop: 73, mobile: 190 },
-    { month: "May", desktop: 209, mobile: 130 },
-    { month: "June", desktop: 214, mobile: 140 },
-    { month: "July", desktop: 250, mobile: 160 },
-    { month: "August", desktop: 280, mobile: 180 },
-    { month: "September", desktop: 320, mobile: 210 },
-    { month: "October", desktop: 290, mobile: 195 },
-    { month: "November", desktop: 310, mobile: 205 },
-    { month: "December", desktop: 350, mobile: 230 },
-]
 
-const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
-    },
-    mobile: {
-        label: "Mobile",
-        color: "hsl(var(--chart-2))",
-    },
-    label: {
-        color: "hsl(var(--background))",
-    },
-} satisfies ChartConfig
+// Define the type for chart data items
+interface ChartDataItem {
+  label: string;
+  count: number;
+}
 
-export function HorizontalBarChartComponent() {
-    return (
-        <Card className="bg-transparent shadow-none border-none">
-            <CardHeader>
-                <CardTitle className="text-center">Attendees By Companies</CardTitle>
-                {/* <CardDescription>January - June 2024</CardDescription> */}
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig}>
-                    <BarChart
-                        accessibilityLayer
-                        data={chartData}
-                        layout="vertical"
-                        margin={{
-                            right: 16,
-                        }}
-                    >
-                        <CartesianGrid horizontal={true} />
-                        <YAxis
-                            dataKey="month"
-                            type="category"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
-                            hide
-                        />
-                        <XAxis dataKey="desktop" type="number" hide />
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="line" />}
-                        />
-                        
-                        <Bar
-                            dataKey="desktop"
-                            layout="vertical"
-                            fill="#0071E3"
-                            radius={4}
-                        >
-                            <LabelList
-                                dataKey="month"
-                                position="insideLeft"
-                                offset={8}
-                                className="fill-white"
-                                fontSize={12}
-                            />
-                            <LabelList
-                                dataKey="desktop"
-                                position="right"
-                                offset={8}
-                                className="fill-foreground"
-                                fontSize={12}
-                            />
-                        </Bar>
-                    </BarChart>
-                </ChartContainer>
-            </CardContent>
-            <CardFooter className="flex-col items-start gap-2 text-sm">
-                
-            </CardFooter>
-        </Card>
-    )
+// Define props interface for the component
+interface HorizontalBarChartProps {
+  chartData: ChartDataItem[];
+  title?: string;
+}
+
+export function HorizontalBarChartComponent({ chartData, title = "Total Attendees by Company" }: HorizontalBarChartProps) {
+
+  const maxCount = Math.max(...chartData.map((data) => data.count));
+
+  return (
+    <Card className="bg-transparent shadow-none border-none">
+      <CardHeader>
+        <CardTitle className="text-center">{title}</CardTitle>
+        {/* <CardDescription className="text-center">January - June 2024</CardDescription> */}
+      </CardHeader>
+      <CardContent className="h-fit">
+        <div className="flex flex-col gap-3">
+          {chartData.map((item, index) => (
+            <div key={index} className='flex gap-[10px] items-center'>
+              <p 
+                className='cursor-default font-semibold max-w-40 w-full text-ellipsis overflow-hidden text-nowrap text-right'
+                title={item.label}
+              >
+                {item.label}
+              </p>
+              <div
+                className={`h-6 rounded-sm grid font-sans min-w-fit font-semibold place-content-center bg-brand-primary text-center text-white p-1`}
+                style={{
+                  width: `${(item.count / maxCount) * 100 * 0.6}%`,
+                }}
+              >
+                {item.count}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card >
+  )
 }
