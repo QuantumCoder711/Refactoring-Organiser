@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
+import * as htmlToImage from 'html-to-image';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -48,7 +49,7 @@ const AddEvent: React.FC = () => {
     const [showTemplates, setShowTemplates] = useState<boolean>(false);
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [imageSource, setImageSource] = useState<'upload' | 'template' | null>(null);
-
+    const imageRef = useRef<HTMLDivElement | null>(null);
     const [formData, setFormData] = useState<AddEventType>({
         title: "",
         image: null,
@@ -149,21 +150,25 @@ const AddEvent: React.FC = () => {
         }));
     };
 
-    const handleTemplateSelect = (template: string) => {
-        // Set the image source to 'template'
-        setImageSource('template');
-        setSelectedTemplate(template);
-        setFormData(prevState => ({
-            ...prevState,
-            image: template
-        }));
-    };
+        // Also modify handleTemplateSelect to improve template handling
+        const handleTemplateSelect = (template: string) => {
+            // Set the image source to 'template'
+            setImageSource('template');
+            setSelectedTemplate(template);
+    
+            // When a template is selected, set the image in formData to the template string
+            // (it will be converted to a File during submission)
+            setFormData(prevState => ({
+                ...prevState,
+                image: template
+            }));
+        };
 
     // Toggle template display and reset selections
     const toggleTemplates = () => {
         const newShowTemplates = !showTemplates;
         setShowTemplates(newShowTemplates);
-        
+
         if (newShowTemplates) {
             // If showing templates, clear any uploaded image
             if (imageSource === 'upload') {
@@ -256,31 +261,65 @@ const AddEvent: React.FC = () => {
         return true;
     }, []);
 
+    // Modified handleSubmit function - place this in your AddEvent component
     const handleSubmit = async () => {
-        // Validate form before submission
-        if (!validateForm(formData)) {
-            return;
+        // First, handle the template image if needed
+        if (imageSource === 'template' && selectedTemplate && imageRef.current) {
+            try {
+                setLoading(true);
+
+                // Generate the image from the HTML content
+                const dataUrl = await htmlToImage.toPng(imageRef.current);
+
+                // Convert the Data URL to a Blob and create a File
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], 'template.png', { type: 'image/png' });
+
+                // Update the form data with the new file
+                setFormData(prevData => ({
+                    ...prevData,
+                    image: file
+                }));
+
+                // Now continue with validation and submission
+                await submitFormData({
+                    ...formData,
+                    image: file
+                });
+            } catch (error) {
+                console.error('Error processing template:', error);
+                toast("Error creating image from template", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+                setLoading(false);
+            }
+        } else {
+            // For normal image upload or when no image is selected
+            setLoading(true);
+            await submitFormData(formData);
         }
+    };
 
-        // Log whether image was uploaded or selected from template
-        console.log("Image source:", imageSource);
-        
-        if (imageSource === 'template' && selectedTemplate) {
-            console.log("The template is selected:", selectedTemplate);
-        } else if (imageSource === 'upload' && formData.image instanceof File) {
-            console.log("Image was uploaded:", formData.image.name);
-        }
-
-        return;
-
-        setLoading(true);
+    // Separate the actual form submission from image processing
+    const submitFormData = async (dataToSubmit: AddEventType) => {
         try {
-            const response = await useEventStore.getState().addEvent(formData);
+            // Validate form before submission
+            if (!validateForm(dataToSubmit)) {
+                setLoading(false);
+                return;
+            }
+
+            const response = await useEventStore.getState().addEvent(dataToSubmit);
             if (response.status === 200) {
                 toast(response.message, {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
+
+                // Reset form on success
+                resetForm();
             } else {
                 toast(response.message, {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -293,7 +332,7 @@ const AddEvent: React.FC = () => {
             // Handle validation errors
             if (error.response && error.response.status === 422 && error.response.data.errors) {
                 // Display each validation error
-                Object.entries(error.response.data.errors).forEach(([field, messages]: [string, any]) => {
+                Object.entries(error.response.data.errors).forEach(([field, messages]) => {
                     const errorMessages = Array.isArray(messages) ? messages.join(', ') : String(messages);
                     toast(`${field}: ${errorMessages}`, {
                         className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -309,42 +348,46 @@ const AddEvent: React.FC = () => {
                 });
             }
         } finally {
-            setFormData({
-                title: "",
-                image: null,
-                description: "",
-                event_start_date: "",
-                event_date: "",
-                google_map_link: "",
-                start_time: "",
-                start_minute_time: "",
-                start_time_type: "",
-                end_time: "",
-                end_minute_time: "",
-                end_time_type: "",
-                status: 1,
-                feedback: 1,
-                event_otp: getRandomOTP(),
-                view_agenda_by: 0,
-                event_fee: "0",
-                paid_event: 0,
-                printer_count: 0,
-                pincode: '',
-                state: '',
-                city: '',
-                country: '',
-                event_venue_name: '',
-                event_venue_address_1: '',
-                event_venue_address_2: '',
-            });
-            setImageSource(null);
-            setSelectedTemplate(null);
-            setCoords({
-                lat: 0,
-                lng: 0
-            });
             setLoading(false);
         }
+    };
+
+    // Add this helper function to reset the form
+    const resetForm = () => {
+        setFormData({
+            title: "",
+            image: null,
+            description: "",
+            event_start_date: "",
+            event_date: "",
+            google_map_link: "",
+            start_time: "",
+            start_minute_time: "",
+            start_time_type: "",
+            end_time: "",
+            end_minute_time: "",
+            end_time_type: "",
+            status: 1,
+            feedback: 1,
+            event_otp: getRandomOTP(),
+            view_agenda_by: 0,
+            event_fee: "0",
+            paid_event: 0,
+            printer_count: 0,
+            pincode: '',
+            state: '',
+            city: '',
+            country: '',
+            event_venue_name: '',
+            event_venue_address_1: '',
+            event_venue_address_2: '',
+        });
+        setImageSource(null);
+        setSelectedTemplate(null);
+        setCoords({
+            lat: 0,
+            lng: 0
+        });
     };
 
     if (loading) {
@@ -448,7 +491,7 @@ const AddEvent: React.FC = () => {
                     </div>
 
                     {/* Image Preview */}
-                    <div className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
+                    <div ref={imageRef} className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
                         {formData.event_start_date && showTemplates && <p
                             style={{ color: textConfig.color }}
                             className='absolute top-0 w-11/12 bg-white/10 backdrop-blur-3xl mx-auto right-0 left-0 text-center p-1 rounded-b-full'>{beautifyDate(new Date(formData.event_start_date))}
