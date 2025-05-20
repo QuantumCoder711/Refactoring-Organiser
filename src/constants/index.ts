@@ -64,3 +64,5 @@ export const domain: string = import.meta.env.VITE_API_URL;
 export const appDomain: string = import.meta.env.VITE_APP_URL;
 export const googleMapsApiKey: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 export const token: string | null = JSON.parse(localStorage.getItem("klout-organiser-storage") || '{}')?.state?.token || null;
+export const additionalDomain: string = import.meta.env.VITE_ADDITIONAL_URL;
+export const photoBucketUrl: string = import.meta.env.VITE_PHOTO_BUCKET_URL;
