@@ -3,7 +3,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { domain, googleMapsApiKey, UserAvatar } from '@/constants';
-import Template1 from "@/assets/templates/template1.png";
+import Template1 from "@/assets/templates/template_1.jpg";
+import Template2 from "@/assets/templates/template_2.jpg";
+import Template3 from "@/assets/templates/template_3.jpg";
+import Template4 from "@/assets/templates/template_4.jpg";
+import Template5 from "@/assets/templates/template_5.jpg";
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { beautifyDate, compressImage, getRandomOTP } from '@/lib/utils';
@@ -36,7 +40,7 @@ const UpdateEvent: React.FC = () => {
         lng: 0
     });
 
-    const templates: string[] = [Template1, Template1, Template1, Template1, Template1];
+    const templates: string[] = [Template1, Template2, Template3, Template4, Template5];
 
     const [formData, setFormData] = useState<AddEventType & { event_end_date?: string }>({
         title: "",

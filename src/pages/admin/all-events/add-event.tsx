@@ -3,7 +3,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { googleMapsApiKey, UserAvatar } from '@/constants';
-import Template1 from "@/assets/templates/template1.png";
+import Template1 from "@/assets/templates/template_1.jpg";
+import Template2 from "@/assets/templates/template_2.jpg";
+import Template3 from "@/assets/templates/template_3.jpg";
+import Template4 from "@/assets/templates/template_4.jpg";
+import Template5 from "@/assets/templates/template_5.jpg";
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { beautifyDate, getRandomOTP } from '@/lib/utils';
@@ -31,9 +35,19 @@ const AddEvent: React.FC = () => {
         lng: 0
     });
 
-    const templates: string[] = [Template1, Template1, Template1, Template1, Template1];
+    const [textConfig, setTextConfig] = useState<{
+        size: number;
+        color: string;
+    }>({
+        size: 16,
+        color: '#000'
+    });
 
-    // const event = useEventStore((state) => state.getEventBySlug(slug));
+    const templates: string[] = [Template1, Template2, Template3, Template4, Template5];
+
+    const [showTemplates, setShowTemplates] = useState<boolean>(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+    const [imageSource, setImageSource] = useState<'upload' | 'template' | null>(null);
 
     const [formData, setFormData] = useState<AddEventType>({
         title: "",
@@ -64,14 +78,9 @@ const AddEvent: React.FC = () => {
         event_venue_address_2: '',
     });
 
-    useEffect(()=>{
-        console.log(formData)
-    }, [formData]);
-
     const handlePlaceSelect = () => {
         if (autocomplete) {
             const place = autocomplete.getPlace();
-            console.log(place);
 
             if (place && place.address_components) {
                 const addressComponents = place.address_components as google.maps.GeocoderAddressComponent[];
@@ -90,7 +99,6 @@ const AddEvent: React.FC = () => {
             }
 
             if (place.geometry?.location) {
-                console.log(place.geometry.location.lat(), place.geometry.location.lng())
                 setCoords({
                     lat: place.geometry.location.lat(),
                     lng: place.geometry.location.lng()
@@ -117,10 +125,15 @@ const AddEvent: React.FC = () => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
-        setFormData(prevState => ({
-            ...prevState,
-            image: file
-        }));
+        if (file) {
+            // Set the image source to 'upload'
+            setImageSource('upload');
+            setSelectedTemplate(null);
+            setFormData(prevState => ({
+                ...prevState,
+                image: file
+            }));
+        }
     };
 
     const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, timeType: 'start' | 'end') => {
@@ -134,6 +147,43 @@ const AddEvent: React.FC = () => {
             [`${timeType}_minute_time`]: minutes,
             [`${timeType}_time_type`]: ampm
         }));
+    };
+
+    const handleTemplateSelect = (template: string) => {
+        // Set the image source to 'template'
+        setImageSource('template');
+        setSelectedTemplate(template);
+        setFormData(prevState => ({
+            ...prevState,
+            image: template
+        }));
+    };
+
+    // Toggle template display and reset selections
+    const toggleTemplates = () => {
+        const newShowTemplates = !showTemplates;
+        setShowTemplates(newShowTemplates);
+        
+        if (newShowTemplates) {
+            // If showing templates, clear any uploaded image
+            if (imageSource === 'upload') {
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: null
+                }));
+                setImageSource(null);
+            }
+        } else {
+            // If hiding templates, clear any selected template
+            if (imageSource === 'template') {
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: null
+                }));
+                setSelectedTemplate(null);
+                setImageSource(null);
+            }
+        }
     };
 
     // Validation function
@@ -212,6 +262,17 @@ const AddEvent: React.FC = () => {
             return;
         }
 
+        // Log whether image was uploaded or selected from template
+        console.log("Image source:", imageSource);
+        
+        if (imageSource === 'template' && selectedTemplate) {
+            console.log("The template is selected:", selectedTemplate);
+        } else if (imageSource === 'upload' && formData.image instanceof File) {
+            console.log("Image was uploaded:", formData.image.name);
+        }
+
+        return;
+
         setLoading(true);
         try {
             const response = await useEventStore.getState().addEvent(formData);
@@ -276,6 +337,8 @@ const AddEvent: React.FC = () => {
                 event_venue_address_1: '',
                 event_venue_address_2: '',
             });
+            setImageSource(null);
+            setSelectedTemplate(null);
             setCoords({
                 lat: 0,
                 lng: 0
@@ -284,7 +347,7 @@ const AddEvent: React.FC = () => {
         }
     };
 
-    if(loading) {
+    if (loading) {
         return <Wave />
     }
 
@@ -345,13 +408,20 @@ const AddEvent: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Banner Image */}
+                        {/* Banner Image - Disabled when templates are showing */}
                         <div className="flex flex-col gap-2">
                             <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
-                            <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                            <div className={`input relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
-                                    {formData.image ? (formData.image as File).name : "No file Chosen"}
+                                    {formData.image
+                                        ? formData.image instanceof File
+                                            ? (formData.image as File).name
+                                            : typeof formData.image === 'string'
+                                                ? "Template selected"
+                                                : "No file Chosen"
+                                        : "No file Chosen"
+                                    }
                                 </p>
                                 <Input
                                     id="image"
@@ -359,6 +429,7 @@ const AddEvent: React.FC = () => {
                                     type='file'
                                     accept="image/*"
                                     onChange={handleFileChange}
+                                    disabled={showTemplates}
                                     className='input absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
                                 />
                             </div>
@@ -366,35 +437,77 @@ const AddEvent: React.FC = () => {
 
                         <p className='font-semibold text-center -my-4'>Or</p>
 
-                        {/* Choose Banner Image Button */}
-                        <button className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'>Create Event Banner</button>
+                        {/* Toggle Template Button */}
+                        <button
+                            onClick={toggleTemplates}
+                            type="button"
+                            className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'
+                        >
+                            {showTemplates ? 'Hide Templates' : 'Create Event Banner'}
+                        </button>
                     </div>
 
-                    <img
-                        height={237}
-                        width={237}
-                        src={formData.image instanceof File ? URL.createObjectURL(formData.image) : UserAvatar}
-                        className='max-h-[237px] min-w-[237px] object-cover bg-brand-light-gray rounded-[10px]' />
-                </div>
+                    {/* Image Preview */}
+                    <div className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
+                        {formData.event_start_date && showTemplates && <p
+                            style={{ color: textConfig.color }}
+                            className='absolute top-0 w-11/12 bg-white/10 backdrop-blur-3xl mx-auto right-0 left-0 text-center p-1 rounded-b-full'>{beautifyDate(new Date(formData.event_start_date))}
+                        </p>}
 
-                {/* Templates Images */}
-                <div className='flex justify-between mt-5'>
-                    {templates.map((image, index) => (
-                        <img key={index} src={image} alt="template" width={100} height={100} className='bg-brand-light-gray rounded-[10px] cursor-pointer' />
-                    ))}
-                </div>
-
-                {/* Text Size and Color */}
-                <div className='flex justify-between items-center mt-[26px] gap-9'>
-                    <div className='flex gap-[18px] items-center flex-1'>
-                        <Label className='font-semibold text-nowrap'>Text Size: </Label>
-                        <Slider defaultValue={[33]} className='cursor-pointer' max={100} step={1} />
-                    </div>
-                    <div className='w-fit flex gap-[18px]'>
-                        <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
-                        <Input type='color' className='w-[75px] h-6 p-0 outline-0 border-0' />
+                        {showTemplates && <h3
+                            style={{ fontSize: textConfig.size + 'px', color: textConfig.color }}
+                            className='text-center w-11/12 text-xl leading-[1] font-semibold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>{formData.title}</h3>}
+                        <img
+                            src={
+                                formData.image instanceof File
+                                    ? URL.createObjectURL(formData.image)
+                                    : typeof formData.image === 'string' && formData.image
+                                        ? formData.image
+                                        : UserAvatar
+                            }
+                            className='h-full w-full object-cover bg-brand-light-gray rounded-[10px]'
+                        />
                     </div>
                 </div>
+
+                {/* Template Images Section */}
+                {showTemplates && (
+                    <div className='flex justify-between mt-5'>
+                        {templates.map((template, index) => (
+                            <img
+                                onClick={() => handleTemplateSelect(template)}
+                                key={index}
+                                src={template}
+                                alt={`template ${index + 1}`}
+                                width={100}
+                                height={100}
+                                className={`bg-brand-light-gray size-24 object-cover rounded-[10px] cursor-pointer hover:border-2 hover:border-brand-primary transition-all ${selectedTemplate === template ? 'border-2 border-brand-primary' : ''}`}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Text Size and Color for Templates */}
+                {showTemplates && (
+                    <div className='flex justify-between items-center mt-[26px] gap-9'>
+                        <div className='flex gap-[18px] items-center flex-1'>
+                            <Label className='font-semibold text-nowrap'>Text Size: </Label>
+                            <Slider
+                                defaultValue={[textConfig.size]}
+                                value={[textConfig.size]}
+                                onValueChange={(value) => setTextConfig(prev => ({ ...prev, size: value[0] }))}
+                                className='cursor-pointer'
+                                min={16}
+                                max={48}
+                                step={1}
+                            />
+                        </div>
+                        <div className='w-fit flex gap-[18px]'>
+                            <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
+                            <Input type='color' value={textConfig.color} onChange={(e) => setTextConfig(prev => ({ ...prev, color: e.target.value }))} className='w-[75px] h-6 p-0 outline-0 border-0' />
+                        </div>
+                    </div>
+                )}
 
                 {/* Description Box */}
                 <div className='flex flex-col gap-2 mt-5'>
@@ -428,7 +541,9 @@ const AddEvent: React.FC = () => {
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_start_date))}</p>
+                                <p className='h-full px-3 flex items-center'>
+                                    {formData.event_start_date ? beautifyDate(new Date(formData.event_start_date)) : 'DD/MM/YYYY'}
+                                </p>
                             </div>
 
                             {/* For Time */}
@@ -436,12 +551,19 @@ const AddEvent: React.FC = () => {
                                 <Input
                                     type='time'
                                     name='start_time'
-                                    value={`${formData.start_time}:${formData.start_minute_time}`}
+                                    value={
+                                        formData.start_time && formData.start_minute_time
+                                            ? `${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`
+                                            : '00:00 AM'
+                                    }
                                     onChange={(e) => handleTimeChange(e, 'start')}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
                                 <p className='h-full px-3 flex items-center text-nowrap'>
-                                    {`${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`}
+                                    {formData.start_time && formData.start_minute_time
+                                        ? `${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`
+                                        : '00:00 AM'
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -463,7 +585,9 @@ const AddEvent: React.FC = () => {
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_date))}</p>
+                                <p className='h-full px-3 flex items-center'>
+                                    {formData.event_date ? beautifyDate(new Date(formData.event_date)) : 'DD/MM/YYYY'}
+                                </p>
                             </div>
 
                             {/* For Time */}
@@ -471,12 +595,19 @@ const AddEvent: React.FC = () => {
                                 <Input
                                     type='time'
                                     name='end_time'
-                                    value={`${formData.end_time}:${formData.end_minute_time}`}
+                                    value={
+                                        formData.end_time && formData.end_minute_time
+                                            ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
+                                            : '00:00 AM'
+                                    }
                                     onChange={(e) => handleTimeChange(e, 'end')}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
                                 <p className='h-full px-3 flex items-center text-nowrap'>
-                                    {`${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`}
+                                    {formData.end_time && formData.end_minute_time
+                                        ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
+                                        : '00:00 AM'
+                                    }
                                 </p>
                             </div>
                         </div>
