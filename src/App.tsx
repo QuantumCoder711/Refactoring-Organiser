@@ -46,6 +46,8 @@ import Charts from './pages/admin/all-reports/charts';
 import AiPhotos from './pages/admin/all-reports/ai-photos';
 import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
 import EditAgenda from './pages/admin/all-events/edit-agenda';
+import ExploreAllEvents from './pages/guest/explore-all-events';
+import ExploreViewEvent from './pages/guest/explore-view-event';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -63,8 +65,10 @@ const App: React.FC = () => {
       {/* Guest Routes */}
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
-        <Route path="explore-events" element={<ExploreEvents />} />
+        <Route path="events" element={<ExploreEvents />} />
         <Route path="add-first-event" element={<AddFirstEvent />} />
+        <Route path="explore-events/:city" element={<ExploreAllEvents />} />
+        <Route path="explore-events/event/:slug" element={<ExploreViewEvent />} />
         <Route
           path="login"
           element={
