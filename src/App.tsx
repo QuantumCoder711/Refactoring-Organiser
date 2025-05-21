@@ -48,6 +48,7 @@ import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
 import EditAgenda from './pages/admin/all-events/edit-agenda';
 import ExploreAllEvents from './pages/guest/explore-all-events';
 import ExploreViewEvent from './pages/guest/explore-view-event';
+import PaymentStatus from './pages/guest/add-first-event/payment/payment-status';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -69,6 +70,7 @@ const App: React.FC = () => {
         <Route path="add-first-event" element={<AddFirstEvent />} />
         <Route path="explore-events/:city" element={<ExploreAllEvents />} />
         <Route path="explore-events/event/:slug" element={<ExploreViewEvent />} />
+        <Route path="payment/:status/:id" element={<PaymentStatus />} />
         <Route
           path="login"
           element={
