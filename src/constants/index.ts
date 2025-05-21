@@ -42,7 +42,7 @@ export const navbarLinks = [
     },
     {
         label: "Events",
-        path: "#",
+        path: "/explore-events",
     },
     {
         label: "Feature",

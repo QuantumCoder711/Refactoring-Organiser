@@ -10,7 +10,8 @@ import GuestLayout from '@/pages/guest/layout';
 // Guest Pages
 import Login from '@/pages/guest/login';
 import Homepage from '@/pages/guest/homepage';
-
+import ExploreEvents from '@/pages/guest/explore-events';
+import AddFirstEvent from '@/pages/guest/add-first-event';
 // Admin Pages
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
@@ -62,6 +63,8 @@ const App: React.FC = () => {
       {/* Guest Routes */}
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
+        <Route path="explore-events" element={<ExploreEvents />} />
+        <Route path="add-first-event" element={<AddFirstEvent />} />
         <Route
           path="login"
           element={
