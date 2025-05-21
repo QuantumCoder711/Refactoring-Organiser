@@ -4,7 +4,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { domain } from '@/constants';
 import Wave from '@/components/Wave';
 import { Calendar, ChevronDown, MapPin } from 'lucide-react';
-import { beautifyDate, formatDateTime } from '@/lib/utils';
+import { formatDateTime } from '@/lib/utils';
 
 const ExploreAllEvents: React.FC = () => {
   const { city } = useParams<{ city: string }>();

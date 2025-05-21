@@ -48,7 +48,7 @@ import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
 import EditAgenda from './pages/admin/all-events/edit-agenda';
 import ExploreAllEvents from './pages/guest/explore-all-events';
 import ExploreViewEvent from './pages/guest/explore-view-event';
-import PaymentStatus from './pages/guest/add-first-event/payment/payment-status';
+import PaymentStatus from './pages/guest/payment/payment-status';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

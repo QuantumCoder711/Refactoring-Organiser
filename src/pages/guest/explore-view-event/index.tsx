@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { googleMapsApiKey, domain, appDomain, UserAvatar } from '@/constants';
@@ -51,9 +51,7 @@ const ExploreViewEvent: React.FC = () => {
 
     const [open, setOpen] = useState(false);
     const [companies, setCompanies] = useState<ApiType[]>([]);
-    const [selectedCompany, setSelectedCompany] = useState<string>('');
-    const [customCompanyName, setCustomCompanyName] = useState<string>('');
-
+    
     const [userAccount, setUserAccount] = useState({
         first_name: '',
         last_name: '',
@@ -63,15 +61,6 @@ const ExploreViewEvent: React.FC = () => {
         company_name: '',
         acceptance: '1',
         industry: 'Others'
-    });
-
-    const [formErrors, setFormErrors] = useState({
-        first_name: '',
-        last_name: '',
-        phone_number: '',
-        email_id: '',
-        company_name: '',
-        custom_company_name: '',
     });
 
     const validateForm = () => {
@@ -121,7 +110,6 @@ const ExploreViewEvent: React.FC = () => {
             isValid = false;
         }
 
-        setFormErrors(errors);
         return isValid;
     };
 
