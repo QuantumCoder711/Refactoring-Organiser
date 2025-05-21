@@ -5,10 +5,10 @@ import { AddEventResponse, DeleteEventResponse } from "@/types/api-responses";
 
 interface EventStore {
     events: EventType[];
+    addEvent: (event: AddEventType, token?: string) => Promise<AddEventResponse>;
     setEvents: (events: EventType[]) => void;
     getAllEvents: (token: string) => Promise<void>;
     getEventBySlug: (slug: string | undefined) => EventType | null;
-    addEvent: (event: AddEventType) => Promise<AddEventResponse>;
     updateEvent: (id: string, event: AddEventType) => Promise<AddEventResponse>;
     deleteEvent: (id: number) => Promise<DeleteEventResponse>;
 }
@@ -24,17 +24,12 @@ const useEventStore = create<EventStore>((set, get) => ({
         const { events } = get();
         return events.find(event => event.slug === slug) || null;
     },
-    addEvent: async (event: AddEventType) => {
+    addEvent: async (event: AddEventType, token?: string) => {
         try {
-            // Get token from localStorage
-            const tokenData = localStorage.getItem("klout-organiser-storage");
-            const token = tokenData ? JSON.parse(tokenData).state.token : null;
+            // If token is passed then use it, otherwise get it from localStorage
+            const tokenToUse = token || (localStorage.getItem("klout-organiser-storage") ? JSON.parse(localStorage?.getItem("klout-organiser-storage") || "").state.token : null);
 
-            if (!token) {
-                throw new Error("Authentication token not found");
-            }
-
-            const response = await addEvent(event, token);
+            const response = await addEvent(event, tokenToUse);
             if (response.status === 200) {
                 // Add the new event to the store
                 set((state) => ({
