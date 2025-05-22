@@ -147,10 +147,10 @@ const SendInvitations: React.FC = () => {
 
             <div className='flex items-center gap-5 mt-5 font-semibold'>
                 <Link
-                    to="#"
+                    to={`/send-invitations/add-requested-attendee/${slug}`}
                     className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-fit text-nowrap text-sm grid place-content-center"
                 >
-                    Add Attendees
+                    Add Requested Attendee
                 </Link>
 
                 <Link

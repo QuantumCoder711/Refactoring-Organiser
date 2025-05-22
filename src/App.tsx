@@ -50,6 +50,7 @@ import ExploreAllEvents from '@/pages/guest/explore-all-events';
 import ExploreViewEvent from '@/pages/guest/explore-view-event';
 import PaymentStatus from '@/pages/guest/payment/payment-status';
 import SendInvitations from '@/pages/admin/send-invitations';
+import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-attendee';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -101,6 +102,8 @@ const App: React.FC = () => {
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
         <Route path='tutorials' element={<Tutorials />} />
+        <Route path="send-invitations" element={<SendInvitations />} />
+        <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
 
         <Route path="update-profile" element={<UpdateProfile />} />
 
