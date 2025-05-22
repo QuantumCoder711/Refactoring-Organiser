@@ -166,7 +166,7 @@ const EventCard: React.FC<EventCardProps> = ({
                             <Link to={`/all-events/update-event/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Edit Event</Link>
                             <Link to={`/all-events/attendees/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>All Attendees</Link>
                             <div className='col-span-3 flex w-full gap-1 justify-center'>
-                                <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Send Invitations</Link>
+                                <Link to={`/all-events/send-invitations/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>Send Invitations</Link>
                                 <Link to={`/all-agendas/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-1'>View Agendas</Link>
                             </div>
                         </div>

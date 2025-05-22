@@ -39,16 +39,17 @@ import AllAgendas from '@/pages/admin/all-events/all-agendas';
 import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user-request';
 import AddAgenda from '@/pages/admin/all-events/add-agenda';
 import UpdateProfile from '@/pages/admin/profile/update-profile';
-import Tutorials from './pages/admin/tutorials';
-import MailReport from './pages/admin/all-reports/mail-report';
-import WhatsAppReport from './pages/admin/all-reports/whatsapp-report';
-import Charts from './pages/admin/all-reports/charts';
-import AiPhotos from './pages/admin/all-reports/ai-photos';
-import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
-import EditAgenda from './pages/admin/all-events/edit-agenda';
-import ExploreAllEvents from './pages/guest/explore-all-events';
-import ExploreViewEvent from './pages/guest/explore-view-event';
-import PaymentStatus from './pages/guest/payment/payment-status';
+import Tutorials from '@/pages/admin/tutorials';
+import MailReport from '@/pages/admin/all-reports/mail-report';
+import WhatsAppReport from '@/pages/admin/all-reports/whatsapp-report';
+import Charts from '@/pages/admin/all-reports/charts';
+import AiPhotos from '@/pages/admin/all-reports/ai-photos';
+import AiTranscriber from '@/pages/admin/all-reports/ai-transcriber';
+import EditAgenda from '@/pages/admin/all-events/edit-agenda';
+import ExploreAllEvents from '@/pages/guest/explore-all-events';
+import ExploreViewEvent from '@/pages/guest/explore-view-event';
+import PaymentStatus from '@/pages/guest/payment/payment-status';
+import SendInvitations from '@/pages/admin/send-invitations';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -113,6 +114,7 @@ const App: React.FC = () => {
           <Route path="attendees/:slug" element={<Attendees />} />
           <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
+          <Route path="send-invitations/:slug" element={<SendInvitations />} />
 
           {/* Message Template Routes */}
           <Route path="event/all-template-messages/:slug" element={<AllTemplateMessages />} />
