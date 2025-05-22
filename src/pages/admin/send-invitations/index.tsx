@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { Checkbox } from '@/components/ui/checkbox';
-import { CircleX, Eye, SquarePen, Trash, UserCheck } from 'lucide-react';
+import { CircleCheck, CircleX, Eye, SquarePen, Trash, UserCheck } from 'lucide-react';
 import { RequestedAttendeeType } from '@/types';
 import axios from 'axios';
 import { domain } from '@/constants';
@@ -63,7 +63,8 @@ const SendInvitations: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [loading, setLoading] = useState<boolean>(false);
     const [requestedAttendees, setRequestedAttendees] = useState<RequestedAttendeeType[]>([]);
-    
+    const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
+
     // Search filters
     const [nameFilter, setNameFilter] = useState('');
     const [emailFilter, setEmailFilter] = useState('');
@@ -74,7 +75,7 @@ const SendInvitations: React.FC = () => {
         setItemsPerPage(Number(value));
         setCurrentPage(1); // Reset to first page when changing items per page
     };
-    
+
     // Handle page change
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -111,17 +112,17 @@ const SendInvitations: React.FC = () => {
             const nameMatch = `${attendee.first_name || ''} ${attendee.last_name || ''}`.toLowerCase().includes(nameFilter.toLowerCase());
             const emailMatch = (attendee.email_id || '').toLowerCase().includes(emailFilter.toLowerCase());
             const companyMatch = (attendee.company_name || '').toLowerCase().includes(companyFilter.toLowerCase());
-            const statusMatch = statusFilter === 'all' || 
+            const statusMatch = statusFilter === 'all' ||
                 (statusFilter === 'delegate' && attendee.status === 'delegate') ||
                 (statusFilter === 'speaker' && attendee.status === 'speaker') ||
                 (statusFilter === 'sponsor' && attendee.status === 'sponsor') ||
                 (statusFilter === 'panelist' && attendee.status === 'panelist') ||
                 (statusFilter === 'moderator' && attendee.status === 'moderator');
-            
+
             return nameMatch && emailMatch && companyMatch && statusMatch;
         });
     }, [requestedAttendees, nameFilter, emailFilter, companyFilter, statusFilter]);
-    
+
     // Calculate pagination
     const totalItems = filteredAttendees.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -129,7 +130,94 @@ const SendInvitations: React.FC = () => {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    
+
+    // Handle checkbox selection
+    const handleSelectAttendee = (id: number, isSelected: boolean) => {
+        setSelectedAttendees(prev => {
+            const newSet = new Set(prev);
+            if (isSelected) {
+                newSet.add(id);
+            } else {
+                newSet.delete(id);
+            }
+            return newSet;
+        });
+    };
+
+    // Handle select all
+    const handleSelectAll = (isSelected: boolean) => {
+        if (isSelected) {
+            // Only select the currently filtered attendees
+            setSelectedAttendees(new Set(filteredAttendees.map(attendee => attendee.id)));
+        } else {
+            setSelectedAttendees(new Set());
+        }
+    };
+
+    // Handle delete selected
+    const handleDeleteSelected = async () => {
+        const selectedIds = Array.from(selectedAttendees);
+        if (selectedIds.length > 0) {
+            if (!event || !user) return;
+            setLoading(true);
+            const response = await axios.post(`${domain}/api/bulk-delete-requested-attendee`, {
+                event_id: event?.id,
+                user_id: user?.id,
+                ids: selectedIds
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.status) {
+                // Remove the deleted attendees from the list
+                setRequestedAttendees(requestedAttendees.filter(attendee => !selectedIds.includes(attendee.id)));
+                toast(response.data.message || "Attendees deleted successfully", {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            } else {
+                toast(response.data.message || "Failed to delete attendees", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+            setLoading(false);
+            // Clear selected attendees after logging
+            setSelectedAttendees(new Set());
+        }
+    };
+
+    const handleSingleDelete = (uuid: string) => {
+        return async () => {
+            if (!event || !user) return;
+            setLoading(true);
+            const response = await axios.delete(`${domain}/api/requested-attendee/${uuid}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.status) {
+                // Remove the deleted attendee from the list
+                setRequestedAttendees(requestedAttendees.filter(attendee => attendee.uuid !== uuid));
+                toast(response.data.message || "Attendee deleted successfully", {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            } else {
+                toast(response.data.message || "Failed to delete attendee", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+            setLoading(false);
+        };
+    }
+
     if (loading) return <Wave />
 
     return (
@@ -160,7 +248,7 @@ const SendInvitations: React.FC = () => {
                     Invite Registrations
                 </Link>
             </div>
-            
+
             {/* Search and Filter Section */}
             <div className='flex w-full gap-2.5 mt-4'>
                 {/* Search By Name */}
@@ -193,10 +281,10 @@ const SendInvitations: React.FC = () => {
                         <SelectValue placeholder="Status">
                             {statusFilter === 'all' ? 'All Statuses' :
                                 statusFilter === 'delegate' ? 'Delegate' :
-                                statusFilter === 'speaker' ? 'Speaker' :
-                                statusFilter === 'sponsor' ? 'Sponsor' :
-                                statusFilter === 'panelist' ? 'Panelist' :
-                                statusFilter === 'moderator' ? 'Moderator' : 'Status'}
+                                    statusFilter === 'speaker' ? 'Speaker' :
+                                        statusFilter === 'sponsor' ? 'Sponsor' :
+                                            statusFilter === 'panelist' ? 'Panelist' :
+                                                statusFilter === 'moderator' ? 'Moderator' : 'Status'}
                         </SelectValue>
                     </SelectTrigger>
                     <SelectContent className='!text-sm !font-semibold'>
@@ -211,6 +299,8 @@ const SendInvitations: React.FC = () => {
 
                 <Button
                     className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
+                    onClick={handleDeleteSelected}
+                    disabled={selectedAttendees.size === 0}
                 >
                     Delete
                 </Button>
@@ -243,6 +333,8 @@ const SendInvitations: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">
                                 <Checkbox
                                     className='bg-white border-brand-dark-gray cursor-pointer'
+                                    checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
+                                    onCheckedChange={handleSelectAll}
                                 />
                             </TableHead>
                             <TableHead className="text-left min-w-10 !px-2">LinkedIn</TableHead>
@@ -265,7 +357,13 @@ const SendInvitations: React.FC = () => {
                     <TableBody>
                         {paginatedAttendees.map((attendee, index) => (
                             <TableRow key={attendee.id}>
-                                <TableCell><Checkbox className='bg-white border-brand-dark-gray cursor-pointer' /></TableCell>
+                                <TableCell>
+                                    <Checkbox
+                                        className='bg-white border-brand-dark-gray cursor-pointer'
+                                        checked={selectedAttendees.has(attendee.id)}
+                                        onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
+                                    />
+                                </TableCell>
                                 <TableCell>{attendee.linkedin_url || "-"}</TableCell>
                                 <TableCell>{attendee.first_name + " " + attendee.last_name}</TableCell>
                                 <TableCell>{attendee.job_title || "-"}</TableCell>
@@ -340,12 +438,17 @@ const SendInvitations: React.FC = () => {
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
-                                                    Are you sure want to delete John Doe ?
+                                                    Are you sure want to delete {attendee.first_name} {attendee.last_name} ?
                                                 </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => { }}>Continue</AlertDialogAction>
+                                                <AlertDialogAction
+                                                    className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white'
+                                                    onClick={handleSingleDelete(attendee.uuid)}
+                                                >
+                                                    Continue
+                                                </AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
