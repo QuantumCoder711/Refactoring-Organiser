@@ -10,6 +10,7 @@ interface AuthStore {
   user: UserType | null;
   login: (email: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
+  setUser: (user: UserType) => void;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -39,6 +40,9 @@ const useAuthStore = create<AuthStore>()(
           token: null,
           user: null
         });
+      },
+      setUser: (user: UserType) => {
+        set({ user });
       }
     }),
     {

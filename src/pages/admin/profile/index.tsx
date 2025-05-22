@@ -24,7 +24,7 @@ const Profile: React.FC = () => {
                     </div>
                     <div>
                         <h3 className='font-bold'>Company Logo</h3>
-                        <img width={165} height={165} className='rounded-[10px] bg-brand-light-gray object-contain shadow-blur size-[165px] mt-2.5' src={user?.company_logo ? getImageUrl(user?.image) : UserAvatar} alt={user?.first_name + ' ' + user?.last_name} />
+                        <img width={165} height={165} className='rounded-[10px] bg-brand-light-gray object-contain shadow-blur size-[165px] mt-2.5' src={user?.company_logo ? getImageUrl(user?.company_logo) : UserAvatar} alt={user?.first_name + ' ' + user?.last_name} />
                     </div>
                 </div>
 
