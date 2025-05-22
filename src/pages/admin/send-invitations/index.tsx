@@ -112,9 +112,11 @@ const SendInvitations: React.FC = () => {
             const emailMatch = (attendee.email_id || '').toLowerCase().includes(emailFilter.toLowerCase());
             const companyMatch = (attendee.company_name || '').toLowerCase().includes(companyFilter.toLowerCase());
             const statusMatch = statusFilter === 'all' || 
-                (statusFilter === 'pending' && attendee.status === 'pending') ||
-                (statusFilter === 'confirmed' && attendee.status === 'confirmed') ||
-                (statusFilter === 'rejected' && attendee.status === 'rejected');
+                (statusFilter === 'delegate' && attendee.status === 'delegate') ||
+                (statusFilter === 'speaker' && attendee.status === 'speaker') ||
+                (statusFilter === 'sponsor' && attendee.status === 'sponsor') ||
+                (statusFilter === 'panelist' && attendee.status === 'panelist') ||
+                (statusFilter === 'moderator' && attendee.status === 'moderator');
             
             return nameMatch && emailMatch && companyMatch && statusMatch;
         });
@@ -190,16 +192,20 @@ const SendInvitations: React.FC = () => {
                     <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
                         <SelectValue placeholder="Status">
                             {statusFilter === 'all' ? 'All Statuses' :
-                                statusFilter === 'pending' ? 'Pending' :
-                                statusFilter === 'confirmed' ? 'Confirmed' :
-                                statusFilter === 'rejected' ? 'Rejected' : 'Status'}
+                                statusFilter === 'delegate' ? 'Delegate' :
+                                statusFilter === 'speaker' ? 'Speaker' :
+                                statusFilter === 'sponsor' ? 'Sponsor' :
+                                statusFilter === 'panelist' ? 'Panelist' :
+                                statusFilter === 'moderator' ? 'Moderator' : 'Status'}
                         </SelectValue>
                     </SelectTrigger>
                     <SelectContent className='!text-sm !font-semibold'>
                         <SelectItem value="all" className='cursor-pointer'>All Statuses</SelectItem>
-                        <SelectItem value="pending" className='cursor-pointer'>Pending</SelectItem>
-                        <SelectItem value="confirmed" className='cursor-pointer'>Confirmed</SelectItem>
-                        <SelectItem value="rejected" className='cursor-pointer'>Rejected</SelectItem>
+                        <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
+                        <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
+                        <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
+                        <SelectItem value="panelist" className='cursor-pointer'>Panelist</SelectItem>
+                        <SelectItem value="moderator" className='cursor-pointer'>Moderator</SelectItem>
                     </SelectContent>
                 </Select>
 
