@@ -10,7 +10,8 @@ import GuestLayout from '@/pages/guest/layout';
 // Guest Pages
 import Login from '@/pages/guest/login';
 import Homepage from '@/pages/guest/homepage';
-
+import ExploreEvents from '@/pages/guest/explore-events';
+import AddFirstEvent from '@/pages/guest/add-first-event';
 // Admin Pages
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
@@ -38,12 +39,20 @@ import AllAgendas from '@/pages/admin/all-events/all-agendas';
 import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user-request';
 import AddAgenda from '@/pages/admin/all-events/add-agenda';
 import UpdateProfile from '@/pages/admin/profile/update-profile';
-import Tutorials from './pages/admin/tutorials';
-import MailReport from './pages/admin/all-reports/mail-report';
-import WhatsAppReport from './pages/admin/all-reports/whatsapp-report';
-import Charts from './pages/admin/all-reports/charts';
-import AiPhotos from './pages/admin/all-reports/ai-photos';
-import AiTranscriber from './pages/admin/all-reports/ai-transcriber';
+import Tutorials from '@/pages/admin/tutorials';
+import MailReport from '@/pages/admin/all-reports/mail-report';
+import WhatsAppReport from '@/pages/admin/all-reports/whatsapp-report';
+import Charts from '@/pages/admin/all-reports/charts';
+import AiPhotos from '@/pages/admin/all-reports/ai-photos';
+import AiTranscriber from '@/pages/admin/all-reports/ai-transcriber';
+import EditAgenda from '@/pages/admin/all-events/edit-agenda';
+import ExploreAllEvents from '@/pages/guest/explore-all-events';
+import ExploreViewEvent from '@/pages/guest/explore-view-event';
+import PaymentStatus from '@/pages/guest/payment/payment-status';
+import SendInvitations from '@/pages/admin/send-invitations';
+import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-attendee';
+import EditAttendee from './pages/admin/all-events/edit-attendee';
+import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested-attendee';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -61,6 +70,11 @@ const App: React.FC = () => {
       {/* Guest Routes */}
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
+        <Route path="events" element={<ExploreEvents />} />
+        <Route path="add-first-event" element={<AddFirstEvent />} />
+        <Route path="explore-events/:city" element={<ExploreAllEvents />} />
+        <Route path="explore-events/event/:slug" element={<ExploreViewEvent />} />
+        <Route path="payment/:status/:id" element={<PaymentStatus />} />
         <Route
           path="login"
           element={
@@ -90,11 +104,15 @@ const App: React.FC = () => {
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
         <Route path='tutorials' element={<Tutorials />} />
+        <Route path="send-invitations" element={<SendInvitations />} />
+        <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
+        <Route path="send-invitations/edit-requested-attendee/:slug/:uuid" element={<EditRequestedAttendee />} />
 
         <Route path="update-profile" element={<UpdateProfile />} />
 
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
+        <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />
 
         {/* Event Related Routes */}
         <Route path="all-events">
@@ -102,6 +120,8 @@ const App: React.FC = () => {
           <Route path="attendees/:slug" element={<Attendees />} />
           <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
+          <Route path="edit-attendee/:slug/:uuid" element={<EditAttendee />} />
+          <Route path="send-invitations/:slug" element={<SendInvitations />} />
 
           {/* Message Template Routes */}
           <Route path="event/all-template-messages/:slug" element={<AllTemplateMessages />} />

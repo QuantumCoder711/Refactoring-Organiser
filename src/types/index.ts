@@ -208,3 +208,26 @@ export interface AgendaType {
     position: number;
     speakers: AttendeeType[] | [];
 }
+
+
+export interface RequestedAttendeeType {
+    id: number;
+    uuid: string;
+    user_id: number;
+    event_id: number;
+    first_name: string;
+    last_name: string;
+    email_id: string;
+    phone_number: string;
+    status: string;
+    alternate_mobile_number: string;
+    alternate_email: string;
+    company_name: string;
+    job_title: string;
+    confirmed_status: number;
+    reaching_out_status: string;
+    follow_up: string | null;
+    managed_by: string;
+    remark: string | null;
+    linkedin_url: string;
+}

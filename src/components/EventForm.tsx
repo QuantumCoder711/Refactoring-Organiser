@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { googleMapsApiKey, UserAvatar } from '@/constants';
+import { domain, googleMapsApiKey, UserAvatar } from '@/constants';
 import Template1 from "@/assets/templates/template1.png";
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,9 +18,10 @@ import Wave from './Wave';
 
 interface EventFormProps {
     data?: AddEventType;
+    eventId?: string | number;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ data }) => {
+const EventForm: React.FC<EventFormProps> = ({ data, eventId }) => {
 
     const { isLoaded } = useLoadScript({
         googleMapsApiKey,
@@ -146,32 +147,129 @@ const EventForm: React.FC<EventFormProps> = ({ data }) => {
         }));
     };
 
-    const handleSubmit = async () => {
-        if (data) {
-            // Event will update
-        } else {
-            // Event will Add
-            setLoading(true);
-            try {
-                const response = await useEventStore.getState().addEvent(formData);
-                if (response.status === 200) {
-                    toast(response.message, {
-                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                        icon: <CircleCheck className='size-5' />
-                    });
-                } else {
-                    toast(response.message, {
-                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                        icon: <CircleX className='size-5' />
-                    });
-                }
-            } catch (error) {
-                console.error("Error adding event:", error);
-                toast("An error occurred while adding the event", {
+    // Validation function
+    const validateForm = (data: AddEventType) => {
+        // Define required fields based on UI asterisks
+        const requiredFields: (keyof AddEventType)[] = [
+            'title',
+            'description',
+            'image',
+            'event_start_date',
+            'event_date',
+            'start_time',
+            'start_minute_time',
+            'start_time_type',
+            'end_time',
+            'end_minute_time',
+            'end_time_type',
+            'google_map_link',
+            'printer_count'
+        ];
+
+        // Check required fields
+        const missingFields = requiredFields.filter(field => {
+            if (field === 'image') {
+                return !data[field];
+            }
+            return !data[field] || data[field] === '';
+        });
+
+        if (missingFields.length > 0) {
+            toast("Please fill in all required fields marked with *", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return false;
+        }
+
+        // Validate dates
+        if (data.event_start_date && data.event_date) {
+            const startDate = new Date(data.event_start_date);
+            const endDate = new Date(data.event_date);
+
+            if (endDate < startDate) {
+                toast("End date cannot be before start date", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
                 });
-            } finally {
+                return false;
+            }
+        }
+
+        // Validate printer count
+        if (isNaN(Number(data.printer_count)) || Number(data.printer_count) < 0) {
+            toast("Printer count must be a valid number", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return false;
+        }
+
+        // If paid event, validate event fee
+        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) <= 0)) {
+            toast("Please enter a valid event fee", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async () => {
+        // Validate form before submission
+        if (!validateForm(formData)) {
+            return;
+        }
+
+        setLoading(true);
+        try {
+            let response;
+
+            if (eventId) {
+                // Update existing event - ensure ID is a string
+                response = await useEventStore.getState().updateEvent(String(eventId), formData);
+            } else {
+                // Add new event
+                response = await useEventStore.getState().addEvent(formData);
+            }
+
+            if (response.status === 200) {
+                toast(response.message, {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            } else {
+                toast(response.message, {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+        } catch (error: any) {
+            console.error("Error with event:", error);
+
+            // Handle validation errors
+            if (error.response && error.response.status === 422 && error.response.data.errors) {
+                // Display each validation error
+                Object.entries(error.response.data.errors).forEach(([field, messages]: [string, any]) => {
+                    const errorMessages = Array.isArray(messages) ? messages.join(', ') : String(messages);
+                    toast(`${field}: ${errorMessages}`, {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                });
+            } else {
+                // Display general error message
+                const errorMessage = error.message || "An error occurred";
+                toast(errorMessage, {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+        } finally {
+            if (!eventId) {
+                // Only reset form for new events, not updates
                 setFormData({
                     title: "",
                     image: null,
@@ -204,8 +302,8 @@ const EventForm: React.FC<EventFormProps> = ({ data }) => {
                     lat: 0,
                     lng: 0
                 });
-                setLoading(false);
             }
+            setLoading(false);
         }
     };
 
@@ -276,7 +374,14 @@ const EventForm: React.FC<EventFormProps> = ({ data }) => {
                             <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
-                                    {formData.image ? (formData.image as File).name : "No file Chosen"}
+                                    {formData.image
+                                        ? formData.image instanceof File
+                                            ? (formData.image as File).name
+                                            : typeof formData.image === 'string'
+                                                ? formData.image.split('/').pop()
+                                                : "No file Chosen"
+                                        : "No file Chosen"
+                                    }
                                 </p>
                                 <Input
                                     id="image"
@@ -298,7 +403,13 @@ const EventForm: React.FC<EventFormProps> = ({ data }) => {
                     <img
                         height={237}
                         width={237}
-                        src={formData.image instanceof File ? URL.createObjectURL(formData.image) : UserAvatar}
+                        src={
+                            formData.image instanceof File
+                                ? URL.createObjectURL(formData.image)
+                                : typeof formData.image === 'string' && formData.image
+                                    ? `${domain}/${formData.image}`
+                                    : UserAvatar
+                        }
                         className='max-h-[237px] min-w-[237px] object-cover bg-brand-light-gray rounded-[10px]' />
                 </div>
 

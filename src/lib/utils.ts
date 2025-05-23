@@ -1,5 +1,5 @@
 import { domain, UserAvatar } from "@/constants";
-import { EventType, UserType } from "@/types";
+import { AgendaType, EventType, UserType } from "@/types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -126,6 +126,35 @@ export const formatDateTime = (dateString: string): string => {
   // Return formatted date string
   return `(${hours}:${minutes}:${seconds} ${ampm}) ${day}/${month}/${year}`;
 };
+// Helper function to format date time
+export const formatDateTimeReport = (dateString: string): string => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+
+  // Get month name (short version)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[date.getMonth()];
+
+  // Get day
+  const day = date.getDate();
+
+  // Get year
+  const year = date.getFullYear();
+
+  // Get hours in 12-hour format
+  let hours = date.getHours();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  // Get minutes and seconds
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+
+  // Return formatted date string
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+};
 
 export const createImage = (url: File | undefined | null): string => {
   if (url instanceof File) {
@@ -189,4 +218,70 @@ export const beautifyTime = (time: string): string => {
 
 export const getRandomOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Function to compress image files
+export const compressImage = async (file: File, maxSizeMB: number = 1): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    // If file is already smaller than max size, return it as is
+    if (file.size / 1024 / 1024 < maxSizeMB) {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate the width and height, preserving the aspect ratio
+        const maxDimension = 1200; // Max width or height
+        if (width > height && width > maxDimension) {
+          height = (height * maxDimension) / width;
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = (width * maxDimension) / height;
+          height = maxDimension;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Get the data URL of the resized image
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Canvas to Blob conversion failed'));
+              return;
+            }
+
+            // Create a new file from the blob
+            const newFile = new File([blob], file.name, {
+              type: file.type,
+              lastModified: Date.now(),
+            });
+
+            resolve(newFile);
+          },
+          file.type,
+          0.7 // Quality (0.7 = 70% quality)
+        );
+      };
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
+export const getStartEndTime = (event: EventType | AgendaType | null): string => {
+  if (!event) return '';
+  return `${event.start_time}:${event.start_minute_time} ${event.start_time_type} - ${event.end_time}:${event.end_minute_time} ${event.end_time_type}`;
 }

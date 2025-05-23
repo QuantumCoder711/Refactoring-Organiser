@@ -43,6 +43,11 @@ export interface SingleEventAttendeesResponse {
     total_attendees: number;
 }
 
+export interface BasicResponse {
+    status: number;
+    message: string;
+}
+
 export interface DeleteAttendeeResponse {
     status: number;
     message: string;

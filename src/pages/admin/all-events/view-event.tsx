@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import GoogleMap from "@/components/GoogleMap";
-import { googleMapsApiKey, UserAvatar } from '@/constants';
+import { googleMapsApiKey, UserAvatar, domain } from '@/constants';
 import { Button } from '@/components/ui/button';
 import { isEventLive, isEventUpcoming, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { Badge } from '@/components/ui/badge';
+import axios from 'axios';
 
 import {
     Dialog,
@@ -18,7 +19,7 @@ import {
 import useAgendaStore from '@/store/agendaStore';
 import Wave from '@/components/Wave';
 import { useLoadScript } from '@react-google-maps/api';
-
+import GoBack from '@/components/GoBack';
 
 const ViewEvent: React.FC = () => {
 
@@ -31,12 +32,73 @@ const ViewEvent: React.FC = () => {
     const event = useEventStore((state) => state.getEventBySlug(slug));
 
     const { loading, getEventAgendas } = useAgendaStore(state => state);
+<<<<<<< HEAD
+=======
+    const [mapCoordinates, setMapCoordinates] = useState({ lat: 28.4595, lng: 77.0265 });
+    const [agendaData, setAgendaData] = useState<any[]>([]);
+    const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
+    const [allJury, setAllJury] = useState<any[]>([]);
+    const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
+
+    // Add extractCoordinates function
+    const extractCoordinates = async (address: string | undefined) => {
+        if (!address) return { lat: 28.4595, lng: 77.0265 }; // Default coordinates
+
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleMapsApiKey}`
+            );
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const { lat, lng } = data.results[0].geometry.location;
+                return { lat, lng };
+            }
+
+            return { lat: 28.4595, lng: 77.0265 }; // Default coordinates if geocoding fails
+        } catch (error) {
+            console.error('Error getting coordinates:', error);
+            return { lat: 28.4595, lng: 77.0265 }; // Default coordinates if request fails
+        }
+    };
+>>>>>>> main
 
     useEffect(() => {
         if (event?.id) {
             getEventAgendas(event.id);
+            // Fetch agenda data
+            axios.get(`${domain}/api/all-agendas/${event.id}`)
+                .then((res) => {
+                    if (res.data) {
+                        const sortedData = res.data.data.sort((a: any, b: any) => a.position - b.position);
+                        setAgendaData(sortedData);
+                    }
+                });
+
+            // Fetch speakers and jury data
+            axios.post(`${domain}/api/event_details_attendee_list/`, {
+                event_uuid: event.uuid,
+                phone_number: 9643314331
+            })
+                .then((res) => {
+                    setAllSpeakers(res.data.data.speakers);
+                    setAllJury(res.data.data.jury);
+                    setViewAgendaBy(res.data.data.view_agenda_by);
+                })
+                .catch((err) => {
+                    console.log("The error is", err);
+                });
         }
     }, [event, getEventAgendas]);
+
+    // Add useEffect for updating map coordinates
+    useEffect(() => {
+        if (event?.event_venue_address_1) {
+            extractCoordinates(event.event_venue_address_1).then(coords => {
+                setMapCoordinates(coords);
+            });
+        }
+    }, [event?.event_venue_address_1]);
 
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
@@ -46,124 +108,146 @@ const ViewEvent: React.FC = () => {
     }
 
     return (
-        <div className='max-w-2xl mx-auto bg-brand-background rounded-lg'>
-            <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
-            <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-            {/* Time */}
-            <div className='text-xs flex gap-2.5 mt-5 justify-center'>
-                <span className='border border-brand-light-gray px-3 rounded-md'>Fri, 14 Jan-20 Feb, 2025</span>
-                <span className='border border-brand-light-gray px-3 rounded-md'>09:00 AM - 05:00 PM</span>
+        <div className='w-full min-h-screen bg-brand-foreground text-black'>
+            <div className='sticky top-0 z-50 bg-brand-foreground'>
+                <GoBack />
             </div>
+            <div className='max-w-2xl mx-auto bg-brand-background rounded-lg px-4 py-8'>
+                <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
+                <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                
+                {/* Time */}
+                <div className='text-xs flex gap-2.5 mt-5 justify-center'>
+                    <span className='border border-brand-light-gray px-3 rounded-md'>Fri, 14 Jan-20 Feb, 2025</span>
+                    <span className='border border-brand-light-gray px-3 rounded-md'>09:00 AM - 05:00 PM</span>
+                </div>
 
-            <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
-                {isLive && (
-                    <>
-                        <Button className='btn-rounded h-6'>View QR Code</Button>
-                        <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
-                    </>
-                )}
-                {isUpcoming && (
-                    <div className='col-span-2 flex justify-center'>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button className='btn-rounded h-6'>View QR Code</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle className='text-center'>{event?.title}</DialogTitle>
-                                    <DialogDescription className="text-center">
-                                        <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-                                        <Button className='btn mx-auto mt-6'>Download</Button>
-                                    </DialogDescription>
-                                </DialogHeader>
-                            </DialogContent>
-                        </Dialog>
+                <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                    {isLive && (
+                        <>
+                            <Button className='btn-rounded h-6'>View QR Code</Button>
+                            <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                        </>
+                    )}
+                    {isUpcoming && (
+                        <div className='col-span-2 flex justify-center'>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className='btn-rounded h-6'>View QR Code</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                        <DialogDescription className="text-center">
+                                            <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                                            <Button className='btn mx-auto mt-6'>Download</Button>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    )}
+                </div>
 
+                {/* Description */}
+                <div className='border-t mt-3 p-5 border-white'>
+                    <h3 className='font-semibold'>Description</h3>
+                    <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
+                </div>
+
+                {/* Event OTP & Agenda By */}
+                <div className='p-5 border-t border-white flex justify-between'>
+                    <div className='w-1/2'>
+                        <h3 className='font-semibold'>Event OTP</h3>
+                        <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
                     </div>
-                )}
-            </div>
-
-            {/* Description */}
-            <div className='border-t mt-3 p-5 border-white'>
-                <h3 className='font-semibold'>Description</h3>
-                <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
-            </div>
-
-
-            {/* Event OTP & Agenda By */}
-            <div className='p-5 border-t border-white flex justify-between'>
-                <div className='w-1/2'>
-                    <h3 className='font-semibold'>Event OTP</h3>
-                    <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
+                    <div className='w-1/2 border-l border-white pl-5'>
+                        <h3 className='font-semibold'>View Agenda By</h3>
+                        <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by}</p>
+                    </div>
                 </div>
-                <div className='w-1/2 border-l border-white pl-5'>
-                    <h3 className='font-semibold'>View Agenda By</h3>
-                    <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by}</p>
-                </div>
-            </div>
 
-            {/* Event Location */}
-            <div className='p-5 border-t border-white'>
-                <h3 className='font-semibold'>Location</h3>
-                <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>Hotel holiday Inn, Aerocity</p>
-                <p className='text-sm text-brand-dark-gray'>3rd - 5th floor, Huda City Centre Metro Station, Sector 29, Gurugram, Haryana 122002, India</p>
+                {/* Event Location */}
+                <div className='p-5 border-t border-white'>
+                    <h3 className='font-semibold'>Location</h3>
+                    <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>{event?.event_venue_name}</p>
+                    <p className='text-sm text-brand-dark-gray'>{event?.event_venue_address_1}</p>
 
-                {/* Map Component */}
-                <div className='h-40 mt-3 rounded-lg shadow-blur'>
-                    <GoogleMap isLoaded={isLoaded} latitude={28.4595} longitude={77.0265} />
-                </div>
-            </div>
-
-            {/* Agenda Details */}
-            <div className='p-5 border-t border-white'>
-                <h3 className='font-semibold'>Agenda</h3>
-
-                {/* Day 1 Agenda Details */}
-                <div>
-                    <span className="text-sm p-1 px-2 block font-semibold mt-5 rounded-md bg-white">Day 1 (Friday, 17th Jan 2025)</span>
-
-                    {/* Hourly Agenda Details */}
-                    <div className='mt-2 px-2'>
-                        {/* 1st hour agenda details */}
-                        <div>
-                            <span className='font-medium text-sm'>12:00AM-07:00AM</span>
-                            <p className='text-sm font-light'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-
-                            {/* Speaker Details (If there are any speakers) */}
-                            <div className='grid grid-cols-4 gap-4'>
-                                {/* Speaker 1 */}
-                                <div className='flex gap-2 items-center mt-2'>
-                                    <img src={UserAvatar} width={36} height={36} alt="Speaker Avatar" className='rounded-full' />
-                                    <div className='flex flex-col'>
-                                        <h4 className='leading-none font-semibold text-sm overflow-hidden text-ellipsis text-nowrap'>John Doe</h4>
-                                        <span className='leading-none text-xs overflow-hidden text-ellipsis text-nowrap'>Klout Club</span>
-                                        <span className='leading-none text-xs font-light overflow-hidden text-ellipsis text-nowrap'>CEO</span>
-                                    </div>
-                                </div>
-                            </div>
+                    {/* Map Component */}
+                    <div className='h-60 mt-3 rounded-lg shadow-blur overflow-hidden'>
+                        <div className='relative w-full h-full'>
+                            <GoogleMap 
+                                isLoaded={isLoaded} 
+                                latitude={mapCoordinates.lat} 
+                                longitude={mapCoordinates.lng}
+                                zoom={15}
+                            />
                         </div>
                     </div>
                 </div>
 
-            </div>
-
-            {/* Event Speakers */}
-            <div className='p-5 border-t border-white'>
-                <h3 className='font-semibold'>Speakers</h3>
-
-                {/* Speaker List */}
-                <div className='grid grid-cols-4 gap-4'>
-                    <div className='text-sm text-center max-w-28 border-2'>
-                        <img src={UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto' />
-                        <h4 className='font-semibold leading-none'>Udit Tiwari</h4>
-                        <p className='leading-none'>Klout Club</p>
-                        <p className='leading-none font-light'>CEO</p>
+                {/* Content Container */}
+                <div className='mt-4'>
+                    {/* Agenda Details */}
+                    <div className='p-5 border-t border-white'>
+                        <h3 className='font-semibold'>Agenda</h3>
+                        {agendaData.length > 0 ? agendaData.map((agenda) => (
+                            <div key={agenda.id} className='!my-4'>
+                                <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time} {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                <p className='font-light'>{agenda.description}</p>
+                                <div className='flex gap-5 my-3'>
+                                    <div className='grid grid-cols-2 gap-5'>
+                                        {agenda.speakers.map((speaker: any) => (
+                                            <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
+                                                <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
+                                                <div className='space-y-1'>
+                                                    <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
+                                                    <p className='text-sm leading-none'>{speaker.company_name}</p>
+                                                    <p className='text-xs leading-none'>{speaker.job_title}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
                     </div>
-                </div>
 
+                    {/* Event Speakers */}
+                    <div className='p-5 border-t border-white'>
+                        <h3 className='font-semibold'>Speakers</h3>
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
+                                <div key={index} className='text-sm text-center max-w-56'>
+                                    <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto' />
+                                    <h4 className='font-semibold leading-none'>{speaker.first_name} {speaker.last_name}</h4>
+                                    <p className='leading-none'>{speaker.company_name}</p>
+                                    <p className='leading-none font-light'>{speaker.job_title}</p>
+                                </div>
+                            )) : <p className='text-brand-gray mb-10'>No speakers available</p>}
+                        </div>
+                    </div>
+
+                    {/* Jury */}
+                    {allJury.length > 0 && (
+                        <div className='p-5 border-t border-white'>
+                            <h3 className='font-semibold'>Jury</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                                {allJury.map((jury, index) => (
+                                    <div key={index} className='text-sm text-center max-w-28 border-2'>
+                                        <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto' />
+                                        <h4 className='font-semibold leading-none'>{jury.first_name} {jury.last_name}</h4>
+                                        <p className='leading-none'>{jury.company_name}</p>
+                                        <p className='leading-none font-light'>{jury.job_title}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ViewEvent;
