@@ -8,11 +8,7 @@ import { FileUp, FileText, CircleX, CheckCircle, CircleCheck } from 'lucide-reac
 import GoBack from '@/components/GoBack';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-<<<<<<< HEAD
-import { FileUp, FileText } from 'lucide-react';
-=======
->>>>>>> main
-import { UserAvatar } from '@/constants';
+
 import {
     Pagination,
     PaginationContent,
@@ -25,21 +21,11 @@ import {
 import useAuthStore from '@/store/authStore';
 import useEventStore from '@/store/eventStore';
 
-<<<<<<< HEAD
-const AiPhotos: React.FC = () => {
-    const [,setFiles] = useState<File[]>([]);
-    const [bulkFile, setBulkFile] = useState<File | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const imagesPerPage = 15;
-    const totalImages = 100; // Replace with actual total number of images
-    const totalPages = Math.ceil(totalImages / imagesPerPage);
-=======
 // Constants
 const CHUNK_SIZE = 1024 * 1024 * 5; // 5MB chunks
 const API_ENDPOINT = additionalDomain + '/api/v1/faces/uploadChunk';
 const PHOTOS_ENDPOINT = additionalDomain + '/api/v1/faces/all-photos';
 const CHECK_ENDPOINT = additionalDomain + '/api/v1/faces/check';
->>>>>>> main
 
 // Types
 interface Photo {
@@ -65,7 +51,6 @@ const AiPhotos: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [processing, setProcessing] = useState<boolean>(false);
-  const [imagesAlreadyUploaded, setImagesAlreadyUploaded] = useState<boolean>(false);
   
   // Photos and pagination states
   const [activeTab, setActiveTab] = useState<string>("upload");
@@ -182,13 +167,10 @@ const AiPhotos: React.FC = () => {
         const { completedStep } = response.data.data;
         
         if (completedStep === 2) {
-          setImagesAlreadyUploaded(true);
           setProcessing(false);
         } else if (completedStep === 1) {
-          setImagesAlreadyUploaded(true);
           setProcessing(true);
         } else {
-          setImagesAlreadyUploaded(false);
           setProcessing(false);
         }
       }
@@ -279,10 +261,8 @@ const AiPhotos: React.FC = () => {
         setUploadProgress(0);
         // You might want to refresh upload status
         if (completedStep === 1) {
-          setImagesAlreadyUploaded(true);
           setProcessing(true);
         } else if (completedStep === 2) {
-          setImagesAlreadyUploaded(true);
           setProcessing(false);
         }
       } else {

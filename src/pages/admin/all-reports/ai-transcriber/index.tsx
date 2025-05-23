@@ -1,21 +1,17 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-=======
 import React, { useState, useEffect } from 'react';
->>>>>>> main
 import GoBack from '@/components/GoBack';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import useEventStore from '@/store/eventStore';
 import { useParams } from 'react-router-dom';
+import useEventStore from '@/store/eventStore';
 import useAuthStore from '@/store/authStore';
+import { additionalDomain } from '@/constants';
+import axios from 'axios';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
-import axios from 'axios';
-import { additionalDomain } from '@/constants';
 import Wave from '@/components/Wave';
 
 const parseText = (text: string): string => {
@@ -44,8 +40,6 @@ const AiTranscriber: React.FC = () => {
 
   const { slug } = useParams();
 
-<<<<<<< HEAD
-=======
   const event = useEventStore(state => state.getEventBySlug(slug));
   const user = useAuthStore(state => state.user);
 
@@ -117,7 +111,6 @@ const AiTranscriber: React.FC = () => {
     return <Wave />
   }
 
->>>>>>> main
   return (
     <div className='relative w-full h-full'>
       <div className='absolute top-0 left-0'>

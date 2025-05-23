@@ -32,13 +32,10 @@ const ViewEvent: React.FC = () => {
     const event = useEventStore((state) => state.getEventBySlug(slug));
 
     const { loading, getEventAgendas } = useAgendaStore(state => state);
-<<<<<<< HEAD
-=======
     const [mapCoordinates, setMapCoordinates] = useState({ lat: 28.4595, lng: 77.0265 });
     const [agendaData, setAgendaData] = useState<any[]>([]);
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
     const [allJury, setAllJury] = useState<any[]>([]);
-    const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
 
     // Add extractCoordinates function
     const extractCoordinates = async (address: string | undefined) => {
@@ -61,7 +58,6 @@ const ViewEvent: React.FC = () => {
             return { lat: 28.4595, lng: 77.0265 }; // Default coordinates if request fails
         }
     };
->>>>>>> main
 
     useEffect(() => {
         if (event?.id) {
@@ -83,7 +79,6 @@ const ViewEvent: React.FC = () => {
                 .then((res) => {
                     setAllSpeakers(res.data.data.speakers);
                     setAllJury(res.data.data.jury);
-                    setViewAgendaBy(res.data.data.view_agenda_by);
                 })
                 .catch((err) => {
                     console.log("The error is", err);

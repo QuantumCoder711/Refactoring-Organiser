@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { Checkbox } from '@/components/ui/checkbox';
-import { CircleCheck, CircleX, Eye, SquarePen, Trash, UserCheck } from 'lucide-react';
+import { CircleCheck, CircleX, Eye, SquarePen, Trash } from 'lucide-react';
 import { RequestedAttendeeType } from '@/types';
 import axios from 'axios';
 import { domain } from '@/constants';
@@ -355,7 +355,7 @@ const SendInvitations: React.FC = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedAttendees.map((attendee, index) => (
+                        {paginatedAttendees.map((attendee) => (
                             <TableRow key={attendee.id}>
                                 <TableCell>
                                     <Checkbox

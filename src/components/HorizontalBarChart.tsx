@@ -1,19 +1,8 @@
-<<<<<<< HEAD
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis, YAxis } from "recharts"
-
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-=======
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
->>>>>>> main
 } from "@/components/ui/card"
 
 // Define the type for chart data items

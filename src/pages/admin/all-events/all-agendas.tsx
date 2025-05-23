@@ -88,18 +88,9 @@ const AllAgendas: React.FC = () => {
         fetchAgendas();
     }, [event?.id]);
 
-<<<<<<< HEAD
-    // Filter states
-    const [nameFilter, setNameFilter] = useState('');
-    const [companyFilter, ] = useState('');
-    const [designationFilter, ] = useState('');
-    const [checkInFilter, ] = useState<string>('all');
-    const [roleFilter, ] = useState<string>('all');
-=======
     const filteredAgendas = agendas.filter(agenda =>
         agenda.title.toLowerCase().includes(filters.title.toLowerCase())
     );
->>>>>>> main
 
     const totalPages = Math.ceil(filteredAgendas.length / agendasPerPage);
 
