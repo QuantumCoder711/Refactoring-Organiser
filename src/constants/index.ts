@@ -1,6 +1,7 @@
 import { HandHeart, LayoutDashboard, NotebookPen, Trophy, Users, Youtube } from "lucide-react";
+import PlaceholderImage from "/placeholder.png";
 
-export const UserAvatar: string = "https://github.com/shadcn.png";
+export const UserAvatar: string = PlaceholderImage;
 
 export const sidebarItems = [
     {
