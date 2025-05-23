@@ -8,8 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CircleCheck, CircleX, Download, FileText, FileUp } from "lucide-react";
 import { toast } from "sonner";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { createImage } from "@/lib/utils";
 
 import {
     Select,
@@ -23,7 +21,6 @@ import useExtrasStore from "@/store/extrasStore";
 import useAuthStore from "@/store/authStore";
 import useEventStore from "@/store/eventStore";
 import Wave from "@/components/Wave";
-import GoBack from "@/components/GoBack";
 import axios from "axios";
 
 // Simple Input Component with React.memo to prevent unnecessary re-renders
@@ -139,7 +136,7 @@ const AddRequestedAttendee: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const { token, user } = useAuthStore(state => state);
     const { getEventBySlug } = useEventStore(state => state);
-    const { companies, jobTitles, industries, loading: extrasLoading } = useExtrasStore();
+    const { companies, jobTitles, loading: extrasLoading } = useExtrasStore();
     const loading = extrasLoading;
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [showCustomCompany, setShowCustomCompany] = useState(false);
@@ -160,11 +157,6 @@ const AddRequestedAttendee: React.FC = () => {
     const [bulkFile, setBulkFile] = useState<File | null>(null);
 
     const event = getEventBySlug(slug);
-
-    const formattedRoles = roles.map(role => ({
-        value: role.toLowerCase(),
-        label: role
-    }));
 
     // Utility functions for form handling
     const createFormData = useCallback((data: Record<string, any>, specialFields?: Record<string, any>) => {
@@ -229,19 +221,6 @@ const AddRequestedAttendee: React.FC = () => {
         });
     }, []);
 
-    const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, files } = e.target as HTMLInputElement;
-        if (files) {
-            // Use requestAnimationFrame to batch updates and reduce lag
-            requestAnimationFrame(() => {
-                setFormData(prev => ({
-                    ...prev,
-                    [name]: files[0]
-                }));
-            });
-        }
-    }, []);
-
     const handleCompanyChange = useCallback((value: string) => {
         requestAnimationFrame(() => {
             const selectedCompany = companies.find((company: { id: number, name: string }) => company.id.toString() === value);
@@ -281,26 +260,6 @@ const AddRequestedAttendee: React.FC = () => {
                     setCustomJobTitle(value);
                     break;
             }
-        });
-    }, []);
-
-    const handleStatusChange = useCallback((value: string) => {
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            setFormData(prev => ({
-                ...prev,
-                status: value
-            }));
-        });
-    }, []);
-
-    const handleAwardWinnerChange = useCallback((value: string) => {
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            setFormData(prev => ({
-                ...prev,
-                award_winner: value
-            }));
         });
     }, []);
 

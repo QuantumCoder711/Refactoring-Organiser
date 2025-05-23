@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CircleCheck, CircleX } from "lucide-react";
 import { toast } from "sonner";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { createImage, getImageUrl } from "@/lib/utils";
+import { getImageUrl } from "@/lib/utils";
 
 import {
     Select,
@@ -16,7 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { roles, UserAvatar } from "@/constants";
+import { roles } from "@/constants";
 import useExtrasStore from "@/store/extrasStore";
 import useAttendeeStore from "@/store/attendeeStore";
 import useAuthStore from "@/store/authStore";

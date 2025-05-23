@@ -16,10 +16,9 @@ import {
 } from "@/components/ui/select";
 import { beautifyDate } from '@/lib/utils';
 import { CircleCheck, CircleX, X } from 'lucide-react';
-import useAgendaStore from '@/store/agendaStore';
 import { domain, token } from '@/constants';
 import axios from 'axios';
-import { AgendaType, AttendeeType } from '@/types';
+import { AttendeeType } from '@/types';
 import { toast } from 'sonner';
 import Wave from '@/components/Wave';
 
@@ -28,8 +27,6 @@ const EditAgenda: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [speakers, setSpeakers] = useState<AttendeeType[]>([]);
-    // const { getAgendaByUuid, updateAgenda } = useAgendaStore();
-    const [agenda, setAgenda] = useState<AgendaType | null>(null);
     const [event, setEvent] = useState<any>(null);
 
     const [formData, setFormData] = useState({
@@ -109,27 +106,20 @@ const EditAgenda: React.FC = () => {
                         return;
                     }
 
-                    console.log("Parsed agenda data:", agendaData);
-                    setAgenda(agendaData);
-
                     // Get event details
                     const events = useEventStore.getState().events;
-                    console.log("Available events:", events);
 
                     const eventData = events.find(e => e.id === agendaData.event_id);
-                    console.log("Found event:", eventData);
 
                     setEvent(eventData || { title: "Event" });
 
                     // Parse tagged speakers from string to array
                     // Check for different possible field names
                     const tagSpeakersField = agendaData.tag_speakers || agendaData.tagged_speakers || '';
-                    console.log("Tag speakers field:", tagSpeakersField);
 
                     const taggedSpeakersArray = tagSpeakersField ?
                         (typeof tagSpeakersField === 'string' ? tagSpeakersField.split(',') : []) : [];
 
-                    console.log("Tagged speakers array:", taggedSpeakersArray);
 
                     // Set form data with all possible field mappings
                     const formDataToSet = {

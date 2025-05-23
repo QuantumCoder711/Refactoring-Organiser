@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import { beautifyDate } from '@/lib/utils';
 import { CircleCheck, CircleX, X } from 'lucide-react';
-import useAgendaStore from '@/store/agendaStore';
 import { domain, token } from '@/constants';
 import axios from 'axios';
 import { AttendeeType } from '@/types';
