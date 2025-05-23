@@ -427,7 +427,7 @@ const SendInvitations: React.FC = () => {
                                     </Dialog>
 
                                     {/* Edit Event */}
-                                    <Link to="#" className=''><SquarePen width={9.78} height={9.5} /></Link>
+                                    <Link to={`/send-invitations/edit-requested-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} /></Link>
 
                                     {/* Delete Attendee */}
                                     <AlertDialog>
