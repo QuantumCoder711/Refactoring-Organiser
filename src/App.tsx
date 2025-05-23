@@ -51,6 +51,7 @@ import ExploreViewEvent from '@/pages/guest/explore-view-event';
 import PaymentStatus from '@/pages/guest/payment/payment-status';
 import SendInvitations from '@/pages/admin/send-invitations';
 import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-attendee';
+import EditAttendee from './pages/admin/all-events/edit-attendee';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -117,6 +118,7 @@ const App: React.FC = () => {
           <Route path="attendees/:slug" element={<Attendees />} />
           <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
+          <Route path="edit-attendee/:slug/:uuid" element={<EditAttendee />} />
           <Route path="send-invitations/:slug" element={<SendInvitations />} />
 
           {/* Message Template Routes */}

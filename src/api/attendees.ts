@@ -139,3 +139,21 @@ export const bulkUploadAttendees = async (token: string, uuid: string, file: Fil
         throw new Error("An unexpected error occurred");
     }
 }
+
+// Update Attendee
+export const updateAttendee = async (token: string, uuid: string, attendeeData: FormData): Promise<AddAttendeeResponse> => {
+    try {
+        const response = await axios.post(`${domain}/api/attendees/${uuid}`, attendeeData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to update attendee");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}

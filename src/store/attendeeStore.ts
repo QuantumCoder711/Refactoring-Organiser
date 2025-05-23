@@ -1,4 +1,4 @@
-import { addAttendee, bulkDeleteAttendees, bulkUploadAttendees, customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees } from "@/api/attendees";
+import { addAttendee, bulkDeleteAttendees, bulkUploadAttendees, customCheckIn, deleteAttendee, getAllEventsAttendees, getSingleEventAttendees, updateAttendee } from "@/api/attendees";
 import { AttendeeType } from "@/types";
 import { AddAttendeeResponse, AddBulkAttendeeResponse, BulkDeleteAttendeesResponse, CustomCheckInResponse, DeleteAttendeeResponse } from "@/types/api-responses";
 import { create } from "zustand";
@@ -14,6 +14,7 @@ interface AttendeeStore {
     bulkDeleteAttendees: (token: string, ids: number[]) => Promise<BulkDeleteAttendeesResponse>;
     addAttendee: (token: string, uuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
     bulkUploadAttendees: (token: string, uuid: string, file: File) => Promise<AddBulkAttendeeResponse>;
+    updateAttendee: (token: string, uuid: string, eventUuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
 }
 
 const useAttendeeStore = create<AttendeeStore>((set) => ({
@@ -137,6 +138,26 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
             if (response.status === 200) {
                 // Refresh the attendees list for this event
                 await getSingleEventAttendees(token, uuid)
+                    .then(eventAttendeesResponse => {
+                        set({ singleEventAttendees: eventAttendeesResponse.data });
+                    });
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    // Update Attendee
+    updateAttendee: async (token: string, uuid: string, eventUuid: string, attendeeData: FormData) => {
+        try {
+            set({ loading: true });
+            const response = await updateAttendee(token, uuid, attendeeData);
+            if (response.status === 200) {
+                // Refresh the attendees list for this event
+                await getSingleEventAttendees(token, eventUuid)
                     .then(eventAttendeesResponse => {
                         set({ singleEventAttendees: eventAttendeesResponse.data });
                     });
