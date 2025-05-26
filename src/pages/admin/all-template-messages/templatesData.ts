@@ -67,7 +67,7 @@ export const templates = [
     title: "Send Poll",
     path: `/all-events/event/all-template-messages/send-poll`,
     icon: SendPoll,
-    message: ` <p>Hi <strong>User</strong>, <br /> <br />Hope you're enjoying the <strong>{currentEvent.title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />Thank you for your time! <br /> <br />Regards, Team <strong>{user?.company_name}</strong> <br /></p>`,
+    message: ` <p>Hi <strong>User</strong>, <br /> <br />Hope you're enjoying the <strong>{title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />Thank you for your time! <br /> <br />Regards, Team <strong>{company_name}</strong> <br /></p>`,
     sendBy: "whatsapp",
     sendTo: true,
     paragraph: "Use the Send Poll feature to share a poll link via WhatsApp with all checked-in attendees—boost engagement instantly!"
@@ -85,7 +85,7 @@ export const templates = [
     title: "Thank You Message",
     path: `/all-events/event/all-template-messages/thank-you-message`,
     icon: ThankYou,
-    message: `<p>Thank you for being part of <strong> {currentEvent.title} </strong><br /> <br />It was a privilege to host you at this distinguished gathering of Senior Leaders and industry Trailblazers from diverse Sectors. <br /> <br />We hope you found the conference insightful and impactful, gaining valuable perspectives to drive innovation and excellence in your field. <br /> <br />Your active participation made the event truly memorable, and we are excited about staying connected and welcoming you to future editions of <strong> {currentEvent.title} </strong>and other events organised by <strong>{user?.company_name}</strong>  <br /> <br />Warm regards, <br />Team <strong>{user?.company_name}</strong></p>`,
+    message: `<p>Thank you for being part of <strong> {title} </strong><br /> <br />It was a privilege to host you at this distinguished gathering of Senior Leaders and industry Trailblazers from diverse Sectors. <br /> <br />We hope you found the conference insightful and impactful, gaining valuable perspectives to drive innovation and excellence in your field. <br /> <br />Your active participation made the event truly memorable, and we are excited about staying connected and welcoming you to future editions of <strong> {title} </strong>and other events organised by <strong>{company_name}</strong>  <br /> <br />Warm regards, <br />Team <strong>{company_name}</strong></p>`,
     sendBy: "whatsapp",
     sendTo: true,
     paragraph: "Send a quick thank you via WhatsApp to all checked-in delegates—make your appreciation personal and instant!"

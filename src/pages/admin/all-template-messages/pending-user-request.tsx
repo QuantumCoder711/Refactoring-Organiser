@@ -6,6 +6,7 @@ import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, ArrowDownToLine
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
+import * as XLSX from 'xlsx';
 
 import {
     Table,
@@ -193,25 +194,60 @@ const PendingUserRequest: React.FC = () => {
         });
     };
 
-    // Handle delete selected
-    const handleDeleteSelected = async () => {
-        const selectedIds = Array.from(selectedAttendees);
-        if (token && selectedIds.length > 0) {
-            const response = await bulkDeleteAttendees(token, selectedIds);
-            if (response.status === 200) {
-                // Clear selected attendees after successful deletion
-                setSelectedAttendees(new Set());
-                toast(response.message, {
-                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleCheck className='size-5' />
-                });
-            } else {
-                toast(response.message, {
-                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleX className='size-5' />
-                });
-            }
-        }
+    // Export to Excel
+    const exportToExcel = () => {
+        // Prepare data for export
+        const dataToExport = paginatedAttendees.map(attendee => ({
+            'First Name': attendee.first_name || '',
+            'Last Name': attendee.last_name || '',
+            'Email': attendee.email_id || '',
+            'Alternate Email': attendee.alternate_email || '',
+            'Phone': attendee.phone_number || '',
+            'Alternate Phone': attendee.alternate_mobile_number || '',
+            'Designation': attendee.job_title || '',
+            'Company': attendee.company_name || '',
+            'Status': attendee.status || '',
+            'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
+            'Check In Status': attendee.check_in === 1 ? 'Yes' : 'No',
+            'Check In Time': attendee.check_in_time || '',
+            'Registration Date': attendee.created_at || ''
+        }));
+
+        // Create a new workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+        // Auto-size columns
+        const columnWidths = [
+            { wch: 15 }, // First Name
+            { wch: 15 }, // Last Name
+            { wch: 25 }, // Email
+            { wch: 25 }, // Alternate Email
+            { wch: 15 }, // Phone
+            { wch: 15 }, // Alternate Phone
+            { wch: 20 }, // Designation
+            { wch: 25 }, // Company
+            { wch: 15 }, // Status
+            { wch: 15 }, // Award Winner
+            { wch: 15 }, // Check In Status
+            { wch: 20 }, // Check In Time
+            { wch: 20 }  // Registration Date
+        ];
+        ws['!cols'] = columnWidths;
+
+        // Add the worksheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Pending Requests');
+
+        // Generate a filename with timestamp
+        const fileName = `pending_requests_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+        // Write the workbook and trigger download
+        XLSX.writeFile(wb, fileName);
+
+        toast.success('Excel file downloaded successfully!', {
+            className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+            icon: <CircleCheck className='size-5' />
+        });
     };
 
     // Generate check-in data cells based on date difference
@@ -329,28 +365,37 @@ const PendingUserRequest: React.FC = () => {
                         />
 
                         <Button
-                            className='btn !rounded-[10px] min-w-fit w-36 text-white'
-                            onClick={handleDeleteSelected}
-                            // disabled={selectedAttendees.size === 0}
+                            className='btn !rounded-[10px] min-w-fit w-36 text-white bg-brand-primary hover:bg-brand-primary/90'
+                            onClick={exportToExcel}
+                            disabled={paginatedAttendees.length === 0}
                         >
-                            <ArrowDownToLine />  Download Excel
+                            <ArrowDownToLine className='mr-2 h-4 w-4' /> Download Excel
                         </Button>
                     </div>
-                    <p className='font-semibold text-xl'>Pending Requests: 69</p>
+                    <p className='font-semibold text-xl'>Pending Requests: {paginatedAttendees.length}</p>
                 </div>
 
                 <Table className='mt-4'>
                     {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
                     <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
                         <TableRow className='!text-base'>
-                            <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Status</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">First Name</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Last Name</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Select</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">#</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Alternate Email</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Phone</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Alternate Phone</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Status</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
+                            {dateDiff >= 0 && <TableHead className="text-left min-w-10 !px-2">Check In (1st)</TableHead>}
+                            {dateDiff >= 1 && <TableHead className="text-left min-w-10 !px-2">Check In (2nd)</TableHead>}
+                            {dateDiff >= 2 && <TableHead className="text-left min-w-10 !px-2">Check In (3rd)</TableHead>}
+                            {dateDiff >= 3 && <TableHead className="text-left min-w-10 !px-2">Check In (4th)</TableHead>}
+                            {dateDiff >= 4 && <TableHead className="text-left min-w-10 !px-2">Check In (5th)</TableHead>}
+                            <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -398,7 +443,7 @@ const PendingUserRequest: React.FC = () => {
 
                                     {/* For Viewing the Event */}
                                     <Dialog>
-                                        <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} /></DialogTrigger>
+                                        <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} className='size-4' /></DialogTrigger>
                                         <DialogContent className="max-w-md p-6">
                                             <DialogHeader className="space-y-2">
                                                 <DialogTitle className="text-2xl font-bold text-brand-primary">
@@ -443,7 +488,7 @@ const PendingUserRequest: React.FC = () => {
                                     </Dialog>
 
                                     {/* Edit Event */}
-                                    <Link to="#" className=''><SquarePen width={9.78} height={9.5} /></Link>
+                                    <Link to="#" className=''><SquarePen width={9.78} height={9.5} className='size-4'/></Link>
 
                                     {/* Custom Check-In User */}
                                     {isEventLive(event) && <AlertDialog>
@@ -467,7 +512,7 @@ const PendingUserRequest: React.FC = () => {
                                     {/* Delete Attendee */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary' />
+                                            <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary size-4' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>

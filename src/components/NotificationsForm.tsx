@@ -42,7 +42,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
     send_to: selectedRoles.join(','),
     send_method: props.sendBy === 'both' ? 'email' : props.sendBy,
     subject: '',
-    message: props.message || "Template",
+    message: formatTemplateMessage(props.message || "", event, user) || "Template",
     start_date: event?.event_start_date as string,
     delivery_schedule: 'now', // For now
     start_date_time: event?.start_time as string,
@@ -64,19 +64,28 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         placeholder: "Type your message here...",
       });
 
-      quill.on('text-change', () => {
-        setFormData((prev:MessageTemplateType) => ({
+      // Set initial content if message exists
+      if (props.message) {
+        quill.clipboard.dangerouslyPasteHTML(formatTemplateMessage(props.message, event, user));
+        setFormData(prev => ({
           ...prev,
-          message: quill.root.innerHTML
+          message: formatTemplateMessage(props.message || "", event, user)
+        }));
+      }
+
+      quill.on('text-change', () => {
+        const content = quill.root.innerHTML;
+        setFormData(prev => ({
+          ...prev,
+          message: content
         }));
       });
 
-      // // Set initial content if message exists
-      // if (formData.message) {
-      //   quill.root.innerHTML = formData.message;
-      // }
+      return () => {
+        quill.off('text-change');
+      };
     }
-  }, [quillRef, formData.send_method === "email", loading]);
+  }, [quillRef, formData.send_method === "email", props.message]);
 
   // Update formData when selectedRoles changes
   useEffect(() => {
