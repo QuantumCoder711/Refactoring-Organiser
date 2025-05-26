@@ -68,7 +68,7 @@ const PendingUserRequest: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore(state => state.getEventBySlug(slug));
     const { token, user } = useAuthStore(state => state);
-    const { singleEventAttendees, loading, deleteAttendee, customCheckIn, bulkDeleteAttendees, getSingleEventAttendees } = useAttendeeStore(state => state);
+    const { singleEventAttendees, loading, deleteAttendee, customCheckIn, getSingleEventAttendees } = useAttendeeStore(state => state);
 
     // Date Difference State
     const [dateDiff, setDateDiff] = useState<number>(0);

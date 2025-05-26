@@ -340,7 +340,7 @@ const ExploreViewEvent: React.FC = () => {
     return (
         <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
             <div
-                dangerouslySetInnerHTML={{ __html: form }}
+                dangerouslySetInnerHTML={{ __html: form as unknown as string}}
                 style={{ opacity: 0 }}
             />
 
