@@ -241,27 +241,27 @@ const Attendees: React.FC = () => {
     const columns = [];
     if (dateDiff >= 0) {
       columns.push(
-        <TableHead key="check-in-1" className="text-left min-w-10 !px-2">Check-IN(1st)</TableHead>
+        <TableHead key="check-in-1" className="text-left min-w-10 !px-2">Checked In(1st)</TableHead>
       );
     }
     if (dateDiff >= 1) {
       columns.push(
-        <TableHead key="check-in-2" className="text-left min-w-10 !px-2">Check-IN(2nd)</TableHead>
+        <TableHead key="check-in-2" className="text-left min-w-10 !px-2">Checked In(2nd)</TableHead>
       );
     }
     if (dateDiff >= 2) {
       columns.push(
-        <TableHead key="check-in-3" className="text-left min-w-10 !px-2">Check-IN(3rd)</TableHead>
+        <TableHead key="check-in-3" className="text-left min-w-10 !px-2">Checked In(3rd)</TableHead>
       );
     }
     if (dateDiff >= 3) {
       columns.push(
-        <TableHead key="check-in-4" className="text-left min-w-10 !px-2">Check-IN(4th)</TableHead>
+        <TableHead key="check-in-4" className="text-left min-w-10 !px-2">Checked In(4th)</TableHead>
       );
     }
     if (dateDiff >= 4) {
       columns.push(
-        <TableHead key="check-in-5" className="text-left min-w-10 !px-2">Check-IN(5th)</TableHead>
+        <TableHead key="check-in-5" className="text-left min-w-10 !px-2">Checked In(5th)</TableHead>
       );
     }
     return columns;
@@ -414,8 +414,8 @@ const Attendees: React.FC = () => {
           {/* Filter By Check-In */}
           <Select value={checkInFilter} onValueChange={setCheckInFilter}>
             <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Check-IN">
-                {checkInFilter === 'all' ? 'Check-IN' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Check-IN'}
+              <SelectValue placeholder="Checked-In">
+                {checkInFilter === 'all' ? 'Checked-In' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Checked-In'}
               </SelectValue>
             </SelectTrigger>
             <SelectContent className='!text-sm !font-semibold'>
@@ -526,7 +526,7 @@ const Attendees: React.FC = () => {
 
                   {/* For Viewing the Event */}
                   <Dialog>
-                    <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} /></DialogTrigger>
+                    <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} className='size-4' /></DialogTrigger>
                     <DialogContent className="max-w-md p-6">
                       <DialogHeader className="space-y-2">
                         <DialogTitle className="text-2xl font-bold text-brand-primary">
@@ -571,7 +571,7 @@ const Attendees: React.FC = () => {
                   </Dialog>
 
                   {/* Edit Event */}
-                  <Link to={`/all-events/edit-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} /></Link>
+                  <Link to={`/all-events/edit-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} className='size-4' /></Link>
 
                   {/* Custom Check-In User */}
                   {isEventLive(event) && <AlertDialog>
@@ -595,7 +595,7 @@ const Attendees: React.FC = () => {
                   {/* Delete Attendee */}
                   <AlertDialog>
                     <AlertDialogTrigger className='cursor-pointer'>
-                      <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary' />
+                      <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary size-4' />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>

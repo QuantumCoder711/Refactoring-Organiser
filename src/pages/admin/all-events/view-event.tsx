@@ -158,7 +158,7 @@ const ViewEvent: React.FC = () => {
                     </div>
                     <div className='w-1/2 border-l border-white pl-5'>
                         <h3 className='font-semibold'>View Agenda By</h3>
-                        <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by}</p>
+                        <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by == 0 ? "All" : "Checked In"}</p>
                     </div>
                 </div>
 
@@ -211,10 +211,10 @@ const ViewEvent: React.FC = () => {
                     {/* Event Speakers */}
                     <div className='p-5 border-t border-white'>
                         <h3 className='font-semibold'>Speakers</h3>
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
                             {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
-                                <div key={index} className='text-sm text-center max-w-56'>
-                                    <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto' />
+                                <div key={index} className='text-sm text-center space-y-2 max-w-56'>
+                                    <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
                                     <h4 className='font-semibold leading-none'>{speaker.first_name} {speaker.last_name}</h4>
                                     <p className='leading-none'>{speaker.company_name}</p>
                                     <p className='leading-none font-light'>{speaker.job_title}</p>
@@ -227,10 +227,10 @@ const ViewEvent: React.FC = () => {
                     {allJury.length > 0 && (
                         <div className='p-5 border-t border-white'>
                             <h3 className='font-semibold'>Jury</h3>
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
                                 {allJury.map((jury, index) => (
-                                    <div key={index} className='text-sm text-center max-w-28 border-2'>
-                                        <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto' />
+                                    <div key={index} className='text-sm space-y-2 text-center max-w-28 border-2'>
+                                        <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
                                         <h4 className='font-semibold leading-none'>{jury.first_name} {jury.last_name}</h4>
                                         <p className='leading-none'>{jury.company_name}</p>
                                         <p className='leading-none font-light'>{jury.job_title}</p>

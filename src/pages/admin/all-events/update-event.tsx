@@ -146,16 +146,35 @@ const UpdateEvent: React.FC = () => {
                 event_venue_address_2: event.event_venue_address_2 || '',
             });
 
-            // Try to extract coordinates from Google Maps link if available
-            if (event.google_map_link) {
-                // Attempt to extract coordinates from Google Maps URL
-                const coordsMatch = event.google_map_link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-                if (coordsMatch && coordsMatch.length >= 3) {
-                    setCoords({
-                        lat: parseFloat(coordsMatch[1]),
-                        lng: parseFloat(coordsMatch[2])
-                    });
+            // Function to extract coordinates from an address using Google Maps Geocoding API
+            const extractCoordinates = async (address: string | undefined) => {
+                if (!address) return { lat: 0, lng: 0 }; // Default coordinates
+
+                try {
+                    const response = await fetch(
+                        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleMapsApiKey}`
+                    );
+                    const data = await response.json();
+
+                    if (data.results && data.results.length > 0) {
+                        const { lat, lng } = data.results[0].geometry.location;
+                        return { lat, lng };
+                    }
+
+                    return { lat: 0, lng: 0 }; // Default coordinates if geocoding fails
+                } catch (error) {
+                    console.error('Error getting coordinates:', error);
+                    return { lat: 0, lng: 0 }; // Default coordinates if request fails
                 }
+            };
+
+            // Try to extract coordinates from venue address if available
+            if (event.event_venue_address_1) {
+                extractCoordinates(event.event_venue_address_1).then((coordinates) => {
+                    if (coordinates) {
+                        setCoords(coordinates);
+                    }
+                });
             }
         }
     }, [event]);
@@ -662,7 +681,7 @@ const UpdateEvent: React.FC = () => {
                                     id='google_map_link'
                                     name='google_map_link'
                                     type='text'
-                                    value={formData.google_map_link}
+                                    value={formData.event_venue_address_1}
                                     onChange={handleInputChange}
                                     placeholder='Enter Location'
                                     className='input !h-12 min-w-full text-base'
