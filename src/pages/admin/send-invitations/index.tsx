@@ -53,6 +53,7 @@ import { domain } from '@/constants';
 import useAuthStore from '@/store/authStore';
 import { toast } from 'sonner';
 import Wave from '@/components/Wave';
+import * as XLSX from 'xlsx';
 
 const SendInvitations: React.FC = () => {
 
@@ -218,6 +219,70 @@ const SendInvitations: React.FC = () => {
         };
     }
 
+    // Export to Excel function
+    const handleExportToExcel = (dataToExport?: RequestedAttendeeType[]) => {
+        // If no data provided, use filtered attendees
+        const data = dataToExport || filteredAttendees;
+        
+        if (data.length === 0) {
+            toast('No data to export', {
+                className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        try {
+            // Prepare data for export
+            const exportData = data.map(attendee => ({
+                'First Name': attendee.first_name || '',
+                'Last Name': attendee.last_name || '',
+                'Email': attendee.email_id || '',
+                'Company': attendee.company_name || '',
+                'Job Title': attendee.job_title || '',
+                'Phone': attendee.phone_number || '',
+                'Status': attendee.status || '',
+            }));
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Set column widths for better readability
+            const wscols = [
+                { wch: 20 }, // First Name
+                { wch: 20 }, // Last Name
+                { wch: 30 }, // Email
+                { wch: 25 }, // Company
+                { wch: 25 }, // Job Title
+                { wch: 20 }, // Phone
+                { wch: 15 }, // Status
+                { wch: 15 }, // Created At
+                { wch: 15 }  // Updated At
+            ];
+            ws['!cols'] = wscols;
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Requested Attendees');
+            
+            // Generate Excel file
+            const fileName = `requested_attendees_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            
+            // Show success message
+            toast('Export successful!', {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+        } catch (error) {
+            console.error('Error exporting to Excel:', error);
+            toast('Failed to export data', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        }
+    };
+
     if (loading) return <Wave />
 
     return (
@@ -229,7 +294,29 @@ const SendInvitations: React.FC = () => {
                 </div>
 
                 <div className='flex items-center gap-5'>
-                    <Button className='btn !rounded-[10px] !px-3'>Export Data</Button>
+                    {selectedAttendees.size > 0 ? (
+                        <div className="flex gap-2">
+                            <Button 
+                                onClick={() => handleExportToExcel(filteredAttendees.filter(attendee => selectedAttendees.has(attendee.id)))}
+                                className='btn !rounded-[10px] !px-3 !bg-green-600 hover:!bg-green-700'
+                            >
+                                Export Selected ({selectedAttendees.size})
+                            </Button>
+                            <Button 
+                                onClick={() => handleExportToExcel()}
+                                className='btn !rounded-[10px] !px-3'
+                            >
+                                Export All
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button 
+                            onClick={() => handleExportToExcel()}
+                            className='btn !rounded-[10px] !px-3'
+                        >
+                            Export Data
+                        </Button>
+                    )}
                 </div>
             </div>
 

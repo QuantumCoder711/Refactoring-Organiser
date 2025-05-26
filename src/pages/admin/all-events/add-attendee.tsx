@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import * as XLSX from 'xlsx';
 import { useParams } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 
@@ -704,7 +705,67 @@ const AddAttendee: React.FC = () => {
                     <TabsContent value="bulk">
                         <div className="mt-5 flex justify-between">
                             <span className="font-semibold">Upload File</span>
-                            <Button className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm"> <Download size={13} strokeWidth={1} /> Download Sample Excel CSV Sheet Format</Button>
+                            <Button 
+                                onClick={() => {
+                                    // Create sample data with exact fields and sample data
+                                    const sampleData = [{
+                                        'first_name': 'John',
+                                        'last_name': 'Doe',
+                                        'job_title': 'CEO',
+                                        'company_name': 'Digimantra',
+                                        'industry': 'IT',
+                                        'email': 'johndoe@example.com',
+                                        'phone_number': '8709289369',
+                                        'alternate_mobile_number': '7865656575',
+                                        'website': 'www.digimantra.com',
+                                        'status': 'Speaker',
+                                        'employee_size': '200',
+                                        'company_turn_over': '5M',
+                                        'linkedin_page_link': 'https://linkedin/company/digimantra',
+                                        'award_winner': 'YES'
+                                    }];
+
+                                    // Create workbook and worksheet
+                                    const wb = XLSX.utils.book_new();
+                                    const ws = XLSX.utils.json_to_sheet(sampleData);
+                                    
+                                    // Set column widths for better readability
+                                    const wscols = [
+                                        { wch: 15 }, // first_name
+                                        { wch: 15 }, // last_name
+                                        { wch: 15 }, // job_title
+                                        { wch: 15 }, // company_name
+                                        { wch: 15 }, // industry
+                                        { wch: 25 }, // email
+                                        { wch: 15 }, // phone_number
+                                        { wch: 20 }, // alternate_mobile_number
+                                        { wch: 20 }, // website
+                                        { wch: 15 }, // status
+                                        { wch: 15 }, // employee_size
+                                        { wch: 20 }, // company_turn_over
+                                        { wch: 30 }, // linkedin_page_link
+                                        { wch: 15 }  // award_winner
+                                    ];
+                                    ws['!cols'] = wscols;
+                                    
+                                    // Add worksheet to workbook
+                                    XLSX.utils.book_append_sheet(wb, ws, 'Sample Attendees');
+                                    
+                                    // Generate Excel file
+                                    const fileName = `attendee_import_template_${new Date().toISOString().split('T')[0]}.xlsx`;
+                                    XLSX.writeFile(wb, fileName);
+                                    
+                                    // Show success message
+                                    toast('Sample file downloaded successfully!', {
+                                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                                        icon: <CircleCheck className='size-5' />
+                                    });
+                                }}
+                                className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm flex items-center gap-1"
+                            >
+                                <Download size={13} strokeWidth={1} />
+                                Download Sample Excel File
+                            </Button>
                         </div>
 
                         <div className="mt-1.5 w-full">

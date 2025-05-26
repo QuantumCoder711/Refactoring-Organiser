@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CircleCheck, CircleX, Download, FileText, FileUp } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from 'xlsx';
 
 import {
     Select,
@@ -394,8 +395,42 @@ const AddRequestedAttendee: React.FC = () => {
     };
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        setBulkFile(acceptedFiles[0]);
+        if (acceptedFiles && acceptedFiles.length > 0) {
+            setBulkFile(acceptedFiles[0]);
+        }
     }, []);
+
+    const downloadSampleFile = () => {
+        const sampleData = [
+            { 
+                first_name: 'John', 
+                last_name: 'Doe', 
+                email_id: 'john.doe@example.com', 
+                phone_number: '1234567890', 
+                alternate_mobile_number: '9876543210',
+                job_title: 'Software Engineer', 
+                company_name: 'Tech Corp', 
+                linkedin_url: 'https://linkedin.com/in/johndoe',
+                status: 'Attendee'
+            },
+            { 
+                first_name: 'Jane', 
+                last_name: 'Smith', 
+                email_id: 'jane.smith@example.com', 
+                phone_number: '9876543210',
+                alternate_mobile_number: '',
+                job_title: 'Product Manager', 
+                company_name: 'Innovate Inc', 
+                linkedin_url: 'https://linkedin.com/in/janesmith',
+                status: 'VIP'
+            }
+        ];
+        
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(sampleData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Sample Attendees');
+        XLSX.writeFile(wb, 'sample_attendees_import.xlsx');
+    };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -557,7 +592,12 @@ const AddRequestedAttendee: React.FC = () => {
                     <TabsContent value="bulk">
                         <div className="mt-5 flex justify-between">
                             <span className="font-semibold">Upload File</span>
-                            <Button className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm"> <Download size={13} strokeWidth={1} /> Download Sample Excel CSV Sheet Format</Button>
+                            <Button 
+                                onClick={downloadSampleFile}
+                                className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm"
+                            > 
+                                <Download size={13} strokeWidth={1} /> Download Sample Excel CSV Sheet Format
+                            </Button>
                         </div>
 
                         <div className="mt-1.5 w-full">

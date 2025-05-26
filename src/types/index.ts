@@ -230,4 +230,6 @@ export interface RequestedAttendeeType {
     managed_by: string;
     remark: string | null;
     linkedin_url: string;
+    created_at: string;
+    updated_at: string;
 }
