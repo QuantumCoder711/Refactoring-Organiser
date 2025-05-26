@@ -1,5 +1,6 @@
 import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
@@ -152,9 +153,61 @@ const Attendees: React.FC = () => {
   // Buttons
   const links = [
     { name: "Add Attendee", url: `/all-events/add-attendee/${slug}` },
-    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/all-template-messages/${slug}` }, ,
+    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/all-template-messages/${slug}` },
     { name: "Pending User Request", url: `/all-events/event/all-template-messages/pending-user-request/${slug}` },
   ];
+
+  // Handle export to Excel
+  const handleExportToExcel = () => {
+    // Use selected attendees if any, otherwise use filtered attendees
+    const attendeesToExport = selectedAttendees.size > 0 
+      ? singleEventAttendees.filter(attendee => selectedAttendees.has(attendee.id))
+      : filteredAttendees;
+
+    if (attendeesToExport.length === 0) {
+      toast('No data to export', {
+        className: "!bg-yellow-500 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+      return;
+    }
+
+    // Prepare data for Excel
+    const data = attendeesToExport.map((attendee, index) => ({
+      'Sr. No.': index + 1,
+      'Name': `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || '-',
+      'Designation': attendee.job_title || '-',
+      'Company': attendee.company_name || '-',
+      'Email': attendee.email_id || '-',
+      'Alternate Email': attendee.alternate_email || '-',
+      'Mobile': attendee.phone_number || '-',
+      'Alternate Mobile': attendee.alternate_mobile_number || '-',
+      'Role': attendee.status || '-',
+      'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
+      'Check In 1st': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
+      'Check In 2nd': dateDiff >= 1 ? (attendee.check_in_second === 1 ? (attendee.check_in_second_time ? formatDateTime(attendee.check_in_second_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 3rd': dateDiff >= 2 ? (attendee.check_in_third === 1 ? (attendee.check_in_third_time ? formatDateTime(attendee.check_in_third_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 4th': dateDiff >= 3 ? (attendee.check_in_forth === 1 ? (attendee.check_in_forth_time ? formatDateTime(attendee.check_in_forth_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 5th': dateDiff >= 4 ? (attendee.check_in_fifth === 1 ? (attendee.check_in_fifth_time ? formatDateTime(attendee.check_in_fifth_time) : 'Yes') : 'No') : 'N/A',
+    }));
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Attendees');
+    
+    // Generate Excel file
+    const fileName = `attendees_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    // Show success message
+    toast('Export successful!', {
+      className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+      icon: <CircleCheck className='size-5' />
+    });
+  };
 
   // Handle delete attendee
   const handleDeleteAttendee = async (id: number) => {
@@ -340,7 +393,12 @@ const Attendees: React.FC = () => {
         </div>
 
         <div className='flex items-center gap-5'>
-          <Button className='btn !rounded-[10px] !px-3'>Export Data</Button>
+          <Button 
+            className='btn !rounded-[10px] !px-3'
+            onClick={handleExportToExcel}
+          >
+            {selectedAttendees.size > 0 ? `Export Selected (${selectedAttendees.size})` : 'Export Data'}
+          </Button>
           <Button className='btn !rounded-[10px] !px-3'>QR Code</Button>
         </div>
       </div>
