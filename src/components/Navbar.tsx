@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import Logo from '@/assets/logo.svg';
-import InsightnerLogo from '@/assets/insightnerLogo.svg';
 import WhiteLogo from '@/assets/white_logo.png';
 import { Button } from '@/components/ui/button';
 import {
@@ -73,10 +72,10 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
   return (
     !isAuthenticated ?
-      <header className={`flex justify-between p-3 ${location.pathname==="/events" ? 'bg-black/10 backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
+      <header className={`flex justify-between p-3 ${location.pathname === "/events" ? 'bg-black/10 backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
         <nav className='w-full flex justify-between items-center'>
           <Link to="/">
-            <img width={152} src={location.pathname==="/events" ? WhiteLogo : Logo} alt="logo" />
+            <img width={152} src={location.pathname === "/events" ? WhiteLogo : Logo} alt="logo" />
           </Link>
 
           <ul className='hidden sm:flex gap-7 items-center'>
@@ -117,9 +116,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
       </header>
       :
       <header className='flex items-center bg-brand-background max-h-16'>
-        <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
-          <img src={user?.company_logo ? getImageUrl(user?.company_logo) : InsightnerLogo} alt="logo" className='h-14 object-contain object-center' />
-        </div>
+        <Link to="/">
+          <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
+            <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" className='h-14 object-contain object-center' />
+          </div>
+        </Link>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
@@ -132,7 +133,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
               <DropdownMenu>
                 <DropdownMenuTrigger className='flex gap-2 items-center cursor-pointer focus:outline-none'>
                   <Avatar className='w-10 h-10'>
-                    <AvatarImage src={UserAvatar} alt="User" />
+                    <AvatarImage src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt="User" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                   <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
@@ -143,9 +144,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
+                  {/* <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
-                  <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem>
+                  <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className='cursor-pointer !text-destructive'>Logout</DropdownMenuItem>
                 </DropdownMenuContent>

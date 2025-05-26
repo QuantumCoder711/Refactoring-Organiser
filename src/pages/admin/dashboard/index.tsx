@@ -5,6 +5,7 @@ import useEventStore from '@/store/eventStore';
 import useAttendeeStore from '@/store/attendeeStore';
 import useSponsorStore from '@/store/sponsorStore';
 import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
   const { events } = useEventStore();
@@ -24,7 +25,7 @@ const Dashboard: React.FC = () => {
         ].map((card, index) => (
           <div
             key={index}
-            className='min-w-40 cursor-pointer duration-300 hover:bg-brand-background rounded-lg h-9 px-4 shadow-blur flex justify-between items-center'
+            className='min-w-40 rounded-lg h-9 px-4 shadow-blur flex justify-between items-center'
           >
             <span>{card.title}</span>
             <span>{card.value}</span>
@@ -38,7 +39,7 @@ const Dashboard: React.FC = () => {
         <div>
           <div className='flex justify-between items-center'>
             <h2 className='text-xl font-semibold'>Upcoming Events</h2>
-            <Button className='btn'>View All</Button>
+            <Link to='/all-events'><Button className='btn'>View All</Button></Link>
           </div>
 
           <div className='mt-5 flex gap-10'>
@@ -64,7 +65,7 @@ const Dashboard: React.FC = () => {
         <div className='mt-8'>
           <div className='flex justify-between items-center'>
             <h2 className='text-xl font-semibold'>Past Events</h2>
-            <Button className='btn'>View All</Button>
+            <Link to='/all-events'><Button className='btn'>View All</Button></Link>
           </div>
 
           <div className='mt-5 flex gap-10'>

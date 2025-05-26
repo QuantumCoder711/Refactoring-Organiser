@@ -1,6 +1,9 @@
 import React from 'react';
-import { Facebook, HeartIcon, Linkedin, Twitter, Instagram } from 'lucide-react';
 import { Link } from "react-router-dom";
+import Facebook from "@/assets/social-media/facebook.svg"
+import Twitter from "@/assets/social-media/twitter.svg"
+import Linkedin from "@/assets/social-media/linkedIn.svg"
+import Instagram from "@/assets/social-media/instagram.svg"
 import LogoFullWhite from "@/assets/logo-full-white.svg";
 import LogoWhite from "@/assets/logo-white.svg";
 import FooterBg from "@/assets/footerbg.png";
@@ -9,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import AppleStore from './AppleStore';
 import GooglePlay from './GooglePlay';
 import AwsSsl from "@/assets/aws-ssl.png";
+import { HeartIcon } from 'lucide-react';
 
 interface FooterProps {
     type?: "styled" | "basic";
@@ -58,26 +62,26 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
             <div className=''>
                 <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                 <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
-                    <Link to="#" className='underline'>Privacy Policy</Link>
+                    <Link target="_blank" to="#" className='underline'>Privacy Policy</Link>
                     <span className='text-brand'>|</span>
-                    <Link to="#" className='underline'>Terms and Conditions</Link>
+                    <Link target="_blank" to="#" className='underline'>Terms and Conditions</Link>
                     <span className='text-brand'>|</span>
-                    <Link to="#" className='underline'>Refund Policy</Link>
+                    <Link target="_blank" to="#" className='underline'>Refund Policy</Link>
                 </p>
             </div>
 
-            <div className='flex items-center gap-2'>
-                <Link to="#">
-                    <Facebook height={25} width={25} className='stroke-black stroke-1' />
+            <div className='flex items-center gap-4'>
+                <Link target='_blank' to="https://www.facebook.com/thekloutclub">
+                    <img src={Facebook} alt="facebook" />
                 </Link>
-                <Link to="#">
-                    <Twitter height={25} width={25} className='stroke-black stroke-1' />
+                <Link target="_blank" to="https://twitter.com/thekloutclub">
+                    <img src={Twitter} alt="twitter" />
                 </Link>
-                <Link to="#">
-                    <Linkedin height={25} width={25} className='stroke-black stroke-1' />
+                <Link target="_blank" to="https://www.linkedin.com/company/klout-club">
+                    <img src={Linkedin} alt="linkedin" />
                 </Link>
-                <Link to="#">
-                    <Instagram height={25} width={25} className='stroke-black stroke-1' />
+                <Link target="_blank" to="https://www.instagram.com/klout_club">
+                    <img src={Instagram} alt="instagram" />
                 </Link>
             </div>
         </footer> :
@@ -106,7 +110,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                                     <ul>
                                         {item.links.map((link, linkIndex) => (
                                             <li key={linkIndex} className='text-white text-base font-light my-2'>
-                                                <Link to="#">{link}</Link>
+                                                <Link target="_blank" to="#">{link}</Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -122,26 +126,26 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                     <div className=''>
                         <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                         <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
-                            <Link to="#" className='underline'>Privacy Policy</Link>
+                            <Link target="_blank" to="#" className='underline'>Privacy Policy</Link>
                             <span className='text-brand'>|</span>
-                            <Link to="#" className='underline'>Terms and Conditions</Link>
+                            <Link target="_blank" to="#" className='underline'>Terms and Conditions</Link>
                             <span className='text-brand'>|</span>
-                            <Link to="#" className='underline'>Refund Policy</Link>
+                            <Link target="_blank" to="#" className='underline'>Refund Policy</Link>
                         </p>
                     </div>
 
-                    <div className='flex items-center gap-2'>
-                        <Link to="#">
-                            <Facebook height={25} width={25} className='fill-white stroke-white' />
+                    <div className='flex items-center gap-4 invert'>
+                        <Link target="_blank" to="https://www.facebook.com/thekloutclub">
+                            <img src={Facebook} alt="facebook" />
                         </Link>
-                        <Link to="#">
-                            <Twitter height={25} width={25} className='fill-white stroke-white' />
+                        <Link target="_blank" to="https://twitter.com/thekloutclub">
+                            <img src={Twitter} alt="twitter" />
                         </Link>
-                        <Link to="#">
-                            <Linkedin height={25} width={25} className='fill-white stroke-white' />
+                        <Link target="_blank" to="https://www.linkedin.com/company/klout-club">
+                            <img src={Linkedin} alt="linkedin" />
                         </Link>
-                        <Link to="#">
-                            <Instagram height={25} width={25} className='fill-black stroke-white' />
+                        <Link target="_blank" to="https://www.instagram.com/klout_club">
+                            <img src={Instagram} alt="instagram" />
                         </Link>
                     </div>
                 </div>
