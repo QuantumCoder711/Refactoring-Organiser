@@ -27,6 +27,7 @@ interface EventCardProps {
     isLive?: boolean;
     slug: string;
     id: number;
+    total_attendees: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -37,7 +38,8 @@ const EventCard: React.FC<EventCardProps> = ({
     imageAlt,
     slug,
     id,
-    isLive = false
+    isLive = false,
+    total_attendees,
 }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const { deleteEvent } = useEventStore(state => state)
@@ -185,7 +187,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
             {isLive && (
                 <div className='min-h-full w-full p-2 bg-white rounded-xl rounded-l-none'>
-                    {renderStatItem('Registrations', 800, 900)}
+                    {renderStatItem('Registrations', total_attendees)}
                     {renderStatItem('Attendees', 500, 900)}
                     {renderStatItem('Speakers', 100, 900)}
                     {renderStatItem('Sponsors', 450, 900)}

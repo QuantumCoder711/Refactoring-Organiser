@@ -672,7 +672,7 @@ const Attendees: React.FC = () => {
                   {attendee.status === "sponsor" &&
 
                     <Dialog>
-                      <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-amber-400' /></DialogTrigger>
+                      <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
                       <DialogContent className="max-w-md p-6">
                         {isLoading ? <Wave /> : <>
                           <DialogHeader className="space-y-2">
