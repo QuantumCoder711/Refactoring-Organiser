@@ -3,7 +3,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck } from 'lucide-react';
+import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X } from 'lucide-react';
+
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
@@ -23,6 +24,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -61,6 +64,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import axios from 'axios';
+import { domain } from '@/constants';
 
 
 
@@ -72,6 +77,8 @@ const Attendees: React.FC = () => {
 
   // Date Difference State
   const [dateDiff, setDateDiff] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedSponsorsAttendees, setSelectedSponsorsAttendees] = useState<{ uuid: string, attendee_id: number }[]>([]);
 
   // Calculate date difference when event changes
   useEffect(() => {
@@ -160,7 +167,7 @@ const Attendees: React.FC = () => {
   // Handle export to Excel
   const handleExportToExcel = () => {
     // Use selected attendees if any, otherwise use filtered attendees
-    const attendeesToExport = selectedAttendees.size > 0 
+    const attendeesToExport = selectedAttendees.size > 0
       ? singleEventAttendees.filter(attendee => selectedAttendees.has(attendee.id))
       : filteredAttendees;
 
@@ -194,14 +201,14 @@ const Attendees: React.FC = () => {
     // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
-    
+
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Attendees');
-    
+
     // Generate Excel file
     const fileName = `attendees_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(wb, fileName);
-    
+
     // Show success message
     toast('Export successful!', {
       className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -381,6 +388,86 @@ const Attendees: React.FC = () => {
     return cells;
   };
 
+  const handleGetSponsorsAttendee = async (event_id: number, sponsor_id: number) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${domain}/api/get-sponsor-attendee`, {
+        event_id,
+        sponsor_id
+      }, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.data.status === 200) {
+        setSelectedSponsorsAttendees(response.data.data);
+      }
+    } catch (error: any) {
+      toast(error.response.data.message || "Something went wrong", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className="size-5" />
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleSponsorAttendeeDelete = async (uuid: string) => {
+    try {
+      const response = await axios.delete(`${domain}/api/delete-sponsor-attendee/${uuid}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.data.status === 200) {
+        setSelectedSponsorsAttendees((prev) => prev.filter((item) => item.uuid !== uuid));
+        toast(response.data.message, {
+          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleCheck className="size-5" />
+        });
+      }
+    } catch (error: any) {
+      toast(error.response.data.message || "Something went wrong", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className="size-5" />
+      });
+    }
+  }
+
+  const handleBulkSponsorAttendeeAdd = async (sponsor_id: number) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(`${domain}/api/add-multiple-sponsor-attendee`, {
+        event_id: event?.id,
+        sponsor_id,
+        attendee_ids: selectedSponsorsAttendees.map((attendee) => attendee.attendee_id)
+      }, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.data.status === 200) {
+        toast(response.data.message, {
+          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <CircleCheck className="size-5" />
+        });
+      }
+    } catch (error: any) {
+      toast(error.response.data.message || "Something went wrong", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className="size-5" />
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   if (loading) return <Wave />
 
   return (
@@ -393,7 +480,7 @@ const Attendees: React.FC = () => {
         </div>
 
         <div className='flex items-center gap-5'>
-          <Button 
+          <Button
             className='btn !rounded-[10px] !px-3'
             onClick={handleExportToExcel}
           >
@@ -580,7 +667,71 @@ const Attendees: React.FC = () => {
                     : "-"}
                 </TableCell>
                 {renderCheckInData(attendee)}
-                <TableCell className="text-left min-w-10 flex items-center gap-1.5">
+                <TableCell className="min-w-10 flex items-center justify-end gap-1.5">
+
+                  {attendee.status === "sponsor" &&
+
+                    <Dialog>
+                      <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-amber-400' /></DialogTrigger>
+                      <DialogContent className="max-w-md p-6">
+                        {isLoading ? <Wave /> : <>
+                          <DialogHeader className="space-y-2">
+                            <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
+                              {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                            </DialogTitle>
+                            <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
+                          </DialogHeader>
+
+                          <DialogDescription className='flex items-center h-2 gap-2'>
+                            {selectedSponsorsAttendees.map((item) => (
+                              <div key={item.attendee_id} className="flex items-center gap-2 mt-5">
+                                <div className="p-2 px-4 flex gap-2 items-center justify-center rounded-full bg-brand-primary">
+                                  <p className="text-white capitalize text-xs tracking-wider">{paginatedAttendees.map((attendee: AttendeeType) => attendee.id === item.attendee_id && attendee.first_name + " " + attendee.last_name)}</p>
+                                  <X className="size-4 text-white cursor-pointer" onClick={() => handleSponsorAttendeeDelete(item.uuid)} />
+                                </div>
+                              </div>
+                            ))}
+                          </DialogDescription>
+
+                          <Table className="mt-4">
+                            <TableHeader className="bg-brand-light">
+                              <TableRow className="text-left">
+                                <TableHead>Name</TableHead>
+                                <TableHead>Company</TableHead>
+                                <TableHead className='text-right max-w-fit flex items-center justify-center'>Action</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => (
+                                <TableRow key={attendee.id} className="hover:bg-brand-lightest">
+                                  <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
+                                  <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
+                                  <TableCell className="text-center max-w-fit flex items-center justify-center">
+                                    <Checkbox
+                                      id={String(attendee.id)}
+                                      name="sponsor"
+                                      checked={selectedSponsorsAttendees.find((item) => item.attendee_id === attendee.id) ? true : false}
+                                      className="mx-auto cursor-pointer border border-brand-dark-gray"
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setSelectedSponsorsAttendees((prev) => [...prev, { uuid: event?.uuid as string, attendee_id: attendee.id }])
+                                        } else {
+                                          setSelectedSponsorsAttendees((prev) => [...prev].filter((item) => item.attendee_id !== attendee.id))
+                                        }
+                                      }}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                          <DialogFooter>
+                            <Button className='cursor-pointer btn' onClick={() => handleBulkSponsorAttendeeAdd(attendee.id)}>Save</Button>
+                          </DialogFooter>
+                        </>}
+                      </DialogContent>
+                    </Dialog>
+                  }
 
                   {/* For Viewing the Event */}
                   <Dialog>
