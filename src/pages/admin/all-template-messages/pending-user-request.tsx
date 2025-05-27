@@ -62,8 +62,6 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-
-
 const PendingUserRequest: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore(state => state.getEventBySlug(slug));

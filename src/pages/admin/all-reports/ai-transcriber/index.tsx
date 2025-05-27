@@ -107,6 +107,18 @@ const AiTranscriber: React.FC = () => {
     }
   }
 
+  const handleDownload = () => {
+    const blob = new Blob([summary], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `summary-${event?.title || 'report'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
   if (loading) {
     return <Wave />
   }
@@ -116,7 +128,7 @@ const AiTranscriber: React.FC = () => {
       <div className='absolute top-0 left-0'>
         <GoBack />
       </div>
-
+     
       <div className='max-w-3xl bg-brand-background mx-auto rounded-[10px] p-7'>
         <Tabs defaultValue="upload" className="mx-auto" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
@@ -167,7 +179,17 @@ const AiTranscriber: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="summary">
-            <p dangerouslySetInnerHTML={{ __html: parseText(summary) }} className='text-left mt-8' />
+            <div className='flex flex-col gap-4'>
+              <div className='flex justify-end'>
+                <Button 
+                  onClick={handleDownload}
+                  className='bg-brand-secondary cursor-pointer text-white hover:bg-brand-secondary'
+                >
+                  Download Summary
+                </Button>
+              </div>
+              <p dangerouslySetInnerHTML={{ __html: parseText(summary) }} className='text-left mt-8' />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
