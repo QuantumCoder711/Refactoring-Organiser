@@ -194,7 +194,7 @@ const EventCard: React.FC<EventCardProps> = ({
             {isLive && (
                 <div className='min-h-full w-full p-2 bg-white rounded-xl rounded-l-none'>
                     {renderStatItem('Registrations', total_attendees)}
-                    {renderStatItem('Attendees', 500, 900)}
+                    {renderStatItem('Attendees', checkInCount, total_attendees)}
                     {renderStatItem('Speakers', 100, 900)}
                     {renderStatItem('Sponsors', 450, 900)}
                     {renderStatItem('Pending Delegates', 10)}
