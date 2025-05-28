@@ -63,7 +63,7 @@ export interface EventType {
     event_otp: string;
     paid_event: number;
     event_fee: string;
-    total_attendee: number;
+    total_attendees: number;
     total_accepted: number;
     total_not_accepted: number;
     total_rejected: number;

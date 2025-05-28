@@ -2,7 +2,7 @@ import { appDomain, domain } from '@/constants';
 import { EventType } from '@/types';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
 
@@ -23,7 +23,6 @@ const CheckinPage: React.FC = () => {
     const location = useLocation();
     const params: URLSearchParams = new URLSearchParams(location.search);
     const eventUUID: string | null = params.get("eventuuid");
-    const userID: string | null = params.get("userid");
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);

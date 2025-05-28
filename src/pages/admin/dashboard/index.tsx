@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
                   isLive={isEventLive(event)}
                   id={event.id}
                   uuid={event.uuid}
-                  total_attendees={event.total_attendee || 0}
+                  total_attendees={event.total_attendees || 0}
                 />
               </div>
             ))
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
                   isLive={isEventLive(event)}
                   id={event.id}
                   uuid={event.uuid}
-                  total_attendees={event.total_attendee || 0}
+                  total_attendees={event.total_attendees || 0}
                 />
               </div>
             ))}

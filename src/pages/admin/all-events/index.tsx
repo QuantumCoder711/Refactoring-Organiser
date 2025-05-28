@@ -16,7 +16,7 @@ import {
 const AllEvents: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-    const { events } = useEventStore();
+    const { events } = useEventStore(state=> state);
     const [currentPage, setCurrentPage] = useState(1);
     const eventsPerPage = 10; // Adjust as needed
 
