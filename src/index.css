@@ -147,7 +147,7 @@
     width: 0;
     display: none;
   }
-  
+
   * {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -165,6 +165,24 @@
 
   .input {
     @apply max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none;
+  }
+
+  @keyframes caret-blink {
+
+    0%,
+    70%,
+    100% {
+      opacity: 1;
+    }
+
+    20%,
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .animate-caret-blink {
+    animation: caret-blink 1.25s ease-out infinite;
   }
 }
 

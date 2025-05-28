@@ -12,6 +12,10 @@ import Login from '@/pages/guest/login';
 import Homepage from '@/pages/guest/homepage';
 import ExploreEvents from '@/pages/guest/explore-events';
 import AddFirstEvent from '@/pages/guest/add-first-event';
+import TermsAndConditions from './pages/guest/terms-and-conditions';
+import RefundPolicy from './pages/guest/refund-policy';
+import PrivacyPolicy from './pages/guest/privacy-policy';
+import FAQ from './pages/guest/faq';
 // Admin Pages
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
@@ -54,6 +58,7 @@ import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-a
 import EditAttendee from './pages/admin/all-events/edit-attendee';
 import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested-attendee';
 import SearchPeople from './pages/admin/all-events/search-people';
+import CheckInPage from './pages/guest/check-in-page';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -76,6 +81,11 @@ const App: React.FC = () => {
         <Route path="explore-events/:city" element={<ExploreAllEvents />} />
         <Route path="explore-events/event/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
+        <Route path="terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="refund-policy" element={<RefundPolicy />} />
+        <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="event/check-in" element={<CheckInPage />} />
+        <Route path="faq" element={<FAQ />} />
         <Route
           path="login"
           element={

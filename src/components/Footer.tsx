@@ -62,11 +62,13 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
             <div className=''>
                 <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                 <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
-                    <Link target="_blank" to="#" className='underline'>Privacy Policy</Link>
+                    <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                     <span className='text-brand'>|</span>
-                    <Link target="_blank" to="#" className='underline'>Terms and Conditions</Link>
+                    <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
                     <span className='text-brand'>|</span>
-                    <Link target="_blank" to="#" className='underline'>Refund Policy</Link>
+                    <Link to="/refund-policy" className='underline'>Refund Policy</Link>
+                    <span className='text-brand'>|</span>
+                    <Link to="/faq" className='underline'>FAQ</Link>
                 </p>
             </div>
 
@@ -74,13 +76,13 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                 <Link target='_blank' to="https://www.facebook.com/thekloutclub">
                     <img src={Facebook} alt="facebook" />
                 </Link>
-                <Link target="_blank" to="https://twitter.com/thekloutclub">
+                <Link to="https://twitter.com/thekloutclub">
                     <img src={Twitter} alt="twitter" />
                 </Link>
-                <Link target="_blank" to="https://www.linkedin.com/company/klout-club">
+                <Link to="https://www.linkedin.com/company/klout-club">
                     <img src={Linkedin} alt="linkedin" />
                 </Link>
-                <Link target="_blank" to="https://www.instagram.com/klout_club">
+                <Link to="https://www.instagram.com/klout_club">
                     <img src={Instagram} alt="instagram" />
                 </Link>
             </div>
@@ -110,7 +112,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                                     <ul>
                                         {item.links.map((link, linkIndex) => (
                                             <li key={linkIndex} className='text-white text-base font-light my-2'>
-                                                <Link target="_blank" to="#">{link}</Link>
+                                                <Link to="#">{link}</Link>
                                             </li>
                                         ))}
                                     </ul>
@@ -126,25 +128,27 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                     <div className=''>
                         <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                         <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
-                            <Link target="_blank" to="#" className='underline'>Privacy Policy</Link>
+                            <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                             <span className='text-brand'>|</span>
-                            <Link target="_blank" to="#" className='underline'>Terms and Conditions</Link>
+                            <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
                             <span className='text-brand'>|</span>
-                            <Link target="_blank" to="#" className='underline'>Refund Policy</Link>
+                            <Link to="/refund-policy" className='underline'>Refund Policy</Link>
+                            <span className='text-brand'>|</span>
+                            <Link to="/faq" className='underline'>FAQ</Link>
                         </p>
                     </div>
 
                     <div className='flex items-center gap-4 invert'>
-                        <Link target="_blank" to="https://www.facebook.com/thekloutclub">
+                        <Link to="https://www.facebook.com/thekloutclub">
                             <img src={Facebook} alt="facebook" />
                         </Link>
-                        <Link target="_blank" to="https://twitter.com/thekloutclub">
+                        <Link to="https://twitter.com/thekloutclub">
                             <img src={Twitter} alt="twitter" />
                         </Link>
-                        <Link target="_blank" to="https://www.linkedin.com/company/klout-club">
+                        <Link to="https://www.linkedin.com/company/klout-club">
                             <img src={Linkedin} alt="linkedin" />
                         </Link>
-                        <Link target="_blank" to="https://www.instagram.com/klout_club">
+                        <Link to="https://www.instagram.com/klout_club">
                             <img src={Instagram} alt="instagram" />
                         </Link>
                     </div>
