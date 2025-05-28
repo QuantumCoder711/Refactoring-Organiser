@@ -9,6 +9,7 @@ import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import useSponsorStore from '@/store/sponsorStore';
 import useExtrasStore from '@/store/extrasStore';
+import useCheckInSocket from "@/hooks/useCheckInSocket";
 
 const Layout: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -35,6 +36,9 @@ const Layout: React.FC = () => {
             setLoading(false);
         }
     }, [token, getAllEvents, getAllEventsAttendees, getAllEventsSponsors, fetchExtras]);
+
+    const events = useEventStore((state) => state.events);
+    useCheckInSocket(events);
 
     if(loading) {
         return (

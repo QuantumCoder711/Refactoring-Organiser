@@ -56,16 +56,16 @@ const AllEvents: React.FC = () => {
                 <Pagination className='mt-[26px] flex justify-end'>
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious 
+                      <PaginationPrevious
                         onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       />
                     </PaginationItem>
-                    
+
                     {/* Show first page */}
                     {totalPages > 0 && (
                       <PaginationItem>
-                        <PaginationLink 
+                        <PaginationLink
                           isActive={currentPage === 1}
                           onClick={() => handlePageChange(1)}
                           className="cursor-pointer"
@@ -74,18 +74,18 @@ const AllEvents: React.FC = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    
+
                     {/* Show ellipsis if needed */}
                     {currentPage > 3 && (
                       <PaginationItem>
                         <PaginationEllipsis />
                       </PaginationItem>
                     )}
-                    
+
                     {/* Show current page and adjacent pages */}
                     {totalPages > 1 && currentPage > 2 && (
                       <PaginationItem>
-                        <PaginationLink 
+                        <PaginationLink
                           onClick={() => handlePageChange(currentPage - 1)}
                           className="cursor-pointer"
                         >
@@ -93,10 +93,10 @@ const AllEvents: React.FC = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    
+
                     {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
                       <PaginationItem>
-                        <PaginationLink 
+                        <PaginationLink
                           isActive={true}
                           className="cursor-pointer"
                         >
@@ -104,10 +104,10 @@ const AllEvents: React.FC = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    
+
                     {totalPages > 2 && currentPage < totalPages - 1 && (
                       <PaginationItem>
-                        <PaginationLink 
+                        <PaginationLink
                           onClick={() => handlePageChange(currentPage + 1)}
                           className="cursor-pointer"
                         >
@@ -115,18 +115,18 @@ const AllEvents: React.FC = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    
+
                     {/* Show ellipsis if needed */}
                     {currentPage < totalPages - 2 && (
                       <PaginationItem>
                         <PaginationEllipsis />
                       </PaginationItem>
                     )}
-                    
+
                     {/* Show last page */}
                     {totalPages > 1 && (
                       <PaginationItem>
-                        <PaginationLink 
+                        <PaginationLink
                           isActive={currentPage === totalPages}
                           onClick={() => handlePageChange(totalPages)}
                           className="cursor-pointer"
@@ -135,9 +135,9 @@ const AllEvents: React.FC = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    
+
                     <PaginationItem>
-                      <PaginationNext 
+                      <PaginationNext
                         onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
                       />
@@ -160,6 +160,8 @@ const AllEvents: React.FC = () => {
                         isLive={isEventLive(event)}
                         slug={event.slug}
                         id={event.id}
+                        uuid={event.uuid}
+                        total_attendees={event.total_attendees || 0}
                     />
                 ))}
             </div>}
@@ -177,6 +179,8 @@ const AllEvents: React.FC = () => {
                         imageAlt={event.title}
                         slug={event.slug}
                         id={event.id}
+                        uuid={event.uuid}
+                        total_attendees={event.total_attendees || 0}
                     />
                 ))}
             </div>}

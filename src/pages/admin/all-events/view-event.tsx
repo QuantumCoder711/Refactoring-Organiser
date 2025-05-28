@@ -120,7 +120,20 @@ const ViewEvent: React.FC = () => {
                 <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
                     {isLive && (
                         <>
-                            <Button className='btn-rounded h-6'>View QR Code</Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className='btn-rounded h-6'>View QR Code</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                        <DialogDescription className="text-center">
+                                            <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                                            <Button className='btn mx-auto mt-6'>Download</Button>
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                             <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
                         </>
                     )}

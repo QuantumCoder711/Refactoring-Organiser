@@ -11,10 +11,17 @@ interface EventStore {
     getEventBySlug: (slug: string | undefined) => EventType | null;
     updateEvent: (id: string, event: AddEventType) => Promise<AddEventResponse>;
     deleteEvent: (id: number) => Promise<DeleteEventResponse>;
+    checkInCounts: { [eventUuid: string]: number };
+    setCheckInCount: (eventUuid: string, count: number) => void;
 }
 
 const useEventStore = create<EventStore>((set, get) => ({
     events: [],
+    checkInCounts: {},
+    setCheckInCount: (eventUuid, count) =>
+        set((state) => ({
+            checkInCounts: { ...state.checkInCounts, [eventUuid]: count },
+        })),
     setEvents: (events: EventType[]) => set({ events }),
     getAllEvents: async (token: string) => {
         const response = await getAllEvents(token);
