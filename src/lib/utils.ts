@@ -113,18 +113,8 @@ export const formatDateTime = (dateString: string): string => {
   // Get year
   const year = date.getFullYear();
 
-  // Get hours in 12-hour format
-  let hours = date.getHours();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12; // the hour '0' should be '12'
-
-  // Get minutes and seconds
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-
   // Return formatted date string
-  return `(${hours}:${minutes}:${seconds} ${ampm}) ${day}/${month}/${year}`;
+  return `${day}, ${month}, ${year}`;
 };
 // Helper function to format date time
 export const formatDateTimeReport = (dateString: string): string => {

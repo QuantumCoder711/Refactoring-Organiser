@@ -49,7 +49,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { CircleCheck, CircleX, Eye, SquarePen, Trash } from 'lucide-react';
 import { RequestedAttendeeType } from '@/types';
 import axios from 'axios';
-import { domain } from '@/constants';
+import { domain, appDomain } from '@/constants';
 import useAuthStore from '@/store/authStore';
 import { toast } from 'sonner';
 import Wave from '@/components/Wave';
@@ -65,6 +65,7 @@ const SendInvitations: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [requestedAttendees, setRequestedAttendees] = useState<RequestedAttendeeType[]>([]);
     const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
+    const [isLoadingContacts, setIsLoadingContacts] = useState(false);
 
     // Search filters
     const [nameFilter, setNameFilter] = useState('');
@@ -241,6 +242,7 @@ const SendInvitations: React.FC = () => {
                 'Company': attendee.company_name || '',
                 'Job Title': attendee.job_title || '',
                 'Phone': attendee.phone_number || '',
+                'LinkedIn URL': attendee.linkedin_url || '',
                 'Status': attendee.status || '',
             }));
 
@@ -256,9 +258,8 @@ const SendInvitations: React.FC = () => {
                 { wch: 25 }, // Company
                 { wch: 25 }, // Job Title
                 { wch: 20 }, // Phone
+                { wch: 40 }, // LinkedIn URL
                 { wch: 15 }, // Status
-                { wch: 15 }, // Created At
-                { wch: 15 }  // Updated At
             ];
             ws['!cols'] = wscols;
             
@@ -280,6 +281,61 @@ const SendInvitations: React.FC = () => {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
+        }
+    };
+
+    // Add function to handle getting contacts
+    const handleGetContacts = async () => {
+        if (selectedAttendees.size === 0) {
+            toast('Please select at least one attendee', {
+                className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        // Get selected attendees with LinkedIn URLs
+        const selectedAttendeesData = filteredAttendees.filter(attendee => 
+            selectedAttendees.has(attendee.id) && attendee.linkedin_url
+        );
+
+        if (selectedAttendeesData.length === 0) {
+            toast('None of the selected attendees have LinkedIn URLs', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        try {
+            setIsLoadingContacts(true);
+            const linkedin = selectedAttendeesData.map(attendee => attendee.linkedin_url);
+            
+            const response = await axios.post(
+                `${appDomain}/api/mapping/v1/people/get-contact-signal`,
+                { linkedin },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (response.data) {
+                toast(`Successfully retrieved contact information for ${selectedAttendeesData.length} attendees`, {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            }
+        } catch (error) {
+            console.error('Error getting contacts:', error);
+            toast('Failed to get contact information', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        } finally {
+            setIsLoadingContacts(false);
         }
     };
 
@@ -384,6 +440,15 @@ const SendInvitations: React.FC = () => {
                     </SelectContent>
                 </Select>
 
+                {/* Get Contact Button */}
+                <Button
+                    className='btn !rounded-[10px] !p-2.5 !bg-blue-600 text-white hover:!bg-blue-700'
+                    onClick={handleGetContacts}
+                    disabled={isLoadingContacts || selectedAttendees.size === 0}
+                >
+                    {isLoadingContacts ? 'Getting Contacts...' : 'Get Contact'}
+                </Button>
+
                 <Button
                     className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
                     onClick={handleDeleteSelected}
@@ -451,7 +516,18 @@ const SendInvitations: React.FC = () => {
                                         onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
                                     />
                                 </TableCell>
-                                <TableCell>{attendee.linkedin_url || "-"}</TableCell>
+                                <TableCell>
+                                    {attendee.linkedin_url ? (
+                                        <a 
+                                            href={attendee.linkedin_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            View Profile
+                                        </a>
+                                    ) : "-"}
+                                </TableCell>
                                 <TableCell>{attendee.first_name + " " + attendee.last_name}</TableCell>
                                 <TableCell>{attendee.job_title || "-"}</TableCell>
                                 <TableCell>{attendee.company_name || "-"}</TableCell>

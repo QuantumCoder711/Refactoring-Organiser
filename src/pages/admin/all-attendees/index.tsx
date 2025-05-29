@@ -131,6 +131,7 @@ const AllAttendees: React.FC = () => {
             'Alternate Email': attendee.alternate_email || '-',
             'Mobile': attendee.phone_number || '-',
             'Alternate Mobile': attendee.alternate_mobile_number || '-',
+            'LinkedIn URL': attendee.linkedin_page_link || '-',
             'Role': attendee.status || '-',
             'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
             'Check In': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
@@ -139,6 +140,23 @@ const AllAttendees: React.FC = () => {
         // Create workbook and worksheet
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(data);
+
+        // Set column widths for better readability
+        const wscols = [
+            { wch: 10 },  // Sr. No.
+            { wch: 25 },  // Name
+            { wch: 25 },  // Designation
+            { wch: 25 },  // Company
+            { wch: 30 },  // Email
+            { wch: 30 },  // Alternate Email
+            { wch: 15 },  // Mobile
+            { wch: 15 },  // Alternate Mobile
+            { wch: 40 },  // LinkedIn URL
+            { wch: 15 },  // Role
+            { wch: 15 },  // Award Winner
+            { wch: 20 },  // Check In
+        ];
+        ws['!cols'] = wscols;
 
         // Add worksheet to workbook
         XLSX.utils.book_append_sheet(wb, ws, 'All Attendees');
@@ -273,6 +291,7 @@ const AllAttendees: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">A. Email</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">LinkedIn URL</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Checked In</TableHead>
@@ -302,6 +321,9 @@ const AllAttendees: React.FC = () => {
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
                                     {attendee.alternate_mobile_number || "-"}
+                                </TableCell>
+                                <TableCell className="text-left min-w-10">
+                                    {attendee.linkedin_page_link || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
                                     {attendee.status || "-"}

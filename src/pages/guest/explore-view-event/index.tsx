@@ -420,7 +420,7 @@ const ExploreViewEvent: React.FC = () => {
 
                             <div className={`p-[10px] ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
                                 <p className='text-sm'>Welcome! Register below to request event access.</p>
-                                <Button onClick={() => setOpen(true)} className='w-full mt-[10px] !py-6 text-base hover:bg-brand-primary-dark cursor-pointer duration-300 bg-brand-primary rounded-lg text-white'>
+                                <Button disabled={isEventDatePassed()} onClick={() => setOpen(true)} className='w-full mt-[10px] !py-6 text-base hover:bg-brand-primary-dark cursor-pointer duration-300 bg-brand-primary rounded-lg text-white'>
                                     Get an Invite
                                 </Button>
                             </div>

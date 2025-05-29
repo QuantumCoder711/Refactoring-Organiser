@@ -7,6 +7,8 @@ import { isEventLive, isEventUpcoming, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
+import { toast } from 'sonner';
+import { CircleCheck, CircleX } from 'lucide-react';
 
 import {
     Dialog,
@@ -36,6 +38,7 @@ const ViewEvent: React.FC = () => {
     const [agendaData, setAgendaData] = useState<any[]>([]);
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
     const [allJury, setAllJury] = useState<any[]>([]);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     // Add extractCoordinates function
     const extractCoordinates = async (address: string | undefined) => {
@@ -98,6 +101,50 @@ const ViewEvent: React.FC = () => {
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
 
+    const handleDownload = async () => {
+        if (!event?.qr_code) {
+            console.error('No QR code available');
+            return;
+        }
+        
+        setIsDownloading(true);
+        try {
+            // Get the image URL
+            const imageUrl = getImageUrl(event.qr_code);
+            
+            // Fetch the image
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `qr-code-${event.title || 'event'}.png`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+            
+            toast.success('QR code downloaded successfully!', {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+        } catch (error) {
+            console.error('Download error:', error);
+            toast.error('Failed to download QR code. Please try again.', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     if (loading) {
         return <Wave />
     }
@@ -129,7 +176,13 @@ const ViewEvent: React.FC = () => {
                                         <DialogTitle className='text-center'>{event?.title}</DialogTitle>
                                         <DialogDescription className="text-center">
                                             <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-                                            <Button className='btn mx-auto mt-6'>Download</Button>
+                                            <Button 
+                                                onClick={handleDownload} 
+                                                className='btn mx-auto mt-6'
+                                                disabled={isDownloading}
+                                            >
+                                                {isDownloading ? 'Downloading...' : 'Download'}
+                                            </Button>
                                         </DialogDescription>
                                     </DialogHeader>
                                 </DialogContent>
@@ -148,7 +201,13 @@ const ViewEvent: React.FC = () => {
                                         <DialogTitle className='text-center'>{event?.title}</DialogTitle>
                                         <DialogDescription className="text-center">
                                             <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-                                            <Button className='btn mx-auto mt-6'>Download</Button>
+                                            <Button 
+                                                onClick={handleDownload} 
+                                                className='btn mx-auto mt-6'
+                                                disabled={isDownloading}
+                                            >
+                                                {isDownloading ? 'Downloading...' : 'Download'}
+                                            </Button>
                                         </DialogDescription>
                                     </DialogHeader>
                                 </DialogContent>
