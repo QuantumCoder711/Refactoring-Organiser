@@ -3,11 +3,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X } from 'lucide-react';
+import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, Download } from 'lucide-react';
 
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
+import { dateDifference, formatDateTime, getImageUrl, isEventLive } from '@/lib/utils';
 
 import {
   Table,
@@ -66,7 +66,24 @@ import {
 } from "@/components/ui/pagination";
 import axios from 'axios';
 import { domain } from '@/constants';
+import QRCode from 'qrcode';
 
+// Function to generate QR code data URL
+const generateQRCodeDataUrl = async (url: string): Promise<string> => {
+  try {
+    return await QRCode.toDataURL(url, {
+      width: 200,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    });
+  } catch (error) {
+    console.error('Error generating QR code:', error);
+    return '';
+  }
+};
 
 
 const Attendees: React.FC = () => {
@@ -79,6 +96,7 @@ const Attendees: React.FC = () => {
   const [dateDiff, setDateDiff] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedSponsorsAttendees, setSelectedSponsorsAttendees] = useState<{ uuid: string, attendee_id: number }[]>([]);
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState<boolean>(false);
 
   // Calculate date difference when event changes
   useEffect(() => {
@@ -235,6 +253,70 @@ const Attendees: React.FC = () => {
   }
 
   // Handle custom check-in
+  // Function to handle QR code download
+  const handleDownloadQRCode = () => {
+    if (!event?.qr_code) {
+      console.error('No QR code available for this event');
+      toast('No QR code available for this event', {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+      return;
+    }
+
+    try {
+      console.log('Original QR code:', event.qr_code);
+      
+      // Check if qr_code is already a full URL or a relative path
+      const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
+      const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
+      
+      console.log('Generated image URL:', imageUrl);
+      
+      // Create a temporary link with the direct image URL
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.target = '_blank'; // Open in new tab as a fallback
+      link.rel = 'noopener noreferrer';
+      
+      // Set download attribute with a filename
+      const fileName = `qrcode-${event.slug || 'event'}.png`;
+      link.download = fileName;
+      
+      // Append to body, click and remove
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
+
+      console.log('QR code download initiated');
+      toast('QR Code download started!', {
+        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleCheck className='size-5' />
+      });
+    } catch (error) {
+      console.error('Error initiating QR code download:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error details:', { error });
+      toast(`Failed to download QR Code: ${errorMessage}`, {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+    }
+  };
+
+  // Generate QR code when dialog opens
+  useEffect(() => {
+    if (!event) return;
+    const generateQR = async () => {
+      await generateQRCodeDataUrl(event.qr_code);
+    };
+    generateQR();
+  }, [event]);
+
   const handleCustomCheckIn = async (uuid: string) => {
     if (token && event && user) {
       const response = await customCheckIn(uuid, event?.id, user?.id, token);
@@ -486,7 +568,50 @@ const Attendees: React.FC = () => {
           >
             {selectedAttendees.size > 0 ? `Export Selected (${selectedAttendees.size})` : 'Export Data'}
           </Button>
-          <Button className='btn !rounded-[10px] !px-3'>QR Code</Button>
+
+          <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                className='btn !rounded-[10px] !px-3'
+                onClick={() => setIsQrDialogOpen(true)}
+              >
+                QR Code
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="text-center">Event Check-In QR Code</DialogTitle>
+                <DialogDescription className="text-center">
+                  Scan this QR code to check in to the event
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-center justify-center py-4">
+                <div className="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
+                  {event?.qr_code ? (
+                    <img
+                      src={getImageUrl(event?.qr_code)}
+                      alt="QR Code"
+                      className="w-48 h-48"
+                    />
+                  ) : (
+                    <div className="w-48 h-48 flex items-center justify-center text-gray-500">
+                      Generating QR code...
+                    </div>
+                  )}
+                </div>
+                <p className="mt-4 text-sm text-gray-500">{event?.title}</p>
+              </div>
+              <DialogFooter className="sm:justify-center">
+                <Button
+                  onClick={handleDownloadQRCode}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download QR Code
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

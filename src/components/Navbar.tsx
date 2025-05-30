@@ -62,7 +62,6 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         .join(' ')
       );
     }
-
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -124,6 +123,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
+            <li>
+              <Link to={`/search-people`}>
+                <Button className='btn-rounded !px-3'>Search</Button>
+              </Link>
+            </li>
             <li>
               <Link to={"/add-event"}>
                 <Button className='btn-rounded !px-3'>Create New Event</Button>

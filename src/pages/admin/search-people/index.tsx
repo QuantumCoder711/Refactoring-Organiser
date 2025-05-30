@@ -1,9 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
 import GoBack from '@/components/GoBack';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import {
     Select,
     SelectContent,
@@ -35,6 +42,9 @@ import { appDomain, domain } from '@/constants';
 import { toast } from 'sonner';
 import Wave from '@/components/Wave';
 import useAuthStore from '@/store/authStore';
+import { EventType } from '@/types';
+import { filterEvents, formatDateTime, getImageUrl } from '@/lib/utils';
+import { Calendar, MapPin } from 'lucide-react';
 
 interface SearchPeopleType {
     _id: string;
@@ -58,14 +68,16 @@ const cities: string[] = [
 ];
 
 const SearchPeople: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
-    const event = useEventStore((state) => state.getEventBySlug(slug));
+    const { events } = useEventStore(state => state);
+    const { upcomingEvents } = filterEvents(events);
     const [designation, setDesignation] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [loading, setLoading] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const { user, token } = useAuthStore(state => state);
     const [people, setPeople] = useState<SearchPeopleType[]>([]);
+
+    const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
 
     // Filter states
     const [filters, setFilters] = useState({
@@ -190,7 +202,7 @@ const SearchPeople: React.FC = () => {
         });
 
         const response = await axios.post(`${domain}/api/bulk-upload-requested-attendees-without-excel`, {
-            event_id: event?.id,
+            event_id: selectedEvent?.id,
             user_id: user?.id,
             attendees
         }, {
@@ -201,15 +213,16 @@ const SearchPeople: React.FC = () => {
         });
 
         if (response.data.status) {
-            toast(response.data.message || "Attendees added successfully", {
+            toast("People added successfully", {
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider"
             });
         } else {
-            toast(response.data.message || "Failed to add attendees", {
+            toast(response.data.message || "Failed to add people", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider"
             });
         }
         setSelectedPeople([]);
+        setSelectedEvent(null);
         setLoading(false);
     }
 
@@ -225,7 +238,7 @@ const SearchPeople: React.FC = () => {
         <div className="space-y-6">
             <div className='flex gap-5 items-center'>
                 <GoBack />
-                <h1 className='text-xl font-semibold'>{event?.title}</h1>
+                <h1 className='text-xl font-semibold'>Add People</h1>
             </div>
 
             {/* Initial Search UI - Show when no data is loaded */}
@@ -272,6 +285,7 @@ const SearchPeople: React.FC = () => {
 
                     <Button
                         onClick={handleSearch}
+                        disabled={designation === '' || selectedCity === ''}
                         className="w-fit btn"
                     >
                         Search
@@ -346,9 +360,42 @@ const SearchPeople: React.FC = () => {
                             onChange={(e) => setFilters(prev => ({ ...prev, industry: e.target.value }))}
                         />
 
-                        <Button onClick={handleAddSelectedPeople} className='btn'>
-                            Add Selected People
-                        </Button>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button className='btn' disabled={selectedPeople.length === 0}>
+                                    Add Selected People
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Select the event</DialogTitle>
+                                </DialogHeader>
+
+                                <div className='max-h-80 h-full space-y-3 overflow-y-scroll overflow-x-hidden'>
+                                    {upcomingEvents.map((event) => (
+                                        <div onClick={() => setSelectedEvent(event)} key={event.uuid} className={`p-2 border-2 border-white cursor-pointer hover:bg-brand-primary/20 rounded-md ${selectedEvent?.uuid === event.uuid ? '!border-brand-primary !bg-brand-primary/20' : 'border-white'}`}>
+                                            <div className='flex gap-2 w-full'>
+                                                <img src={getImageUrl(event.image)} alt="" width={80} height={80} className='w-20 h-20 object-cover rounded' />
+                                                <div className='flex flex-col gap-1 overflow-hidden overflow-ellipsis'>
+                                                    <p className='font-semibold text-lg text-nowrap overflow-hidden overflow-ellipsis'>{event.title}</p>
+                                                    <div className='flex items-center gap-1'>
+                                                        <MapPin className='w-4 h-4' />
+                                                        <p className='text-sm text-nowrap overflow-hidden overflow-ellipsis'>{event.event_venue_address_2}</p>
+                                                    </div>
+                                                    <div className='flex items-center gap-1'>
+                                                        <Calendar className='w-4 h-4' />
+                                                        <p className='text-sm text-nowrap overflow-hidden overflow-ellipsis'>{formatDateTime(event.event_date)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <DialogFooter>
+                                    <Button className='btn' onClick={handleAddSelectedPeople} disabled={!selectedEvent}>Add Selected People</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
                     <Table className='mt-4'>

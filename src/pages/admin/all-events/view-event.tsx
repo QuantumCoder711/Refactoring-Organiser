@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
+import QRCode from 'qrcode';
 
 import {
     Dialog,
@@ -101,42 +102,83 @@ const ViewEvent: React.FC = () => {
     const isLive = isEventLive(event);
     const isUpcoming = isEventUpcoming(event);
 
-    const handleDownload = async () => {
+    // Function to generate QR code data URL
+    const generateQRCodeDataUrl = async (text: string): Promise<string> => {
+        try {
+            return await QRCode.toDataURL(text, {
+                width: 200,
+                margin: 1,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            });
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            return '';
+        }
+    };
+
+    // Generate QR code when component mounts or event changes
+    useEffect(() => {
+        const generateQR = async () => {
+            if (event?.uuid) {
+                const qrText = `${domain}/event/${event.slug}/check-in`;
+                await generateQRCodeDataUrl(qrText);
+            }
+        };
+        generateQR();
+    }, [event]);
+
+    const handleDownload = () => {
         if (!event?.qr_code) {
-            console.error('No QR code available');
+            console.error('No QR code available for this event');
+            toast('No QR code available for this event', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
             return;
         }
-        
+
         setIsDownloading(true);
         try {
-            // Get the image URL
-            const imageUrl = getImageUrl(event.qr_code);
+            console.log('Original QR code:', event.qr_code);
             
-            // Fetch the image
-            const response = await fetch(imageUrl);
-            const blob = await response.blob();
+            // Check if qr_code is already a full URL or a relative path
+            const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
+            const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
             
-            // Create download link
-            const url = window.URL.createObjectURL(blob);
+            console.log('Generated image URL:', imageUrl);
+            
+            // Create a temporary link with the direct image URL
             const link = document.createElement('a');
-            link.href = url;
-            link.download = `qr-code-${event.title || 'event'}.png`;
+            link.href = imageUrl;
+            link.target = '_blank'; // Open in new tab as a fallback
+            link.rel = 'noopener noreferrer';
             
-            // Trigger download
+            // Set download attribute with a filename
+            const fileName = `qrcode-${event.slug || 'event'}.png`;
+            link.download = fileName;
+            
+            // Append to body, click and remove
             document.body.appendChild(link);
             link.click();
             
             // Clean up
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(link);
-            
-            toast.success('QR code downloaded successfully!', {
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+
+            console.log('QR code download initiated');
+            toast('QR Code download started!', {
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleCheck className='size-5' />
             });
         } catch (error) {
-            console.error('Download error:', error);
-            toast.error('Failed to download QR code. Please try again.', {
+            console.error('Error initiating QR code download:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Error details:', { error });
+            toast(`Failed to download QR Code: ${errorMessage}`, {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });

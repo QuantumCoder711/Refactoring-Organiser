@@ -57,7 +57,7 @@ import SendInvitations from '@/pages/admin/send-invitations';
 import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-attendee';
 import EditAttendee from './pages/admin/all-events/edit-attendee';
 import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested-attendee';
-import SearchPeople from './pages/admin/all-events/search-people';
+import SearchPeople from './pages/admin/search-people';
 import CheckInPage from './pages/guest/check-in-page';
 
 const App: React.FC = () => {
@@ -114,6 +114,7 @@ const App: React.FC = () => {
         <Route path="all-charts" element={<AllCharts />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
+        <Route path="search-people" element={<SearchPeople />} />
         <Route path='tutorials' element={<Tutorials />} />
         <Route path="send-invitations" element={<SendInvitations />} />
         <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
@@ -129,7 +130,6 @@ const App: React.FC = () => {
         <Route path="all-events">
           <Route path="view/:slug" element={<ViewEvent />} />
           <Route path="attendees/:slug" element={<Attendees />} />
-          <Route path="search-people/:slug" element={<SearchPeople />} />
           <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
           <Route path="edit-attendee/:slug/:uuid" element={<EditAttendee />} />
