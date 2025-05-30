@@ -140,7 +140,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     />
                     <div className='h-1/2 bottom-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
                         <div className='w-full h-full flex justify-between items-end p-2'>
-                            <span className='rounded-full border text-white text-xs h-[15px] w-20 grid place-content-center'>
+                            <span className='rounded-full px-2 w-fit border text-white text-xs h-[15px] grid place-content-center'>
                                 {formatDate(date)}
                             </span>
                             {isLive && (
