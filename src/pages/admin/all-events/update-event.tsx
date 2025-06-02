@@ -670,19 +670,19 @@ const UpdateEvent: React.FC = () => {
                             style={{ fontSize: textConfig.size + 'px', color: textConfig.color }}
                             className='text-center w-11/12 text-xl leading-[1] font-semibold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>{formData.title}</h3>}
                         <img
-                            src={
+                        src={
                                 showTemplates
                                     ? selectedTemplate || UserAvatar
                                     : formData.image instanceof File
-                                        ? URL.createObjectURL(formData.image)
-                                        : typeof formData.image === 'string' && formData.image
+                                ? URL.createObjectURL(formData.image)
+                                : typeof formData.image === 'string' && formData.image
                                             ? formData.image.startsWith('http') || formData.image.startsWith('data:')
                                                 ? formData.image
                                                 : formData.image.startsWith('/src/assets/')
                                                     ? formData.image
                                                     : `${domain}/${formData.image}`
-                                            : UserAvatar
-                            }
+                                    : UserAvatar
+                        }
                             alt="Event banner"
                             className='h-full w-full object-cover bg-brand-light-gray rounded-[10px]'
                         />
@@ -691,7 +691,7 @@ const UpdateEvent: React.FC = () => {
 
                 {/* Template Images Section */}
                 {showTemplates && (
-                    <div className='flex justify-between mt-5'>
+                <div className='flex justify-between mt-5'>
                         {templates.map((template, index) => (
                             <img
                                 onClick={() => handleTemplateSelect(template)}
@@ -702,15 +702,15 @@ const UpdateEvent: React.FC = () => {
                                 height={100}
                                 className={`bg-brand-light-gray size-24 object-cover rounded-[10px] cursor-pointer hover:border-2 hover:border-brand-primary transition-all ${selectedTemplate === template ? 'border-2 border-brand-primary' : ''}`}
                             />
-                        ))}
-                    </div>
+                    ))}
+                </div>
                 )}
 
                 {/* Text Size and Color for Templates */}
                 {showTemplates && (
-                    <div className='flex justify-between items-center mt-[26px] gap-9'>
-                        <div className='flex gap-[18px] items-center flex-1'>
-                            <Label className='font-semibold text-nowrap'>Text Size: </Label>
+                <div className='flex justify-between items-center mt-[26px] gap-9'>
+                    <div className='flex gap-[18px] items-center flex-1'>
+                        <Label className='font-semibold text-nowrap'>Text Size: </Label>
                             <Slider
                                 defaultValue={[textConfig.size]}
                                 value={[textConfig.size]}
@@ -720,9 +720,9 @@ const UpdateEvent: React.FC = () => {
                                 max={48}
                                 step={1}
                             />
-                        </div>
-                        <div className='w-fit flex gap-[18px]'>
-                            <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
+                    </div>
+                    <div className='w-fit flex gap-[18px]'>
+                        <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
                             <Input type='color' value={textConfig.color} onChange={(e) => setTextConfig(prev => ({ ...prev, color: e.target.value }))} className='w-[75px] h-6 p-0 outline-0 border-0' />
                         </div>
                     </div>

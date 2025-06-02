@@ -1,6 +1,7 @@
 import useAuthStore from '@/store/authStore';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import * as htmlToImage from 'html-to-image';
 
 import {
     Dialog,
@@ -28,14 +29,12 @@ import { Button } from '@/components/ui/button';
 import { CircleCheck, CircleX } from 'lucide-react';
 import axios from 'axios';
 import { domain, googleMapsApiKey, UserAvatar } from '@/constants';
-import * as htmlToImage from 'html-to-image';
 import { Autocomplete, useLoadScript } from '@react-google-maps/api';
 import Template1 from '@/assets/templates/template_1.jpg';
 import Template2 from '@/assets/templates/template_2.jpg';
 import Template3 from '@/assets/templates/template_3.jpg';
 import Template4 from '@/assets/templates/template_4.jpg';
 import Template5 from '@/assets/templates/template_5.jpg';
-import { useRef } from 'react';
 import { AddEventType } from '@/types';
 import { beautifyDate, getRandomOTP } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
@@ -131,13 +130,22 @@ const AddFirstEvent: React.FC = () => {
             if (place && place.address_components) {
                 const addressComponents = place.address_components as google.maps.GeocoderAddressComponent[];
 
+                // Find pincode from address components
+                let pincode = '000000';
+                for (const component of addressComponents) {
+                    if (component.types.includes('postal_code')) {
+                        pincode = component.long_name;
+                        break;
+                    }
+                }
+
                 setFormData(prevState => ({
                     ...prevState,
                     event_venue_name: place.name as string,
                     event_venue_address_1: place.formatted_address as string,
                     event_venue_address_2: place.vicinity as string,
                     google_map_link: place.url as string,
-                    pincode: addressComponents[addressComponents.length - 1]?.long_name as string,
+                    pincode: pincode,
                     country: addressComponents[addressComponents.length - 2]?.long_name as string,
                     state: addressComponents[addressComponents.length - 3]?.long_name as string,
                     city: addressComponents[addressComponents.length - 4]?.long_name as string,
@@ -157,7 +165,7 @@ const AddFirstEvent: React.FC = () => {
         const { name, value } = e.target;
         setFormData(prevState => ({
             ...prevState,
-            [name]: value
+            [name]: name === 'printer_count' ? (value === '' ? 0 : Number(value)) : value
         }));
     };
 
@@ -165,14 +173,13 @@ const AddFirstEvent: React.FC = () => {
         setFormData(prevState => ({
             ...prevState,
             [name]: checked ? 1 : 0,
-            event_fee: checked ? prevState.event_fee : "0"
+            event_fee: checked ? "1" : "0"
         }));
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         if (file) {
-            // Set the image source to 'upload'
             setImageSource('upload');
             setSelectedTemplate(null);
             setFormData(prevState => ({
@@ -195,27 +202,20 @@ const AddFirstEvent: React.FC = () => {
         }));
     };
 
-    // Also modify handleTemplateSelect to improve template handling
     const handleTemplateSelect = (template: string) => {
-        // Set the image source to 'template'
         setImageSource('template');
         setSelectedTemplate(template);
-
-        // When a template is selected, set the image in formData to the template string
-        // (it will be converted to a File during submission)
         setFormData(prevState => ({
             ...prevState,
             image: template
         }));
     };
 
-    // Toggle template display and reset selections
     const toggleTemplates = () => {
         const newShowTemplates = !showTemplates;
         setShowTemplates(newShowTemplates);
 
         if (newShowTemplates) {
-            // If showing templates, clear any uploaded image
             if (imageSource === 'upload') {
                 setFormData(prevState => ({
                     ...prevState,
@@ -224,7 +224,6 @@ const AddFirstEvent: React.FC = () => {
                 setImageSource(null);
             }
         } else {
-            // If hiding templates, clear any selected template
             if (imageSource === 'template') {
                 setFormData(prevState => ({
                     ...prevState,
@@ -236,9 +235,7 @@ const AddFirstEvent: React.FC = () => {
         }
     };
 
-    // Validation function
     const validateForm = useCallback((data: AddEventType) => {
-        // Define required fields based on UI asterisks
         const requiredFields: (keyof AddEventType)[] = [
             'title',
             'description',
@@ -252,10 +249,8 @@ const AddFirstEvent: React.FC = () => {
             'end_minute_time',
             'end_time_type',
             'google_map_link',
-            'printer_count'
         ];
 
-        // Check required fields
         const missingFields = requiredFields.filter(field => {
             if (field === 'image') {
                 return !data[field];
@@ -264,6 +259,7 @@ const AddFirstEvent: React.FC = () => {
         });
 
         if (missingFields.length > 0) {
+            console.log(missingFields);
             toast("Please fill in all required fields marked with *", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
@@ -271,7 +267,6 @@ const AddFirstEvent: React.FC = () => {
             return false;
         }
 
-        // Validate dates
         if (data.event_start_date && data.event_date) {
             const startDate = new Date(data.event_start_date);
             const endDate = new Date(data.event_date);
@@ -285,7 +280,6 @@ const AddFirstEvent: React.FC = () => {
             }
         }
 
-        // Validate printer count
         if (isNaN(Number(data.printer_count)) || Number(data.printer_count) < 0) {
             toast("Printer count must be a valid number", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -294,7 +288,6 @@ const AddFirstEvent: React.FC = () => {
             return false;
         }
 
-        // If paid event, validate event fee
         if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) <= 0)) {
             toast("Please enter a valid event fee", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -307,7 +300,6 @@ const AddFirstEvent: React.FC = () => {
     }, []);
 
     const handleSubmit = async () => {
-        // Step 1: Run validation first on current formData
         if (!validateForm(formData)) {
             return;
         }
@@ -317,16 +309,42 @@ const AddFirstEvent: React.FC = () => {
         try {
             let updatedFormData = { ...formData };
 
-            // Step 2: If using a template, generate image and attach it
             if (imageSource === 'template' && selectedTemplate && imageRef.current) {
                 try {
-                    const dataUrl = await htmlToImage.toPng(imageRef.current);
-                    const response = await fetch(dataUrl);
-                    const blob = await response.blob();
-                    const file = new File([blob], 'template.png', { type: 'image/png' });
+                    // Clone the node to avoid modifying the original
+                    const clonedNode = imageRef.current.cloneNode(true) as HTMLElement;
 
-                    updatedFormData.image = file; // Update form data with generated image
-                    setFormData(updatedFormData);
+                    // Create a temporary container
+                    const container = document.createElement('div');
+                    container.style.position = 'absolute';
+                    container.style.left = '-9999px';
+                    container.style.top = '-9999px';
+                    container.appendChild(clonedNode);
+                    document.body.appendChild(container);
+
+                    try {
+                        // Generate the image from the cloned content
+                        const dataUrl = await htmlToImage.toPng(clonedNode, {
+                            quality: 1.0,
+                            pixelRatio: 2,
+                            backgroundColor: 'white',
+                            skipFonts: true,
+                            filter: (node) => {
+                                return !node.classList?.contains('google-map') &&
+                                    !node.classList?.contains('map-container');
+                            }
+                        });
+
+                        // Convert the Data URL to a Blob and create a File
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'template.png', { type: 'image/png' });
+
+                        updatedFormData.image = file;
+                    } finally {
+                        // Clean up the temporary container
+                        document.body.removeChild(container);
+                    }
                 } catch (error) {
                     console.error('Error processing template:', error);
                     toast("Error creating image from template", {
@@ -338,9 +356,6 @@ const AddFirstEvent: React.FC = () => {
                 }
             }
 
-            // Step 3: Submit form data and log
-            console.log("The data that will be submitted is: ", updatedFormData);
-
             if (token) {
                 const response = await useEventStore.getState().addEvent(updatedFormData);
                 if (response.status === 200) {
@@ -348,51 +363,20 @@ const AddFirstEvent: React.FC = () => {
                         className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                         icon: <CircleCheck className='size-5' />
                     });
-                    setIsLoading(false);
+                    navigate("/dashboard");
                 }
             } else {
                 setOpen(true);
             }
+        } catch (error) {
+            toast(error instanceof Error ? error.message : "Something went wrong", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
         } finally {
-            // Ensure loading is reset regardless of outcome
             setIsLoading(false);
-            setFormData({
-                title: "",
-                image: null,
-                description: "",
-                event_start_date: "",
-                event_date: "",
-                google_map_link: "",
-                start_time: "",
-                start_minute_time: "",
-                start_time_type: "",
-                end_time: "",
-                end_minute_time: "",
-                end_time_type: "",
-                status: 1,
-                feedback: 1,
-                event_otp: getRandomOTP(),
-                view_agenda_by: 0,
-                event_fee: "0",
-                paid_event: 0,
-                printer_count: 0,
-                pincode: '',
-                state: '',
-                city: '',
-                country: '',
-                event_venue_name: '',
-                event_venue_address_1: '',
-                event_venue_address_2: '',
-            });
-            setImageSource(null);
-            setSelectedTemplate(null);
-            setCoords({
-                lat: 0,
-                lng: 0
-            });
         }
     };
-
 
     useEffect(() => {
         getAllCompanies();
@@ -406,7 +390,6 @@ const AddFirstEvent: React.FC = () => {
         }));
     };
 
-    // Handle company selection change 
     const handleCompanyChange = (value: string) => {
         const companyId = parseInt(value);
         setUserAccount(prevState => ({
@@ -415,10 +398,18 @@ const AddFirstEvent: React.FC = () => {
         }));
     };
 
-    // Handle Account Creation
-    const handleCreateAccount = async () => {
-        const { first_name, last_name, email, mobile_number, password, confirm_password, company, tnc, notifications } = userAccount;
+    // Fixed: Added dedicated handler for custom company name input
+    const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUserAccount(prevState => ({
+            ...prevState,
+            company_name: e.target.value
+        }));
+    };
 
+    const handleCreateAccount = async () => {
+        const { first_name, last_name, email, mobile_number, password, confirm_password, company_name, tnc, notifications, company } = userAccount;
+
+        // Fixed: Updated validation logic for company name
         if (!first_name) {
             toast("Please enter your first name", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -467,8 +458,17 @@ const AddFirstEvent: React.FC = () => {
             return;
         }
 
-        if (!company) {
+        // Fixed: Updated company validation logic
+        if (company === 0) {
             toast("Please select your company", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        if (company === 439 && !company_name) {
+            toast("Please enter your company name", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
@@ -490,6 +490,7 @@ const AddFirstEvent: React.FC = () => {
             });
             return;
         }
+
         try {
             setIsLoading(true);
             const res = await axios.post(`${domain}/api/register`, userAccount, {
@@ -504,30 +505,24 @@ const AddFirstEvent: React.FC = () => {
                     step: "2"
                 }));
             }
-
-            if (res.data.status === 422) {
-                const errors = [];
-                if (res.data.error.email) {
-                    errors.push(res.data.error.email[0]);
-                }
-                if (res.data.error.mobile_number) {
-                    errors.push(res.data.error.mobile_number[0]);
-                }
+            else if (res.data.status === 422) {
+                toast("Email or Phone No. already exists", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            } else {
+                toast(res.data.message || "Something went wrong", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
             }
-            if (res.data.status === 400) {
-                const errors = [];
-                if (res.data.error.email) {
-                    errors.push(res.data.error.email[0]);
-                }
-                if (res.data.error.mobile_number) {
-                    errors.push(res.data.error.mobile_number[0]);
-                }
-            }
-        } catch (error) {
-            toast(error instanceof Error ? error.message : "Something went wrong", {
+        } catch (error: any) {
+            toast(error.data.message || "Something went wrong", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
-            })
+            });
+
+
         } finally {
             setIsLoading(false);
         }
@@ -545,8 +540,56 @@ const AddFirstEvent: React.FC = () => {
             if (res.data.status === 200) {
                 const loginResponse = await login(userAccount.email, userAccount.password);
                 if (loginResponse.status === 200) {
-                    // Event Will Create
-                    const response = await useEventStore.getState().addEvent(formData, loginResponse.access_token);
+                    let updatedFormData = { ...formData };
+
+                    if (imageSource === 'template' && selectedTemplate && imageRef.current) {
+                        try {
+                            // Clone the node to avoid modifying the original
+                            const clonedNode = imageRef.current.cloneNode(true) as HTMLElement;
+
+                            // Create a temporary container
+                            const container = document.createElement('div');
+                            container.style.position = 'absolute';
+                            container.style.left = '-9999px';
+                            container.style.top = '-9999px';
+                            container.appendChild(clonedNode);
+                            document.body.appendChild(container);
+
+                            try {
+                                // Generate the image from the cloned content
+                                const dataUrl = await htmlToImage.toPng(clonedNode, {
+                                    quality: 1.0,
+                                    pixelRatio: 2,
+                                    backgroundColor: 'white',
+                                    skipFonts: true,
+                                    filter: (node) => {
+                                        return !node.classList?.contains('google-map') &&
+                                            !node.classList?.contains('map-container');
+                                    }
+                                });
+
+                                // Convert the Data URL to a Blob and create a File
+                                const response = await fetch(dataUrl);
+                                const blob = await response.blob();
+                                const file = new File([blob], 'template.png', { type: 'image/png' });
+
+                                updatedFormData.image = file;
+                            } finally {
+                                // Clean up the temporary container
+                                document.body.removeChild(container);
+                            }
+                        } catch (error) {
+                            console.error('Error processing template:', error);
+                            toast("Error creating image from template", {
+                                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                                icon: <CircleX className='size-5' />
+                            });
+                            setIsLoading(false);
+                            return;
+                        }
+                    }
+
+                    const response = await useEventStore.getState().addEvent(updatedFormData, loginResponse.access_token);
                     if (response.status === 200) {
                         toast("Event added successfully", {
                             className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -560,7 +603,7 @@ const AddFirstEvent: React.FC = () => {
             toast(error instanceof Error ? error.message : "Something went wrong", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
-            })
+            });
         } finally {
             setIsLoading(false);
         }
@@ -573,14 +616,11 @@ const AddFirstEvent: React.FC = () => {
     return (
         <div className='min-h-full min-w-full'>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger>Open</DialogTrigger>
                 <DialogContent className='bg-brand-light'>
                     <DialogHeader>
                         <DialogTitle className='text-center text-2xl'>Create Account</DialogTitle>
 
-                        {/* Sign Up Form */}
                         {userAccount.step == "1" && <div>
-                            {/* First Name & Last Name */}
                             <div className='flex gap-5 justify-between'>
                                 <div className='flex mt-5 gap-2 flex-col w-full'>
                                     <Label className='font-semibold'>First Name</Label>
@@ -607,7 +647,6 @@ const AddFirstEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Email & Mobile Number */}
                             <div className='flex gap-5 justify-between mt-5'>
                                 <div className='flex gap-2 flex-col w-full'>
                                     <Label className='font-semibold'>Email</Label>
@@ -634,9 +673,7 @@ const AddFirstEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Company and Company Name */}
                             <div className='flex gap-5 justify-between mt-5'>
-                                {/* Company Name */}
                                 <div className='flex gap-2 flex-col w-full'>
                                     <Label className='font-semibold'>Company Name</Label>
                                     <Select onValueChange={handleCompanyChange}>
@@ -658,9 +695,10 @@ const AddFirstEvent: React.FC = () => {
 
                                     {userAccount.company === 439 && (
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end mt-2'>
+                                            {/* Fixed: Use dedicated handler for custom company name */}
                                             <Input
                                                 value={userAccount.company_name}
-                                                onChange={handleInputChange}
+                                                onChange={handleCompanyNameChange}
                                                 name='company_name'
                                                 type='text'
                                                 placeholder="Enter custom company name"
@@ -671,7 +709,6 @@ const AddFirstEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Password & Confirm Password */}
                             <div className='flex gap-5 justify-between mt-5'>
                                 <div className='flex gap-2 flex-col w-full'>
                                     <Label className='font-semibold'>Password</Label>
@@ -700,7 +737,6 @@ const AddFirstEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Terms and Conditions */}
                             <div className='mt-5 space-y-5'>
                                 <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setUserAccount(prevState => ({
                                     ...prevState,
@@ -734,7 +770,6 @@ const AddFirstEvent: React.FC = () => {
                         </div>}
 
                         {userAccount.step == "2" && <div>
-                            {/* Email and Mobile OTP */}
                             <div className='flex gap-5 justify-between'>
                                 <div className='flex mt-5 gap-2 flex-col w-full'>
                                     <Label className='font-semibold'>Email OTP</Label>
@@ -767,11 +802,8 @@ const AddFirstEvent: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Adding Event Form */}
             <div className=''>
-
                 <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background'>
-                    {/* Event Name */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='title'>
                             Event Name <span className="text-brand-secondary">*</span>
@@ -786,10 +818,8 @@ const AddFirstEvent: React.FC = () => {
                         />
                     </div>
 
-                    {/* Event Type, Image, and Choose Banner Image Button */}
                     <div className='flex gap-7 mt-5 items-center'>
                         <div className='flex flex-col w-full gap-5'>
-                            {/* Event Type */}
                             <div className="flex flex-col gap-2 w-full">
                                 <Label className="font-semibold" htmlFor='paid_event'>
                                     Event Type <span className="text-brand-secondary">*</span>
@@ -824,7 +854,6 @@ const AddFirstEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Banner Image - Disabled when templates are showing */}
                             <div className="flex flex-col gap-2">
                                 <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
                                 <div className={`input relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
@@ -853,7 +882,6 @@ const AddFirstEvent: React.FC = () => {
 
                             <p className='font-semibold text-center -my-4'>Or</p>
 
-                            {/* Toggle Template Button */}
                             <button
                                 onClick={toggleTemplates}
                                 type="button"
@@ -863,7 +891,6 @@ const AddFirstEvent: React.FC = () => {
                             </button>
                         </div>
 
-                        {/* Image Preview */}
                         <div ref={imageRef} className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
                             {formData.event_start_date && showTemplates && <p
                                 style={{ color: textConfig.color }}
@@ -886,7 +913,6 @@ const AddFirstEvent: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Template Images Section */}
                     {showTemplates && (
                         <div className='flex justify-between mt-5'>
                             {templates.map((template, index) => (
@@ -903,7 +929,6 @@ const AddFirstEvent: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Text Size and Color for Templates */}
                     {showTemplates && (
                         <div className='flex justify-between items-center mt-[26px] gap-9'>
                             <div className='flex gap-[18px] items-center flex-1'>
@@ -925,7 +950,6 @@ const AddFirstEvent: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Description Box */}
                     <div className='flex flex-col gap-2 mt-5'>
                         <Label className="font-semibold" htmlFor='description'>
                             Description <span className="text-brand-secondary">*</span>
@@ -939,16 +963,13 @@ const AddFirstEvent: React.FC = () => {
                         />
                     </div>
 
-                    {/* Start Time & End Time */}
                     <div className='flex gap-5 w-full mt-5'>
-                        {/* Start Time */}
                         <div className='flex flex-col gap-2 w-full'>
                             <Label className='font-semibold'>
                                 Start Time <span className="text-brand-secondary">*</span>
                             </Label>
 
                             <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                                {/* For Date */}
                                 <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                     <Input
                                         type='date'
@@ -962,7 +983,6 @@ const AddFirstEvent: React.FC = () => {
                                     </p>
                                 </div>
 
-                                {/* For Time */}
                                 <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
                                     <Input
                                         type='time'
@@ -985,14 +1005,12 @@ const AddFirstEvent: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* End Time */}
                         <div className='flex flex-col gap-2 w-full'>
                             <Label className='font-semibold'>
                                 End Time <span className="text-brand-secondary">*</span>
                             </Label>
 
                             <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                                {/* For Date */}
                                 <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                     <Input
                                         type='date'
@@ -1006,7 +1024,6 @@ const AddFirstEvent: React.FC = () => {
                                     </p>
                                 </div>
 
-                                {/* For Time */}
                                 <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
                                     <Input
                                         type='time'
@@ -1030,7 +1047,6 @@ const AddFirstEvent: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Location */}
                     <div className='flex flex-col gap-2 mt-5'>
                         <Label className='font-semibold' htmlFor='google_map_link'>
                             Location <span className="text-brand-secondary">*</span>
@@ -1062,32 +1078,29 @@ const AddFirstEvent: React.FC = () => {
                                     className='input !h-12 min-w-full text-base'
                                 />
                             )}
-
                         </div>
 
                         <div className='w-full h-60'>
                             <GoogleMap isLoaded={isLoaded} latitude={coords.lat} longitude={coords.lng} />
                         </div>
-
                     </div>
 
-                    {/* Printers Count */}
                     <div className='flex items-center justify-between gap-5 mt-5'>
                         <div className="flex flex-col gap-2 w-full">
                             <Label className="font-semibold" htmlFor='printer_count'>
-                                No. of Printers <span className="text-brand-secondary">*</span>
+                                No. of Printers
                             </Label>
                             <Input
                                 id="printer_count"
                                 name='printer_count'
                                 type="number"
-                                value={formData.printer_count ? formData.printer_count : ''}
+                                min="0"
+                                value={formData.printer_count || 0}
                                 onChange={handleInputChangeEventForm}
                                 className='input !h-12 min-w-full text-base'
                             />
                         </div>
 
-                        {/* View Agenda By */}
                         <div className="flex flex-col gap-2 w-full">
                             <Label className="font-semibold" htmlFor='view_agenda_by'>
                                 View Agenda By <span className="text-brand-secondary">*</span>
