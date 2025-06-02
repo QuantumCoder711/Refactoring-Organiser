@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -21,6 +21,7 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import Wave from '@/components/Wave';
 import GoBack from '@/components/GoBack';
 import { useParams, useNavigate } from 'react-router-dom';
+import * as htmlToImage from 'html-to-image';
 
 const UpdateEvent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -72,6 +73,20 @@ const UpdateEvent: React.FC = () => {
         event_venue_address_2: '',
     });
 
+    const [showTemplates, setShowTemplates] = useState<boolean>(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+    const [imageSource, setImageSource] = useState<'upload' | 'template' | null>(null);
+    const imageRef = useRef<HTMLDivElement | null>(null);
+    const [textConfig, setTextConfig] = useState<{
+        size: number;
+        color: string;
+    }>({
+        size: 16,
+        color: '#000'
+    });
+
+    const [originalImage, setOriginalImage] = useState<string | null>(null);
+
     // Load event data when component mounts
     useEffect(() => {
         // Fetch event data if not already available
@@ -115,6 +130,14 @@ const UpdateEvent: React.FC = () => {
     useEffect(() => {
         if (event) {
             console.log("Event data loaded:", event);
+
+            // Check if the image is a template by comparing with the template paths
+            const isTemplate = templates.some(template => event.image === template);
+            if (isTemplate) {
+                setImageSource('template');
+                setSelectedTemplate(event.image);
+                setShowTemplates(true);
+            }
 
             setFormData({
                 title: event.title || "",
@@ -220,14 +243,77 @@ const UpdateEvent: React.FC = () => {
         setFormData(prevState => ({
             ...prevState,
             [name]: checked ? 1 : 0,
-            event_fee: checked ? prevState.event_fee : "0"
+            event_fee: checked ? "1" : "0"
         }));
+    };
+
+    const handleTemplateSelect = (template: string) => {
+        // Set the image source to 'template'
+        setImageSource('template');
+        setSelectedTemplate(template);
+
+        // When a template is selected, set the image in formData to the template string
+        setFormData(prevState => ({
+            ...prevState,
+            image: template // This will be the direct import path from assets
+        }));
+
+        // Show templates if not already shown
+        if (!showTemplates) {
+            setShowTemplates(true);
+        }
+    };
+
+    // Toggle template display and reset selections
+    const toggleTemplates = () => {
+        const newShowTemplates = !showTemplates;
+        setShowTemplates(newShowTemplates);
+
+        if (newShowTemplates) {
+            // If showing templates, store the current image and clear it
+            if (imageSource === 'upload') {
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: null
+                }));
+                setImageSource(null);
+            } else if (!imageSource && formData.image) {
+                // Store the current image temporarily if it's from backend
+                setOriginalImage(formData.image as string);
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: null
+                }));
+            }
+        } else {
+            // If hiding templates, restore the original image if it exists
+            if (imageSource === 'template') {
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: null
+                }));
+                setSelectedTemplate(null);
+                setImageSource(null);
+            }
+            // Restore the original image if it was stored
+            if (originalImage) {
+                setFormData(prevState => ({
+                    ...prevState,
+                    image: originalImage
+                }));
+                setOriginalImage(null);
+            }
+        }
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
 
         if (file) {
+            // Set the image source to 'upload'
+            setImageSource('upload');
+            setSelectedTemplate(null);
+
             // Check file size before compression
             const fileSizeMB = file.size / 1024 / 1024;
             if (fileSizeMB > 10) {
@@ -246,10 +332,6 @@ const UpdateEvent: React.FC = () => {
 
                 // Compress the image to reduce size
                 const compressedFile = await compressImage(file, 0.8);
-
-                // Log sizes for debugging
-                console.log("Original size:", (file.size / 1024 / 1024).toFixed(2) + "MB");
-                console.log("Compressed size:", (compressedFile.size / 1024 / 1024).toFixed(2) + "MB");
 
                 setFormData(prevState => ({
                     ...prevState,
@@ -304,7 +386,6 @@ const UpdateEvent: React.FC = () => {
             'end_minute_time',
             'end_time_type',
             'google_map_link',
-            'printer_count'
         ];
 
         // Check required fields
@@ -337,18 +418,18 @@ const UpdateEvent: React.FC = () => {
             }
         }
 
-        // Validate printer count
-        if (isNaN(Number(data.printer_count)) || Number(data.printer_count) < 0) {
-            toast("Printer count must be a valid number", {
+        // Validate printer count - must not be negative
+        if (data.printer_count !== null && data.printer_count < 0) {
+            toast("Printer count cannot be negative", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
             return false;
         }
 
-        // If paid event, validate event fee
-        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) <= 0)) {
-            toast("Please enter a valid event fee", {
+        // If paid event, validate event fee - must be at least 1
+        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) < 1)) {
+            toast("Paid events must have a fee of at least 1", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
@@ -374,29 +455,59 @@ const UpdateEvent: React.FC = () => {
 
         setSubmitLoading(true);
         try {
-            // Use the event's UUID for the API call
             const eventUuid = event.uuid;
+            let dataToSubmit = { ...formData };
 
-            // Make sure event_end_date is set if not already
-            if (!formData.event_end_date && formData.event_date) {
-                setFormData(prev => ({
-                    ...prev,
-                    event_end_date: formData.event_date
-                }));
+            // Handle template image if selected
+            if (imageSource === 'template' && selectedTemplate && imageRef.current) {
+                try {
+                    const clonedNode = imageRef.current.cloneNode(true) as HTMLElement;
+                    const container = document.createElement('div');
+                    container.style.position = 'absolute';
+                    container.style.left = '-9999px';
+                    container.style.top = '-9999px';
+                    container.appendChild(clonedNode);
+                    document.body.appendChild(container);
+
+                    try {
+                        const dataUrl = await htmlToImage.toPng(clonedNode, {
+                            quality: 1.0,
+                            pixelRatio: 2,
+                            backgroundColor: 'white',
+                            skipFonts: true,
+                            filter: (node) => {
+                                return !node.classList?.contains('google-map') && 
+                                       !node.classList?.contains('map-container');
+                            }
+                        });
+
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'template.png', { type: 'image/png' });
+                        dataToSubmit.image = file;
+                    } finally {
+                        document.body.removeChild(container);
+                    }
+                } catch (error) {
+                    console.error('Error processing template:', error);
+                    toast("Error creating image from template. Please try again.", {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                    setSubmitLoading(false);
+                    return;
+                }
             }
 
-            // Log the data being sent to help debug
-            console.log("Updating event with UUID:", eventUuid);
-            console.log("Form data:", formData);
-
-            const response = await useEventStore.getState().updateEvent(eventUuid, formData);
+            const response = await useEventStore.getState().updateEvent(eventUuid, dataToSubmit);
             if (response.status === 200) {
+                // The event store will automatically update the event in the store
+                // with the response data from the API
                 toast(response.message || "Event updated successfully", {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
-                // Navigate back to events list after successful update
-                navigate('/admin/all-events');
+                navigate('/dashboard');
             } else {
                 toast(response.message || "Failed to update event", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -405,17 +516,12 @@ const UpdateEvent: React.FC = () => {
             }
         } catch (error: any) {
             console.error("Error updating event:", error);
-
-            // Handle specific error codes
             if (error.response && error.response.status === 413) {
                 toast("File size is too large. Please use a smaller image (less than 2MB).", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
                 });
-            }
-            // Handle validation errors
-            else if (error.response && error.response.status === 422 && error.response.data.errors) {
-                // Display each validation error
+            } else if (error.response && error.response.status === 422 && error.response.data.errors) {
                 Object.entries(error.response.data.errors).forEach(([field, messages]: [string, any]) => {
                     const errorMessages = Array.isArray(messages) ? messages.join(', ') : String(messages);
                     toast(`${field}: ${errorMessages}`, {
@@ -424,7 +530,6 @@ const UpdateEvent: React.FC = () => {
                     });
                 });
             } else {
-                // Display general error message
                 const errorMessage = error.message || "An error occurred while updating the event";
                 toast(errorMessage, {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -515,10 +620,10 @@ const UpdateEvent: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Banner Image */}
+                        {/* Banner Image - Disabled when templates are showing */}
                         <div className="flex flex-col gap-2">
                             <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
-                            <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                            <div className={`input relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                     {formData.image
@@ -536,6 +641,7 @@ const UpdateEvent: React.FC = () => {
                                     type='file'
                                     accept="image/*"
                                     onChange={handleFileChange}
+                                    disabled={showTemplates}
                                     className='input absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
                                 />
                             </div>
@@ -543,41 +649,84 @@ const UpdateEvent: React.FC = () => {
 
                         <p className='font-semibold text-center -my-4'>Or</p>
 
-                        {/* Choose Banner Image Button */}
-                        <button className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'>Create Event Banner</button>
+                        {/* Toggle Template Button */}
+                        <button
+                            onClick={toggleTemplates}
+                            type="button"
+                            className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'
+                        >
+                            {showTemplates ? 'Hide Templates' : 'Create Event Banner'}
+                        </button>
                     </div>
 
-                    <img
-                        height={237}
-                        width={237}
-                        src={
-                            formData.image instanceof File
-                                ? URL.createObjectURL(formData.image)
-                                : typeof formData.image === 'string' && formData.image
-                                    ? `${domain}/${formData.image}`
-                                    : UserAvatar
-                        }
-                        className='max-h-[237px] min-w-[237px] object-cover bg-brand-light-gray rounded-[10px]' />
-                </div>
+                    {/* Image Preview */}
+                    <div ref={imageRef} className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
+                        {formData.event_start_date && showTemplates && <p
+                            style={{ color: textConfig.color }}
+                            className='absolute top-0 w-11/12 bg-white/10 backdrop-blur-3xl mx-auto right-0 left-0 text-center p-1 rounded-b-full'>{beautifyDate(new Date(formData.event_start_date))}
+                        </p>}
 
-                {/* Templates Images */}
-                <div className='flex justify-between mt-5'>
-                    {templates.map((image, index) => (
-                        <img key={index} src={image} alt="template" width={100} height={100} className='bg-brand-light-gray rounded-[10px] cursor-pointer' />
-                    ))}
-                </div>
-
-                {/* Text Size and Color */}
-                <div className='flex justify-between items-center mt-[26px] gap-9'>
-                    <div className='flex gap-[18px] items-center flex-1'>
-                        <Label className='font-semibold text-nowrap'>Text Size: </Label>
-                        <Slider defaultValue={[33]} className='cursor-pointer' max={100} step={1} />
-                    </div>
-                    <div className='w-fit flex gap-[18px]'>
-                        <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
-                        <Input type='color' className='w-[75px] h-6 p-0 outline-0 border-0' />
+                        {showTemplates && <h3
+                            style={{ fontSize: textConfig.size + 'px', color: textConfig.color }}
+                            className='text-center w-11/12 text-xl leading-[1] font-semibold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>{formData.title}</h3>}
+                        <img
+                            src={
+                                showTemplates
+                                    ? selectedTemplate || UserAvatar
+                                    : formData.image instanceof File
+                                        ? URL.createObjectURL(formData.image)
+                                        : typeof formData.image === 'string' && formData.image
+                                            ? formData.image.startsWith('http') || formData.image.startsWith('data:')
+                                                ? formData.image
+                                                : formData.image.startsWith('/src/assets/')
+                                                    ? formData.image
+                                                    : `${domain}/${formData.image}`
+                                            : UserAvatar
+                            }
+                            alt="Event banner"
+                            className='h-full w-full object-cover bg-brand-light-gray rounded-[10px]'
+                        />
                     </div>
                 </div>
+
+                {/* Template Images Section */}
+                {showTemplates && (
+                    <div className='flex justify-between mt-5'>
+                        {templates.map((template, index) => (
+                            <img
+                                onClick={() => handleTemplateSelect(template)}
+                                key={index}
+                                src={template}
+                                alt={`template ${index + 1}`}
+                                width={100}
+                                height={100}
+                                className={`bg-brand-light-gray size-24 object-cover rounded-[10px] cursor-pointer hover:border-2 hover:border-brand-primary transition-all ${selectedTemplate === template ? 'border-2 border-brand-primary' : ''}`}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Text Size and Color for Templates */}
+                {showTemplates && (
+                    <div className='flex justify-between items-center mt-[26px] gap-9'>
+                        <div className='flex gap-[18px] items-center flex-1'>
+                            <Label className='font-semibold text-nowrap'>Text Size: </Label>
+                            <Slider
+                                defaultValue={[textConfig.size]}
+                                value={[textConfig.size]}
+                                onValueChange={(value) => setTextConfig(prev => ({ ...prev, size: value[0] }))}
+                                className='cursor-pointer'
+                                min={16}
+                                max={48}
+                                step={1}
+                            />
+                        </div>
+                        <div className='w-fit flex gap-[18px]'>
+                            <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
+                            <Input type='color' value={textConfig.color} onChange={(e) => setTextConfig(prev => ({ ...prev, color: e.target.value }))} className='w-[75px] h-6 p-0 outline-0 border-0' />
+                        </div>
+                    </div>
+                )}
 
                 {/* Description Box */}
                 <div className='flex flex-col gap-2 mt-5'>

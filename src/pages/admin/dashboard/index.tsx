@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import EventCard from '@/components/EventCard';
 import useEventStore from '@/store/eventStore';
@@ -8,9 +8,32 @@ import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  const { events } = useEventStore();
-  const { allEventsAttendees } = useAttendeeStore();
-  const { allEventsSponsors } = useSponsorStore();
+  const { events, getAllEvents } = useEventStore();
+  const { allEventsAttendees, getAllEventsAttendees } = useAttendeeStore();
+  const { allEventsSponsors, getAllEventsSponsors } = useSponsorStore();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get token from localStorage
+        const tokenData = localStorage.getItem("klout-organiser-storage");
+        const token = tokenData ? JSON.parse(tokenData).state.token : null;
+
+        if (token) {
+          // Fetch fresh data
+          await Promise.all([
+            getAllEvents(token),
+            getAllEventsAttendees(token),
+            getAllEventsSponsors(token)
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, [getAllEvents, getAllEventsAttendees, getAllEventsSponsors]);
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
   return (
@@ -34,7 +57,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* All Events */}
-      <div className='mt-8'>
+      <div className='mt-10 space-y-10'>
         {/* Upcoming Events */}
         <div>
           <div className='flex justify-between items-center'>
@@ -58,13 +81,12 @@ const Dashboard: React.FC = () => {
                   total_attendees={event.total_attendees || 0}
                 />
               </div>
-            ))
-            }
+            ))}
           </div>
         </div>
 
         {/* Past Events */}
-        <div className='mt-8'>
+        <div>
           <div className='flex justify-between items-center'>
             <h2 className='text-xl font-semibold'>Past Events</h2>
             <Link to='/all-events'><Button className='btn'>View All</Button></Link>
@@ -89,10 +111,9 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
         </div>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Dashboard;

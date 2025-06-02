@@ -187,6 +187,22 @@ const ViewEvent: React.FC = () => {
         }
     };
 
+    // Add a function to format the date and time
+    const formatEventDateTime = (event: any) => {
+        if (!event) return { dateRange: '', timeRange: '' };
+        
+        const startDate = new Date(event.event_start_date);
+        const endDate = new Date(event.event_date);
+        
+        // Format the date range
+        const dateRange = `${startDate.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })} - ${endDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+        
+        // Format the time range
+        const timeRange = `${event.start_time}:${event.start_minute_time} ${event.start_time_type} - ${event.end_time}:${event.end_minute_time} ${event.end_time_type}`;
+        
+        return { dateRange, timeRange };
+    };
+
     if (loading) {
         return <Wave />
     }
@@ -202,8 +218,12 @@ const ViewEvent: React.FC = () => {
                 
                 {/* Time */}
                 <div className='text-xs flex gap-2.5 mt-5 justify-center'>
-                    <span className='border border-brand-light-gray px-3 rounded-md'>Fri, 14 Jan-20 Feb, 2025</span>
-                    <span className='border border-brand-light-gray px-3 rounded-md'>09:00 AM - 05:00 PM</span>
+                    {event && (
+                        <>
+                            <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).dateRange}</span>
+                            <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).timeRange}</span>
+                        </>
+                    )}
                 </div>
 
                 <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
