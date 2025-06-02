@@ -85,6 +85,15 @@ const AddEvent: React.FC = () => {
 
             if (place && place.address_components) {
                 const addressComponents = place.address_components as google.maps.GeocoderAddressComponent[];
+                
+                // Find pincode from address components
+                let pincode = '000000';
+                for (const component of addressComponents) {
+                    if (component.types.includes('postal_code')) {
+                        pincode = component.long_name;
+                        break;
+                    }
+                }
 
                 setFormData(prevState => ({
                     ...prevState,
@@ -92,7 +101,7 @@ const AddEvent: React.FC = () => {
                     event_venue_address_1: place.formatted_address as string,
                     event_venue_address_2: place.vicinity as string,
                     google_map_link: place.url as string,
-                    pincode: addressComponents[addressComponents.length - 1]?.long_name as string,
+                    pincode: pincode,
                     country: addressComponents[addressComponents.length - 2]?.long_name as string,
                     state: addressComponents[addressComponents.length - 3]?.long_name as string,
                     city: addressComponents[addressComponents.length - 4]?.long_name as string,
@@ -120,7 +129,7 @@ const AddEvent: React.FC = () => {
         setFormData(prevState => ({
             ...prevState,
             [name]: checked ? 1 : 0,
-            event_fee: checked ? prevState.event_fee : "0"
+            event_fee: checked ? "1" : "0"
         }));
     };
 
@@ -207,7 +216,6 @@ const AddEvent: React.FC = () => {
             'end_minute_time',
             'end_time_type',
             'google_map_link',
-            'printer_count'
         ];
 
         // Check required fields
@@ -240,18 +248,18 @@ const AddEvent: React.FC = () => {
             }
         }
 
-        // Validate printer count
-        if (isNaN(Number(data.printer_count)) || Number(data.printer_count) < 0) {
-            toast("Printer count must be a valid number", {
+        // Validate printer count - must not be negative
+        if (data.printer_count !== null && data.printer_count < 0) {
+            toast("Printer count cannot be negative", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
             return false;
         }
 
-        // If paid event, validate event fee
-        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) <= 0)) {
-            toast("Please enter a valid event fee", {
+        // If paid event, validate event fee - must be at least 1
+        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) < 1)) {
+            toast("Paid events must have a fee of at least 1", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
@@ -268,28 +276,54 @@ const AddEvent: React.FC = () => {
             try {
                 setLoading(true);
 
-                // Generate the image from the HTML content
-                const dataUrl = await htmlToImage.toPng(imageRef.current);
+                // Clone the node to avoid modifying the original
+                const clonedNode = imageRef.current.cloneNode(true) as HTMLElement;
+                
+                // Create a temporary container
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '-9999px';
+                container.appendChild(clonedNode);
+                document.body.appendChild(container);
 
-                // Convert the Data URL to a Blob and create a File
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
-                const file = new File([blob], 'template.png', { type: 'image/png' });
+                try {
+                    // Generate the image from the cloned content
+                    const dataUrl = await htmlToImage.toPng(clonedNode, {
+                        quality: 1.0,
+                        pixelRatio: 2,
+                        backgroundColor: 'white',
+                        skipFonts: true, // Skip external fonts
+                        filter: (node) => {
+                            // Filter out problematic elements
+                            return !node.classList?.contains('google-map') && 
+                                   !node.classList?.contains('map-container');
+                        }
+                    });
 
-                // Update the form data with the new file
-                setFormData(prevData => ({
-                    ...prevData,
-                    image: file
-                }));
+                    // Convert the Data URL to a Blob and create a File
+                    const response = await fetch(dataUrl);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'template.png', { type: 'image/png' });
 
-                // Now continue with validation and submission
-                await submitFormData({
-                    ...formData,
-                    image: file
-                });
+                    // Update the form data with the new file
+                    setFormData(prevData => ({
+                        ...prevData,
+                        image: file
+                    }));
+
+                    // Now continue with validation and submission
+                    await submitFormData({
+                        ...formData,
+                        image: file
+                    });
+                } finally {
+                    // Clean up the temporary container
+                    document.body.removeChild(container);
+                }
             } catch (error) {
                 console.error('Error processing template:', error);
-                toast("Error creating image from template", {
+                toast("Error creating image from template. Please try again.", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
                 });
@@ -320,6 +354,9 @@ const AddEvent: React.FC = () => {
 
                 // Reset form on success
                 resetForm();
+                
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
             } else {
                 toast(response.message, {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
