@@ -58,10 +58,9 @@ const Features: React.FC = () => {
                 {features.map((feature, index) => (
                     <div
                         key={index}
-                        className={`bg-white overflow-clip rounded-md transition-all duration-300 ease-in-out p-5 h-[500px] relative
+                        className={`bg-white overflow-clip rounded-md transition-all duration-300 ease-in-out p-5 h-[500px] relative cursor-pointer
                             ${activeIndex === index ? 'max-w-[530px]' : 'max-w-[120px]'}`}
-                        onMouseEnter={() => setActiveIndex(index)}
-                        onMouseLeave={() => setActiveIndex(index)}
+                        onClick={() => setActiveIndex(index)}
                     >
                         <div className={`flex ${activeIndex === index ? 'flex-row items-center gap-4' : 'flex-col items-center'}`}>
                             {feature.icon}
