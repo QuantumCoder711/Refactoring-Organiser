@@ -273,5 +273,7 @@ export const compressImage = async (file: File, maxSizeMB: number = 1): Promise<
 
 export const getStartEndTime = (event: EventType | AgendaType | null): string => {
   if (!event) return '';
-  return `${event.start_time}:${event.start_minute_time} ${event.start_time_type} - ${event.end_time}:${event.end_minute_time} ${event.end_time_type}`;
+  const startMinute = event.start_minute_time || '00';
+  const endMinute = event.end_minute_time || '00';
+  return `${event.start_time}:${startMinute} ${event.start_time_type} - ${event.end_time}:${endMinute} ${event.end_time_type}`;
 }

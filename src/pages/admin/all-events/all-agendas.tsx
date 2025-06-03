@@ -77,16 +77,51 @@ const AllAgendas: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [agendasPerPage, setAgendasPerPage] = useState(10);
 
+    // Fetch agendas when component mounts or event/slug changes
     useEffect(() => {
         const fetchAgendas = async () => {
             if (event?.id) {
-                const data = await getEventAgendas(event.id);
-                if (data) setAgendas(data);
+                try {
+                    const data = await getEventAgendas(event.id);
+                    if (data) {
+                        // Update local state with the fetched data
+                        setAgendas(data);
+                        
+                        // Also update the store's state to keep it in sync
+                        useAgendaStore.setState(state => {
+                            const existingIndex = state.allEventAgendas.findIndex(ea => ea.event_id === event.id);
+                            const updatedAgendas = [...state.allEventAgendas];
+                            
+                            if (existingIndex >= 0) {
+                                updatedAgendas[existingIndex] = { 
+                                    event_id: event.id, 
+                                    agendas: data 
+                                };
+                            } else {
+                                updatedAgendas.push({ 
+                                    event_id: event.id, 
+                                    agendas: data 
+                                });
+                            }
+                            
+                            return { allEventAgendas: updatedAgendas };
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching agendas:', error);
+                    // Reset agendas if there's an error to prevent showing stale data
+                    setAgendas([]);
+                }
             }
         };
 
         fetchAgendas();
-    }, [event?.id]);
+        
+        // Cleanup function to reset loading state if component unmounts
+        return () => {
+            useAgendaStore.setState({ loading: false });
+        };
+    }, [event?.id, slug, getEventAgendas]);
 
     const filteredAgendas = agendas.filter(agenda =>
         agenda.title.toLowerCase().includes(filters.title.toLowerCase())
@@ -264,10 +299,17 @@ const AllAgendas: React.FC = () => {
                             <TableRow key={agenda.id}>
                                 <TableCell>{(currentPage - 1) * agendasPerPage + index + 1}</TableCell>
                                 <TableCell>{agenda.title}</TableCell>
-                                <TableCell>{agenda.speakers ? agenda.speakers.map(speaker => speaker.first_name).join(', ') : ''}</TableCell>
+                                <TableCell>
+                                    {Array.isArray(agenda.speakers) && agenda.speakers.length > 0 
+                                        ? agenda.speakers.map(speaker => speaker.first_name || speaker.last_name 
+                                            ? `${speaker.first_name || ''} ${speaker.last_name || ''}`.trim() 
+                                            : 'Unknown Speaker'
+                                        ).filter(Boolean).join(', ')
+                                        : 'No speakers assigned'}
+                                </TableCell>
                                 <TableCell>{agenda.event_date}</TableCell>
                                 <TableCell>{getStartEndTime(agenda)}</TableCell>
-                                <TableCell>{agenda.position}</TableCell>
+                                <TableCell>{agenda.position || 'Not set'}</TableCell>
                                 <TableCell className='flex items-center gap-1.5'>
                                     {/* View Agenda */}
                                     <Dialog>
