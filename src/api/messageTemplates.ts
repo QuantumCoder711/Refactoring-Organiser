@@ -1,5 +1,5 @@
 import { domain, token } from "@/constants";
-import { DayTwoReminderType, SendReminderType, SendSameDayReminderType, SessionReminderType, VisitBoothReminderType } from "@/types";
+import { DayTwoReminderType, SendInAppMessage, SendPollType, SendReminderType, SendSameDayReminderType, SessionReminderType, ThankYouMessageType, VisitBoothReminderType } from "@/types";
 import axios from "axios";
 
 export const sendReminder = async (formData: SendReminderType) => {
@@ -109,6 +109,64 @@ export const dayTwoSameDayReminder = async (formData: DayTwoReminderType) => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to send day two same day reminder");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+
+export const thankYouMessage = async (formData: ThankYouMessageType) => {
+    try {
+        const response = await axios.post(`${domain}/api/thank-you-message`, formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return response.data;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to send thank you message");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const sendPoll = async (formData: SendPollType) => {
+    try {
+        const response = await axios.post(`${domain}/api/notification-poll`, formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return response.data;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to send thank you message");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const sendInAppMessage = async (formData: SendInAppMessage) => {
+    try {
+        const response = await axios.post(`${domain}/api/custom-notification-message`, formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return response.data;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to send app message");
         }
         throw new Error("An unexpected error occurred");
     }

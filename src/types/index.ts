@@ -187,6 +187,17 @@ export interface VisitBoothReminderType extends MessageTemplateType { }
 
 export interface DayTwoReminderType extends MessageTemplateType { }
 
+export interface ThankYouMessageType extends MessageTemplateType { }
+
+export interface SendInAppMessage {
+    event_id: string;
+    title: string;
+    message: string;
+}
+
+export interface SendPollType extends MessageTemplateType {
+    link: string;
+}
 
 export interface AgendaType {
     id: number;

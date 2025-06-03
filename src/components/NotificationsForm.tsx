@@ -12,12 +12,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { MessageTemplateType } from '@/types';
+import { MessageTemplateType, SendPollType } from '@/types';
 import { toast } from 'sonner';
 import { CircleX, CircleCheck, ChevronRight } from 'lucide-react';
-import { dayTwoReminder, dayTwoSameDayReminder, sendReminder, sendSameDayReminder, sessionReminder, visitBoothReminder } from '@/api/messageTemplates';
+import { dayTwoReminder, dayTwoSameDayReminder, sendInAppMessage, sendPoll, sendReminder, sendSameDayReminder, sessionReminder, thankYouMessage, visitBoothReminder } from '@/api/messageTemplates';
 import Wave from './Wave';
 import useAuthStore from '@/store/authStore';
+import Logo from '@/assets/logo.svg';
 
 interface NotifcationsFormProps {
   sendBy: "email" | "whatsapp" | "both";
@@ -34,17 +35,25 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
   const { user } = useAuthStore(state => state);
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
-  const [allSelected, setAllSelected] = useState(true); // Initialize as true since all roles are selected by default
+  const [allSelected, setAllSelected] = useState(true);
   const quillRef = useRef<HTMLDivElement | null>(null);
+  const [pollLink, setPollLink] = useState("");
+
+  // Get the template name from URL
+  const pathname = window.location.pathname;
+  const templateName = pathname.split('/')[pathname.split('/').length - 2];
+  const isPollTemplate = templateName === 'send-poll';
+  const isThankYouTemplate = templateName === 'thank-you-message';
+  const isInAppTemplate = templateName === 'send-in-app-message';
 
   const [formData, setFormData] = useState<MessageTemplateType>({
     event_id: event?.uuid as string,
     send_to: selectedRoles.join(','),
-    send_method: props.sendBy === 'both' ? 'email' : props.sendBy,
+    send_method: isThankYouTemplate ? 'whatsapp' : (props.sendBy === 'both' ? 'email' : props.sendBy),
     subject: '',
     message: formatTemplateMessage(props.message || "", event, user) || "Template",
     start_date: event?.event_start_date as string,
-    delivery_schedule: 'now', // For now
+    delivery_schedule: 'now',
     start_date_time: event?.start_time as string,
     start_date_type: event?.start_time_type as string,
     end_date: event?.event_end_date as string,
@@ -53,12 +62,12 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
     no_of_times: 1,
     hour_interval: 1,
     status: 1,
-    check_in: 2,
+    check_in: isThankYouTemplate ? 1 : 2,
   });
 
   // Initialize Quill editor
   useEffect(() => {
-    if (quillRef.current && formData.send_method === "email") {
+    if (quillRef.current && (formData.send_method === "email" || isInAppTemplate)) {
       const quill = new Quill(quillRef.current, {
         theme: "snow",
         placeholder: "Type your message here...",
@@ -85,7 +94,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         quill.off('text-change');
       };
     }
-  }, [quillRef, formData.send_method === "email", props.message]);
+  }, [quillRef, formData.send_method === "email" || isInAppTemplate, props.message]);
 
   // Update formData when selectedRoles changes
   useEffect(() => {
@@ -171,11 +180,24 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       return;
     }
 
+    if (isPollTemplate && !pollLink) {
+      toast("Please enter the poll link", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+      return;
+    }
+
+    if (isInAppTemplate && (!formData.message || !formData.subject)) {
+      toast("Please fill in all required fields", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+      return;
+    }
+
     setLoading(true);
 
-    // Get the template name from URL
-    const pathname = window.location.pathname;
-    const templateName = pathname.split('/')[pathname.split('/').length - 2];
     try {
       let response;
       switch (templateName) {
@@ -198,22 +220,51 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         case 'day-two-same-day-reminder':
           response = await dayTwoSameDayReminder(formData);
           break;
+        case 'send-poll':
+          response = await sendPoll({ ...formData, link: pollLink } as SendPollType);
+          break;
+        case 'thank-you-message':
+          response = await thankYouMessage(formData);
+          break;
+        case 'send-in-app-message':
+          if (!event?.id) {
+            throw new Error("Event ID is required");
+          }
+          // For in-app messages, only send event_id, title, and message
+          const inAppData = {
+            event_id: event.id.toString(),
+            title: formData.subject,
+            message: formData.message
+          };
+          response = await sendInAppMessage(inAppData);
+          break;
         default:
           throw new Error('Unknown template type');
       }
 
-      if (response.status === 200) {
+      console.log('API Response:', response); // Debug log
+
+      // Check if response exists and has a message property
+      if (response && response.message === "Messages sent successfully") {
         toast("Message sent successfully!", {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className='size-5' />
         });
+      } else if (response && response.message) {
+        // If there's a message in the response, show it
+        toast(response.message, {
+          className: response.message === "Messages sent successfully" ? "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2" : "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: response.message === "Messages sent successfully" ? <CircleCheck className='size-5' /> : <CircleX className='size-5' />
+        });
       } else {
-        toast(response.message || "Something went wrong!!!", {
+        // Default error message if no specific response format
+        toast("Something went wrong!!!", {
           className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleX className='size-5' />
         });
       }
     } catch (error) {
+      console.error('Error:', error); // Debug log
       toast(error instanceof Error ? error.message : "Failed to send message", {
         className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
         icon: <CircleX className='size-5' />
@@ -224,6 +275,9 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         ...formData,
         subject: "",
       });
+      if (isPollTemplate) {
+        setPollLink("");
+      }
     }
   };
 
@@ -236,59 +290,90 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       </div>
       <div className='mt-8 flex gap-4 h-full'>
         <div className='bg-brand-background rounded-[10px] flex-1 w-full p-5 flex flex-col'>
-          {/* SelectBoxes */}
-          <h2 className='font-semibold'>Select Roles</h2>
-          <div className='flex gap-5 mt-[15px] flex-wrap'>
-            <div className="flex items-center gap-x-2.5">
-              <Checkbox
-                id="all"
-                checked={allSelected}
-                onCheckedChange={handleAllChange}
-                className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
-              />
-              <Label htmlFor="all" className='cursor-pointer'>All</Label>
-            </div>
-            {roles.map((role, index) => (
-              <div key={index} className="flex items-center gap-x-2.5">
-                <Checkbox
-                  id={role}
-                  checked={selectedRoles.includes(role)}
-                  onCheckedChange={() => handleRoleChange(role)}
-                  className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
-                />
-                <Label htmlFor={role} className='cursor-pointer'>{role}</Label>
+          {/* SelectBoxes - Only show if not in-app message */}
+          {!isInAppTemplate && (
+            <>
+              <h2 className='font-semibold'>Select Roles</h2>
+              <div className='flex gap-5 mt-[15px] flex-wrap'>
+                <div className="flex items-center gap-x-2.5">
+                  <Checkbox
+                    id="all"
+                    checked={allSelected}
+                    onCheckedChange={handleAllChange}
+                    className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                  />
+                  <Label htmlFor="all" className='cursor-pointer'>All</Label>
+                </div>
+                {roles.map((role, index) => (
+                  <div key={index} className="flex items-center gap-x-2.5">
+                    <Checkbox
+                      id={role}
+                      checked={selectedRoles.includes(role)}
+                      onCheckedChange={() => handleRoleChange(role)}
+                      className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                    />
+                    <Label htmlFor={role} className='cursor-pointer'>{role}</Label>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
           {/* Send By Options */}
-          <h2 className='font-semibold mt-[30px]'>Send By</h2>
-          <RadioGroup
-            value={formData.send_method}
-            onValueChange={handleSendMethodChange}
-            className='flex gap-5 mt-[15px]'
-          >
-            {(props.sendBy === "email" || props.sendBy === "both") && (
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="email"
-                  id="email"
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
-                />
-                <Label htmlFor="email" className='cursor-pointer'>Email</Label>
-              </div>
-            )}
-            {(props.sendBy === "whatsapp" || props.sendBy === "both") && (
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="whatsapp"
-                  id="whatsapp"
-                  className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
-                />
-                <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
-              </div>
-            )}
-          </RadioGroup>
+          {!isThankYouTemplate && !isInAppTemplate && (
+            <>
+              <h2 className='font-semibold mt-[30px]'>Send By</h2>
+              <RadioGroup
+                value={formData.send_method}
+                onValueChange={handleSendMethodChange}
+                className='flex gap-5 mt-[15px]'
+              >
+                {(props.sendBy === "email" || props.sendBy === "both") && !isPollTemplate && (
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value="email"
+                      id="email"
+                      className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
+                    />
+                    <Label htmlFor="email" className='cursor-pointer'>Email</Label>
+                  </div>
+                )}
+                {(props.sendBy === "whatsapp" || props.sendBy === "both") && (
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem
+                      value="whatsapp"
+                      id="whatsapp"
+                      className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
+                    />
+                    <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
+                  </div>
+                )}
+              </RadioGroup>
+            </>
+          )}
+
+          {/* Send By for In-App Message */}
+          {isInAppTemplate && (
+            <>
+              <h2 className='font-semibold mt-[30px]'>Send By</h2>
+              <RadioGroup
+                value="app"
+                className='flex gap-5 mt-[15px]'
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="app"
+                    id="app"
+                    className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
+                  />
+                  <Label htmlFor="app" className='cursor-pointer flex items-center gap-2'>
+                    App
+                    <img src={Logo} alt="App Logo" className="w-5 h-5" />
+                  </Label>
+                </div>
+              </RadioGroup>
+            </>
+          )}
 
           <div className='w-full flex-1 flex flex-col'>
             {/* Send To Options */}
@@ -300,25 +385,29 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                   onValueChange={handleCheckIn}
                   className='flex gap-5 mt-[15px]'
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
-                    <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
-                  </div>
+                  {!isThankYouTemplate && (
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                      <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="checkedIn" id="checkedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
                     <Label htmlFor="checkedIn" className='cursor-pointer'>Checked In</Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
-                    <Label htmlFor="nonCheckedIn" className='cursor-pointer'>Non-Checked In</Label>
-                  </div>
+                  {!isThankYouTemplate && (
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                      <Label htmlFor="nonCheckedIn" className='cursor-pointer'>Non-Checked In</Label>
+                    </div>
+                  )}
                 </RadioGroup>
               </div>
             )}
 
             {/* MessageBox */}
             <div className='mt-[30px] flex-1 flex flex-col'>
-              {formData.send_method === "email" ? (
+              {(formData.send_method === "email" || isInAppTemplate) ? (
                 <>
                   <Input
                     type='text'
@@ -333,7 +422,25 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                 </>
               ) : (
                 <div className='flex-1 flex flex-col'>
-                  <h3 className='font-semibold mb-[15px]'>Your Message</h3>
+                  {isPollTemplate && (
+                    <div className='mb-4'>
+                      <Input
+                        type='text'
+                        value={pollLink}
+                        onChange={(e) => setPollLink(e.target.value)}
+                        className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-12 font-semibold'
+                        placeholder='Poll Link *'
+                      />
+                    </div>
+                  )}
+                  <h3 className='font-semibold mb-[15px] flex items-center gap-2'>
+                    {isInAppTemplate && (
+                      <>
+                        Your Message
+                      </>
+                    )}
+                    {!isInAppTemplate && "Your Message"}
+                  </h3>
                   <div className='p-5 bg-white rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
                 </div>
               )}
