@@ -7,6 +7,7 @@ import DayTwoSameDayReminderIcon from '@/assets/template-message-icons/day-two-s
 import SendPoll from "@/assets/template-message-icons/send-poll.svg";
 import SendInApp from "@/assets/template-message-icons/send-in-app.svg";
 import ThankYou from "@/assets/template-message-icons/thank-you.svg";
+import { IdCard } from 'lucide-react';
 
 export const templates = [
   {
@@ -86,6 +87,20 @@ export const templates = [
     path: `/all-events/event/all-template-messages/thank-you-message`,
     icon: ThankYou,
     message: `<p>Thank you for being part of <strong> {title} </strong><br /> <br />It was a privilege to host you at this distinguished gathering of Senior Leaders and industry Trailblazers from diverse Sectors. <br /> <br />We hope you found the conference insightful and impactful, gaining valuable perspectives to drive innovation and excellence in your field. <br /> <br />Your active participation made the event truly memorable, and we are excited about staying connected and welcoming you to future editions of <strong> {title} </strong>and other events organised by <strong>{company_name}</strong>  <br /> <br />Warm regards, <br />Team <strong>{company_name}</strong></p>`,
+    sendBy: "whatsapp",
+    sendTo: true,
+    paragraph: "Send a quick thank you via WhatsApp to all checked-in delegates—make your appreciation personal and instant!"
+  },
+  {
+    title: "Invite Registrations",
+    path: `/send-invitations/invite-registrations/hr-event`,
+    icon: IdCard,
+    message: `<p>Hello, this is a follow-up reminder for the email sent for <strong>{title}</strong> happening on <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br /><br />
+                                    
+                                    Kindly review the same or check the link below for more details on the invitation. <br /><br />
+                                    
+                                    Best Regards, <br />
+                                    {company_name}</p>`,
     sendBy: "whatsapp",
     sendTo: true,
     paragraph: "Send a quick thank you via WhatsApp to all checked-in delegates—make your appreciation personal and instant!"

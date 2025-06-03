@@ -59,6 +59,7 @@ import EditAttendee from './pages/admin/all-events/edit-attendee';
 import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested-attendee';
 import SearchPeople from './pages/admin/search-people';
 import CheckInPage from './pages/guest/check-in-page';
+import InviteRegistrations from './pages/admin/send-invitations/invite-registrations';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -119,6 +120,7 @@ const App: React.FC = () => {
         <Route path="send-invitations" element={<SendInvitations />} />
         <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
         <Route path="send-invitations/edit-requested-attendee/:slug/:uuid" element={<EditRequestedAttendee />} />
+        <Route path="send-invitations/invite-registrations/:slug" element={<InviteRegistrations />} />
 
         <Route path="update-profile" element={<UpdateProfile />} />
 

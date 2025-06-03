@@ -385,7 +385,7 @@ const SendInvitations: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="#"
+                    to={`/send-invitations/invite-registrations/${slug}`}
                     className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-fit text-nowrap text-sm grid place-content-center"
                 >
                     Invite Registrations

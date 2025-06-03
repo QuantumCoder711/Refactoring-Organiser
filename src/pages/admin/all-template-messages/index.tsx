@@ -14,14 +14,14 @@ const AllTemplateMessages: React.FC = () => {
         <GoBack /> <h1 className='text-xl font-semibold'>Send Whatsapp/E-Mail</h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-        {templates.map((template, index) => (
+        {templates.filter(t => t.title !== "Invite Registrations").map((template, index) => (
           <div
             key={index}
             onClick={() => navigate(`${template.path}/${slug}`)}
             className="bg-brand-background p-4 rounded-[10px] h-52 cursor-pointer group flex flex-col justify-between"
           >
             <div className='flex flex-col gap-2'>
-              <img src={template.icon} alt={template.title} className="size-10" />
+              <img src={template.icon as string} alt={template.title} className="size-10" />
               <h2 className="text-lg font-medium group-hover:text-brand-primary duration-300">{template.title}</h2>
             </div>
 

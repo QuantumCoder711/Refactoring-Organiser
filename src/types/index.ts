@@ -189,6 +189,8 @@ export interface DayTwoReminderType extends MessageTemplateType { }
 
 export interface ThankYouMessageType extends MessageTemplateType { }
 
+export interface InviteRegistrationType extends MessageTemplateType { }
+
 export interface SendInAppMessage {
     event_id: string;
     title: string;

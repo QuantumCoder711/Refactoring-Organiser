@@ -1,5 +1,5 @@
 import { domain, token } from "@/constants";
-import { DayTwoReminderType, SendInAppMessage, SendPollType, SendReminderType, SendSameDayReminderType, SessionReminderType, ThankYouMessageType, VisitBoothReminderType } from "@/types";
+import { DayTwoReminderType, InviteRegistrationType, SendInAppMessage, SendPollType, SendReminderType, SendSameDayReminderType, SessionReminderType, ThankYouMessageType, VisitBoothReminderType } from "@/types";
 import axios from "axios";
 
 export const sendReminder = async (formData: SendReminderType) => {
@@ -167,6 +167,25 @@ export const sendInAppMessage = async (formData: SendInAppMessage) => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to send app message");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+export const inviteRegistrations = async (formData: InviteRegistrationType) => {
+    try {
+        const response = await axios.post(`${domain}/api/invitation-request-message`, formData, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        return response.data;
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to invite registrations");
         }
         throw new Error("An unexpected error occurred");
     }
