@@ -190,7 +190,7 @@ const EventCard: React.FC<EventCardProps> = ({
                             <Link to={`/all-events/view/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>View</Link>
                             <Link to={`/all-events/update-event/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Edit</Link>
                             <Link to={`/all-events/attendees/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Attendees</Link>
-                            <Link to={"#"} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Agenda</Link>
+                            <Link to={`/all-agendas/${slug}`} className='text-xs rounded-full bg-white text-brand-primary text-center px-2'>Agenda</Link>
                         </div>
                     )}
                 </div>
@@ -206,12 +206,12 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     <div className='mt-2 flex flex-col gap-2 justify-between'>
                         <div className='flex gap-2 justify-between'>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-1/3 min-w-fit text-center'>Report</Link>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-2/3 min-w-fit text-center'>Transcriber</Link>
+                            <Link to={`/all-reports/mail-report/${slug}`} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-1/3 min-w-fit text-center'>Report</Link>
+                            <Link to={`/all-reports/ai-transcriber/${slug}`} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-2/3 min-w-fit text-center'>Transcriber</Link>
                         </div>
                         <div className='flex gap-2 justify-between'>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Photos</Link>
-                            <Link to={"#"} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Chart</Link>
+                            <Link to={`/all-reports/ai-photos/${slug}`} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Photos</Link>
+                            <Link to={`/all-reports/charts/${slug}`} className='bg-brand-primary/20 text-brand-primary text-xs rounded-full px-2 w-full text-center'>Chart</Link>
                         </div>
                         <Button className='bg-brand-primary/20 hover:bg-brand-primary/30 cursor-pointer py-0 h-fit text-brand-primary text-xs rounded-full px-2 w-full text-center'>
                             Generate PDF
