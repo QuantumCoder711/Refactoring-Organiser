@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CircleCheck, CircleX } from 'lucide-react';
+import { ChevronLeft, CircleCheck, CircleX, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +10,16 @@ import useAgendaStore from '@/store/agendaStore';
 import Wave from '@/components/Wave';
 import { toast } from 'sonner';
 import { beautifyDate } from '@/lib/utils';
+import { domain, token } from '@/constants';
+import axios from 'axios';
+import { AttendeeType } from '@/types';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface FormData {
     title: string;
@@ -31,12 +41,15 @@ interface FormErrors {
     position?: string;
     start_time?: string;
     end_time?: string;
+    tag_speakers?: string;
 }
 
 const EditAgenda: React.FC = () => {
     const { slug, id } = useParams<{ slug: string; id: string }>();
+    const navigate = useNavigate();
     const event = useEventStore(state => state.getEventBySlug(slug));
     const { loading, getAgendaById, updateAgenda } = useAgendaStore(state => state);
+    const [speakers, setSpeakers] = useState<AttendeeType[]>([]);
     const [formData, setFormData] = useState<FormData>({
         title: '',
         description: '',
@@ -50,6 +63,21 @@ const EditAgenda: React.FC = () => {
         event_id: event?.id
     });
     const [errors, setErrors] = useState<FormErrors>({});
+
+    useEffect(() => {
+        if (event?.id) {
+            axios.post(`${domain}/api/speaker-attendee/${event.id}`, {}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }).then(res => {
+                setSpeakers(res.data.data);
+            }).catch(error => {
+                console.error("Error fetching speakers:", error);
+                toast.error("Failed to fetch speakers");
+            });
+        }
+    }, [event?.id]);
 
     useEffect(() => {
         const fetchAgenda = async () => {
@@ -98,6 +126,27 @@ const EditAgenda: React.FC = () => {
         }
     };
 
+    const handleSpeakerSelect = (value: string) => {
+        const selectedSpeaker = speakers.find(speaker => speaker.id.toString() === value);
+        if (selectedSpeaker) {
+            setFormData(prevData => ({
+                ...prevData,
+                tag_speakers: [...prevData.tag_speakers, value]
+            }));
+        }
+        // Clear error when user selects a speaker
+        if (errors.tag_speakers) {
+            setErrors(prev => ({ ...prev, tag_speakers: undefined }));
+        }
+    };
+
+    const handleRemoveSpeaker = (speakerId: string) => {
+        setFormData(prevData => ({
+            ...prevData,
+            tag_speakers: prevData.tag_speakers.filter(id => id !== speakerId)
+        }));
+    };
+
     const validateForm = () => {
         const newErrors: FormErrors = {};
 
@@ -107,6 +156,10 @@ const EditAgenda: React.FC = () => {
 
         if (!formData.description.trim()) {
             newErrors.description = 'Description is required';
+        }
+
+        if (formData.tag_speakers.length === 0) {
+            newErrors.tag_speakers = 'At least one speaker must be tagged';
         }
 
         if (!formData.event_date) {
@@ -157,7 +210,8 @@ const EditAgenda: React.FC = () => {
                     icon: <CircleCheck className='size-5' />
                 });
                 // Navigate back to agendas list
-                window.location.href = `/all-agendas/${slug}`;
+
+                navigate(`/all-agendas/${slug}`);
             } else {
                 toast.error(response.message || "Failed to update agenda", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -220,6 +274,56 @@ const EditAgenda: React.FC = () => {
                         required
                     />
                     {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+                </div>
+
+                {/* Tag Speakers & Speakers List */}
+                <div className="flex gap-5 justify-between">
+                    {/* Tagged Speakers */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold">
+                            Tagged Speakers <span className="text-brand-secondary">*</span>
+                        </Label>
+                        <div className={`bg-white min-h-12 p-2 rounded-md flex flex-wrap gap-2 ${errors.tag_speakers ? 'border border-red-500' : ''}`}>
+                            {formData.tag_speakers.map((speakerId) => {
+                                const speaker = speakers.find(s => s.id.toString() === speakerId);
+                                return (
+                                    <span key={speakerId} className="bg-brand-primary/20 px-2 py-1 rounded flex items-center">
+                                        {speaker?.first_name || speaker?.last_name}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveSpeaker(speakerId)}
+                                            className="ml-2 text-gray-500 hover:text-gray-700"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </span>
+                                );
+                            })}
+                        </div>
+                        {errors.tag_speakers && <p className="text-red-500 text-sm">{errors.tag_speakers}</p>}
+                    </div>
+
+                    {/* Speakers List */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='speakers_list'>
+                            Speakers List <span className="text-brand-secondary">*</span>
+                        </Label>
+                        <Select name="speakers_list" onValueChange={handleSpeakerSelect}>
+                            <SelectTrigger className="!min-w-full cursor-pointer input !max-h-12 !h-full">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {speakers
+                                    .filter(speaker => !formData.tag_speakers.includes(speaker.id.toString()))
+                                    .map((speaker) => (
+                                        <SelectItem key={speaker.id} className='cursor-pointer' value={speaker.id.toString()}>
+                                            {speaker?.first_name || speaker?.last_name}
+                                        </SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <div className='flex gap-5 justify-between'>
