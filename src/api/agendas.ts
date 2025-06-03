@@ -20,9 +20,9 @@ export const getEventAgendas = async (id: number): Promise<GetEventAgendasRespon
     }
 }
 
-export const getAgendaByUuid = async (uuid: string) => {
+export const getAgendaById = async (id: string) => {
     try {
-        const response = await axios.get(`${domain}/api/agendas/${uuid}`, {
+        const response = await axios.get(`${domain}/api/agendas/${id}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,

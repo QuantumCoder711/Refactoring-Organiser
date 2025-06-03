@@ -331,7 +331,7 @@ const AllAgendas: React.FC = () => {
                                     </Dialog>
 
                                     {/* Edit Agenda */}
-                                    <Link to={`/edit-agenda/${slug}/${agenda.id}`} className=''><SquarePen width={20} height={20} /></Link>
+                                    <Link to={`/edit-agenda/${slug}/${agenda.uuid}`} className=''><SquarePen width={20} height={20} /></Link>
 
                                     {/* Delete Agenda */}
                                     <AlertDialog>

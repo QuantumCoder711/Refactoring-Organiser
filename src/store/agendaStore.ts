@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AgendaType } from "@/types";
-import { deleteAgenda, getAgendaByUuid, getEventAgendas, importAgenda, updateAgenda } from "@/api/agendas";
+import { deleteAgenda, getAgendaById, getEventAgendas, importAgenda, updateAgenda } from "@/api/agendas";
 import { BasicResponse, GetEventAgendasResponse } from "@/types/api-responses";
 
 interface EventAgendas {
@@ -13,7 +13,7 @@ interface AgendaStore {
     loading: boolean;
     currentAgenda: AgendaType | null;
     getEventAgendas: (id: number | undefined) => Promise<AgendaType[] | undefined>;
-    getAgendaByUuid: (uuid: string) => Promise<AgendaType | null>;
+    getAgendaById: (id: string) => Promise<AgendaType | null>;
     updateAgenda: (uuid: string, formData: any) => Promise<BasicResponse>;
     deleteAgenda: (uuid: string) => Promise<BasicResponse>;
     importAgenda: (event_id: number, new_event_id: number, date: string) => Promise<GetEventAgendasResponse>;
@@ -41,10 +41,10 @@ const useAgendaStore = create<AgendaStore>((set, get) => ({
             set({ loading: false });
         }
     },
-    getAgendaByUuid: async (uuid: string) => {
+    getAgendaById: async (id: string) => {
         try {
             set({ loading: true });
-            const response = await getAgendaByUuid(uuid);
+            const response = await getAgendaById(id);
             if (response.status === 200) {
                 set({ currentAgenda: response.data });
                 return response.data;
