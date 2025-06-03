@@ -79,6 +79,9 @@ const Dashboard: React.FC = () => {
                   id={event.id}
                   uuid={event.uuid}
                   total_attendees={event.total_attendees || 0}
+                  total_checkedin_speaker={event.total_checkedin_speaker}
+                  total_checkedin_sponsor={event.total_checkedin_sponsor}
+                  total_pending_delegate={event.total_pending_delegate}
                 />
               </div>
             ))}
@@ -106,6 +109,9 @@ const Dashboard: React.FC = () => {
                   id={event.id}
                   uuid={event.uuid}
                   total_attendees={event.total_attendees || 0}
+                  total_checkedin_speaker={event.total_checkedin_speaker}
+                  total_checkedin_sponsor={event.total_checkedin_sponsor}
+                  total_pending_delegate={event.total_pending_delegate}
                 />
               </div>
             ))}

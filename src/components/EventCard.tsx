@@ -29,6 +29,9 @@ interface EventCardProps {
     id: number;
     uuid: string;
     total_attendees: number;
+    total_checkedin_speaker: number;
+    total_checkedin_sponsor: number;
+    total_pending_delegate: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -42,6 +45,9 @@ const EventCard: React.FC<EventCardProps> = ({
     uuid,
     isLive = false,
     total_attendees,
+    total_checkedin_speaker,
+    total_checkedin_sponsor,
+    total_pending_delegate
 }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const { deleteEvent } = useEventStore(state => state);
@@ -194,9 +200,9 @@ const EventCard: React.FC<EventCardProps> = ({
                 <div className='min-h-full w-full p-2 bg-white rounded-xl rounded-l-none'>
                     {renderStatItem('Registrations', total_attendees)}
                     {renderStatItem('Attendees', checkInCount, total_attendees)}
-                    {renderStatItem('Speakers', 100, 900)}
-                    {renderStatItem('Sponsors', 450, 900)}
-                    {renderStatItem('Pending Delegates', 10)}
+                    {renderStatItem('Speakers', total_checkedin_speaker)}
+                    {renderStatItem('Sponsors', total_checkedin_sponsor)}
+                    {renderStatItem('Pending Delegates', total_pending_delegate)}
 
                     <div className='mt-2 flex flex-col gap-2 justify-between'>
                         <div className='flex gap-2 justify-between'>

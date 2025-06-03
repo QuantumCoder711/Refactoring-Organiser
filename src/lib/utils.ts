@@ -38,10 +38,11 @@ export const filterEvents = (events: EventType[]): { upcomingEvents: EventType[]
 
 export const isEventLive = (event: EventType | null): boolean => {
   if (!event) return false;
-  if (!event.event_date) return false;
+  if (!event.event_date || !event.event_start_date) return false;
 
   const now = new Date();
-  const eventDate = new Date(event.event_date);
+  const eventStartDate = new Date(event.event_start_date);
+  const eventEndDate = new Date(event.event_date);
 
   // Parse event start time
   const startTimeParts = `${event.start_time}:${event.start_minute_time} ${event.start_time_type}`.match(/(\d+):(\d+) (AM|PM)/i);
@@ -50,14 +51,15 @@ export const isEventLive = (event: EventType | null): boolean => {
 
   if (!startTimeParts || !endTimeParts) return false;
 
-  // Create start and end datetime objects
-  const eventStart = new Date(eventDate);
+  // Create start datetime object
+  const eventStart = new Date(eventStartDate);
   let startHours = parseInt(startTimeParts[1]);
   if (startTimeParts[3].toUpperCase() === 'PM' && startHours < 12) startHours += 12;
   if (startTimeParts[3].toUpperCase() === 'AM' && startHours === 12) startHours = 0;
   eventStart.setHours(startHours, parseInt(startTimeParts[2]), 0, 0);
 
-  const eventEnd = new Date(eventDate);
+  // Create end datetime object
+  const eventEnd = new Date(eventEndDate);
   let endHours = parseInt(endTimeParts[1]);
   if (endTimeParts[3].toUpperCase() === 'PM' && endHours < 12) endHours += 12;
   if (endTimeParts[3].toUpperCase() === 'AM' && endHours === 12) endHours = 0;
