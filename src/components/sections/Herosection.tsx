@@ -5,6 +5,7 @@ import Network from "@/assets/network.svg";
 import AiFile from "@/assets/ai-file.svg";
 import Handshake from "@/assets/handshake.svg";
 import QrCode from "@/assets/qr-code.svg";
+import { Link } from 'react-router-dom';
 
 const Herosection: React.FC = () => {
     return (
@@ -14,7 +15,9 @@ const Herosection: React.FC = () => {
             <div className='flex flex-col gap-9 w-full mt-[68px] lg:mt-0 lg:w-1/2 text-center lg:text-left'>
                 <h1 className='text-5xl font-bold'>Make Business Networking Effortless with <span className='text-brand-primary'>Klout Club</span></h1>
                 <p className='text-2xl '>Klout Club helps you create smarter events — with instant QR check-in, real-time networking, AI photos, and professional connections that last beyond the event. Start free, set up in minutes.</p>
-                <Button className='btn !rounded-full !max-w-fit !text-lg !font-semibold !h-12 mx-auto lg:mx-0'>Get Started -  It's Free</Button>
+                <Link to={"/add-first-event"}>
+                    <Button className='btn !rounded-full !max-w-fit !text-lg !font-semibold !h-12 mx-auto lg:mx-0'>Get Started -  It's Free</Button>
+                </Link>
             </div>
 
             {/* Image Div with Feature Icons */}

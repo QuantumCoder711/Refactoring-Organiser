@@ -49,14 +49,14 @@ export const navbarLinks = [
         label: "Explore",
         path: "/explore-events/all",
     },
-    {
-        label: "Feature",
-        path: "#",
-    },
-    {
-        label: "Download",
-        path: "#",
-    },
+    // {
+    //     label: "Feature",
+    //     path: "#",
+    // },
+    // {
+    //     label: "Download",
+    //     path: "#",
+    // },
     {
         label: "Organiser Login",
         path: "/login",

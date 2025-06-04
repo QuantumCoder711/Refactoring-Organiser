@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
 import { ArrowUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const LaunchEvent:React.FC = () => {
     return (
@@ -8,7 +9,9 @@ const LaunchEvent:React.FC = () => {
             <h2 className='capitalize text-center text-[40px] font-bold'>Build Lasting Business Connections with Klout Club</h2>
             <p className='text-center'>Host smarter events, empower professionals, and grow real communities — not just one-time gatherings.</p>
             <span className='text-center'>Get started free today.</span>
+            <Link to="/add-first-event">
             <Button className='btn rounded-full font-semibold text-xl flex items-center gap-5 w-[342px] !h-12'>Launch your free event today <ArrowUp className='rotate-45 size-5'/></Button>
+            </Link>
         </section>
     )
 }
