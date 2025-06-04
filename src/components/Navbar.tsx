@@ -125,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <ul className='flex gap-5 items-center'>
             <li>
               <Link to={`/search-people`}>
-                <Button className='btn-rounded !px-3'>Search</Button>
+                <Button className='btn-rounded !px-3'>Search People</Button>
               </Link>
             </li>
             <li>

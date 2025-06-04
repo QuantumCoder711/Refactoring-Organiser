@@ -296,7 +296,7 @@ const AllAgendas: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedAgendas.map((agenda, index) => (
-                            <TableRow key={agenda.id}>
+                            <TableRow key={agenda.id} className='!capitalize'>
                                 <TableCell>{(currentPage - 1) * agendasPerPage + index + 1}</TableCell>
                                 <TableCell>{agenda.title}</TableCell>
                                 <TableCell>

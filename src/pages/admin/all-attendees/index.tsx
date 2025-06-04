@@ -301,13 +301,13 @@ const AllAttendees: React.FC = () => {
                         {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
                             <TableRow key={attendee.id}>
                                 <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 !capitalize">
                                     {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 !capitalize">
                                     {attendee.job_title || "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 !capitalize">
                                     {attendee.company_name || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">

@@ -2,11 +2,11 @@ import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, ArrowDownToLine } from 'lucide-react';
+import { Eye, SquarePen, Trash, CircleX, CircleCheck, ArrowDownToLine } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatDateTime, isEventLive } from '@/lib/utils';
 import * as XLSX from 'xlsx';
+import axios from 'axios';
 
 import {
     Table,
@@ -61,36 +61,44 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import { domain } from '@/constants';
 
 const PendingUserRequest: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const event = useEventStore(state => state.getEventBySlug(slug));
     const { token, user } = useAuthStore(state => state);
-    const { singleEventAttendees, loading, deleteAttendee, customCheckIn, getSingleEventAttendees } = useAttendeeStore(state => state);
+    const { deleteAttendee: deleteAttendeeFromStore } = useAttendeeStore(state => state);
+    const [pendingRequests, setPendingRequests] = useState<AttendeeType[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Date Difference State
-    const [dateDiff, setDateDiff] = useState<number>(0);
-
-    // Calculate date difference when event changes
+    // Fetch pending requests when component mounts or event changes
     useEffect(() => {
-        if (event?.event_start_date && event?.event_end_date) {
-            const diff = dateDifference(event.event_start_date, event.event_end_date);
-            setDateDiff(diff);
+        if (event && token && user?.id) {
+            setLoading(true);
+            try {
+                axios.post(`${domain}/api/pending_event_requests/${event.uuid}`, { user_id: user.id }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                    setPendingRequests(res.data.data);
+                    setLoading(false);
+                }).catch(error => {
+                    console.error('Error fetching pending requests:', error);
+                    setLoading(false);
+                });
+            } catch (error) {
+                console.error('Error in pending requests fetch:', error);
+                setLoading(false);
+            }
         }
-    }, [event]);
-
-    // Fetch attendees when component mounts or event changes
-    useEffect(() => {
-        if (event?.uuid && token) {
-            getSingleEventAttendees(token, event.uuid);
-        }
-    }, [event?.uuid, token, getSingleEventAttendees]);
+    }, [user, event, token]);
 
     // Filter states
     const [nameFilter, setNameFilter] = useState('');
     const [companyFilter, setCompanyFilter] = useState('');
     const [designationFilter, ] = useState('');
-    const [checkInFilter, ] = useState<string>('all');
     const [roleFilter, ] = useState<string>('all');
 
     // Add selected attendees state
@@ -102,7 +110,7 @@ const PendingUserRequest: React.FC = () => {
 
     const filteredAttendees = useMemo(() => {
         setCurrentPage(1);
-        return singleEventAttendees.filter(attendee => {
+        return pendingRequests.filter(attendee => {
             const nameMatch = `${attendee.first_name || ''} ${attendee.last_name || ''}`.toLowerCase().includes(nameFilter.toLowerCase());
             const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
 
@@ -112,14 +120,11 @@ const PendingUserRequest: React.FC = () => {
                     attendee.job_title.toLowerCase().includes(designationFilter.toLowerCase()) :
                     designationFilter === '');
 
-            const checkInMatch = checkInFilter === '' || checkInFilter === 'all' ||
-                (checkInFilter === '1' && attendee.check_in === 1) ||
-                (checkInFilter === '0' && attendee.check_in === 0);
             const roleMatch = roleFilter === '' || roleFilter === 'all' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
 
-            return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
+            return nameMatch && companyMatch && designationMatch && roleMatch;
         });
-    }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
+    }, [pendingRequests, nameFilter, companyFilter, designationFilter, roleFilter]);
 
     // Calculate paginated data
     const paginatedAttendees = useMemo(() => {
@@ -146,25 +151,7 @@ const PendingUserRequest: React.FC = () => {
     // Handle delete attendee
     const handleDeleteAttendee = async (id: number) => {
         if (token) {
-            const response = await deleteAttendee(id, token);
-            if (response.status === 200) {
-                toast(response.message, {
-                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleCheck className='size-5' />
-                });
-            } else {
-                toast(response.message, {
-                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleX className='size-5' />
-                });
-            }
-        }
-    }
-
-    // Handle custom check-in
-    const handleCustomCheckIn = async (uuid: string) => {
-        if (token && event && user) {
-            const response = await customCheckIn(uuid, event?.id, user?.id, token);
+            const response = await deleteAttendeeFromStore(id, token);
             if (response.status === 200) {
                 toast(response.message, {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -206,8 +193,6 @@ const PendingUserRequest: React.FC = () => {
             'Company': attendee.company_name || '',
             'Status': attendee.status || '',
             'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
-            'Check In Status': attendee.check_in === 1 ? 'Yes' : 'No',
-            'Check In Time': attendee.check_in_time || '',
             'Registration Date': attendee.created_at || ''
         }));
 
@@ -227,8 +212,6 @@ const PendingUserRequest: React.FC = () => {
             { wch: 25 }, // Company
             { wch: 15 }, // Status
             { wch: 15 }, // Award Winner
-            { wch: 15 }, // Check In Status
-            { wch: 20 }, // Check In Time
             { wch: 20 }  // Registration Date
         ];
         ws['!cols'] = columnWidths;
@@ -246,67 +229,6 @@ const PendingUserRequest: React.FC = () => {
             className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
             icon: <CircleCheck className='size-5' />
         });
-    };
-
-    // Generate check-in data cells based on date difference
-    const renderCheckInData = (attendee: AttendeeType) => {
-        const cells = [];
-        if (dateDiff >= 0) {
-            cells.push(
-                <TableCell key="check-in-1" className="text-left min-w-10">
-                    {attendee.check_in !== null && attendee.check_in !== undefined ?
-                        (attendee.check_in === 1 ?
-                            (attendee.check_in_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_time)}</> : "Checked In") :
-                            "-") :
-                        "-"}
-                </TableCell>
-            );
-        }
-        if (dateDiff >= 1) {
-            cells.push(
-                <TableCell key="check-in-2" className="text-left min-w-10">
-                    {attendee.check_in_second !== null && attendee.check_in_second !== undefined ?
-                        (attendee.check_in_second === 1 ?
-                            (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_second_time)}</> : "Checked In") :
-                            "-") :
-                        "-"}
-                </TableCell>
-            );
-        }
-        if (dateDiff >= 2) {
-            cells.push(
-                <TableCell key="check-in-3" className="text-left min-w-10">
-                    {attendee.check_in_third !== null && attendee.check_in_third !== undefined ?
-                        (attendee.check_in_third === 1 ?
-                            (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_third_time)}</> : "Checked In") :
-                            "-") :
-                        "-"}
-                </TableCell>
-            );
-        }
-        if (dateDiff >= 3) {
-            cells.push(
-                <TableCell key="check-in-4" className="text-left min-w-10">
-                    {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ?
-                        (attendee.check_in_forth === 1 ?
-                            (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_forth_time)}</> : "Checked In") :
-                            "-") :
-                        "-"}
-                </TableCell>
-            );
-        }
-        if (dateDiff >= 4) {
-            cells.push(
-                <TableCell key="check-in-5" className="text-left min-w-10">
-                    {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ?
-                        (attendee.check_in_fifth === 1 ?
-                            (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_fifth_time)}</> : "Checked In") :
-                            "-") :
-                        "-"}
-                </TableCell>
-            );
-        }
-        return cells;
     };
 
     if (loading) return <Wave />
@@ -388,11 +310,6 @@ const PendingUserRequest: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">Alternate Phone</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Status</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
-                            {dateDiff >= 0 && <TableHead className="text-left min-w-10 !px-2">Check In (1st)</TableHead>}
-                            {dateDiff >= 1 && <TableHead className="text-left min-w-10 !px-2">Check In (2nd)</TableHead>}
-                            {dateDiff >= 2 && <TableHead className="text-left min-w-10 !px-2">Check In (3rd)</TableHead>}
-                            {dateDiff >= 3 && <TableHead className="text-left min-w-10 !px-2">Check In (4th)</TableHead>}
-                            {dateDiff >= 4 && <TableHead className="text-left min-w-10 !px-2">Check In (5th)</TableHead>}
                             <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -436,7 +353,6 @@ const PendingUserRequest: React.FC = () => {
                                         ? (attendee.award_winner === 1 ? "Yes" : "No")
                                         : "-"}
                                 </TableCell>
-                                {renderCheckInData(attendee)}
                                 <TableCell className="text-left min-w-10 flex items-center gap-1.5">
 
                                     {/* For Viewing the Event */}
@@ -487,25 +403,6 @@ const PendingUserRequest: React.FC = () => {
 
                                     {/* Edit Event */}
                                     <Link to="#" className=''><SquarePen width={9.78} height={9.5} className='size-4'/></Link>
-
-                                    {/* Custom Check-In User */}
-                                    {isEventLive(event) && <AlertDialog>
-                                        <AlertDialogTrigger className='cursor-pointer'>
-                                            <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary' />
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    Are you sure want to mark this user as checked in ?
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>}
 
                                     {/* Delete Attendee */}
                                     <AlertDialog>

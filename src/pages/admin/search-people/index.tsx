@@ -410,8 +410,8 @@ const SearchPeople: React.FC = () => {
                                 </TableHead>
                                 <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
                                 <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Mobile Number</TableHead>
+                                {/* <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
+                                <TableHead className="text-left min-w-10 !px-2">Mobile Number</TableHead> */}
                                 <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
                                 <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
                                 <TableHead className="text-left min-w-10 !px-2">Industry</TableHead>
@@ -434,12 +434,12 @@ const SearchPeople: React.FC = () => {
                                     <TableCell className="text-left min-w-10 capitalize">
                                         {person.firstName && person.lastName ? `${person.firstName} ${person.lastName}` : "-"}
                                     </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
+                                    {/* <TableCell className="text-left min-w-10 capitalize">
                                         {person.email ? person.email : "-"}
                                     </TableCell>
                                     <TableCell className="text-left min-w-10 capitalize">
                                         {person.mobileNumber ? person.mobileNumber : "-"}
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell className="text-left min-w-10 capitalize">
                                         {person.designation || "-"}
                                     </TableCell>
