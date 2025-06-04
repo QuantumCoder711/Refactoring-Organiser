@@ -9,6 +9,7 @@ import GuestLayout from '@/pages/guest/layout';
 
 // Guest Pages
 import Login from '@/pages/guest/login';
+import Signup from '@/pages/guest/signup';
 import Homepage from '@/pages/guest/homepage';
 import ExploreEvents from '@/pages/guest/explore-events';
 import AddFirstEvent from '@/pages/guest/add-first-event';
@@ -92,6 +93,14 @@ const App: React.FC = () => {
           element={
             <GuestRoute>
               <Login />
+            </GuestRoute>
+          }
+        />
+        <Route
+          path="signup"
+          element={
+            <GuestRoute>
+              <Signup />
             </GuestRoute>
           }
         />

@@ -446,8 +446,8 @@ const ExploreViewEvent: React.FC = () => {
                                         alt="Speaker"
                                         className='rounded-full mx-auto size-24'
                                     />
-                                    <p className='font-semibold text-wrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
-                                    <p className='text-wrap text-sm'>{speaker.job_title}</p>
+                                    <p className='font-semibold text-wrap capitalize'>{speaker.first_name + ' ' + speaker.last_name}</p>
+                                    <p className='text-wrap text-sm capitalize'>{speaker.job_title}</p>
                                     <p className='text-sm font-bold text-wrap capitalize'>{speaker.company_name}</p>
                                 </div>
                             )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
@@ -466,8 +466,8 @@ const ExploreViewEvent: React.FC = () => {
                                         alt="Jury"
                                         className='rounded-full mx-auto size-24'
                                     />
-                                    <p className='font-semibold text-wrap'>{jury.first_name + ' ' + jury.last_name}</p>
-                                    <p className='text-wrap text-sm'>{jury.job_title}</p>
+                                    <p className='font-semibold text-wrap capitalize'>{jury.first_name + ' ' + jury.last_name}</p>
+                                    <p className='text-wrap text-sm capitalize'>{jury.job_title}</p>
                                     <p className='text-sm font-bold text-wrap capitalize'>{jury.company_name}</p>
                                 </div>
                             ))}
@@ -490,9 +490,9 @@ const ExploreViewEvent: React.FC = () => {
                                                     <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
                                                         <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
                                                         <div className='space-y-1'>
-                                                            <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
-                                                            <p className='text-sm leading-none'>{speaker.company_name}</p>
-                                                            <p className='text-xs leading-none'>{speaker.job_title}</p>
+                                                            <p className='font-semibold text-lg leading-none capitalize'>{speaker.first_name} {speaker.last_name}</p>
+                                                            <p className='text-sm leading-none capitalize'>{speaker.company_name}</p>
+                                                            <p className='text-xs leading-none capitalize'>{speaker.job_title}</p>
                                                         </div>
                                                     </div>
                                                 ))}

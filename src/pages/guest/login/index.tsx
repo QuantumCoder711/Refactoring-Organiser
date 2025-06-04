@@ -115,7 +115,7 @@ const Login: React.FC = () => {
         </Button>
 
         <p className='text-center mt-5 text-xs'>
-          Don't have an account? <Link to='#' className='text-brand-primary'>Signup Here</Link>
+          Don't have an account? <Link to='/signup' className='text-brand-primary'>Signup Here</Link>
         </p>
       </div>
     </div>
