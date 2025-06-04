@@ -11,6 +11,7 @@ import GuestLayout from '@/pages/guest/layout';
 import Login from '@/pages/guest/login';
 import Signup from '@/pages/guest/signup';
 import ForgotPassword from '@/pages/guest/forgot-password';
+import ResetPassword from '@/pages/guest/reset-password';
 import Homepage from '@/pages/guest/homepage';
 import ExploreEvents from '@/pages/guest/explore-events';
 import AddFirstEvent from '@/pages/guest/add-first-event';
@@ -62,6 +63,7 @@ import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested
 import SearchPeople from './pages/admin/search-people';
 import CheckInPage from './pages/guest/check-in-page';
 import InviteRegistrations from './pages/admin/send-invitations/invite-registrations';
+import ChangePassword from '@/pages/admin/profile/change-password';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -113,6 +115,14 @@ const App: React.FC = () => {
             </GuestRoute>
           }
         />
+        <Route
+          path="organiser/reset-password"
+          element={
+            <GuestRoute>
+              <ResetPassword />
+            </GuestRoute>
+          }
+        />
       </Route>
 
       {/* Protected Admin Routes */}
@@ -126,6 +136,7 @@ const App: React.FC = () => {
         {/* Main Routes */}
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="profile/change-password" element={<ChangePassword />} />
         <Route path="all-events" element={<AllEvents />} />
         <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />

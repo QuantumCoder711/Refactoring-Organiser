@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
 import { Label } from '@/components/ui/label';
