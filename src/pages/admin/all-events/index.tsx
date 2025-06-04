@@ -161,7 +161,7 @@ const AllEvents: React.FC = () => {
             slug={event.slug}
             id={event.id}
             uuid={event.uuid}
-            total_attendees={event.total_attendees || 0}
+            total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
@@ -183,7 +183,7 @@ const AllEvents: React.FC = () => {
             slug={event.slug}
             id={event.id}
             uuid={event.uuid}
-            total_attendees={event.total_attendees || 0}
+            total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
