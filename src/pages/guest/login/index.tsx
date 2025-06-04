@@ -103,7 +103,7 @@ const Login: React.FC = () => {
           </div>
         </form>
         <div className='max-w-64 w-full text-left px-3'>
-          <Link to='#' className='text-brand-primary text-xs'>Forgot Password?</Link>
+          <Link to='/forgot-password' className='text-brand-primary text-xs'>Forgot Password?</Link>
         </div>
 
         <Button
