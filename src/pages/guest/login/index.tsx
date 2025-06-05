@@ -103,7 +103,7 @@ const Login: React.FC = () => {
           </div>
         </form>
         <div className='max-w-64 w-full text-left px-3'>
-          <Link to='/forgot-password' className='text-brand-primary text-xs'>Forgot Password?</Link>
+          <Link to='/organiser/forgot-password' className='text-brand-primary text-xs'>Forgot Password?</Link>
         </div>
 
         <Button
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
         </Button>
 
         <p className='text-center mt-5 text-xs'>
-          Don't have an account? <Link to='/signup' className='text-brand-primary'>Signup Here</Link>
+          Don't have an account? <Link to='/organiser/signup' className='text-brand-primary'>Signup Here</Link>
         </p>
       </div>
     </div>

@@ -178,7 +178,7 @@ const Attendees: React.FC = () => {
   // Buttons
   const links = [
     { name: "Add Attendee", url: `/all-events/add-attendee/${slug}` },
-    { name: "Send WhatsApp/E-Mail", url: `/all-events/event/all-template-messages/${slug}` },
+    { name: "Send Notifications", url: `/all-events/event/all-template-messages/${slug}` },
     { name: "Pending User Request", url: `/all-events/event/all-template-messages/pending-user-request/${slug}` },
   ];
 

@@ -200,7 +200,7 @@ const Signup: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
-                navigate("/login");
+                navigate("/organiser/login");
             } else {
                 toast(res.data.message || "Invalid OTP", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -371,7 +371,7 @@ const Signup: React.FC = () => {
                         </div>
 
                         <Button onClick={handleCreateAccount} className='btn mx-auto w-full'>Create Account</Button>
-                        <p className="text-center">Already have an account? <Link to="/login" className='text-brand-primary'>Login Here</Link></p>
+                        <p className="text-center">Already have an account? <Link to="/organiser/login" className='text-brand-primary'>Login Here</Link></p>
                     </div>
                 )}
 

@@ -81,7 +81,7 @@ const ForgotPassword: React.FC = () => {
                     </Button>
 
                     <p className="text-center text-sm">
-                        Remember your password? <Link to="/login" className='text-brand-primary'>Login Here</Link>
+                        Remember your password? <Link to="/organiser/login" className='text-brand-primary'>Login Here</Link>
                     </p>
                 </div>
             </div>

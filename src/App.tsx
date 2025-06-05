@@ -69,7 +69,7 @@ const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+    return isAuthenticated ? <>{children}</> : <Navigate to="/organiser/login" replace />;
   };
 
   const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -81,10 +81,10 @@ const App: React.FC = () => {
       {/* Guest Routes */}
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
-        <Route path="events" element={<ExploreEvents />} />
+        <Route path="organiser/event" element={<ExploreEvents />} />
         <Route path="add-first-event" element={<AddFirstEvent />} />
-        <Route path="explore-events/:city" element={<ExploreAllEvents />} />
-        <Route path="explore-events/event/:slug" element={<ExploreViewEvent />} />
+        <Route path="events/:city" element={<ExploreAllEvents />} />
+        <Route path="events/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
         <Route path="terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="refund-policy" element={<RefundPolicy />} />
@@ -92,7 +92,7 @@ const App: React.FC = () => {
         <Route path="event/check-in" element={<CheckInPage />} />
         <Route path="faq" element={<FAQ />} />
         <Route
-          path="login"
+          path="organiser/login"
           element={
             <GuestRoute>
               <Login />
@@ -100,7 +100,7 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="signup"
+          path="organiser/signup"
           element={
             <GuestRoute>
               <Signup />
@@ -108,7 +108,7 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="forgot-password"
+          path="organiser/forgot-password"
           element={
             <GuestRoute>
               <ForgotPassword />
@@ -185,7 +185,7 @@ const App: React.FC = () => {
       <Route
         path="/"
         element={
-          <Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />
+          <Navigate to={isAuthenticated ? "/dashboard" : "/organiser/login"} replace />
         }
       />
 

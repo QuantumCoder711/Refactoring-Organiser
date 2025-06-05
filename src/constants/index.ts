@@ -43,11 +43,11 @@ export const navbarLinks = [
     },
     {
         label: "Events",
-        path: "/events",
+        path: "/organiser/event",
     },
     {
         label: "Explore",
-        path: "/explore-events/all",
+        path: "/events/all",
     },
     // {
     //     label: "Feature",
@@ -59,7 +59,7 @@ export const navbarLinks = [
     // },
     {
         label: "Organiser Login",
-        path: "/login",
+        path: "/organiser/login",
     },
 ];
 

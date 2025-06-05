@@ -80,7 +80,7 @@ const ExploreAllEvents: React.FC = () => {
     setSelectedCity(newCity);
     setUpcomingCurrentPage(1);
     setPastCurrentPage(1);
-    navigate(`/explore-events/${newCity.replace(/ /g, '-')}`);
+    navigate(`/events/${newCity.replace(/ /g, '-')}`);
   };
 
   const filterEventsByCity = (events: any[]) => {
@@ -163,7 +163,7 @@ const ExploreAllEvents: React.FC = () => {
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
             {getCurrentEvents().map((event, index) => (
-              <Link to={`/explore-events/event/${event.slug}`} key={index}>
+              <Link to={`/events/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={domain + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
                   <div className='space-y-2 overflow-hidden'>
@@ -355,7 +355,7 @@ export default ExploreAllEvents;
 //     setSelectedCity(newCity);
 //     setUpcomingCurrentPage(1);
 //     setPastCurrentPage(1);
-//     navigate(`/explore-events/${newCity.replace(/ /g, '-')}`);
+//     navigate(`/events/${newCity.replace(/ /g, '-')}`);
 //   };
 
 //   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -595,7 +595,7 @@ export default ExploreAllEvents;
 //         ) : (
 //           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12'>
 //             {getCurrentEvents().map((event, index) => (
-//               <Link to={`/explore-events/event/${event.slug}`} key={index} className="group block h-full">
+//               <Link to={`/events/${event.slug}`} key={index} className="group block h-full">
 //                 <div className='h-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 border border-gray-100 hover:border-brand-primary/30 flex flex-col'>
 //                   <div className="relative">
 //                     <img 

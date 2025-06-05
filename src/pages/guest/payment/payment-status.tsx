@@ -99,7 +99,7 @@ const PaymentStatus: React.FC = () => {
 
                     <div className="flex gap-4 w-full">
                         <Link
-                            to={eventSlug ? `/explore-events/event/${eventSlug}` : '/'}
+                            to={eventSlug ? `/events/${eventSlug}` : '/'}
                             className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
                         >
                             Go Back
