@@ -67,11 +67,49 @@ const InviteRegistrations: React.FC = () => {
     });
 
     const whatsappMessage = `<p>Hello, this is a follow-up reminder for the email sent for <strong>${event?.title}</strong> happening on <strong>${event?.event_start_date}</strong> at <strong>${event?.event_venue_name}</strong>. <br /><br />
-                                    
+    
     Kindly review the same or check the link below for more details on the invitation. <br /><br />
     
     Best Regards, <br />
     ${user?.company_name}</p>`;
+
+    const handleSubmit = async () => {
+        if (formData.send_method === "email" && (!formData.message || !formData.subject)) {
+            toast("Please fill in all required fields", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await inviteRegistrations(formData);
+
+            // Check if response exists and has a message property
+            if (response.status == 200) {
+                toast(response.message || "Message sent successfully!", {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            } else {
+                // Default error message if no specific response format
+                toast("Something went wrong!!!", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toast(error instanceof Error ? error.message : "Failed to send message", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Initialize Quill editor
     useEffect(() => {
@@ -98,7 +136,7 @@ const InviteRegistrations: React.FC = () => {
                 quill.off('text-change');
             };
         }
-    }, [quillRef, formData.send_method === "email", formData.message]);
+    }, [quillRef, formData.send_method === "email", formData.message, handleSubmit]);
 
     // Update formData when selectedRoles changes
     useEffect(() => {
@@ -166,48 +204,6 @@ const InviteRegistrations: React.FC = () => {
             ...prev,
             subject: e.target.value
         }));
-    };
-
-    const handleSubmit = async () => {
-        if (formData.send_method === "email" && (!formData.message || !formData.subject)) {
-            toast("Please fill in all required fields", {
-                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleX className='size-5' />
-            });
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            const response = await inviteRegistrations(formData);
-
-            // Check if response exists and has a message property
-            if (response.status === 200) {
-                toast(response.message || "Message sent successfully!", {
-                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleCheck className='size-5' />
-                });
-            } else {
-                // Default error message if no specific response format
-                toast("Something went wrong!!!", {
-                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleX className='size-5' />
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            toast(error instanceof Error ? error.message : "Failed to send message", {
-                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleX className='size-5' />
-            });
-        } finally {
-            setLoading(false);
-            setFormData({
-                ...formData,
-                subject: "",
-            });
-        }
     };
 
     if (loading) return <Wave />
@@ -325,6 +321,7 @@ const InviteRegistrations: React.FC = () => {
                             </div>
                         </div>
                     </div>
+                    {/* Remove setFormData from finally block to prevent clearing the form */}
                 </div>
             </div>
         </div>
