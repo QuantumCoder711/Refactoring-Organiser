@@ -7,7 +7,7 @@ import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, D
 
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatDateTime, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
+import { dateDifference, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
 
 import {
   Table,
