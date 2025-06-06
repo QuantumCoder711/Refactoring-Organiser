@@ -266,27 +266,27 @@ const Attendees: React.FC = () => {
 
     try {
       console.log('Original QR code:', event.qr_code);
-      
+
       // Check if qr_code is already a full URL or a relative path
       const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
       const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
-      
+
       console.log('Generated image URL:', imageUrl);
-      
+
       // Create a temporary link with the direct image URL
       const link = document.createElement('a');
       link.href = imageUrl;
       link.target = '_blank'; // Open in new tab as a fallback
       link.rel = 'noopener noreferrer';
-      
+
       // Set download attribute with a filename
       const fileName = `qrcode-${event.slug || 'event'}.png`;
       link.download = fileName;
-      
+
       // Append to body, click and remove
       document.body.appendChild(link);
       link.click();
-      
+
       // Clean up
       setTimeout(() => {
         document.body.removeChild(link);
@@ -821,14 +821,32 @@ const Attendees: React.FC = () => {
                           <Table className="mt-4">
                             <TableHeader className="bg-brand-light">
                               <TableRow className="text-left">
+                                <TableHead>Sr. No.</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Company</TableHead>
-                                <TableHead className='text-right max-w-fit flex items-center justify-center'>Action</TableHead>
+                                <TableHead className='text-right max-w-fit flex items-center justify-center'>
+                                  <Checkbox
+                                    id='select-all'
+                                    name='select-all'
+                                    checked={selectedSponsorsAttendees.length === paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").length}
+                                    className="mx-auto cursor-pointer border border-brand-dark-gray"
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        setSelectedSponsorsAttendees(
+                                          paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: event?.uuid as string, attendee_id: attendee.id }))
+                                        )
+                                      } else {
+                                        setSelectedSponsorsAttendees([])
+                                      }
+                                    }}
+                                  />
+                                </TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => (
                                 <TableRow key={attendee.id} className="hover:bg-brand-lightest">
+                                  <TableCell>{paginatedAttendees.indexOf(attendee) + 1}</TableCell>
                                   <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
                                   <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
                                   <TableCell className="text-center max-w-fit flex items-center justify-center">
