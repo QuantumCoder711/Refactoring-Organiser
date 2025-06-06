@@ -10,7 +10,7 @@ interface AttendeeStore {
     getSingleEventAttendees: (token: string, uuid: string) => Promise<void>;
     loading: boolean;
     deleteAttendee: (id: number, token: string) => Promise<DeleteAttendeeResponse>;
-    customCheckIn: (uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
+    customCheckIn: (uuid: string, event_uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
     bulkDeleteAttendees: (token: string, ids: number[]) => Promise<BulkDeleteAttendeesResponse>;
     addAttendee: (token: string, uuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
     bulkUploadAttendees: (token: string, uuid: string, file: File) => Promise<AddBulkAttendeeResponse>;
@@ -70,20 +70,29 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
     },
 
     // Custom Check In
-    customCheckIn: async (uuid: string, event_id: number, user_id: number, token: string) => {
+    customCheckIn: async (uuid: string, event_uuid: string, event_id: number, user_id: number, token: string) => {
         try {
             set({ loading: true });
             const response = await customCheckIn(token, uuid, event_id, user_id);
+            
+            // Only refresh attendees if check-in was successful
             if (response.status === 200) {
-                set((state) => ({
-                    singleEventAttendees: state.singleEventAttendees.map(attendee =>
-                        attendee.uuid === uuid ? { ...attendee, check_in: 1 } : attendee
-                    )
-                }));
+                try {
+                    const temp = await getSingleEventAttendees(token, event_uuid);
+                    set({ singleEventAttendees: temp.data });
+                } catch (refreshError) {
+                    console.error('Failed to refresh attendees after check-in:', refreshError);
+                    // Don't fail the whole operation if refresh fails
+                }
             }
             return response;
         } catch (error) {
-            throw error;
+            console.error('Error in customCheckIn:', error);
+            // Re-throw with a more descriptive message if it's not already an Error object
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error('Failed to process check-in');
         } finally {
             set({ loading: false });
         }

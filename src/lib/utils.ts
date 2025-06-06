@@ -145,7 +145,7 @@ export const formatDateTimeReport = (dateString: string): string => {
   const seconds = date.getSeconds().toString().padStart(2, '0');
 
   // Return formatted date string
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+  return `${day}-${month}-${year} (${hours}:${minutes}:${seconds} ${ampm})`;
 };
 
 export const createImage = (url: File | undefined | null): string => {

@@ -7,7 +7,7 @@ import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, D
 
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatDateTime, getImageUrl, isEventLive } from '@/lib/utils';
+import { dateDifference, formatDateTime, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
 
 import {
   Table,
@@ -209,11 +209,11 @@ const Attendees: React.FC = () => {
       'Alternate Mobile': attendee.alternate_mobile_number || '-',
       'Role': attendee.status || '-',
       'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
-      'Check In 1st': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
-      'Check In 2nd': dateDiff >= 1 ? (attendee.check_in_second === 1 ? (attendee.check_in_second_time ? formatDateTime(attendee.check_in_second_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 3rd': dateDiff >= 2 ? (attendee.check_in_third === 1 ? (attendee.check_in_third_time ? formatDateTime(attendee.check_in_third_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 4th': dateDiff >= 3 ? (attendee.check_in_forth === 1 ? (attendee.check_in_forth_time ? formatDateTime(attendee.check_in_forth_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 5th': dateDiff >= 4 ? (attendee.check_in_fifth === 1 ? (attendee.check_in_fifth_time ? formatDateTime(attendee.check_in_fifth_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 1st': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTimeReport(attendee.check_in_time) : 'Yes') : 'No',
+      'Check In 2nd': dateDiff >= 1 ? (attendee.check_in_second === 1 ? (attendee.check_in_second_time ? formatDateTimeReport(attendee.check_in_second_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 3rd': dateDiff >= 2 ? (attendee.check_in_third === 1 ? (attendee.check_in_third_time ? formatDateTimeReport(attendee.check_in_third_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 4th': dateDiff >= 3 ? (attendee.check_in_forth === 1 ? (attendee.check_in_forth_time ? formatDateTimeReport(attendee.check_in_forth_time) : 'Yes') : 'No') : 'N/A',
+      'Check In 5th': dateDiff >= 4 ? (attendee.check_in_fifth === 1 ? (attendee.check_in_fifth_time ? formatDateTimeReport(attendee.check_in_fifth_time) : 'Yes') : 'No') : 'N/A',
     }));
 
     // Create workbook and worksheet
@@ -319,7 +319,7 @@ const Attendees: React.FC = () => {
 
   const handleCustomCheckIn = async (uuid: string) => {
     if (token && event && user) {
-      const response = await customCheckIn(uuid, event?.id, user?.id, token);
+      const response = await customCheckIn(uuid, event.uuid, event?.id, user?.id, token);
       if (response.status === 200) {
         toast(response.message, {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -417,7 +417,7 @@ const Attendees: React.FC = () => {
         <TableCell key="check-in-1" className="text-left min-w-10">
           {attendee.check_in !== null && attendee.check_in !== undefined ?
             (attendee.check_in === 1 ?
-              (attendee.check_in_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_time)}</> : "Checked In") :
+              (attendee.check_in_time ? <><strong>Y</strong> {formatDateTimeReport(attendee.check_in_time)}</> : "Checked In") :
               "-") :
             "-"}
         </TableCell>
@@ -428,7 +428,7 @@ const Attendees: React.FC = () => {
         <TableCell key="check-in-2" className="text-left min-w-10">
           {attendee.check_in_second !== null && attendee.check_in_second !== undefined ?
             (attendee.check_in_second === 1 ?
-              (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_second_time)}</> : "Checked In") :
+              (attendee.check_in_second_time ? <><strong>Y</strong> {formatDateTimeReport(attendee.check_in_second_time)}</> : "Checked In") :
               "-") :
             "-"}
         </TableCell>
@@ -439,7 +439,7 @@ const Attendees: React.FC = () => {
         <TableCell key="check-in-3" className="text-left min-w-10">
           {attendee.check_in_third !== null && attendee.check_in_third !== undefined ?
             (attendee.check_in_third === 1 ?
-              (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_third_time)}</> : "Checked In") :
+              (attendee.check_in_third_time ? <><strong>Y</strong> {formatDateTimeReport(attendee.check_in_third_time)}</> : "Checked In") :
               "-") :
             "-"}
         </TableCell>
@@ -450,7 +450,7 @@ const Attendees: React.FC = () => {
         <TableCell key="check-in-4" className="text-left min-w-10">
           {attendee.check_in_forth !== null && attendee.check_in_forth !== undefined ?
             (attendee.check_in_forth === 1 ?
-              (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_forth_time)}</> : "Checked In") :
+              (attendee.check_in_forth_time ? <><strong>Y</strong> {formatDateTimeReport(attendee.check_in_forth_time)}</> : "Checked In") :
               "-") :
             "-"}
         </TableCell>
@@ -461,7 +461,7 @@ const Attendees: React.FC = () => {
         <TableCell key="check-in-5" className="text-left min-w-10">
           {attendee.check_in_fifth !== null && attendee.check_in_fifth !== undefined ?
             (attendee.check_in_fifth === 1 ?
-              (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTime(attendee.check_in_fifth_time)}</> : "Checked In") :
+              (attendee.check_in_fifth_time ? <><strong>Y</strong> {formatDateTimeReport(attendee.check_in_fifth_time)}</> : "Checked In") :
               "-") :
             "-"}
         </TableCell>
@@ -910,7 +910,7 @@ const Attendees: React.FC = () => {
                   {/* Custom Check-In User */}
                   {isEventLive(event) && <AlertDialog>
                     <AlertDialogTrigger className='cursor-pointer'>
-                      <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary' />
+                      <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary size-4' />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
