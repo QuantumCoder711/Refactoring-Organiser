@@ -10,6 +10,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
 import QRCode from 'qrcode';
+import CreateQRCode from "react-qr-code";
 
 import {
     Dialog,
@@ -24,13 +25,13 @@ import Wave from '@/components/Wave';
 import { useLoadScript } from '@react-google-maps/api';
 import GoBack from '@/components/GoBack';
 
-const createQRCode = (uuid: string | undefined, breakout_room: number | undefined): string => {
+const createQRCode = (uuid: string | undefined, break_out: number | undefined): string => {
     return `https://kloutclub.page.link/?link=${encodeURIComponent(
-        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${breakout_room}`
+        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${break_out}`
     )}&apn=com.klout.app&afl=${encodeURIComponent(
-        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${breakout_room}`
+        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${break_out}`
     )}&ibi=com.klout.app&ifl=${encodeURIComponent(
-        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${breakout_room}`
+        `https://www.klout.club/event/check-in?eventuuid=${uuid}&breakoutRoom=${break_out}`
     )}&_icp=1`;
 }
 
@@ -153,13 +154,10 @@ const ViewEvent: React.FC = () => {
 
         setIsDownloading(true);
         try {
-            console.log('Original QR code:', event.qr_code);
 
             // Check if qr_code is already a full URL or a relative path
             const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
             const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
-
-            console.log('Generated image URL:', imageUrl);
 
             // Create a temporary link with the direct image URL
             const link = document.createElement('a');
@@ -237,34 +235,63 @@ const ViewEvent: React.FC = () => {
                     )}
                 </div>
 
-                <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                <div className='flex flex-col gap-3 justify-center items-center'>
                     {isLive && (
-                        <>
+                        <React.Fragment>
+                            <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button className='btn-rounded h-6'>View QR Code</Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                            <DialogDescription className="text-center">
+                                                <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                                                <Button
+                                                    onClick={handleDownload}
+                                                    className='btn mx-auto mt-6'
+                                                    disabled={isDownloading}
+                                                >
+                                                    {isDownloading ? 'Downloading...' : 'Download'}
+                                                </Button>
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
+                                <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                            </div>
+                            {/* For breakout rooms */}
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className='btn-rounded h-6'>View QR Code</Button>
+                                    <Button className='btn-rounded h-6'>Breakout QR Code</Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
                                     <DialogHeader>
                                         <DialogTitle className='text-center'>{event?.title}</DialogTitle>
-                                        <DialogDescription className="text-center">
-                                            <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-                                            <Button
-                                                onClick={handleDownload}
-                                                className='btn mx-auto mt-6'
-                                                disabled={isDownloading}
-                                            >
-                                                {isDownloading ? 'Downloading...' : 'Download'}
-                                            </Button>
+                                        <DialogDescription className="text-center grid grid-cols-5 gap-7">
+                                            {
+                                                Array.from({ length: Number(event?.break_out) }, (_, index) => (
+                                                    // <img
+                                                    //     key={index}
+                                                    //     className='w-[100px] h-[100px] rounded-lg'
+                                                    //     alt="QR Code"
+                                                    //     src={createQRCode(event?.uuid, index + 1)}
+                                                    // />
+                                                    <div className='flex flex-col gap-3'>
+                                                        <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
+                                                        <p>Breakout : {index + 1}</p>
+                                                    </div>
+                                                ))
+                                            }
                                         </DialogDescription>
                                     </DialogHeader>
                                 </DialogContent>
                             </Dialog>
-                            <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
-                        </>
+                        </React.Fragment>
                     )}
-                    {isUpcoming && (
-                        <div className='col-span-2 flex justify-center'>
+                    {(isUpcoming && !isLive) && (
+                        <div className='col-span-2 gap-3 flex justify-center'>
                             <Dialog>
                                 <DialogTrigger asChild>
                                     <Button className='btn-rounded h-6'>View QR Code</Button>
@@ -291,18 +318,23 @@ const ViewEvent: React.FC = () => {
                                 <DialogTrigger asChild>
                                     <Button className='btn-rounded h-6'>Breakout QR Code</Button>
                                 </DialogTrigger>
-                                <DialogContent className='max-w-fit w-full'>
+                                <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
                                     <DialogHeader>
                                         <DialogTitle className='text-center'>{event?.title}</DialogTitle>
                                         <DialogDescription className="text-center grid grid-cols-5 gap-7">
                                             {
-                                                Array.from({ length: Number(event?.breakout_room) }, (_, index) => (
-                                                    <img
-                                                    key={index}
-                                                    className='w-[100px] h-[100px] rounded-lg'
-                                                    alt="QR Code"
-                                                    src={createQRCode(event?.uuid, index + 1)}
-                                                    />
+                                                Array.from({ length: Number(event?.break_out) }, (_, index) => (
+                                                    // <img
+                                                    //     key={index}
+                                                    //     className='w-[100px] h-[100px] rounded-lg'
+                                                    //     alt="QR Code"
+                                                    //     src={createQRCode(event?.uuid, index + 1)}
+                                                    // />
+                                                    
+                                                    <div className='flex flex-col gap-3'>
+                                                        <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
+                                                        <p>Breakout : {index + 1}</p>
+                                                    </div>
                                                 ))
                                             }
                                         </DialogDescription>

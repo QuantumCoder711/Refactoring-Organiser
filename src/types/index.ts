@@ -71,7 +71,7 @@ export interface EventType {
     total_checkedin_speaker: number;
     total_checkedin_sponsor: number;
     total_pending_delegate: number;
-    breakout_room: number | string;
+    break_out: number | string;
 }
 
 export interface AddEventType {
@@ -101,6 +101,7 @@ export interface AddEventType {
     city: string;
     country: string;
     pincode: string;
+    break_out: number | string;
 }
 
 export interface AttendeeType {
