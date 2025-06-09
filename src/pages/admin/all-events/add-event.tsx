@@ -77,6 +77,7 @@ const AddEvent: React.FC = () => {
         event_venue_name: '',
         event_venue_address_1: '',
         event_venue_address_2: '',
+        break_out: 0,
     });
 
     const handlePlaceSelect = () => {
@@ -85,7 +86,7 @@ const AddEvent: React.FC = () => {
 
             if (place && place.address_components) {
                 const addressComponents = place.address_components as google.maps.GeocoderAddressComponent[];
-                
+
                 // Find pincode from address components
                 let pincode = '000000';
                 for (const component of addressComponents) {
@@ -159,19 +160,19 @@ const AddEvent: React.FC = () => {
         }));
     };
 
-        // Also modify handleTemplateSelect to improve template handling
-        const handleTemplateSelect = (template: string) => {
-            // Set the image source to 'template'
-            setImageSource('template');
-            setSelectedTemplate(template);
-    
-            // When a template is selected, set the image in formData to the template string
-            // (it will be converted to a File during submission)
-            setFormData(prevState => ({
-                ...prevState,
-                image: template
-            }));
-        };
+    // Also modify handleTemplateSelect to improve template handling
+    const handleTemplateSelect = (template: string) => {
+        // Set the image source to 'template'
+        setImageSource('template');
+        setSelectedTemplate(template);
+
+        // When a template is selected, set the image in formData to the template string
+        // (it will be converted to a File during submission)
+        setFormData(prevState => ({
+            ...prevState,
+            image: template
+        }));
+    };
 
     // Toggle template display and reset selections
     const toggleTemplates = () => {
@@ -278,7 +279,7 @@ const AddEvent: React.FC = () => {
 
                 // Clone the node to avoid modifying the original
                 const clonedNode = imageRef.current.cloneNode(true) as HTMLElement;
-                
+
                 // Create a temporary container
                 const container = document.createElement('div');
                 container.style.position = 'absolute';
@@ -296,8 +297,8 @@ const AddEvent: React.FC = () => {
                         skipFonts: true, // Skip external fonts
                         filter: (node) => {
                             // Filter out problematic elements
-                            return !node.classList?.contains('google-map') && 
-                                   !node.classList?.contains('map-container');
+                            return !node.classList?.contains('google-map') &&
+                                !node.classList?.contains('map-container');
                         }
                     });
 
@@ -354,7 +355,7 @@ const AddEvent: React.FC = () => {
 
                 // Reset form on success
                 resetForm();
-                
+
                 // Redirect to dashboard
                 window.location.href = '/dashboard';
             } else {
@@ -418,6 +419,7 @@ const AddEvent: React.FC = () => {
             event_venue_name: '',
             event_venue_address_1: '',
             event_venue_address_2: '',
+            break_out: 0,
         });
         setImageSource(null);
         setSelectedTemplate(null);
@@ -739,13 +741,28 @@ const AddEvent: React.FC = () => {
                 <div className='flex items-center justify-between gap-5 mt-5'>
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='printer_count'>
-                            No. of Printers <span className="text-brand-secondary">*</span>
+                            No. of Printers
                         </Label>
                         <Input
                             id="printer_count"
                             name='printer_count'
                             type="number"
                             value={formData.printer_count !== null ? formData.printer_count.toString() : ''}
+                            onChange={handleInputChange}
+                            className='input !h-12 min-w-full text-base'
+                        />
+                    </div>
+
+                    {/* Breakout Rooms */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='break_out'>
+                            Breakout Rooms
+                        </Label>
+                        <Input
+                            id="break_out"
+                            name='break_out'
+                            type="number"
+                            value={formData.break_out !== null ? formData.break_out : 0}
                             onChange={handleInputChange}
                             className='input !h-12 min-w-full text-base'
                         />
