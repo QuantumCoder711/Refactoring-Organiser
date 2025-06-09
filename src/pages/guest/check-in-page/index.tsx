@@ -24,6 +24,7 @@ const CheckinPage: React.FC = () => {
     const params: URLSearchParams = new URLSearchParams(location.search);
     const eventUUID: string | null = params.get("eventuuid");
     const breakoutRoom: string | null = params.get("breakoutRoom");
+    const tabId: string | null = params.get("tabId");
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);
@@ -273,7 +274,8 @@ const CheckinPage: React.FC = () => {
                     last_name: getLastName(formData.name),
                     job_title: formData.designation,
                     company_name: formData.company,
-                    industry: 'Others'
+                    industry: 'Others',
+                    tabId: tabId || ''
                 };
 
             // Make the API call
