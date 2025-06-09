@@ -23,6 +23,7 @@ const CheckinPage: React.FC = () => {
     const location = useLocation();
     const params: URLSearchParams = new URLSearchParams(location.search);
     const eventUUID: string | null = params.get("eventuuid");
+    const breakoutRoom: string | null = params.get("breakoutRoom");
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);
@@ -242,19 +243,41 @@ const CheckinPage: React.FC = () => {
                 return;
             }
 
-            // Proceed with check-in if verified
-            const response = await axios.post(`${domain}/api/accept_decline_event_invitation`, {
-                user_id: event?.user_id,
-                event_uuid: eventUUID,
-                email: formData.email,
-                phone_number: formData.mobile,
-                acceptance: '1',
-                first_name: getFirstName(formData.name),
-                last_name: getLastName(formData.name),
-                job_title: formData.designation,
-                company_name: formData.company,
-                industry: 'Others'
-            }, {
+            // Determine which API endpoint to use based on breakoutRoom parameter
+            const endpoint = breakoutRoom 
+                ? `${domain}/api/breakout_room_checkin`
+                : `${domain}/api/accept_decline_event_invitation`;
+
+            // Prepare the request payload
+            const payload = breakoutRoom 
+                ? {
+                    user_id: event?.user_id,
+                    event_uuid: eventUUID,
+                    email: formData.email,
+                    phone_number: formData.mobile,
+                    acceptance: '1',
+                    first_name: getFirstName(formData.name),
+                    last_name: getLastName(formData.name),
+                    job_title: formData.designation,
+                    company_name: formData.company,
+                    industry: 'Others',
+                    breakout_room: breakoutRoom
+                }
+                : {
+                    user_id: event?.user_id,
+                    event_uuid: eventUUID,
+                    email: formData.email,
+                    phone_number: formData.mobile,
+                    acceptance: '1',
+                    first_name: getFirstName(formData.name),
+                    last_name: getLastName(formData.name),
+                    job_title: formData.designation,
+                    company_name: formData.company,
+                    industry: 'Others'
+                };
+
+            // Make the API call
+            const response = await axios.post(endpoint, payload, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
