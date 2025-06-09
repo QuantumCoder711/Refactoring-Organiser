@@ -275,7 +275,7 @@ const CheckinPage: React.FC = () => {
                     job_title: formData.designation,
                     company_name: formData.company,
                     industry: 'Others',
-                    tabId: tabId || ''
+                    tab_id: tabId || ''
                 };
 
             // Make the API call
