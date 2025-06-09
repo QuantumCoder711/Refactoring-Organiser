@@ -874,6 +874,21 @@ const UpdateEvent: React.FC = () => {
                         />
                     </div>
 
+                    {/* Breakout Rooms */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='break_out'>
+                            Breakout Rooms
+                        </Label>
+                        <Input
+                            id="break_out"
+                            name='break_out'
+                            type="number"
+                            value={formData.break_out !== null ? formData.break_out : 0}
+                            onChange={handleInputChange}
+                            className='input !h-12 min-w-full text-base'
+                        />
+                    </div>
+
                     {/* View Agenda By */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='view_agenda_by'>
