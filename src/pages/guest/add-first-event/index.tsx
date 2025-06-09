@@ -120,6 +120,7 @@ const AddFirstEvent: React.FC = () => {
         event_venue_name: '',
         event_venue_address_1: '',
         event_venue_address_2: '',
+        break_out: 0,
     });
 
     const handlePlaceSelect = () => {
@@ -1095,6 +1096,21 @@ const AddFirstEvent: React.FC = () => {
                                 type="number"
                                 min="0"
                                 value={formData.printer_count || 0}
+                                onChange={handleInputChangeEventForm}
+                                className='input !h-12 min-w-full text-base'
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-2 w-full">
+                            <Label className="font-semibold" htmlFor='break_out'>
+                                Break Out
+                            </Label>
+                            <Input
+                                id="break_out"
+                                name='break_out'
+                                type="number"
+                                min="0"
+                                value={formData.break_out || 0}
                                 onChange={handleInputChangeEventForm}
                                 className='input !h-12 min-w-full text-base'
                             />

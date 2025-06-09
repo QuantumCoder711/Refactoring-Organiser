@@ -67,6 +67,7 @@ const EventForm: React.FC<EventFormProps> = ({ data, eventId }) => {
         event_venue_name: '',
         event_venue_address_1: '',
         event_venue_address_2: '',
+        break_out: 0,
     });
 
     useEffect(() => {
@@ -297,6 +298,7 @@ const EventForm: React.FC<EventFormProps> = ({ data, eventId }) => {
                     event_venue_name: '',
                     event_venue_address_1: '',
                     event_venue_address_2: '',
+                    break_out: 0,
                 });
                 setCoords({
                     lat: 0,
@@ -569,6 +571,20 @@ const EventForm: React.FC<EventFormProps> = ({ data, eventId }) => {
                         <Input
                             id="printer_count"
                             name='printer_count'
+                            type="number"
+                            onChange={handleInputChange}
+                            className='input !h-12 min-w-full text-base'
+                        />
+                    </div>
+
+                    {/* Break Out */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='break_out'>
+                            Break Out
+                        </Label>
+                        <Input
+                            id="break_out"
+                            name='break_out'
                             type="number"
                             onChange={handleInputChange}
                             className='input !h-12 min-w-full text-base'
