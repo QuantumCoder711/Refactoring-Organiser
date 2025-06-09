@@ -748,6 +748,7 @@ const Attendees: React.FC = () => {
               <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
               {renderCheckInColumns()}
+              <TableHead className="text-left min-w-10 !px-2">Breakout Checkin</TableHead>
               <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -792,6 +793,9 @@ const Attendees: React.FC = () => {
                     : "-"}
                 </TableCell>
                 {renderCheckInData(attendee)}
+                <TableCell className="text-left min-w-10">
+                  {attendee.break_out_checkin === null ? '-':attendee.break_out_checkin + " / " + attendee.break_out_checkin_time}
+                </TableCell>
                 <TableCell className="min-w-10 flex items-center justify-end gap-1.5">
 
                   {attendee.status === "sponsor" &&

@@ -143,6 +143,8 @@ export interface AttendeeType {
     check_in_fifth_time: string | null;
     not_invited: number;
     award_winner: number;
+    break_out_checkin?: number | null;
+    break_out_checkin_time?: string | null;
 }
 
 export interface CompanyType {
