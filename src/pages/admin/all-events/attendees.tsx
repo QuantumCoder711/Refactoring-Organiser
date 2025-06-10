@@ -794,7 +794,11 @@ const Attendees: React.FC = () => {
                 </TableCell>
                 {renderCheckInData(attendee)}
                 <TableCell className="text-left min-w-10">
-                  {attendee.break_out_checkin === null ? '-':attendee.break_out_checkin + " / " + attendee.break_out_checkin_time}
+                  {!attendee.break_out_room_and_time ? '-' : 
+                    attendee.break_out_room_and_time.map((item, index) => (
+                      <div key={index}>{item}</div>
+                    ))
+                  }
                 </TableCell>
                 <TableCell className="min-w-10 flex items-center justify-end gap-1.5">
 
