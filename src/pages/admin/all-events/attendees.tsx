@@ -7,7 +7,7 @@ import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, D
 
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
+import { dateDifference, formatBreakOutTime, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
 
 import {
   Table,
@@ -754,7 +754,10 @@ const Attendees: React.FC = () => {
           </TableHeader>
           <TableBody>
             {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-              <TableRow key={attendee.id}>
+              <TableRow 
+                key={attendee.id} 
+                className={`${attendee.not_invited === 1 ? 'bg-brand-secondary/10 hover:bg-brand-secondary/20' : 'hover:bg-brand-background'}`}
+              >
                 <TableCell className="text-left min-w-10">
                   <Checkbox
                     className='bg-white border-brand-dark-gray cursor-pointer'
@@ -796,7 +799,7 @@ const Attendees: React.FC = () => {
                 <TableCell className="text-left min-w-10">
                   {!attendee.break_out_room_and_time ? '-' : 
                     attendee.break_out_room_and_time.map((item, index) => (
-                      <div key={index}>{item}</div>
+                      <div key={index}>{formatBreakOutTime(item)}</div>
                     ))
                   }
                 </TableCell>
