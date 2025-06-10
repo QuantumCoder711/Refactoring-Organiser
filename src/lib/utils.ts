@@ -148,6 +148,36 @@ export const formatDateTimeReport = (dateString: string): string => {
   return `${day}-${month}-${year} (${hours}:${minutes}:${seconds} ${ampm})`;
 };
 
+export const formatBreakOutTime = (dateString: string): string => {
+  if (!dateString) return '';
+
+  const parts = dateString.split(" ");
+  if (parts.length < 2) return dateString;
+
+  const datePart = parts[0];
+  const timePart = parts[1];
+
+  // Parse the time part
+  const timeMatch = timePart.match(/(\d+):(\d+)(?::(\d+))?\s*(AM|PM)?/i);
+  if (!timeMatch) return dateString;
+
+  let hours = parseInt(timeMatch[1]);
+  const minutes = timeMatch[2].padStart(2, '0');
+  const seconds = (timeMatch[3] || '00').padStart(2, '0');
+  // const ampm = timeMatch[4]?.toUpperCase() || '';
+
+  // Convert to 12-hour format
+  const period = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // Convert 0 to 12 for 12 AM
+
+  // Format the time
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedTime = `${formattedHours}:${minutes}:${seconds} ${period}`;
+
+  return `${datePart} (${formattedTime})`;
+};
+
 export const createImage = (url: File | undefined | null): string => {
   if (url instanceof File) {
     return URL.createObjectURL(url);
