@@ -24,6 +24,7 @@ const CheckinPage: React.FC = () => {
     const params: URLSearchParams = new URLSearchParams(location.search);
     const eventUUID: string | null = params.get("eventuuid");
     const breakoutRoom: string | null = params.get("breakoutRoom");
+    const tabId: string | null = params.get("tabId");
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);
@@ -273,7 +274,8 @@ const CheckinPage: React.FC = () => {
                     last_name: getLastName(formData.name),
                     job_title: formData.designation,
                     company_name: formData.company,
-                    industry: 'Others'
+                    industry: 'Others',
+                    tab_id: tabId || ''
                 };
 
             // Make the API call
@@ -324,7 +326,7 @@ const CheckinPage: React.FC = () => {
         <div className='min-h-screen w-full flex items-center justify-center p-8'>
             <div className='max-w-md w-full flex flex-col gap-3 text-center'>
                 <h1 className='text-2xl font-semibold'>Registration for {event?.title}</h1>
-                <p>Thank you for your interest in attending the {event?.title}. Please fill the detail below to check in at the {event?.title}</p>
+                <p>Welcome to the {event?.title}, please verify your details to check-in at this session.</p>
 
                 {steps === 1 && <div>
                     <div className='flex mt-5 gap-2 flex-col'>

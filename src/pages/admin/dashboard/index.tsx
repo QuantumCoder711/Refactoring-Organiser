@@ -36,6 +36,14 @@ const Dashboard: React.FC = () => {
   }, [getAllEvents, getAllEventsAttendees, getAllEventsSponsors]);
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
+  pastEvents.sort((a: any, b: any) => {
+    return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
+  });
+
+  upcomingEvents.sort((a: any, b: any) => {
+    return new Date(b.event_start_date).getTime() + new Date(a.event_start_date).getTime();
+  });
+
   return (
     <div>
       {/* Events Information */}
