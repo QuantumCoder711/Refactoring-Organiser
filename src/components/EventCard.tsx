@@ -129,7 +129,6 @@ const EventCard: React.FC<EventCardProps> = ({
                                 <AlertDialogTitle>Do you really want to delete {title} ?</AlertDialogTitle>
                                 <AlertDialogDescription>
                                     This action cannot be undone. This will permanently delete {title}
-                                    and remove it's data from the event.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

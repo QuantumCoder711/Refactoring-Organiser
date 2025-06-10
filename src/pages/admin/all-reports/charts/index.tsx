@@ -178,7 +178,7 @@ const Charts: React.FC = () => {
     }
   };
 
-  if(loading) {
+  if (loading) {
     return <Wave />
   }
 
@@ -188,17 +188,6 @@ const Charts: React.FC = () => {
         <GoBack />
         <Button onClick={handleExport} className='bg-brand-primary hover:bg-brand-primary/90 cursor-pointer'>Export Charts</Button>
       </div>
-      {/* <div ref={chartRef} className='max-w-3xl rounded-[10px] min-h-full w-full bg-brand-background p-2'>
-      <div 
-          <PieChartComponent checkedInUsers={allCheckedInUsers.length} nonCheckedInUsers={allNonCheckedInUsers.length} />
-          <BarChartComponent hoursArray={hoursArray} />
-        
-          <Separator className='bg-black' />
-          <HorizontalBarChartComponent chartData={companyCounts} title="Total Attendees by Company" />
-        
-          <Separator className='bg-black' />
-          <HorizontalBarChartComponent chartData={designationCounts} title="Total Attendees by Designation" />
-        </div> */}
       <div
         ref={chartRef}
         className='max-w-3xl mx-auto rounded-[10px] bg-brand-background p-6 shadow-lg space-y-8 print:shadow-none print:p-2'

@@ -326,7 +326,7 @@ const CheckinPage: React.FC = () => {
         <div className='min-h-screen w-full flex items-center justify-center p-8'>
             <div className='max-w-md w-full flex flex-col gap-3 text-center'>
                 <h1 className='text-2xl font-semibold'>Registration for {event?.title}</h1>
-                <p>Thank you for your interest in attending the {event?.title}. Please fill the detail below to check in at the {event?.title}</p>
+                <p>Welcome to the {event?.title}, please verify your details to check-in at this session.</p>
 
                 {steps === 1 && <div>
                     <div className='flex mt-5 gap-2 flex-col'>
