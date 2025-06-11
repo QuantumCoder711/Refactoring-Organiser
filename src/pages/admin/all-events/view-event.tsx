@@ -142,8 +142,8 @@ const ViewEvent: React.FC = () => {
         generateQR();
     }, [event]);
 
-    const handleDownload = () => {
-        if (!event?.qr_code) {
+    const handleDownload = (qrCode: string | undefined) => {
+        if (!qrCode) {
             console.error('No QR code available for this event');
             toast('No QR code available for this event', {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -156,8 +156,8 @@ const ViewEvent: React.FC = () => {
         try {
 
             // Check if qr_code is already a full URL or a relative path
-            const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
-            const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
+            const isFullUrl = qrCode.startsWith('http://') || qrCode.startsWith('https://');
+            const imageUrl = isFullUrl ? qrCode : getImageUrl(qrCode);
 
             // Create a temporary link with the direct image URL
             const link = document.createElement('a');
@@ -166,7 +166,7 @@ const ViewEvent: React.FC = () => {
             link.rel = 'noopener noreferrer';
 
             // Set download attribute with a filename
-            const fileName = `qrcode-${event.slug || 'event'}.png`;
+            const fileName = `qrcode-${event?.slug || 'event'}.png`;
             link.download = fileName;
 
             // Append to body, click and remove
@@ -249,7 +249,7 @@ const ViewEvent: React.FC = () => {
                                             <DialogDescription className="text-center">
                                                 <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
                                                 <Button
-                                                    onClick={handleDownload}
+                                                    onClick={() => handleDownload(event?.qr_code)}
                                                     className='btn mx-auto mt-6'
                                                     disabled={isDownloading}
                                                 >
@@ -302,7 +302,7 @@ const ViewEvent: React.FC = () => {
                                         <DialogDescription className="text-center">
                                             <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
                                             <Button
-                                                onClick={handleDownload}
+                                                onClick={() => handleDownload(event?.qr_code)}
                                                 className='btn mx-auto mt-6'
                                                 disabled={isDownloading}
                                             >
@@ -334,6 +334,13 @@ const ViewEvent: React.FC = () => {
                                                     <div className='flex flex-col gap-3'>
                                                         <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
                                                         <p>Breakout : {index + 1}</p>
+                                                        {/* <Button
+                                                            onClick={() => handleDownload(createQRCode(event?.uuid, index + 1))}
+                                                            className='btn mx-auto mt-2'
+                                                            disabled={isDownloading}
+                                                        >
+                                                            {isDownloading ? 'Downloading...' : 'Download'}
+                                                        </Button> */}
                                                     </div>
                                                 ))
                                             }

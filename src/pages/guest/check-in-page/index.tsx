@@ -28,6 +28,7 @@ const CheckinPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);
+    const [savedMobile, setSavedMobile] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -39,6 +40,21 @@ const CheckinPage: React.FC = () => {
     });
 
     useEffect(() => {
+        // Check for saved mobile number if it's a breakout room check-in
+        if (breakoutRoom) {
+            const savedMobile = localStorage.getItem('breakoutCheckinMobile');
+            if (savedMobile) {
+                setSavedMobile(savedMobile);
+                setFormData(prev => ({
+                    ...prev,
+                    mobile: savedMobile
+                }));
+                // Skip to form directly if mobile is already verified
+                setSteps(3);
+            }
+        }
+
+        // Fetch event details
         axios.get(`${domain}/api/events/${eventUUID}`).then(res => {
             if (res.data.status === 200) {
                 setEvent(res.data.data);
@@ -48,8 +64,7 @@ const CheckinPage: React.FC = () => {
                 }));
             }
         });
-    }, [eventUUID]);
-
+    }, [eventUUID, breakoutRoom]);
 
     const sendOTP = async () => {
         try {
@@ -100,6 +115,10 @@ const CheckinPage: React.FC = () => {
             );
 
             if (response.data.status) {
+                // Save mobile to localStorage for breakout room check-ins
+                if (breakoutRoom) {
+                    localStorage.setItem('breakoutCheckinMobile', formData.mobile);
+                }
                 toast(response.data.message || "OTP verified successfully!", {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
@@ -341,7 +360,9 @@ const CheckinPage: React.FC = () => {
                                 className='input !h-full min-w-full absolute text-base z-10'
                             />
                         </div>
-                        <Button onClick={sendOTP} className="btn !h-12 w-full mt-2">Send OTP</Button>
+                        <Button onClick={sendOTP} className="btn !h-12 w-full mt-2" disabled={!!savedMobile}>
+                    {savedMobile ? 'Mobile Verified' : 'Send OTP'}
+                </Button>
                     </div>
                 </div>}
 
