@@ -292,7 +292,7 @@ const PendingUserRequest: React.FC = () => {
                             <ArrowDownToLine className='mr-2 h-4 w-4' /> Download Excel
                         </Button>
                     </div>
-                    <p className='font-semibold text-xl'>Pending Requests: {paginatedAttendees.length}</p>
+                    <p className='font-semibold text-xl'>Pending Requests: {pendingRequests.length}</p>
                 </div>
 
                 <Table className='mt-4'>
