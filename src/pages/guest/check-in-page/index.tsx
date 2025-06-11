@@ -28,7 +28,6 @@ const CheckinPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [steps, setSteps] = useState<number>(1);
     const [event, setEvent] = useState<EventType | null>(null);
-    const [savedMobile, setSavedMobile] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -40,52 +39,7 @@ const CheckinPage: React.FC = () => {
     });
 
     useEffect(() => {
-        // Check for saved mobile number if it's a breakout room check-in
-        if (breakoutRoom) {
-            const savedMobile = localStorage.getItem('breakoutCheckinMobile');
-            if (savedMobile) {
-                setSavedMobile(savedMobile);
-                setFormData(prev => ({
-                    ...prev,
-                    mobile: savedMobile
-                }));
-                // Check for existing user with saved mobile
-                axios.post(
-                    `${appDomain}/api/organiser/v1/event-checkin/existing-user`,
-                    {
-                        mobile: Number(savedMobile),
-                        eventID: event?.id,
-                        userID: event?.user_id
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                ).then(res => {
-                    if (res.data.data.length > 0) {
-                        setSteps(3);
-                        const userData = res.data.data[0];
-                        setFormData(prev => ({
-                            ...prev,
-                            name: userData.name,
-                            email: userData.email,
-                            designation: userData.designation,
-                            company: userData.company
-                        }));
-                    } else {
-                        // If no existing user found, proceed to step 1 for verification
-                        setSteps(1);
-                    }
-                }).catch(() => {
-                    setSteps(1);
-                });
-            } else {
-                setSteps(1);
-            }
-        }
-
-        // Fetch event details
+        // Fetch event details first
         axios.get(`${domain}/api/events/${eventUUID}`).then(res => {
             if (res.data.status === 200) {
                 setEvent(res.data.data);
@@ -93,6 +47,46 @@ const CheckinPage: React.FC = () => {
                     ...prev,
                     eventName: res.data.data.title
                 }));
+
+                // After getting event details, check for breakout room flow
+                if (breakoutRoom) {
+                    const savedMobile = localStorage.getItem('breakoutCheckinMobile');
+                    if (savedMobile) {
+                        // Check for existing user with saved mobile
+                        axios.post(
+                            `${appDomain}/api/organiser/v1/event-checkin/existing-user`,
+                            {
+                                mobile: Number(savedMobile),
+                                eventID: res.data.data.id,
+                                userID: res.data.data.user_id
+                            },
+                            {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            }
+                        ).then(userRes => {
+                            if (userRes.data.data.length > 0) {
+                                const userData = userRes.data.data[0];
+                                setFormData(prev => ({
+                                    ...prev,
+                                    mobile: savedMobile,
+                                    name: userData.name,
+                                    email: userData.email,
+                                    designation: userData.designation,
+                                    company: userData.company
+                                }));
+                                setSteps(3); // Go directly to form
+                            } else {
+                                setSteps(1); // No user found, start verification
+                            }
+                        }).catch(() => {
+                            setSteps(1); // Error, start verification
+                        });
+                    } else {
+                        setSteps(1); // No saved mobile, start verification
+                    }
+                }
             }
         });
     }, [eventUUID, breakoutRoom]);
@@ -171,7 +165,6 @@ const CheckinPage: React.FC = () => {
                 );
 
                 if (userResponse.data.data.length > 0) {
-                    setSteps(3);
                     const userData = userResponse.data.data[0];
                     setFormData(prev => ({
                         ...prev,
@@ -180,10 +173,8 @@ const CheckinPage: React.FC = () => {
                         designation: userData.designation,
                         company: userData.company
                     }));
-                } else {
-                    // No existing user found, proceed to step 3 with empty form
-                    setSteps(3);
                 }
+                setSteps(3);
             } else {
                 toast("Invalid OTP", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -285,7 +276,58 @@ const CheckinPage: React.FC = () => {
         try {
             setLoading(true);
 
-            // Check if OTP is verified (from step 2)
+            // Skip OTP verification if we have a saved mobile number for breakout room
+            if (breakoutRoom && localStorage.getItem('breakoutCheckinMobile')) {
+                // Make the API call for breakout room check-in
+                const response = await axios.post(
+                    `${domain}/api/breakout_room_checkin`,
+                    {
+                        user_id: event?.user_id,
+                        event_uuid: eventUUID,
+                        email: formData.email,
+                        phone_number: formData.mobile,
+                        acceptance: '1',
+                        first_name: getFirstName(formData.name),
+                        last_name: getLastName(formData.name),
+                        job_title: formData.designation,
+                        company_name: formData.company,
+                        industry: 'Others',
+                        breakout_room: breakoutRoom
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                if (response.data.status === 200) {
+                    toast(response.data.message || "Checked-In Successfully", {
+                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleCheck className='size-5' />
+                    });
+
+                    // Reset everything after successful check-in
+                    setSteps(1);
+                    setFormData({
+                        name: '',
+                        email: '',
+                        mobile: '',
+                        designation: '',
+                        company: '',
+                        otp: '',
+                        eventName: event?.title || ''
+                    });
+                } else {
+                    toast("Check-in failed", {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                }
+                return;
+            }
+
+            // For cases requiring OTP verification
             if (!formData.otp || formData.otp.length !== 6) {
                 toast("Please verify your mobile number first", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -391,8 +433,8 @@ const CheckinPage: React.FC = () => {
                                 className='input !h-full min-w-full absolute text-base z-10'
                             />
                         </div>
-                        <Button onClick={sendOTP} className="btn !h-12 w-full mt-2" disabled={!!savedMobile}>
-                            {savedMobile ? 'Mobile Verified' : 'Send OTP'}
+                        <Button onClick={sendOTP} className="btn !h-12 w-full mt-2">
+                            Send OTP
                         </Button>
                     </div>
                 </div>}
