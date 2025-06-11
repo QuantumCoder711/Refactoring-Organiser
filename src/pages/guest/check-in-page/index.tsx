@@ -49,8 +49,39 @@ const CheckinPage: React.FC = () => {
                     ...prev,
                     mobile: savedMobile
                 }));
-                // Skip to form directly if mobile is already verified
-                setSteps(3);
+                // Check for existing user with saved mobile
+                axios.post(
+                    `${appDomain}/api/organiser/v1/event-checkin/existing-user`,
+                    {
+                        mobile: Number(savedMobile),
+                        eventID: event?.id,
+                        userID: event?.user_id
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                ).then(res => {
+                    if (res.data.data.length > 0) {
+                        setSteps(3);
+                        const userData = res.data.data[0];
+                        setFormData(prev => ({
+                            ...prev,
+                            name: userData.name,
+                            email: userData.email,
+                            designation: userData.designation,
+                            company: userData.company
+                        }));
+                    } else {
+                        // If no existing user found, proceed to step 1 for verification
+                        setSteps(1);
+                    }
+                }).catch(() => {
+                    setSteps(1);
+                });
+            } else {
+                setSteps(1);
             }
         }
 
@@ -115,7 +146,7 @@ const CheckinPage: React.FC = () => {
             );
 
             if (response.data.status) {
-                // Save mobile to localStorage for breakout room check-ins
+                // Save mobile to localStorage for breakout room check-in
                 if (breakoutRoom) {
                     localStorage.setItem('breakoutCheckinMobile', formData.mobile);
                 }
@@ -253,7 +284,7 @@ const CheckinPage: React.FC = () => {
     const handleCheckIn = async () => {
         try {
             setLoading(true);
-            
+
             // Check if OTP is verified (from step 2)
             if (!formData.otp || formData.otp.length !== 6) {
                 toast("Please verify your mobile number first", {
@@ -264,12 +295,12 @@ const CheckinPage: React.FC = () => {
             }
 
             // Determine which API endpoint to use based on breakoutRoom parameter
-            const endpoint = breakoutRoom 
+            const endpoint = breakoutRoom
                 ? `${domain}/api/breakout_room_checkin`
                 : `${domain}/api/accept_decline_event_invitation`;
 
             // Prepare the request payload
-            const payload = breakoutRoom 
+            const payload = breakoutRoom
                 ? {
                     user_id: event?.user_id,
                     event_uuid: eventUUID,
@@ -309,7 +340,7 @@ const CheckinPage: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
-                
+
                 // Reset everything after successful check-in
                 setSteps(1);
                 setFormData({
@@ -361,8 +392,8 @@ const CheckinPage: React.FC = () => {
                             />
                         </div>
                         <Button onClick={sendOTP} className="btn !h-12 w-full mt-2" disabled={!!savedMobile}>
-                    {savedMobile ? 'Mobile Verified' : 'Send OTP'}
-                </Button>
+                            {savedMobile ? 'Mobile Verified' : 'Send OTP'}
+                        </Button>
                     </div>
                 </div>}
 

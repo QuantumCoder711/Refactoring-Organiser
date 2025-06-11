@@ -31,6 +31,8 @@ const InviteRegistrations: React.FC = () => {
     const [allSelected, setAllSelected] = useState(true);
     const quillRef = useRef<HTMLDivElement | null>(null);
 
+    console.log("The event is: ", event);
+
     const [formData, setFormData] = useState<MessageTemplateType>({
         event_id: event?.uuid as string,
         send_to: selectedRoles.join(','),

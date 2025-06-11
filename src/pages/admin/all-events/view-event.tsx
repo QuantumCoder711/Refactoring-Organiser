@@ -334,13 +334,13 @@ const ViewEvent: React.FC = () => {
                                                     <div className='flex flex-col gap-3'>
                                                         <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
                                                         <p>Breakout : {index + 1}</p>
-                                                        {/* <Button
+                                                        <Button
                                                             onClick={() => handleDownload(createQRCode(event?.uuid, index + 1))}
                                                             className='btn mx-auto mt-2'
                                                             disabled={isDownloading}
                                                         >
                                                             {isDownloading ? 'Downloading...' : 'Download'}
-                                                        </Button> */}
+                                                        </Button>
                                                     </div>
                                                 ))
                                             }
