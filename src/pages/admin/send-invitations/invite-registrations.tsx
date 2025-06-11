@@ -31,8 +31,6 @@ const InviteRegistrations: React.FC = () => {
     const [allSelected, setAllSelected] = useState(true);
     const quillRef = useRef<HTMLDivElement | null>(null);
 
-    console.log("The event is: ", event);
-
     const [formData, setFormData] = useState<MessageTemplateType>({
         event_id: event?.uuid as string,
         send_to: selectedRoles.join(','),
@@ -59,7 +57,7 @@ const InviteRegistrations: React.FC = () => {
         delivery_schedule: 'now',
         start_date_time: event?.start_time as string,
         start_date_type: event?.start_time_type as string,
-        end_date: event?.event_end_date as string,
+        end_date: event?.event_date as string,
         end_date_time: event?.end_time as string,
         end_date_type: event?.end_time_type as string,
         no_of_times: 1,
