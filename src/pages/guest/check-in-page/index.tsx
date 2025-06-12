@@ -37,6 +37,7 @@ const CheckinPage: React.FC = () => {
         otp: '',
         eventName: event?.title || ''
     });
+    const [isCheckedIn, setIsCheckedIn] = useState<boolean>(false);
 
     useEffect(() => {
         // Fetch event details first
@@ -334,17 +335,8 @@ const CheckinPage: React.FC = () => {
                     icon: <CircleCheck className='size-5' />
                 });
 
-                // Reset everything after successful check-in
-                setSteps(1);
-                setFormData({
-                    name: '',
-                    email: '',
-                    mobile: '',
-                    designation: '',
-                    company: '',
-                    otp: '',
-                    eventName: event?.title || ''
-                });
+                // Show success screen instead of resetting
+                setIsCheckedIn(true);
             } else {
                 toast("Check-in failed", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -371,119 +363,129 @@ const CheckinPage: React.FC = () => {
                 <h1 className='text-2xl font-semibold'>Registration for {event?.title}</h1>
                 <p>Welcome to the {event?.title}, please verify your details to check-in at this session.</p>
 
-                {steps === 1 && <div>
-                    <div className='flex mt-5 gap-2 flex-col'>
-                        <Label htmlFor="mobile_number" className='font-semibold'>Mobile Number</Label>
-                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                            <Input
-                                id="mobile_number"
-                                type="tel"
-                                name='mobile_number'
-                                value={formData.mobile}
-                                onChange={e => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                                className='input !h-full min-w-full absolute text-base z-10'
-                            />
-                        </div>
-                        <Button onClick={sendOTP} className="btn !h-12 w-full mt-2">
-                            Send OTP
-                        </Button>
+                {isCheckedIn ? (
+                    <div className="flex flex-col items-center justify-center gap-4 mt-8">
+                        <CircleCheck className="w-16 h-16 text-green-500" />
+                        <h2 className="text-2xl font-semibold text-green-600">Check-in Successful!</h2>
+                        <p className="text-gray-600">Thank you for checking in to {event?.title}</p>
+                        <p className="text-gray-600">You can now close this window.</p>
                     </div>
-                </div>}
+                ) : (
+                    <>
+                        {steps === 1 && <div>
+                            <div className='flex mt-5 gap-2 flex-col'>
+                                <Label htmlFor="mobile_number" className='font-semibold'>Mobile Number</Label>
+                                <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                    <Input
+                                        id="mobile_number"
+                                        type="tel"
+                                        name='mobile_number'
+                                        value={formData.mobile}
+                                        onChange={e => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                                        className='input !h-full min-w-full absolute text-base z-10'
+                                    />
+                                </div>
+                                <Button onClick={sendOTP} className="btn !h-12 w-full mt-2">
+                                    Send OTP
+                                </Button>
+                            </div>
+                        </div>}
 
-                {steps === 2 && <div className='mx-auto'>
-                    <InputOTP
-                        maxLength={6}
-                        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                        value={formData.otp}
-                        onChange={(value) => setFormData(prev => ({ ...prev, otp: value }))}
-                    >
-                        <InputOTPGroup className='h-12 min-w-fit'>
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={0} />
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={1} />
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={2} />
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={3} />
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={4} />
-                            <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={5} />
-                        </InputOTPGroup>
-                    </InputOTP>
-                    <Button onClick={verifyOTP} className='btn !h-12 w-full mt-2'>Verify OTP</Button>
-                    <span onClick={() => setSteps(1)} className='inline-block cursor-pointer text-brand-primary hover:text-brand-primary-dark duration-300 mt-2 px-2'>Go Back</span>
-                </div>}
-
-                {steps === 3 && <div className="w-full">
-                    <form onSubmit={handleFormSubmit} className="flex flex-col gap-3.5 mt-5">
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor="name">
-                                Full Name <span className="text-brand-secondary">*</span>
-                            </Label>
-                            <Input
-                                id="name"
-                                name="name"
-                                type="text"
-                                className='input !h-12 min-w-full text-base'
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor="email">
-                                Email Address <span className="text-brand-secondary">*</span>
-                            </Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                className='input !h-12 min-w-full text-base'
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor="designation">
-                                Job Title/Designation
-                            </Label>
-                            <Input
-                                id="designation"
-                                name="designation"
-                                type="text"
-                                className='input !h-12 min-w-full text-base'
-                                value={formData.designation}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor="company">
-                                Company Name
-                            </Label>
-                            <Input
-                                id="company"
-                                name="company"
-                                type="text"
-                                className='input !h-12 min-w-full text-base'
-                                value={formData.company}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-2 mt-2">
-                            <Button
-                                type="submit"
-                                className="btn !h-12 w-full"
-                                disabled={loading}
-                                onClick={handleCheckIn}
+                        {steps === 2 && <div className='mx-auto'>
+                            <InputOTP
+                                maxLength={6}
+                                pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                                value={formData.otp}
+                                onChange={(value) => setFormData(prev => ({ ...prev, otp: value }))}
                             >
-                                {loading ? 'Submitting...' : 'Complete Check-in'}
-                            </Button>
-                            <span onClick={() => setSteps(2)} className='inline-block cursor-pointer text-brand-primary hover:text-brand-primary-dark duration-300 mt-2 px-2'>Go Back</span>
+                                <InputOTPGroup className='h-12 min-w-fit'>
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={0} />
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={1} />
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={2} />
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={3} />
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={4} />
+                                    <InputOTPSlot className="focus-visible:border-brand-primary border-brand-primary focus-visible:ring-2 focus-visible:ring-blue-500" index={5} />
+                                </InputOTPGroup>
+                            </InputOTP>
+                            <Button onClick={verifyOTP} className='btn !h-12 w-full mt-2'>Verify OTP</Button>
+                            <span onClick={() => setSteps(1)} className='inline-block cursor-pointer text-brand-primary hover:text-brand-primary-dark duration-300 mt-2 px-2'>Go Back</span>
+                        </div>}
 
-                        </div>
-                    </form>
-                </div>}
+                        {steps === 3 && <div className="w-full">
+                            <form onSubmit={handleFormSubmit} className="flex flex-col gap-3.5 mt-5">
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Label className="font-semibold" htmlFor="name">
+                                        Full Name <span className="text-brand-secondary">*</span>
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        className='input !h-12 min-w-full text-base'
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Label className="font-semibold" htmlFor="email">
+                                        Email Address <span className="text-brand-secondary">*</span>
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        className='input !h-12 min-w-full text-base'
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Label className="font-semibold" htmlFor="designation">
+                                        Job Title/Designation
+                                    </Label>
+                                    <Input
+                                        id="designation"
+                                        name="designation"
+                                        type="text"
+                                        className='input !h-12 min-w-full text-base'
+                                        value={formData.designation}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Label className="font-semibold" htmlFor="company">
+                                        Company Name
+                                    </Label>
+                                    <Input
+                                        id="company"
+                                        name="company"
+                                        type="text"
+                                        className='input !h-12 min-w-full text-base'
+                                        value={formData.company}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2 mt-2">
+                                    <Button
+                                        type="submit"
+                                        className="btn !h-12 w-full"
+                                        disabled={loading}
+                                        onClick={handleCheckIn}
+                                    >
+                                        {loading ? 'Submitting...' : 'Complete Check-in'}
+                                    </Button>
+                                    <span onClick={() => setSteps(2)} className='inline-block cursor-pointer text-brand-primary hover:text-brand-primary-dark duration-300 mt-2 px-2'>Go Back</span>
+                                </div>
+                            </form>
+                        </div>}
+                    </>
+                )}
             </div>
         </div>
     );
