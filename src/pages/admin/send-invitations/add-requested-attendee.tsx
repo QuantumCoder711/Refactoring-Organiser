@@ -23,6 +23,7 @@ import useAuthStore from "@/store/authStore";
 import useEventStore from "@/store/eventStore";
 import Wave from "@/components/Wave";
 import axios from "axios";
+import GoBack from "@/components/GoBack";
 
 // Simple Input Component with React.memo to prevent unnecessary re-renders
 const CustomInput = React.memo(({ label, id, name, type, value, onChange, required = false }: {
@@ -402,30 +403,30 @@ const AddRequestedAttendee: React.FC = () => {
 
     const downloadSampleFile = () => {
         const sampleData = [
-            { 
-                first_name: 'John', 
-                last_name: 'Doe', 
-                email_id: 'john.doe@example.com', 
-                phone_number: '1234567890', 
+            {
+                first_name: 'John',
+                last_name: 'Doe',
+                email_id: 'john.doe@example.com',
+                phone_number: '1234567890',
                 alternate_mobile_number: '9876543210',
-                job_title: 'Software Engineer', 
-                company_name: 'Tech Corp', 
+                job_title: 'Software Engineer',
+                company_name: 'Tech Corp',
                 linkedin_url: 'https://linkedin.com/in/johndoe',
                 status: 'Attendee'
             },
-            { 
-                first_name: 'Jane', 
-                last_name: 'Smith', 
-                email_id: 'jane.smith@example.com', 
+            {
+                first_name: 'Jane',
+                last_name: 'Smith',
+                email_id: 'jane.smith@example.com',
                 phone_number: '9876543210',
                 alternate_mobile_number: '',
-                job_title: 'Product Manager', 
-                company_name: 'Innovate Inc', 
+                job_title: 'Product Manager',
+                company_name: 'Innovate Inc',
                 linkedin_url: 'https://linkedin.com/in/janesmith',
                 status: 'VIP'
             }
         ];
-        
+
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(sampleData);
         XLSX.utils.book_append_sheet(wb, ws, 'Sample Attendees');
@@ -445,6 +446,11 @@ const AddRequestedAttendee: React.FC = () => {
 
     return (
         <div className="">
+            <div className='flex items-center gap-5 mb-5'>
+                <GoBack />
+                <h1 className='text-xl font-semibold'>{event?.title}</h1>
+            </div>
+
             <div className="w-[690px] bg-brand-light-gray p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
                     <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
@@ -592,10 +598,10 @@ const AddRequestedAttendee: React.FC = () => {
                     <TabsContent value="bulk">
                         <div className="mt-5 flex justify-between">
                             <span className="font-semibold">Upload File</span>
-                            <Button 
+                            <Button
                                 onClick={downloadSampleFile}
                                 className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm"
-                            > 
+                            >
                                 <Download size={13} strokeWidth={1} /> Download Sample Excel CSV Sheet Format
                             </Button>
                         </div>
