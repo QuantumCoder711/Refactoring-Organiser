@@ -141,9 +141,8 @@ const CheckinPage: React.FC = () => {
 
             if (response.data.status) {
                 // Save mobile to localStorage for breakout room check-in
-                if (breakoutRoom) {
-                    localStorage.setItem('breakoutCheckinMobile', formData.mobile);
-                }
+
+                localStorage.setItem('breakoutCheckinMobile', formData.mobile);
                 toast(response.data.message || "OTP verified successfully!", {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
@@ -278,57 +277,9 @@ const CheckinPage: React.FC = () => {
 
             // Skip OTP verification if we have a saved mobile number for breakout room
             if (breakoutRoom && localStorage.getItem('breakoutCheckinMobile')) {
-                // Make the API call for breakout room check-in
-                const response = await axios.post(
-                    `${domain}/api/breakout_room_checkin`,
-                    {
-                        user_id: event?.user_id,
-                        event_uuid: eventUUID,
-                        email: formData.email,
-                        phone_number: formData.mobile,
-                        acceptance: '1',
-                        first_name: getFirstName(formData.name),
-                        last_name: getLastName(formData.name),
-                        job_title: formData.designation,
-                        company_name: formData.company,
-                        industry: 'Others',
-                        breakout_room: breakoutRoom
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+                // Proceed with check-in
 
-                if (response.data.status === 200) {
-                    toast(response.data.message || "Checked-In Successfully", {
-                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                        icon: <CircleCheck className='size-5' />
-                    });
-
-                    // Reset everything after successful check-in
-                    setSteps(1);
-                    setFormData({
-                        name: '',
-                        email: '',
-                        mobile: '',
-                        designation: '',
-                        company: '',
-                        otp: '',
-                        eventName: event?.title || ''
-                    });
-                } else {
-                    toast("Check-in failed", {
-                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                        icon: <CircleX className='size-5' />
-                    });
-                }
-                return;
-            }
-
-            // For cases requiring OTP verification
-            if (!formData.otp || formData.otp.length !== 6) {
+            } else if (!formData.otp || formData.otp.length !== 6) {
                 toast("Please verify your mobile number first", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
