@@ -310,12 +310,10 @@ const EditAttendee: React.FC = () => {
         const { name, value } = e.target;
 
         // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
-        });
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     }, []);
 
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
