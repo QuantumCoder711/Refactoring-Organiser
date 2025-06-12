@@ -245,7 +245,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
       console.log('API Response:', response); // Debug log
 
       // Check if response exists and has a message property
-      if (response && response.message === "Messages sent successfully") {
+      if (response.data.status === 200) {
         toast("Message sent successfully!", {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className='size-5' />
