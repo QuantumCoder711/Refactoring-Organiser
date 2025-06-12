@@ -163,7 +163,7 @@ const ExploreAllEvents: React.FC = () => {
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
             {getCurrentEvents().map((event, index) => (
-              <Link to={`/events/${event.slug}`} key={index}>
+              <Link to={`/events/explore/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={domain + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
                   <div className='space-y-2 overflow-hidden'>

@@ -25,7 +25,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -98,13 +97,27 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
               </DrawerTrigger>
               <DrawerContent>
                 <DrawerHeader>
-                  <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-                  <DrawerDescription>This action cannot be undone.</DrawerDescription>
+                  <DrawerTitle>Menu</DrawerTitle>
                 </DrawerHeader>
+                <div className="px-4 py-2">
+                  <ul className='flex flex-col gap-4'>
+                    {navbarLinks.map((link, index) => (
+                      <li key={index}>
+                        {link.path === "/organiser/login" ?
+                          <DrawerClose asChild>
+                            <Link to={link.path} className='block px-4 py-2.5 rounded-full border border-black'>Organiser Login</Link>
+                          </DrawerClose> :
+                          <DrawerClose asChild>
+                            <Link to={link.path} className='block px-4 py-2.5'>{link.label}</Link>
+                          </DrawerClose>
+                        }
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <DrawerFooter>
-                  <Button>Submit</Button>
-                  <DrawerClose asChild>
-                    <Button variant="outline">Cancel</Button>
+                  <DrawerClose asChild className='cursor-pointer'>
+                    <Button variant="outline">Close</Button>
                   </DrawerClose>
                 </DrawerFooter>
               </DrawerContent>

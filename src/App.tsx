@@ -84,7 +84,7 @@ const App: React.FC = () => {
         <Route path="organiser/event" element={<ExploreEvents />} />
         <Route path="add-first-event" element={<AddFirstEvent />} />
         <Route path="events/:city" element={<ExploreAllEvents />} />
-        <Route path="events/:slug" element={<ExploreViewEvent />} />
+        <Route path="events/explore/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
         <Route path="terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="refund-policy" element={<RefundPolicy />} />
