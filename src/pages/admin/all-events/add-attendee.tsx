@@ -25,6 +25,7 @@ import useAttendeeStore from "@/store/attendeeStore";
 import useAuthStore from "@/store/authStore";
 import useEventStore from "@/store/eventStore";
 import Wave from "@/components/Wave";
+import GoBack from "@/components/GoBack";
 
 // Simple Input Component with React.memo to prevent unnecessary re-renders
 const CustomInput = React.memo(({ label, id, name, type, value, onChange, required = false }: {
@@ -475,6 +476,10 @@ const AddAttendee: React.FC = () => {
 
     return (
         <div className="">
+            <div className='flex items-center gap-5 mb-5'>
+                <GoBack />
+                <h1 className='text-xl font-semibold'>{event?.title}</h1>
+            </div>
             <div className="w-[690px] bg-brand-light-gray p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
                     <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
@@ -705,7 +710,7 @@ const AddAttendee: React.FC = () => {
                     <TabsContent value="bulk">
                         <div className="mt-5 flex justify-between">
                             <span className="font-semibold">Upload File</span>
-                            <Button 
+                            <Button
                                 onClick={() => {
                                     // Create sample data with exact fields and sample data
                                     const sampleData = [{
@@ -728,7 +733,7 @@ const AddAttendee: React.FC = () => {
                                     // Create workbook and worksheet
                                     const wb = XLSX.utils.book_new();
                                     const ws = XLSX.utils.json_to_sheet(sampleData);
-                                    
+
                                     // Set column widths for better readability
                                     const wscols = [
                                         { wch: 15 }, // first_name
@@ -747,14 +752,14 @@ const AddAttendee: React.FC = () => {
                                         { wch: 15 }  // award_winner
                                     ];
                                     ws['!cols'] = wscols;
-                                    
+
                                     // Add worksheet to workbook
                                     XLSX.utils.book_append_sheet(wb, ws, 'Sample Attendees');
-                                    
+
                                     // Generate Excel file
                                     const fileName = `attendee_import_template_${new Date().toISOString().split('T')[0]}.xlsx`;
                                     XLSX.writeFile(wb, fileName);
-                                    
+
                                     // Show success message
                                     toast('Sample file downloaded successfully!', {
                                         className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -772,7 +777,7 @@ const AddAttendee: React.FC = () => {
                             <div {...getRootProps()} className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
                                 <input {...getInputProps()} />
                                 <div className="flex flex-col items-center justify-center gap-2 text-center">
-                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300"/>
+                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
                                     {isDragActive ? (
                                         <p className="text-brand-secondary font-medium">Drop the file here...</p>
                                     ) : (
