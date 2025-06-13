@@ -85,7 +85,6 @@ const generateQRCodeDataUrl = async (url: string): Promise<string> => {
   }
 };
 
-
 const Attendees: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const event = useEventStore(state => state.getEventBySlug(slug));
@@ -644,6 +643,7 @@ const Attendees: React.FC = () => {
               <SelectItem value="25">25</SelectItem>
               <SelectItem value="50">50</SelectItem>
               <SelectItem value="100">100</SelectItem>
+              <SelectItem value="500">500</SelectItem>
             </SelectContent>
           </Select>
 
@@ -754,8 +754,8 @@ const Attendees: React.FC = () => {
           </TableHeader>
           <TableBody>
             {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-              <TableRow 
-                key={attendee.id} 
+              <TableRow
+                key={attendee.id}
                 className={`${attendee.not_invited === 1 ? 'bg-brand-secondary/10 hover:bg-brand-secondary/20' : 'hover:bg-brand-background'}`}
               >
                 <TableCell className="text-left min-w-10">
@@ -797,7 +797,7 @@ const Attendees: React.FC = () => {
                 </TableCell>
                 {renderCheckInData(attendee)}
                 <TableCell className="text-left min-w-10">
-                  {!attendee.break_out_room_and_time ? '-' : 
+                  {!attendee.break_out_room_and_time ? '-' :
                     attendee.break_out_room_and_time.map((item, index) => (
                       <div key={index}>{formatBreakOutTime(item)}</div>
                     ))
@@ -809,7 +809,7 @@ const Attendees: React.FC = () => {
 
                     <Dialog>
                       <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
-                      <DialogContent className="max-w-md p-6">
+                      <DialogContent className="max-w-md max-h-96 overflow-y-auto p-6">
                         {isLoading ? <Wave /> : <>
                           <DialogHeader className="space-y-2">
                             <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
@@ -818,11 +818,14 @@ const Attendees: React.FC = () => {
                             <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
                           </DialogHeader>
 
-                          <DialogDescription className='flex items-center h-2 gap-2'>
+                          <DialogDescription className='flex items-center overflow-x-scroll gap-2'>
                             {selectedSponsorsAttendees.map((item) => (
-                              <div key={item.attendee_id} className="flex items-center gap-2 mt-5">
-                                <div className="p-2 px-4 flex gap-2 items-center justify-center rounded-full bg-brand-primary">
-                                  <p className="text-white capitalize text-xs tracking-wider">{paginatedAttendees.map((attendee: AttendeeType) => attendee.id === item.attendee_id && attendee.first_name + " " + attendee.last_name)}</p>
+                              <div key={item.attendee_id} className="flex items-center gap-2 mt-5 max-w-md">
+                                <div className="p-2 px-4 flex gap-2 items-center justify-center rounded-full min-w-fit !text-nowrap bg-brand-primary">
+                                  <p className="text-white capitalize text-xs tracking-wider">
+                                    {filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.first_name + " " +
+                                      filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.last_name}
+                                  </p>
                                   <X className="size-4 text-white cursor-pointer" onClick={() => handleSponsorAttendeeDelete(item.uuid)} />
                                 </div>
                               </div>
@@ -839,12 +842,12 @@ const Attendees: React.FC = () => {
                                   <Checkbox
                                     id='select-all'
                                     name='select-all'
-                                    checked={selectedSponsorsAttendees.length === paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").length}
+                                    checked={selectedSponsorsAttendees.length === filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").length}
                                     className="mx-auto cursor-pointer border border-brand-dark-gray"
                                     onCheckedChange={(checked) => {
                                       if (checked) {
                                         setSelectedSponsorsAttendees(
-                                          paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: event?.uuid as string, attendee_id: attendee.id }))
+                                          filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: event?.uuid as string, attendee_id: attendee.id }))
                                         )
                                       } else {
                                         setSelectedSponsorsAttendees([])
@@ -855,9 +858,9 @@ const Attendees: React.FC = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {paginatedAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => (
+                              {filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => (
                                 <TableRow key={attendee.id} className="hover:bg-brand-lightest">
-                                  <TableCell>{paginatedAttendees.indexOf(attendee) + 1}</TableCell>
+                                  <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
                                   <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
                                   <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
                                   <TableCell className="text-center max-w-fit flex items-center justify-center">
