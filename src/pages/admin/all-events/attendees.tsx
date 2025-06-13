@@ -264,13 +264,10 @@ const Attendees: React.FC = () => {
     }
 
     try {
-      console.log('Original QR code:', event.qr_code);
 
       // Check if qr_code is already a full URL or a relative path
       const isFullUrl = event.qr_code.startsWith('http://') || event.qr_code.startsWith('https://');
       const imageUrl = isFullUrl ? event.qr_code : getImageUrl(event.qr_code);
-
-      console.log('Generated image URL:', imageUrl);
 
       // Create a temporary link with the direct image URL
       const link = document.createElement('a');
@@ -496,6 +493,7 @@ const Attendees: React.FC = () => {
   }
 
   const handleSponsorAttendeeDelete = async (uuid: string) => {
+    setSelectedSponsorsAttendees((prev) => prev.filter((item) => item.uuid !== uuid));
     try {
       const response = await axios.delete(`${domain}/api/delete-sponsor-attendee/${uuid}`, {
         headers: {
@@ -505,7 +503,7 @@ const Attendees: React.FC = () => {
       });
 
       if (response.data.status === 200) {
-        setSelectedSponsorsAttendees((prev) => prev.filter((item) => item.uuid !== uuid));
+        // setSelectedSponsorsAttendees((prev) => prev.filter((item) => item.uuid !== uuid));
         toast(response.data.message, {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className="size-5" />
