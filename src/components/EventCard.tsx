@@ -32,6 +32,7 @@ interface EventCardProps {
     total_checkedin_speaker: number;
     total_checkedin_sponsor: number;
     total_pending_delegate: number;
+    total_checked_in: number;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -47,7 +48,8 @@ const EventCard: React.FC<EventCardProps> = ({
     total_attendees,
     total_checkedin_speaker,
     total_checkedin_sponsor,
-    total_pending_delegate
+    total_pending_delegate,
+    total_checked_in
 }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const { deleteEvent } = useEventStore(state => state);
@@ -162,7 +164,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </h3>
                     {isLive && (
                         <p className='text-brand-secondary text-xs'>
-                            Checkin Count - <span className='font-medium text-base'>{checkInCount || total_attendees}</span>
+                            Checkin Count - <span className='font-medium text-base'>{checkInCount || total_checked_in}</span>
                         </p>
                     )}
                     <div className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
@@ -198,7 +200,7 @@ const EventCard: React.FC<EventCardProps> = ({
             {isLive && (
                 <div className='min-h-full w-full p-2 bg-white rounded-xl rounded-l-none'>
                     {renderStatItem('Registrations', total_attendees)}
-                    {renderStatItem('Attendees', (checkInCount||total_attendees), total_attendees)}
+                    {renderStatItem('Attendees', (checkInCount||total_checked_in), total_attendees)}
                     {renderStatItem('Speakers', total_checkedin_speaker)}
                     {renderStatItem('Sponsors', total_checkedin_sponsor)}
                     {renderStatItem('Pending Delegates', total_pending_delegate)}
