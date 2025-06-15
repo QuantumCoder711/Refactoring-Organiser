@@ -28,9 +28,7 @@ const footerLinks = [
             "Features",
             "Pricing",
             "Integrations",
-            "API",
-            "Security",
-            "Support"
+            "Security"
         ]
     },
     {
@@ -39,15 +37,12 @@ const footerLinks = [
             "About Us",
             "Careers",
             "Blog",
-            "Press",
             "Contact Us"
         ]
     },
     {
         title: "Resources",
         links: [
-            "Documentation",
-            "Community",
             "Tutorials",
             "FAQs"
         ]
@@ -58,37 +53,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
 
     const currentYear = new Date().getFullYear();
 
-    const [email, setEmail] = useState<string>("");
-
-    const handleSubscribe = async () => {
-        if (!email) {
-            toast("Please enter your email", {
-                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleX className='size-5' />
-            });
-            return;
-        }
-
-        const response = await axios.post(`${domain}/api/subscribe`, email, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.data.status === 200) {
-            toast(response.data.message || "Subscribed successfully", {
-                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleCheck className='size-5' />
-            });
-            setEmail("");
-        } else {
-            toast(response.data.message || "Failed to subscribe", {
-                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleX className='size-5' />
-            });
-        }
-
-    }
+    // Removed subscribe functionality
 
     return (
         type === "basic" ? <footer className='flex items-center justify-between p-3'>
@@ -126,10 +91,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                 <div className='max-w-7xl flex mx-auto gap-40 p-5 py-10'>
                     <div className='flex flex-col gap-[60px] w-1/2'>
                         <img src={LogoWhite} alt="logo" className='w-[200px] h-[50px]' />
-                        <div className='bg-white rounded-full h-16 relative w-[503px]'>
-                            <Input name='email' value={email} onChange={e => setEmail(e.target.value)} placeholder='Enter your email address' className='bg-white focus-visible:ring-0 absolute top-0 left-0 !pl-3 !text-xl !h-full rounded-full outline-none border-none' />
-                            <Button onClick={handleSubscribe} className='absolute btn top-0 right-0 !h-full !w-[172px] !text-xl rounded-full'>Subscribe</Button>
-                        </div>
+
                         <div className='flex items-center gap-10 invert'>
                             <AppleStore />
                             <GooglePlay />
