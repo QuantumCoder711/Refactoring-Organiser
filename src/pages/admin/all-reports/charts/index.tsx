@@ -17,6 +17,29 @@ import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
 import Wave from '@/components/Wave';
 
+// Utility function to merge case-insensitive duplicates
+const mergeCaseInsensitiveDuplicates = (items: string[]): string[] => {
+  const caseMap = new Map<string, { original: string; count: number }>();
+  
+  // First pass: count occurrences of each case variation
+  items.forEach(item => {
+    const lowerCase = item?.toLowerCase();
+    const existing = caseMap.get(lowerCase);
+    if (existing) {
+      existing.count++;
+      // If this variant appears more times, use it as the preferred version
+      if (items.filter(i => i === item).length > items.filter(i => i === existing.original).length) {
+        existing.original = item;
+      }
+    } else {
+      caseMap.set(lowerCase, { original: item, count: 1 });
+    }
+  });
+
+  // Return the most common variant for each case-insensitive group
+  return Array.from(caseMap.values()).map(entry => entry.original);
+};
+
 const Charts: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { token } = useAuthStore(state => state);
@@ -92,23 +115,29 @@ const Charts: React.FC = () => {
   // Generate hours array with check-in counts
   let hoursArray = generateHoursWithCheckins(start_time, end_time, singleEventAttendees);
 
-  const uniquesDesignations = [...new Set(allCheckedInUsers.map((user: AttendeeType) => user.job_title))];
+  // Get unique designations and merge case-insensitive duplicates
+  const uniqueDesignations = mergeCaseInsensitiveDuplicates([...new Set(allCheckedInUsers.map((user: AttendeeType) => user.job_title))]);
 
-  const designationCounts = uniquesDesignations.map((designation) => {
+  const designationCounts = uniqueDesignations.map((designation) => {
     return {
       label: designation,
-      count: allCheckedInUsers.filter((user: AttendeeType) => user.job_title === designation).length
+      count: allCheckedInUsers.filter((user: AttendeeType) => 
+        user.job_title?.toLowerCase() === designation?.toLowerCase()
+      ).length
     };
-  });
+  }).sort((a, b) => b.count - a.count);
 
-  const uniqueCompanies = [...new Set(allCheckedInUsers.map((user: AttendeeType) => user.company_name))];
+  // Get unique companies and merge case-insensitive duplicates
+  const uniqueCompanies = mergeCaseInsensitiveDuplicates([...new Set(allCheckedInUsers.map((user: AttendeeType) => user.company_name))]);
 
   const companyCounts = uniqueCompanies.map((company) => {
     return {
       label: company,
-      count: allCheckedInUsers.filter((user: AttendeeType) => user.company_name === company).length
+      count: allCheckedInUsers.filter((user: AttendeeType) => 
+        user.company_name?.toLowerCase() === company?.toLowerCase()
+      ).length
     };
-  });
+  }).sort((a, b) => b.count - a.count);
 
   const handleExport = async () => {
     if (!chartRef.current) return;

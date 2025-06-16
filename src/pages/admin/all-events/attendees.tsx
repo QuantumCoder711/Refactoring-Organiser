@@ -845,7 +845,7 @@ const Attendees: React.FC = () => {
                                     onCheckedChange={(checked) => {
                                       if (checked) {
                                         setSelectedSponsorsAttendees(
-                                          filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: event?.uuid as string, attendee_id: attendee.id }))
+                                          filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: attendee?.uuid as string, attendee_id: attendee.id }))
                                         )
                                       } else {
                                         setSelectedSponsorsAttendees([])
