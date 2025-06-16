@@ -173,6 +173,7 @@ const AllEvents: React.FC = () => {
             total_checkedin_speaker={event.total_checkedin_speaker}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
+            total_checked_in={event.total_checkedin}
           />
         ))}
       </div>}
@@ -195,6 +196,7 @@ const AllEvents: React.FC = () => {
             total_checkedin_speaker={event.total_checkedin_speaker}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
+            total_checked_in={event.total_checkedin}
           />
         ))}
       </div>}

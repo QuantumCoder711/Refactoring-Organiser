@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from "react-router-dom";
 import Facebook from "@/assets/social-media/facebook.svg"
 import Twitter from "@/assets/social-media/twitter.svg"
@@ -7,15 +7,10 @@ import Instagram from "@/assets/social-media/instagram.svg"
 import LogoFullWhite from "@/assets/logo-full-white.svg";
 import LogoWhite from "@/assets/logo-white.svg";
 import FooterBg from "@/assets/footerbg.png";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import AppleStore from './AppleStore';
 import GooglePlay from './GooglePlay';
 import AwsSsl from "@/assets/aws-ssl.png";
-import { CircleCheck, CircleX, HeartIcon } from 'lucide-react';
-import { toast } from 'sonner';
-import { domain } from '@/constants';
-import axios from 'axios';
+import { HeartIcon } from 'lucide-react';
 
 interface FooterProps {
     type?: "styled" | "basic";
