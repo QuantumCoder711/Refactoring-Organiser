@@ -24,7 +24,6 @@ import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
 import AllAttendees from '@/pages/admin/all-attendees';
 import AllSponsors from '@/pages/admin/all-sponsors';
-import AllCharts from '@/pages/admin/all-charts';
 import AllPhotos from '@/pages/admin/all-photos';
 import AllReports from '@/pages/admin/all-reports';
 import Profile from '@/pages/admin/profile';
@@ -141,7 +140,6 @@ const App: React.FC = () => {
         <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-sponsors" element={<AllSponsors />} />
-        <Route path="all-charts" element={<AllCharts />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
         <Route path="search-people" element={<SearchPeople />} />
