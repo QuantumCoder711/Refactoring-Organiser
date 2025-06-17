@@ -360,14 +360,22 @@ const UpdateEvent: React.FC = () => {
     };
 
     const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, timeType: 'start' | 'end') => {
-        const [hours, minutes] = e.target.value.split(':');
-        const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
-        const formattedHours = parseInt(hours) % 12 || 12;
+        const timeValue = e.target.value;
+        if (!timeValue) return;
+
+        // Split the time into hours and minutes
+        const [hours, minutes] = timeValue.split(':').map(Number);
+        
+        // Determine if it's AM or PM
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        
+        // Convert to 12-hour format
+        const twelveHour = hours % 12 || 12;
 
         setFormData(prevState => ({
             ...prevState,
-            [`${timeType}_time`]: formattedHours.toString(),
-            [`${timeType}_minute_time`]: minutes,
+            [`${timeType}_time`]: twelveHour.toString().padStart(2, '0'),
+            [`${timeType}_minute_time`]: minutes.toString().padStart(2, '0'),
             [`${timeType}_time_type`]: ampm
         }));
     };
