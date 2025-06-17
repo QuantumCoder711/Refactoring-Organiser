@@ -15,9 +15,10 @@ interface ChartDataItem {
 interface HorizontalBarChartProps {
   chartData: ChartDataItem[];
   title?: string;
+  bgColor?: string;
 }
 
-export function HorizontalBarChartComponent({ chartData, title = "Total Attendees by Company" }: HorizontalBarChartProps) {
+export function HorizontalBarChartComponent({ chartData, title = "Total Attendees by Company", bgColor }: HorizontalBarChartProps) {
 
   const maxCount = Math.max(...chartData.map((data) => data.count));
 
@@ -40,7 +41,8 @@ export function HorizontalBarChartComponent({ chartData, title = "Total Attendee
               <div
                 className={`h-6 rounded-sm grid font-sans min-w-fit font-semibold place-content-center bg-brand-primary text-center text-white p-1`}
                 style={{
-                  width: `${(item.count / maxCount) * 100 * 0.6}%`,
+                  width: `${(item.count / maxCount) * 100}%`,
+                  backgroundColor: bgColor
                 }}
               >
                 {item.count}

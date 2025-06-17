@@ -10,17 +10,17 @@ import useEventStore from '@/store/eventStore';
 import { AttendeeType } from '@/types';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import * as htmlToImage from 'html-to-image';
+import html2canvas from 'html2canvas-pro';
 import { jsPDF } from 'jspdf';
 import { useRef } from 'react';
-import { toast } from 'sonner';
-import { CircleCheck, CircleX } from 'lucide-react';
+// import { toast } from 'sonner';
+// import { CircleCheck, CircleX } from 'lucide-react';
 import Wave from '@/components/Wave';
 
 // Utility function to merge case-insensitive duplicates
 const mergeCaseInsensitiveDuplicates = (items: string[]): string[] => {
   const caseMap = new Map<string, { original: string; count: number }>();
-  
+
   // First pass: count occurrences of each case variation
   items.forEach(item => {
     const lowerCase = item?.toLowerCase();
@@ -121,7 +121,7 @@ const Charts: React.FC = () => {
   const designationCounts = uniqueDesignations.map((designation) => {
     return {
       label: designation,
-      count: allCheckedInUsers.filter((user: AttendeeType) => 
+      count: allCheckedInUsers.filter((user: AttendeeType) =>
         user.job_title?.toLowerCase() === designation?.toLowerCase()
       ).length
     };
@@ -133,77 +133,59 @@ const Charts: React.FC = () => {
   const companyCounts = uniqueCompanies.map((company) => {
     return {
       label: company,
-      count: allCheckedInUsers.filter((user: AttendeeType) => 
+      count: allCheckedInUsers.filter((user: AttendeeType) =>
         user.company_name?.toLowerCase() === company?.toLowerCase()
       ).length
     };
   }).sort((a, b) => b.count - a.count);
 
-  const handleExport = async () => {
-    if (!chartRef.current) return;
+  const handleExport = () => {
     setLoading(true);
-    try {
-      // Set a higher scale for better quality
-      const scale = 2; // Higher scale for better quality
-      const width = chartRef.current.offsetWidth;
-      const height = chartRef.current.scrollHeight;
+    if (chartRef.current) {
+      const element = chartRef.current;
+      element.style.backgroundColor = 'white !important';
 
-      const dataUrl = await htmlToImage.toPng(chartRef.current, {
-        quality: 1,
-        width: width * scale,
-        height: height * scale,
-        style: {
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: `${width}px`,
-          height: `${height}px`
+      // Use a scale factor to capture high-quality images without too large a file
+      html2canvas(element, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+
+        // Create a new jsPDF instance
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        // A4 page size dimensions
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Scale the height based on aspect ratio
+
+        // Define page height for A4
+        const pageHeight = 295; // A4 page height in mm
+        let yPosition = 0;
+
+        // Add the first image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
+
+        // Check if the image height exceeds the page height
+        if (imgHeight > pageHeight) {
+          let remainingHeight = imgHeight - pageHeight;
+          let offset = pageHeight;
+
+          // If the image is larger than the page, split it into multiple pages
+          while (remainingHeight > 0) {
+            // Add the next portion of the image
+            pdf.addPage(); // New page for the next part
+            pdf.addImage(imgData, 'PNG', 0, -offset, imgWidth, imgHeight);
+            offset += pageHeight;
+            remainingHeight -= pageHeight;
+          }
         }
+
+        // Save the final PDF after all content has been added
+        pdf.save(`${event?.title} Chart.pdf`);
+        setLoading(false); // Only set this after the export completes
+      }).catch(() => {
+        setLoading(false); // In case of an error, still stop loading
       });
-
-      // Create PDF with proper orientation and margins
-      const pdf = new jsPDF({
-        orientation: width > height ? 'landscape' : 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // Calculate dimensions to fit the page with margins
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10; // 10mm margin
-      const contentWidth = pageWidth - 2 * margin;
-      const contentHeight = pageHeight - 2 * margin;
-
-      // Calculate aspect ratio to maintain proportions
-      const imgAspectRatio = width / height;
-      let imgWidth = contentWidth;
-      let imgHeight = contentWidth / imgAspectRatio;
-
-      // If the image is too tall for the page, scale it down
-      if (imgHeight > contentHeight) {
-        imgHeight = contentHeight;
-        imgWidth = contentHeight * imgAspectRatio;
-      }
-
-      // Center the image on the page
-      const x = margin + (contentWidth - imgWidth) / 2;
-      const y = margin + (contentHeight - imgHeight) / 2;
-
-      pdf.addImage(dataUrl, 'PNG', x, y, imgWidth, imgHeight);
-      pdf.save(`${event?.title || 'event'}-report.pdf`);
-
-      toast.success('PDF exported successfully!', {
-        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-        icon: <CircleCheck className='size-5' />
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Error exporting PDF. Please try again.', {
-        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-        icon: <CircleX className='size-5' />
-      });
-    } finally {
-      setLoading(false);
+    } else {
+      setLoading(false); // In case the chartsWrapperRef is not set
     }
   };
 
@@ -243,7 +225,7 @@ const Charts: React.FC = () => {
         <Separator className='bg-gray-300 my-8' />
 
         <div className='w-full'>
-          <HorizontalBarChartComponent chartData={designationCounts} title="Total Attendees by Designation" />
+          <HorizontalBarChartComponent chartData={designationCounts} bgColor="#6C7A89" title="Total Attendees by Designation" />
         </div>
       </div>
     </div>
