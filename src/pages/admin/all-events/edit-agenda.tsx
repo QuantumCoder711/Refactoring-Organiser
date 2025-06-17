@@ -158,9 +158,9 @@ const EditAgenda: React.FC = () => {
             newErrors.description = 'Description is required';
         }
 
-        if (formData.tag_speakers.length === 0) {
-            newErrors.tag_speakers = 'At least one speaker must be tagged';
-        }
+        // if (formData.tag_speakers.length === 0) {
+        //     newErrors.tag_speakers = 'At least one speaker must be tagged';
+        // }
 
         if (!formData.event_date) {
             newErrors.event_date = 'Event date is required';
@@ -281,20 +281,20 @@ const EditAgenda: React.FC = () => {
                     {/* Tagged Speakers */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold">
-                            Tagged Speakers <span className="text-brand-secondary">*</span>
+                            Tagged Speakers
                         </Label>
                         <div className={`bg-white min-h-12 p-2 rounded-md flex flex-wrap gap-2 ${errors.tag_speakers ? 'border border-red-500' : ''}`}>
                             {formData.tag_speakers.map((speakerId) => {
                                 const speaker = speakers.find(s => s.id.toString() === speakerId);
                                 return (
-                                    <span key={speakerId} className="bg-brand-primary/20 px-2 py-1 rounded flex items-center">
+                                    <span key={speakerId} className="bg-brand-primary/20 capitalize px-2 py-1 rounded flex items-center">
                                         {speaker?.first_name || speaker?.last_name}
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveSpeaker(speakerId)}
                                             className="ml-2 text-gray-500 hover:text-gray-700"
                                         >
-                                            <X size={16} />
+                                            <X size={16} className='cursor-pointer'/>
                                         </button>
                                     </span>
                                 );
@@ -306,17 +306,17 @@ const EditAgenda: React.FC = () => {
                     {/* Speakers List */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='speakers_list'>
-                            Speakers List <span className="text-brand-secondary">*</span>
+                            Speakers List
                         </Label>
                         <Select name="speakers_list" onValueChange={handleSpeakerSelect}>
-                            <SelectTrigger className="!min-w-full cursor-pointer input !max-h-12 !h-full">
+                            <SelectTrigger className="!min-w-full cursor-pointer input capitalize !max-h-12 !h-full">
                                 <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
                                 {speakers
                                     .filter(speaker => !formData.tag_speakers.includes(speaker.id.toString()))
                                     .map((speaker) => (
-                                        <SelectItem key={speaker.id} className='cursor-pointer' value={speaker.id.toString()}>
+                                        <SelectItem key={speaker.id} className='cursor-pointer capitalize' value={speaker.id.toString()}>
                                             {speaker?.first_name || speaker?.last_name}
                                         </SelectItem>
                                     ))

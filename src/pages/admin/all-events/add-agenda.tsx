@@ -15,15 +15,17 @@ import {
 } from "@/components/ui/select";
 import { beautifyDate } from '@/lib/utils';
 import { ChevronLeft, CircleCheck, CircleX, X } from 'lucide-react';
-import { domain, token } from '@/constants';
+import { domain } from '@/constants';
 import axios from 'axios';
 import { AttendeeType } from '@/types';
 import { toast } from 'sonner';
 import Wave from '@/components/Wave';
+import useAuthStore from '@/store/authStore';
 
 const AddAgenda: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [loading, setLoading] = useState(false);
+    const {token} = useAuthStore(state=>state)
     const event = useEventStore(state => state.getEventBySlug(slug));
     const [speakers, setSpeakers] = useState<AttendeeType[]>([]);
 
@@ -94,7 +96,6 @@ const AddAgenda: React.FC = () => {
         const newErrors: Record<string, string> = {};
         if (!formData.title.trim()) newErrors.title = "Agenda Name is required";
         if (!formData.description.trim()) newErrors.description = "Description is required";
-        if (formData.tag_speakers.length === 0) newErrors.tag_speakers = "At least one speaker must be tagged";
         if (!formData.event_date) newErrors.event_date = "Event Date is required";
         if (!formData.position) newErrors.position = "Position is required";
         if (!formData.start_time) newErrors.start_time = "Start Time is required";
@@ -129,7 +130,7 @@ const AddAgenda: React.FC = () => {
                 end_time_type: formData.end_time_type || 'AM',
                 position: formData.position,
                 event_id: formData.event_id,
-                tag_speakers: formData.tag_speakers.join(',')
+                tag_speakers: formData.tag_speakers.join(',') || ''
             };
 
             const response = await axios.post(`${domain}/api/agendas`, submissionData, {
@@ -228,13 +229,13 @@ const AddAgenda: React.FC = () => {
                     {/* Tagged Speakers */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold">
-                            Tagged Speakers <span className="text-brand-secondary">*</span>
+                            Tagged Speakers
                         </Label>
                         <div className={`bg-white min-h-12 p-2 rounded-md flex flex-wrap gap-2 ${errors.tag_speakers ? 'border border-red-500' : ''}`}>
                             {formData.tag_speakers.map((speakerId) => {
                                 const speaker = speakers.find(s => s.id.toString() === speakerId);
                                 return (
-                                    <span key={speakerId} className="bg-brand-primary/20 px-2 py-1 rounded flex items-center">
+                                    <span key={speakerId} className="bg-brand-primary/20 px-2 py-1 capitalize rounded flex items-center">
                                         {speaker?.first_name || speaker?.last_name}
                                         <button
                                             type="button"
@@ -253,17 +254,17 @@ const AddAgenda: React.FC = () => {
                     {/* Speakers List */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='speakers_list'>
-                            Speakers List <span className="text-brand-secondary">*</span>
+                            Speakers List
                         </Label>
                         <Select name="speakers_list" onValueChange={handleSpeakerSelect}>
-                            <SelectTrigger className="!min-w-full cursor-pointer input !max-h-12 !h-full">
+                            <SelectTrigger className="!min-w-full cursor-pointer input capitalize !max-h-12 !h-full">
                                 <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent>
                                 {speakers
                                     .filter(speaker => !formData.tag_speakers.includes(speaker.id.toString()))
                                     .map((speaker) => (
-                                        <SelectItem key={speaker.id} className='cursor-pointer' value={speaker.id.toString()}>
+                                        <SelectItem key={speaker.id} className='cursor-pointer capitalize' value={speaker.id.toString()}>
                                             {speaker?.first_name || speaker?.last_name}
                                         </SelectItem>
                                     ))

@@ -30,6 +30,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 import {
   AlertDialog,
@@ -44,8 +46,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import useAuthStore from '@/store/authStore';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-
 import {
   Select,
   SelectContent,
@@ -95,6 +95,7 @@ const Attendees: React.FC = () => {
   const [dateDiff, setDateDiff] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedSponsorsAttendees, setSelectedSponsorsAttendees] = useState<{ uuid: string, attendee_id: number }[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isQrDialogOpen, setIsQrDialogOpen] = useState<boolean>(false);
 
   // Calculate date difference when event changes
@@ -809,11 +810,23 @@ const Attendees: React.FC = () => {
                       <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
                       <DialogContent className="max-w-md max-h-96 overflow-y-auto p-6">
                         {isLoading ? <Wave /> : <>
-                          <DialogHeader className="space-y-2">
-                            <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
-                              {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
-                            </DialogTitle>
-                            <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
+                          <DialogHeader className="space-y-4">
+                            <div>
+                              <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
+                                {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                              </DialogTitle>
+                              <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
+                            </div>
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                type="text"
+                                placeholder="Search attendees..."
+                                className="pl-10 w-full"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                              />
+                            </div>
                           </DialogHeader>
 
                           <DialogDescription className='flex items-center overflow-x-scroll gap-2'>
@@ -856,7 +869,19 @@ const Attendees: React.FC = () => {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => (
+                              {filteredAttendees
+                                .filter((attendee: AttendeeType) => attendee.status !== "sponsor")
+                                .filter((attendee: AttendeeType) => {
+                                  if (!searchQuery) return true;
+                                  const search = searchQuery.toLowerCase();
+                                  return (
+                                    (attendee.first_name?.toLowerCase().includes(search) ||
+                                    attendee.last_name?.toLowerCase().includes(search) ||
+                                    attendee.company_name?.toLowerCase().includes(search) ||
+                                    attendee.email_id?.toLowerCase().includes(search))
+                                  );
+                                })
+                                .map((attendee: AttendeeType) => (
                                 <TableRow key={attendee.id} className="hover:bg-brand-lightest">
                                   <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
                                   <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
