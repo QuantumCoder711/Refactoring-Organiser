@@ -3,7 +3,7 @@ import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { domain, token, UserAvatar } from '@/constants';
+import { domain, UserAvatar } from '@/constants';
 import useAuthStore from '@/store/authStore';
 import { CompanyType, UserType } from '@/types';
 import { JobTitleType } from '@/types';
@@ -21,9 +21,10 @@ import {
 import { getImageUrl } from '@/lib/utils';
 import Wave from '@/components/Wave';
 import { useNavigate } from 'react-router-dom';
+import { getProfile } from '@/api/auth';
 
 const UpdateProfile: React.FC = () => {
-    const { user, setUser } = useAuthStore(state => state);
+    const { user, setUser, token } = useAuthStore(state => state);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [companies, setCompanies] = useState<CompanyType[]>([]);
@@ -40,7 +41,7 @@ const UpdateProfile: React.FC = () => {
         address: user?.address || '',
         pincode: user?.pincode || '',
         company_logo: user?.company_logo || null as File | string | null,
-        profile_picture: user?.image || null as File | string | null,
+        image: user?.image || null as File | string | null,
     });
 
     useEffect(() => {
@@ -129,9 +130,11 @@ const UpdateProfile: React.FC = () => {
                 },
             });
 
-            setUser(formData as unknown as UserType);
+            const profileResponse = await getProfile(token as string);
 
-            if (response.data.status === 200) {
+            setUser(profileResponse as unknown as UserType);
+
+            if (response.status === 200) {
                 toast(response.data.message, {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheckBig className='size-5' />
@@ -337,15 +340,15 @@ const UpdateProfile: React.FC = () => {
                     {/* Profile Picture */}
                     <div className='flex gap-5 flex-col w-full'>
                         <div className="flex flex-col gap-2">
-                            <Label className="font-semibold" htmlFor="profile_picture">Profile Picture <span className='text-brand-secondary'>*</span></Label>
+                            <Label className="font-semibold" htmlFor="image">Profile Picture <span className='text-brand-secondary'>*</span></Label>
                             <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
-                                    {formData.profile_picture ? (formData.profile_picture instanceof File ? formData.profile_picture.name : "File selected") : "No file Chosen"}
+                                    {formData.image ? (formData.image instanceof File ? formData.image.name : "File selected") : "No file Chosen"}
                                 </p>
                                 <Input
-                                    id="profile_picture"
-                                    name="profile_picture"
+                                    id="image"
+                                    name="image"
                                     type='file'
                                     accept="image/*"
                                     onChange={handleInputChange}
@@ -355,7 +358,7 @@ const UpdateProfile: React.FC = () => {
                         </div>
 
                         <img
-                            src={formData.profile_picture instanceof File ? URL.createObjectURL(formData.profile_picture) : formData.profile_picture ? getImageUrl(formData.profile_picture) : UserAvatar}
+                            src={formData.image instanceof File ? URL.createObjectURL(formData.image) : formData.image ? getImageUrl(formData.image) : UserAvatar}
                             alt="Profile Picture"
                             width={150}
                             height={150}
