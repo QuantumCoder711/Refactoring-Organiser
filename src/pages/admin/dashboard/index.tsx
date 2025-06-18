@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
   });
 
   upcomingEvents.sort((a: any, b: any) => {
-    return new Date(b.event_start_date).getTime() + new Date(a.event_start_date).getTime();
+    return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
   });
 
   return (
