@@ -51,9 +51,9 @@ const AddAgenda: React.FC = () => {
         event_date: '',
         position: '',
         start_time: '',
-        start_time_type: 'AM',
+        start_time_type: 'PM',
         end_time: '',
-        end_time_type: 'AM',
+        end_time_type: 'PM',
         event_id: event?.id
     });
 
