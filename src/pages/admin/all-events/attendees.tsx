@@ -119,6 +119,7 @@ const Attendees: React.FC = () => {
   const [designationFilter, setDesignationFilter] = useState('');
   const [checkInFilter, setCheckInFilter] = useState<string>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [notInvitedFilter, setNotInvitedFilter] = useState<number>(2);
 
   // Add selected attendees state
   const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
@@ -129,7 +130,7 @@ const Attendees: React.FC = () => {
 
   const filteredAttendees = useMemo(() => {
     setCurrentPage(1);
-    return singleEventAttendees.filter(attendee => {
+    const filtered = singleEventAttendees.filter(attendee => {
       const nameMatch = `${attendee.first_name || ''} ${attendee.last_name || ''}`.toLowerCase().includes(nameFilter.toLowerCase());
       const companyMatch = attendee.company_name?.toLowerCase().includes(companyFilter.toLowerCase()) ?? false;
 
@@ -143,10 +144,17 @@ const Attendees: React.FC = () => {
         (checkInFilter === '1' && attendee.check_in === 1) ||
         (checkInFilter === '0' && attendee.check_in === 0);
       const roleMatch = roleFilter === '' || roleFilter === 'all' || attendee.status?.toLowerCase() === roleFilter.toLowerCase();
+      const notInvitedMatch = notInvitedFilter === 2 ? true : attendee.not_invited === notInvitedFilter;
 
-      return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch;
+      return nameMatch && companyMatch && designationMatch && checkInMatch && roleMatch && notInvitedMatch;
     });
-  }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter]);
+
+    return filtered.sort((a, b) => {
+      const timeA = new Date(a.check_in_time || 0).getTime();
+      const timeB = new Date(b.check_in_time || 0).getTime();
+      return timeB - timeA;
+    });
+  }, [singleEventAttendees, nameFilter, companyFilter, designationFilter, checkInFilter, roleFilter, notInvitedFilter]);
 
   // Calculate paginated data
   const paginatedAttendees = useMemo(() => {
@@ -173,7 +181,7 @@ const Attendees: React.FC = () => {
   // Check if any filter is active
   const isFilterActive = nameFilter !== '' || companyFilter !== '' || designationFilter !== '' ||
     (checkInFilter !== '' && checkInFilter !== 'all') ||
-    (roleFilter !== '' && roleFilter !== 'all');
+    (roleFilter !== '' && roleFilter !== 'all')
 
   // Buttons
   const links = [
@@ -203,21 +211,21 @@ const Attendees: React.FC = () => {
 
     // Define columns
     worksheet.columns = [
-      { header: 'Sr. No.', key: 'srNo' },
-      { header: 'Name', key: 'name' },
-      { header: 'Designation', key: 'designation' },
-      { header: 'Company', key: 'company' },
-      { header: 'Email', key: 'email' },
-      { header: 'Alternate Email', key: 'alternateEmail' },
-      { header: 'Mobile', key: 'mobile' },
-      { header: 'Alternate Mobile', key: 'alternateMobile' },
-      { header: 'Role', key: 'role' },
-      { header: 'Award Winner', key: 'awardWinner' },
-      { header: 'Check In 1st', key: 'checkIn1st' },
-      { header: 'Check In 2nd', key: 'checkIn2nd' },
-      { header: 'Check In 3rd', key: 'checkIn3rd' },
-      { header: 'Check In 4th', key: 'checkIn4th' },
-      { header: 'Check In 5th', key: 'checkIn5th' },
+      // { header: 'Sr. No.', key: 'srNo', width: 5 },
+      { header: 'Name', key: 'name', width: 40 },
+      { header: 'Designation', key: 'designation', width: 40 },
+      { header: 'Company', key: 'company', width: 40 },
+      { header: 'Email', key: 'email', width: 40 },
+      { header: 'Alternate Email', key: 'alternateEmail', width: 40 },
+      { header: 'Mobile', key: 'mobile', width: 40 },
+      { header: 'Alternate Mobile', key: 'alternateMobile', width: 40 },
+      { header: 'Role', key: 'role', width: 10 },
+      { header: 'Award Winner', key: 'awardWinner', width: 25 },
+      { header: 'Check In 1st', key: 'checkIn1st', width: 25 },
+      { header: 'Check In 2nd', key: 'checkIn2nd', width: 25 },
+      { header: 'Check In 3rd', key: 'checkIn3rd', width: 25 },
+      { header: 'Check In 4th', key: 'checkIn4th', width: 25 },
+      { header: 'Check In 5th', key: 'checkIn5th', width: 25 },
     ];
 
     // Style the header row
@@ -229,9 +237,9 @@ const Attendees: React.FC = () => {
     };
 
     // Add data rows
-    attendeesToExport.forEach((attendee, index) => {
+    attendeesToExport.forEach((attendee) => {
       const row = worksheet.addRow({
-        srNo: index + 1,
+        // srNo: index + 1,
         name: `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || '-',
         designation: attendee.job_title || '-',
         company: attendee.company_name || '-',
@@ -253,7 +261,16 @@ const Attendees: React.FC = () => {
         row.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: 'FFFFFF00' } // Yellow background
+          fgColor: { argb: 'fdfd7d' } // Light Yellow background
+        };
+      }
+
+      // Apply green background if not_invited = 0 and check_in = 1
+      if (attendee.not_invited === 0 && (attendee.check_in === 1 || attendee.check_in === 2 || attendee.check_in === 3 || attendee.check_in === 4 || attendee.check_in === 5)) {
+        row.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '78e55c' } // Light Green background
         };
       }
     });
@@ -705,6 +722,8 @@ const Attendees: React.FC = () => {
           {isFilterActive && (
             <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
           )}
+          {notInvitedFilter === 1 && <span className='font-semibold text-sm'>Not Invited: {singleEventAttendees.filter(attendee => attendee.not_invited === 1).length}</span>}
+          {notInvitedFilter === 0 && <span className='font-semibold text-sm'>Invited: {singleEventAttendees.filter(attendee => attendee.not_invited === 0).length}</span>}
         </div>
 
         {/* Filters Bar */}
@@ -744,6 +763,20 @@ const Attendees: React.FC = () => {
               <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
               <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
               <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Filter By Not Invited */}
+          <Select value={notInvitedFilter.toString()} onValueChange={(value) => setNotInvitedFilter(Number(value))}>
+            <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectValue placeholder="Not Invited">
+                {notInvitedFilter === 2 ? 'All' : notInvitedFilter === 1 ? 'Not Invited' : notInvitedFilter === 0 ? 'Invited' : 'All'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent className='!text-sm !font-semibold'>
+              <SelectItem value="2" className='cursor-pointer'>All</SelectItem>
+              <SelectItem value="1" className='cursor-pointer'>Not Invited</SelectItem>
+              <SelectItem value="0" className='cursor-pointer'>Invited</SelectItem>
             </SelectContent>
           </Select>
 

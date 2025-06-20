@@ -93,6 +93,14 @@ const CheckinPage: React.FC = () => {
     }, [eventUUID, breakoutRoom]);
 
     const sendOTP = async () => {
+        if(!formData.mobile) {
+            toast("Please enter your mobile number", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
         try {
             setLoading(true);
             const response = await axios.post(
@@ -293,6 +301,14 @@ const CheckinPage: React.FC = () => {
                 ? `${domain}/api/breakout_room_checkin`
                 : `${domain}/api/accept_decline_event_invitation`;
 
+                if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile) {
+                toast("Please fill in all required fields", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+                return;
+            }
+
             // Prepare the request payload
             const payload = breakoutRoom
                 ? {
@@ -445,12 +461,13 @@ const CheckinPage: React.FC = () => {
 
                                 <div className="flex flex-col gap-2 w-full">
                                     <Label className="font-semibold" htmlFor="designation">
-                                        Job Title/Designation
+                                        Job Title/Designation <span className='text-brand-secondary'>*</span>
                                     </Label>
                                     <Input
                                         id="designation"
                                         name="designation"
                                         type="text"
+                                        required
                                         className='input !h-12 min-w-full text-base'
                                         value={formData.designation}
                                         onChange={handleInputChange}
@@ -459,12 +476,13 @@ const CheckinPage: React.FC = () => {
 
                                 <div className="flex flex-col gap-2 w-full">
                                     <Label className="font-semibold" htmlFor="company">
-                                        Company Name
+                                        Company Name <span className="text-brand-secondary">*</span>
                                     </Label>
                                     <Input
                                         id="company"
                                         name="company"
                                         type="text"
+                                        required
                                         className='input !h-12 min-w-full text-base'
                                         value={formData.company}
                                         onChange={handleInputChange}
