@@ -358,7 +358,7 @@ const AddAttendee: React.FC = () => {
             }
             else {
                 if (response.invalid_data && response.duplicate_entries) {
-                    toast(`${response.message}, rejected ${response.invalid_data} and duplicate ${response.duplicate_entries}` || "Failed to upload attendees", {
+                    toast(`${response.message}, duplicate ${response.duplicate_entries}` || "Failed to upload attendees", {
                         className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                         icon: <CircleCheck className='size-5' />
                     });
