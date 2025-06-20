@@ -12,9 +12,7 @@ export const getAllEvents = async (token: string): Promise<EventResponse> => {
                 'Authorization': `Bearer ${token}`,
             }
         });
-
-        response.data.data = response.data.data.filter((event: EventType) => event.id !== 511);
-
+        
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
