@@ -1,7 +1,7 @@
 import { domain, token } from "@/constants";
 import axios from "axios";
 import { EventResponse } from "@/types/api-responses";
-import { AddEventType, EventType } from "@/types";
+import { AddEventType } from "@/types";
 
 // Fetching All Events List
 export const getAllEvents = async (token: string): Promise<EventResponse> => {
