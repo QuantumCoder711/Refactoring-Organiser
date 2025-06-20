@@ -355,11 +355,19 @@ const AddAttendee: React.FC = () => {
 
                 // Reset the file state
                 setBulkFile(null);
-            } else {
-                toast(response.message || "Failed to upload attendees", {
-                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleX className='size-5' />
-                });
+            }
+            else {
+                if (response.invalid_data && response.duplicate_entries) {
+                    toast(`${response.message}, duplicate ${response.duplicate_entries}` || "Failed to upload attendees", {
+                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleCheck className='size-5' />
+                    });
+                } else {
+                    toast(response.message || "Failed to upload attendees", {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                }
             }
         } catch (error: any) {
 

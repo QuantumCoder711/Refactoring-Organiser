@@ -26,12 +26,8 @@ const ExploreAllEvents: React.FC = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Filter out event with id 443
-        const fetchedEvents = res.data.data;
-
-        const filteredEvents = fetchedEvents.filter((event: any) => event.id !== 511);
-        // const filteredEvents = fetchedEvents;
-
+        const filteredEvents = res.data.data;
+        
         const upcomingEvents = filteredEvents.filter((event: any) => {
           const eventDate = new Date(event.event_start_date);
           eventDate.setHours(0, 0, 0, 0);
