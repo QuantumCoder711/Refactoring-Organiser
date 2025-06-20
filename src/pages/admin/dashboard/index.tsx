@@ -8,7 +8,7 @@ import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  const { events, getAllEvents } = useEventStore();
+  const { events, getAllEvents } = useEventStore(state=>state);
   const { allEventsAttendees, getAllEventsAttendees } = useAttendeeStore();
   const { allEventsSponsors, getAllEventsSponsors } = useSponsorStore();
 

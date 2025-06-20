@@ -1,7 +1,7 @@
 import { domain, token } from "@/constants";
 import axios from "axios";
 import { EventResponse } from "@/types/api-responses";
-import { AddEventType } from "@/types";
+import { AddEventType, EventType } from "@/types";
 
 // Fetching All Events List
 export const getAllEvents = async (token: string): Promise<EventResponse> => {
@@ -12,6 +12,8 @@ export const getAllEvents = async (token: string): Promise<EventResponse> => {
                 'Authorization': `Bearer ${token}`,
             }
         });
+
+        response.data.data = response.data.data.filter((event: EventType) => event.id !== 511);
 
         return response.data;
     } catch (error) {
