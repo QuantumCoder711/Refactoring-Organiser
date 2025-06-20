@@ -1,6 +1,6 @@
 import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, Download } from 'lucide-react';
@@ -182,8 +182,8 @@ const Attendees: React.FC = () => {
     { name: "Pending User Request", url: `/all-events/event/all-template-messages/pending-user-request/${slug}` },
   ];
 
-  // Handle export to Excel
-  const handleExportToExcel = () => {
+  // Handle export to Excel with background colors using ExcelJS
+  const handleExportToExcel = async () => {
     // Use selected attendees if any, otherwise use filtered attendees
     const attendeesToExport = selectedAttendees.size > 0
       ? singleEventAttendees.filter(attendee => selectedAttendees.has(attendee.id))
@@ -197,42 +197,95 @@ const Attendees: React.FC = () => {
       return;
     }
 
-    // Prepare data for Excel
-    const data = attendeesToExport.map((attendee, index) => ({
-      'Sr. No.': index + 1,
-      'Name': `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || '-',
-      'Designation': attendee.job_title || '-',
-      'Company': attendee.company_name || '-',
-      'Email': attendee.email_id || '-',
-      'Alternate Email': attendee.alternate_email || '-',
-      'Mobile': attendee.phone_number || '-',
-      'Alternate Mobile': attendee.alternate_mobile_number || '-',
-      'Role': attendee.status || '-',
-      'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
-      'Check In 1st': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTimeReport(attendee.check_in_time) : 'Yes') : 'No',
-      'Check In 2nd': dateDiff >= 1 ? (attendee.check_in_second === 1 ? (attendee.check_in_second_time ? formatDateTimeReport(attendee.check_in_second_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 3rd': dateDiff >= 2 ? (attendee.check_in_third === 1 ? (attendee.check_in_third_time ? formatDateTimeReport(attendee.check_in_third_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 4th': dateDiff >= 3 ? (attendee.check_in_forth === 1 ? (attendee.check_in_forth_time ? formatDateTimeReport(attendee.check_in_forth_time) : 'Yes') : 'No') : 'N/A',
-      'Check In 5th': dateDiff >= 4 ? (attendee.check_in_fifth === 1 ? (attendee.check_in_fifth_time ? formatDateTimeReport(attendee.check_in_fifth_time) : 'Yes') : 'No') : 'N/A',
-    }));
+    // Create a new workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Attendees');
 
-    // Create workbook and worksheet
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data);
+    // Define columns
+    worksheet.columns = [
+      { header: 'Sr. No.', key: 'srNo' },
+      { header: 'Name', key: 'name' },
+      { header: 'Designation', key: 'designation' },
+      { header: 'Company', key: 'company' },
+      { header: 'Email', key: 'email' },
+      { header: 'Alternate Email', key: 'alternateEmail' },
+      { header: 'Mobile', key: 'mobile' },
+      { header: 'Alternate Mobile', key: 'alternateMobile' },
+      { header: 'Role', key: 'role' },
+      { header: 'Award Winner', key: 'awardWinner' },
+      { header: 'Check In 1st', key: 'checkIn1st' },
+      { header: 'Check In 2nd', key: 'checkIn2nd' },
+      { header: 'Check In 3rd', key: 'checkIn3rd' },
+      { header: 'Check In 4th', key: 'checkIn4th' },
+      { header: 'Check In 5th', key: 'checkIn5th' },
+    ];
 
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Attendees');
+    // Style the header row
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFE0E0E0' }
+    };
+
+    // Add data rows
+    attendeesToExport.forEach((attendee, index) => {
+      const row = worksheet.addRow({
+        srNo: index + 1,
+        name: `${attendee.first_name || ''} ${attendee.last_name || ''}`.trim() || '-',
+        designation: attendee.job_title || '-',
+        company: attendee.company_name || '-',
+        email: attendee.email_id || '-',
+        alternateEmail: attendee.alternate_email || '-',
+        mobile: attendee.phone_number || '-',
+        alternateMobile: attendee.alternate_mobile_number || '-',
+        role: attendee.status || '-',
+        awardWinner: attendee.award_winner === 1 ? 'Yes' : 'No',
+        checkIn1st: attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTimeReport(attendee.check_in_time) : 'Yes') : 'No',
+        checkIn2nd: dateDiff >= 1 ? (attendee.check_in_second === 1 ? (attendee.check_in_second_time ? formatDateTimeReport(attendee.check_in_second_time) : 'Yes') : 'No') : 'N/A',
+        checkIn3rd: dateDiff >= 2 ? (attendee.check_in_third === 1 ? (attendee.check_in_third_time ? formatDateTimeReport(attendee.check_in_third_time) : 'Yes') : 'No') : 'N/A',
+        checkIn4th: dateDiff >= 3 ? (attendee.check_in_forth === 1 ? (attendee.check_in_forth_time ? formatDateTimeReport(attendee.check_in_forth_time) : 'Yes') : 'No') : 'N/A',
+        checkIn5th: dateDiff >= 4 ? (attendee.check_in_fifth === 1 ? (attendee.check_in_fifth_time ? formatDateTimeReport(attendee.check_in_fifth_time) : 'Yes') : 'No') : 'N/A',
+      });
+
+      // Apply yellow background if not_invited = 1
+      if (attendee.not_invited === 1) {
+        row.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFFF00' } // Yellow background
+        };
+      }
+    });
 
     // Generate Excel file
     const fileName = `attendees_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(wb, fileName);
 
-    // Show success message
-    toast('Export successful!', {
-      className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-      icon: <CircleCheck className='size-5' />
-    });
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      // Show success message
+      toast('Export successful!', {
+        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleCheck className='size-5' />
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast('Export failed!', {
+        className: "!bg-red-500 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleX className='size-5' />
+      });
+    }
   };
+
+
 
   // Handle delete attendee
   const handleDeleteAttendee = async (id: number) => {
@@ -876,33 +929,33 @@ const Attendees: React.FC = () => {
                                   const search = searchQuery.toLowerCase();
                                   return (
                                     (attendee.first_name?.toLowerCase().includes(search) ||
-                                    attendee.last_name?.toLowerCase().includes(search) ||
-                                    attendee.company_name?.toLowerCase().includes(search) ||
-                                    attendee.email_id?.toLowerCase().includes(search))
+                                      attendee.last_name?.toLowerCase().includes(search) ||
+                                      attendee.company_name?.toLowerCase().includes(search) ||
+                                      attendee.email_id?.toLowerCase().includes(search))
                                   );
                                 })
                                 .map((attendee: AttendeeType) => (
-                                <TableRow key={attendee.id} className="hover:bg-brand-lightest">
-                                  <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
-                                  <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
-                                  <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
-                                  <TableCell className="text-center max-w-fit flex items-center justify-center">
-                                    <Checkbox
-                                      id={String(attendee.id)}
-                                      name="sponsor"
-                                      checked={selectedSponsorsAttendees.find((item) => item.attendee_id === attendee.id) ? true : false}
-                                      className="mx-auto cursor-pointer border border-brand-dark-gray"
-                                      onCheckedChange={(checked) => {
-                                        if (checked) {
-                                          setSelectedSponsorsAttendees((prev) => [...prev, { uuid: event?.uuid as string, attendee_id: attendee.id }])
-                                        } else {
-                                          setSelectedSponsorsAttendees((prev) => [...prev].filter((item) => item.attendee_id !== attendee.id))
-                                        }
-                                      }}
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              ))}
+                                  <TableRow key={attendee.id} className="hover:bg-brand-lightest">
+                                    <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
+                                    <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
+                                    <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
+                                    <TableCell className="text-center max-w-fit flex items-center justify-center">
+                                      <Checkbox
+                                        id={String(attendee.id)}
+                                        name="sponsor"
+                                        checked={selectedSponsorsAttendees.find((item) => item.attendee_id === attendee.id) ? true : false}
+                                        className="mx-auto cursor-pointer border border-brand-dark-gray"
+                                        onCheckedChange={(checked) => {
+                                          if (checked) {
+                                            setSelectedSponsorsAttendees((prev) => [...prev, { uuid: event?.uuid as string, attendee_id: attendee.id }])
+                                          } else {
+                                            setSelectedSponsorsAttendees((prev) => [...prev].filter((item) => item.attendee_id !== attendee.id))
+                                          }
+                                        }}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
                             </TableBody>
                           </Table>
                           <DialogFooter>
