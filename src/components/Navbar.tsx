@@ -161,6 +161,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
                   </Link>
+                  <Link to="/organiser/change-password">
+                    <DropdownMenuItem className='cursor-pointer'>Change Password</DropdownMenuItem>
+                  </Link>
                   {/* <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem> */}

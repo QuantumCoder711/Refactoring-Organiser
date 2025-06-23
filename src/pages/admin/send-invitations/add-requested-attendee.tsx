@@ -408,22 +408,24 @@ const AddRequestedAttendee: React.FC = () => {
                 last_name: 'Doe',
                 email_id: 'john.doe@example.com',
                 phone_number: '1234567890',
+                status: 'Delegate',
                 alternate_mobile_number: '9876543210',
+                alternate_email: 'john.doe2@example.com',
+                company_name: 'Google',
                 job_title: 'Software Engineer',
-                company_name: 'Tech Corp',
-                linkedin_url: 'https://linkedin.com/in/johndoe',
-                status: 'Attendee'
+                linkedin_url: 'https://linkedin.com/in/johndoe'
             },
             {
                 first_name: 'Jane',
                 last_name: 'Smith',
                 email_id: 'jane.smith@example.com',
                 phone_number: '9876543210',
+                status: 'Delegate',
                 alternate_mobile_number: '',
+                alternate_email: 'jane.smith2@example.com',
+                company_name: 'Meta',
                 job_title: 'Product Manager',
-                company_name: 'Innovate Inc',
                 linkedin_url: 'https://linkedin.com/in/janesmith',
-                status: 'VIP'
             }
         ];
 

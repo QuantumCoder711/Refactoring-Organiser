@@ -135,7 +135,7 @@ const App: React.FC = () => {
         {/* Main Routes */}
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="profile/change-password" element={<ChangePassword />} />
+        <Route path="organiser/change-password" element={<ChangePassword />} />
         <Route path="all-events" element={<AllEvents />} />
         <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />
@@ -150,7 +150,6 @@ const App: React.FC = () => {
         <Route path="send-invitations/invite-registrations/:slug" element={<InviteRegistrations />} />
 
         <Route path="update-profile" element={<UpdateProfile />} />
-
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
         <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />

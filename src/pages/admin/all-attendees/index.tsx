@@ -134,7 +134,7 @@ const AllAttendees: React.FC = () => {
             'LinkedIn URL': attendee.linkedin_page_link || '-',
             'Role': attendee.status || '-',
             'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
-            'Check In': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
+            // 'Check In': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
         }));
 
         // Create workbook and worksheet
@@ -154,7 +154,6 @@ const AllAttendees: React.FC = () => {
             { wch: 40 },  // LinkedIn URL
             { wch: 15 },  // Role
             { wch: 15 },  // Award Winner
-            { wch: 20 },  // Check In
         ];
         ws['!cols'] = wscols;
 
@@ -294,7 +293,6 @@ const AllAttendees: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">LinkedIn URL</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Checked In</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -332,9 +330,6 @@ const AllAttendees: React.FC = () => {
                                     {attendee.award_winner !== null && attendee.award_winner !== undefined
                                         ? (attendee.award_winner === 1 ? "Yes" : "No")
                                         : "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : "Yes") : "No"}
                                 </TableCell>
                             </TableRow>
                         ))}

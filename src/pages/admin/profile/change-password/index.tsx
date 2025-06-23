@@ -62,15 +62,15 @@ const ChangePassword: React.FC = () => {
                 }
             });
 
-            if (res.data.status === "200") {
+            if (res.data.status === 200) {
                 toast("Password changed successfully", {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
                 
-                setTimeout(() => {
-                    navigate('/profile');
-                }, 2000);
+                navigate('/profile');
+                // setTimeout(() => {
+                // }, 2000);
             } else {
                 toast(res.data.message || "Something went wrong", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -92,62 +92,68 @@ const ChangePassword: React.FC = () => {
     }
 
     return (
-        <div className='min-h-screen flex items-center justify-center p-4'>
-            <div className='max-w-[400px] w-full rounded-[10px]'>
+        <div className='flex flex-1 h-full items-center justify-center p-4'>
+            <div className='max-w-lg w-full rounded-[10px]'>
                 <h1 className='text-2xl font-semibold text-center mb-6'>Change Password</h1>
                 
-                <div className='space-y-5'>
+                <div className='space-y-5 p-8 shadow-blur-lg rounded-2xl'>
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold'>Current Password</Label>
-                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                        <div className='relative'>
                             <Input
                                 value={formData.oldPassword}
                                 onChange={handleInputChange}
                                 name="oldPassword"
                                 type={showOldPassword ? 'text' : 'password'}
                                 placeholder='Enter current password'
-                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
-                            {showOldPassword ? 
-                                <Eye onClick={() => setShowOldPassword(!showOldPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' /> : 
-                                <EyeClosed onClick={() => setShowOldPassword(!showOldPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' />
-                            }
+                            <div className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'>
+                                {showOldPassword ? 
+                                    <Eye onClick={() => setShowOldPassword(!showOldPassword)} className='size-4' /> : 
+                                    <EyeClosed onClick={() => setShowOldPassword(!showOldPassword)} className='size-4' />
+                                }
+                            </div>
                         </div>
                     </div>
 
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold'>New Password</Label>
-                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                        <div className='relative'>
                             <Input
                                 value={formData.newPassword}
                                 onChange={handleInputChange}
                                 name="newPassword"
                                 type={showNewPassword ? 'text' : 'password'}
                                 placeholder='Enter new password'
-                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
-                            {showNewPassword ? 
-                                <Eye onClick={() => setShowNewPassword(!showNewPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' /> : 
-                                <EyeClosed onClick={() => setShowNewPassword(!showNewPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' />
-                            }
+                            <div className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'>
+                                {showNewPassword ? 
+                                    <Eye onClick={() => setShowNewPassword(!showNewPassword)} className='size-4' /> : 
+                                    <EyeClosed onClick={() => setShowNewPassword(!showNewPassword)} className='size-4' />
+                                }
+                            </div>
                         </div>
                     </div>
 
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold'>Confirm New Password</Label>
-                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                        <div className='relative'>
                             <Input
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
                                 name="confirmPassword"
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 placeholder='Confirm new password'
-                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
-                            {showConfirmPassword ? 
-                                <Eye onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' /> : 
-                                <EyeClosed onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='absolute size-4 right-2 top-1/2 -translate-y-1/2 cursor-pointer' />
-                            }
+                            <div className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'>
+                                {showConfirmPassword ? 
+                                    <Eye onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='size-4' /> : 
+                                    <EyeClosed onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='size-4' />
+                                }
+                            </div>
                         </div>
                     </div>
 

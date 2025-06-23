@@ -68,7 +68,7 @@ const ResetPassword: React.FC = () => {
                 });
                 
                 setTimeout(() => {
-                    navigate('/login');
+                    navigate('/organiser/login');
                 }, 2000);
             } else {
                 toast(res.data.message || "Something went wrong", {

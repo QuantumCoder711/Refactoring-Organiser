@@ -20,26 +20,56 @@ const footerLinks = [
     {
         title: "Product",
         links: [
-            "Features",
-            "Pricing",
-            "Integrations",
-            "Security"
+            {
+                name: "Features",
+                path: "/features"
+            },
+            {
+                name: "Pricing",
+                path: "/pricing"
+            },
+            {
+                name: "Integrations",
+                path: "/integrations"
+            },
+            // {
+            //     name: "Security",
+            //     path: "/security"
+            // }
         ]
     },
-    {
-        title: "Company",
-        links: [
-            "About Us",
-            "Careers",
-            "Blog",
-            "Contact Us"
-        ]
-    },
+    // {
+    //     title: "Company",
+    //     links: [
+    //         {
+    //             name: "About Us",
+    //             path: "/about-us"
+    //         },
+    //         {
+    //             name: "Careers",
+    //             path: "/careers"
+    //         },
+    //         {
+    //             name: "Blog",
+    //             path: "/blog"
+    //         },
+    //         { 
+    //             name: "Contact Us",
+    //             path: "/contact-us"
+    //         }
+    //     ]
+    // },
     {
         title: "Resources",
         links: [
-            "Tutorials",
-            "FAQs"
+            {
+                name: "Tutorials",
+                path: "/tutorials"
+            },
+            {
+                name: "FAQs",
+                path: "/faq"
+            }
         ]
     }
 ];
@@ -104,7 +134,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                                     <ul>
                                         {item.links.map((link, linkIndex) => (
                                             <li key={linkIndex} className='text-white text-base font-light my-2'>
-                                                <Link to="#">{link}</Link>
+                                                <Link to={link.path}>{link.name}</Link>
                                             </li>
                                         ))}
                                     </ul>
