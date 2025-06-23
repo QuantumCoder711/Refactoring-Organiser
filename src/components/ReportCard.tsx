@@ -60,7 +60,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                         {title}
                     </h3>
                     <div className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
-                        <MapPin width={8} height={12} className='min-w-2 min-h-3 fill-black stroke-white' />
+                        <MapPin size={24} className='min-w-2 min-h-3 fill-black stroke-white' />
                         <span className='overflow-hidden text-ellipsis'>
                             {location}
                         </span>

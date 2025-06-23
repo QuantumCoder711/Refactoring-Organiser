@@ -1,8 +1,8 @@
 import useAttendeeStore from '@/store/attendeeStore';
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Eye, SquarePen, Trash, CircleX, CircleCheck, ArrowDownToLine } from 'lucide-react';
+import { Eye, Trash, CircleX, CircleCheck, ArrowDownToLine, UserCheck } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import * as XLSX from 'xlsx';
@@ -62,6 +62,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { domain } from '@/constants';
+import { approvePendingRequest, disapprovePendingRequest } from '@/api/attendees';
 
 const PendingUserRequest: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -98,8 +99,8 @@ const PendingUserRequest: React.FC = () => {
     // Filter states
     const [nameFilter, setNameFilter] = useState('');
     const [companyFilter, setCompanyFilter] = useState('');
-    const [designationFilter, ] = useState('');
-    const [roleFilter, ] = useState<string>('all');
+    const [designationFilter,] = useState('');
+    const [roleFilter,] = useState<string>('all');
 
     // Add selected attendees state
     const [selectedAttendees, setSelectedAttendees] = useState<Set<number>>(new Set());
@@ -231,6 +232,48 @@ const PendingUserRequest: React.FC = () => {
         });
     };
 
+    const handleApprove = async (id: number) => {
+        if (!token || !event) return;
+        const response = await approvePendingRequest(token, id, event.user_id, event.uuid);
+        if (response.status === 200) {
+            // Remove the approved request from the pendingRequests state
+            setPendingRequests(prevRequests =>
+                prevRequests.filter(request => request.id !== id)
+            );
+
+            toast(response.message, {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+        } else {
+            toast(response.message || "Something went wrong!!!", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        }
+    }
+
+    const handleDisapprove = async (id: number) => {
+        if (!token || !event) return;
+        const response = await disapprovePendingRequest(token, id, event.user_id, event.uuid);
+        if (response.status === 200) {
+            // Remove the disapproved request from the pendingRequests state
+            setPendingRequests(prevRequests =>
+                prevRequests.filter(request => request.id !== id)
+            );
+
+            toast(response.message, {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+        } else {
+            toast(response.message || "Something went wrong!!!", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        }
+    }
+
     if (loading) return <Wave />
 
     return (
@@ -324,13 +367,13 @@ const PendingUserRequest: React.FC = () => {
                                     />
                                 </TableCell>
                                 <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 capitalize">
                                     {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 capitalize">
                                     {attendee.job_title || "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 capitalize">
                                     {attendee.company_name || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
@@ -345,10 +388,10 @@ const PendingUserRequest: React.FC = () => {
                                 <TableCell className="text-left min-w-10">
                                     {attendee.alternate_mobile_number || "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 capitalize">
                                     {attendee.status || "-"}
                                 </TableCell>
-                                <TableCell className="text-left min-w-10">
+                                <TableCell className="text-left min-w-10 capitalize">
                                     {attendee.award_winner !== null && attendee.award_winner !== undefined
                                         ? (attendee.award_winner === 1 ? "Yes" : "No")
                                         : "-"}
@@ -370,11 +413,11 @@ const PendingUserRequest: React.FC = () => {
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.first_name} {attendee.last_name}</p>
+                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.first_name} {attendee.last_name}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.job_title || '-'}</p>
+                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.job_title || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
@@ -382,7 +425,7 @@ const PendingUserRequest: React.FC = () => {
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.company_name || '-'}</p>
+                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.company_name || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
@@ -401,8 +444,25 @@ const PendingUserRequest: React.FC = () => {
                                         </DialogContent>
                                     </Dialog>
 
-                                    {/* Edit Event */}
-                                    <Link to="#" className=''><SquarePen width={9.78} height={9.5} className='size-4'/></Link>
+                                    {/* Approving or Disapproving */}
+                                    <AlertDialog>
+                                        <AlertDialogTrigger className='cursor-pointer'>
+                                            <UserCheck width={9.78} height={9.5} className='size-4' />
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Approve User Request</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Are you sure want to approve {attendee.first_name} {attendee.last_name} ? for the {event?.title}
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDisapprove(attendee.id)} className='cursor-pointer bg-brand-secondary transition-all hover:bg-brand-secondary/80 duration-300 text-white'>Disapprove</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => handleApprove(attendee.id)} className='cursor-pointer bg-brand-primary transition-all hover:bg-brand-primary-dark duration-300 text-white'>Approve</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
 
                                     {/* Delete Attendee */}
                                     <AlertDialog>

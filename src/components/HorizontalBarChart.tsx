@@ -33,7 +33,7 @@ export function HorizontalBarChartComponent({ chartData, title = "Total Attendee
           {chartData.map((item, index) => (
             <div key={index} className='flex gap-[10px] items-center'>
               <p 
-                className='cursor-default font-semibold max-w-40 w-full text-ellipsis overflow-hidden text-nowrap text-right'
+                className='cursor-default font-semibold max-w-40 w-full text-right'
                 title={item.label}
               >
                 {item.label}

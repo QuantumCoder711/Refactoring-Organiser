@@ -528,24 +528,24 @@ const SendInvitations: React.FC = () => {
                                         </a>
                                     ) : "-"}
                                 </TableCell>
-                                <TableCell>{attendee.first_name + " " + attendee.last_name}</TableCell>
-                                <TableCell>{attendee.job_title || "-"}</TableCell>
-                                <TableCell>{attendee.company_name || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.first_name + " " + attendee.last_name}</TableCell>
+                                <TableCell className='capitalize'>{attendee.job_title || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
                                 <TableCell>{attendee.email_id || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_email || "-"}</TableCell>
                                 <TableCell>{attendee.phone_number || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_mobile_number || "-"}</TableCell>
-                                <TableCell>{attendee.status || "Delegate"}</TableCell>
-                                <TableCell>{attendee.confirmed_status || "-"}</TableCell>
-                                <TableCell>{attendee.reaching_out_status || "-"}</TableCell>
-                                <TableCell>{attendee.follow_up || "-"}</TableCell>
-                                <TableCell>{attendee.managed_by || "-"}</TableCell>
-                                <TableCell>{attendee.remark || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.status || "Delegate"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.confirmed_status || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.reaching_out_status || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.follow_up || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.managed_by || "-"}</TableCell>
+                                <TableCell className='capitalize'>{attendee.remark || "-"}</TableCell>
                                 <TableCell className="text-left min-w-10 flex items-center gap-1.5">
 
                                     {/* For Viewing the Event */}
                                     <Dialog>
-                                        <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} /></DialogTrigger>
+                                        <DialogTrigger className='cursor-pointer'><Eye size={20} /></DialogTrigger>
                                         <DialogContent className="max-w-md p-6">
                                             <DialogHeader className="space-y-2">
                                                 <DialogTitle className="text-2xl font-bold text-brand-primary">
@@ -590,12 +590,12 @@ const SendInvitations: React.FC = () => {
                                     </Dialog>
 
                                     {/* Edit Event */}
-                                    <Link to={`/send-invitations/edit-requested-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} /></Link>
+                                    <Link to={`/send-invitations/edit-requested-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen size={20} /></Link>
 
                                     {/* Delete Attendee */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary' />
+                                            <Trash size={20} className='fill-brand-secondary stroke-brand-secondary' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>

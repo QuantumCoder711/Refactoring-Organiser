@@ -125,7 +125,7 @@ export const addAttendee = async (token: string, attendeeData: FormData): Promis
 // Bulk Upload Attendees
 export const bulkUploadAttendees = async (token: string, uuid: string, file: File): Promise<AddBulkAttendeeResponse> => {
     try {
-        const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, {file}, {
+        const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, { file }, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`
@@ -157,3 +157,40 @@ export const updateAttendee = async (token: string, uuid: string, attendeeData: 
         throw new Error("An unexpected error occurred");
     }
 }
+
+// Approve Pending Request
+export const approvePendingRequest = async (token: string, id: number, user_id: number, uuid: string) => {
+    try {
+        const response = await axios.post(`${domain}/api/approved_pending_request`, { id, user_id, event_id: uuid }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to approve pending request");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
+// Disapprove Pending Request
+export const disapprovePendingRequest = async (token: string, id: number, user_id: number, uuid: string) => {
+    try {
+        const response = await axios.post(`${domain}/api/discard_pending_request`, { id, user_id, event_id: uuid }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            throw new Error(error.response?.data?.message || "Failed to disapprove pending request");
+        }
+        throw new Error("An unexpected error occurred");
+    }
+}
+
