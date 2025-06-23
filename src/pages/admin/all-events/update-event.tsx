@@ -130,7 +130,6 @@ const UpdateEvent: React.FC = () => {
     // Set form data when event is available
     useEffect(() => {
         if (event) {
-            console.log("Event data loaded:", event);
 
             // Check if the image is a template by comparing with the template paths
             const isTemplate = templates.some(template => event.image === template);
@@ -365,10 +364,10 @@ const UpdateEvent: React.FC = () => {
 
         // Split the time into hours and minutes
         const [hours, minutes] = timeValue.split(':').map(Number);
-        
+
         // Determine if it's AM or PM
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        
+
         // Convert to 12-hour format
         const twelveHour = hours % 12 || 12;
 
@@ -508,6 +507,45 @@ const UpdateEvent: React.FC = () => {
                     return;
                 }
             }
+            dataToSubmit.event_date = dataToSubmit?.event_start_date;
+
+
+            // Validate dates
+            if (dataToSubmit.event_start_date && dataToSubmit.event_end_date) {
+                // Parse dates first
+                const startDate = new Date(dataToSubmit.event_start_date);
+                const endDate = new Date(dataToSubmit.event_end_date);
+
+                // Set hours, minutes, seconds based on the time inputs
+                const [startHours, endHours] = [dataToSubmit.start_time, dataToSubmit.end_time].map(Number);
+                const [startMins, endMins] = [dataToSubmit.start_minute_time, dataToSubmit.end_minute_time].map(Number);
+
+                // Set the time components
+                startDate.setHours(
+                    dataToSubmit.start_time_type === 'PM' && startHours < 12 ? startHours + 12 : startHours,
+                    startMins,
+                    0,
+                    0
+                );
+
+                endDate.setHours(
+                    dataToSubmit.end_time_type === 'PM' && endHours < 12 ? endHours + 12 : endHours,
+                    endMins,
+                    0,
+                    0
+                );
+
+                const startTimestamp = startDate.getTime();
+                const endTimestamp = endDate.getTime();
+
+                if (endTimestamp < startTimestamp) {
+                    toast("End date and time cannot be before start date and time", {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                    return false;
+                }
+            }
 
             const response = await useEventStore.getState().updateEvent(eventUuid, dataToSubmit);
             if (response.status === 200) {
@@ -519,7 +557,7 @@ const UpdateEvent: React.FC = () => {
                 });
                 navigate('/dashboard');
             } else {
-                toast(response.message || "Failed to update event", {
+                toast(response.errors?.event_end_date[0] || "Failed to update event", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
                 });
@@ -800,12 +838,12 @@ const UpdateEvent: React.FC = () => {
                             <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
                                 <Input
                                     type='date'
-                                    name='event_date'
-                                    value={formData.event_date}
+                                    name='event_end_date'
+                                    value={formData.event_end_date}
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_date))}</p>
+                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData?.event_end_date || ''))}</p>
                             </div>
 
                             {/* For Time */}
