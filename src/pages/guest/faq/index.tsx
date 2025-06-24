@@ -136,7 +136,7 @@ const FAQ: React.FC = () => {
     })).filter(category => category.questions.length > 0);
 
     return (
-        <div className='min-h-screen w-full flex flex-col'>
+        <div className='min-h-screen w-full flex flex-col pb-5'>
             <div className='max-w-6xl mx-auto my-10 w-full'>
                 <h1 className='text-4xl font-bold text-center text-black'>Frequently Asked Questions</h1>
             </div>

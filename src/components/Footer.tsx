@@ -11,6 +11,7 @@ import AppleStore from './AppleStore';
 import GooglePlay from './GooglePlay';
 import AwsSsl from "@/assets/aws-ssl.png";
 import { HeartIcon } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 interface FooterProps {
     type?: "styled" | "basic";
@@ -32,33 +33,33 @@ const footerLinks = [
                 name: "Integrations",
                 path: "/integrations"
             },
-            // {
-            //     name: "Security",
-            //     path: "/security"
-            // }
+            {
+                name: "Security",
+                path: "/security-and-compilance"
+            }
         ]
     },
-    // {
-    //     title: "Company",
-    //     links: [
-    //         {
-    //             name: "About Us",
-    //             path: "/about-us"
-    //         },
-    //         {
-    //             name: "Careers",
-    //             path: "/careers"
-    //         },
-    //         {
-    //             name: "Blog",
-    //             path: "/blog"
-    //         },
-    //         { 
-    //             name: "Contact Us",
-    //             path: "/contact-us"
-    //         }
-    //     ]
-    // },
+    {
+        title: "Company",
+        links: [
+            {
+                name: "About Us",
+                path: "/about-us"
+            },
+            {
+                name: "Careers",
+                path: "/careers"
+            },
+            {
+                name: "Blog",
+                path: "/blog"
+            },
+            { 
+                name: "Contact Us",
+                path: "/contact-us"
+            }
+        ]
+    },
     {
         title: "Resources",
         links: [
@@ -75,6 +76,21 @@ const footerLinks = [
 ];
 
 const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
+
+    const path = useLocation().pathname;
+
+    const styledPaths = [
+        "/integrations",
+        "/about-us",
+        "/faq",
+        "/privacy-policy",
+        "/terms-and-conditions",
+        "/refund-policy",
+        "/security-and-compilance"
+    ];
+    if (styledPaths.includes(path)) {
+        type = "styled";
+    }
 
     const currentYear = new Date().getFullYear();
 

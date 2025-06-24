@@ -19,6 +19,8 @@ import TermsAndConditions from './pages/guest/terms-and-conditions';
 import RefundPolicy from './pages/guest/refund-policy';
 import PrivacyPolicy from './pages/guest/privacy-policy';
 import FAQ from './pages/guest/faq';
+import SecurityAndCompilance from './pages/guest/security-and-compilance';
+import AboutUs from './pages/guest/about-us';
 // Admin Pages
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
@@ -63,6 +65,8 @@ import SearchPeople from './pages/admin/search-people';
 import CheckInPage from './pages/guest/check-in-page';
 import InviteRegistrations from './pages/admin/send-invitations/invite-registrations';
 import ChangePassword from '@/pages/admin/profile/change-password';
+import Features from './pages/guest/features';
+import Integrations from './pages/guest/integrations';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -88,8 +92,13 @@ const App: React.FC = () => {
         <Route path="terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="refund-policy" element={<RefundPolicy />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="security-and-compilance" element={<SecurityAndCompilance />} />
+        <Route path="about-us" element={<AboutUs />} />
         <Route path="event/check-in" element={<CheckInPage />} />
+        <Route path="features" element={<Features />} />
+        <Route path="integrations" element={<Integrations />} />
         <Route path="faq" element={<FAQ />} />
+
         <Route
           path="organiser/login"
           element={

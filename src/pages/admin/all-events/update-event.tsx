@@ -509,7 +509,6 @@ const UpdateEvent: React.FC = () => {
             }
             dataToSubmit.event_date = dataToSubmit?.event_start_date;
 
-
             // Validate dates
             if (dataToSubmit.event_start_date && dataToSubmit.event_end_date) {
                 // Parse dates first
