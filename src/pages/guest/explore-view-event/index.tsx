@@ -24,7 +24,9 @@ interface ApiType {
 }
 
 const ExploreViewEvent: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
+    let { slug } = useParams<{ slug: string }>();
+    const slugParts = slug?.split("_");
+    slug = slugParts?.[0];
     const [isLoading, setIsLoading] = useState(false);
     const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
     const startTime = currentEvent?.event_date || "";

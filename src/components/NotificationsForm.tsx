@@ -462,7 +462,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
             </div>
             <div className='flex flex-col gap-2'>
               <h3 className='font-semibold'>Time</h3>
-              <p>{formatDateTime(event?.event_date as string)}</p>
+              <p>{event?.start_time}:{event?.start_minute_time} {event?.start_time_type} - {event?.end_time}:{event?.end_minute_time} {event?.end_time_type}</p>
             </div>
 
             <div className='flex flex-1 flex-col justify-between'>
