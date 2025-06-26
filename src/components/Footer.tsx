@@ -86,7 +86,8 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
         "/privacy-policy",
         "/terms-and-conditions",
         "/refund-policy",
-        "/security-and-compilance"
+        "/security-and-compilance",
+        "/features"
     ];
     if (styledPaths.includes(path)) {
         type = "styled";
