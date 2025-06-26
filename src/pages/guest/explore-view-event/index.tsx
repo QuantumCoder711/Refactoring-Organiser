@@ -157,8 +157,9 @@ const ExploreViewEvent: React.FC = () => {
     }, [currentEvent]);
 
     useEffect(() => {
-        if (urlSlug && urlSlug.length > 0) {
-            axios.get(`${domain}/api/express-interest/${urlSlug.join("")}`);
+        if (urlSlug) {
+            const customs = urlSlug.slice(1);
+            axios.get(`${domain}/api/express-interest/${customs.join("_")}`);
         }
     }, [urlSlug]);
 
