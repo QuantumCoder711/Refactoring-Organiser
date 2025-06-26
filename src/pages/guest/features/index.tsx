@@ -14,8 +14,8 @@ const preEvent = [
         icon: OpenMail
     },
     {
-        title: "Contact Extractor",
-        description: "Seamlessly import of contacts for invites",
+        title: "Invite Builder",
+        description: "Upload your contacts or build your invitations list with klout club users.",
         icon: Contact
     },
     {
@@ -95,7 +95,7 @@ const Features: React.FC = () => {
                     <div className='grid grid-cols-3 w-full gap-7'>
                         {preEvent.map((item, index) => (
                             <div key={index} className='p-5 bg-white/20 rounded-[10px] shadow-blur-lg flex flex-col gap-[15px]'>
-                                <img src={item.icon} alt="" sizes="56px" width={item.icon === TLS ? 154 : 56} height={56} />
+                                <img src={item.icon} alt="" sizes="56px" width={56} height={56} className='!size-14' />
                                 <h3 className='font-bold text-2xl'>{item.title}</h3>
                                 <p className='text-base font-medium'>{item.description}</p>
                             </div>
@@ -117,7 +117,7 @@ const Features: React.FC = () => {
                     <div className='grid grid-cols-3 w-full gap-7'>
                         {postEvent.map((item, index) => (
                             <div key={index} className='p-5 bg-white/20 rounded-[10px] shadow-blur-lg flex flex-col gap-[15px]'>
-                                <img src={item.icon} alt="" sizes="56px" width={item.icon === TLS ? 154 : 56} height={56} />
+                                <img src={item.icon} alt="" sizes="56px" width={56} height={56} />
                                 <h3 className='font-bold text-2xl'>{item.title}</h3>
                                 <p className='text-base font-medium'>{item.description}</p>
                             </div>

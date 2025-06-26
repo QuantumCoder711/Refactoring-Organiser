@@ -43,7 +43,7 @@ const UpdateEvent: React.FC = () => {
 
     const templates: string[] = [Template1, Template2, Template3, Template4, Template5];
 
-    const [formData, setFormData] = useState<AddEventType & { event_end_date?: string }>({
+    const [formData, setFormData] = useState<AddEventType>({
         title: "",
         image: null,
         description: "",
@@ -414,12 +414,35 @@ const UpdateEvent: React.FC = () => {
         }
 
         // Validate dates
-        if (data.event_start_date && data.event_date) {
+        if (data.event_start_date && data.event_end_date) {
+            // Parse dates first
             const startDate = new Date(data.event_start_date);
-            const endDate = new Date(data.event_date);
+            const endDate = new Date(data.event_end_date);
 
-            if (endDate < startDate) {
-                toast("End date cannot be before start date", {
+            // Set hours, minutes, seconds based on the time inputs
+            const [startHours, endHours] = [data.start_time, data.end_time].map(Number);
+            const [startMins, endMins] = [data.start_minute_time, data.end_minute_time].map(Number);
+
+            // Set the time components
+            startDate.setHours(
+                data.start_time_type === 'PM' && startHours < 12 ? startHours + 12 : startHours,
+                startMins,
+                0,
+                0
+            );
+
+            endDate.setHours(
+                data.end_time_type === 'PM' && endHours < 12 ? endHours + 12 : endHours,
+                endMins,
+                0,
+                0
+            );
+
+            const startTimestamp = startDate.getTime();
+            const endTimestamp = endDate.getTime();
+
+            if (endTimestamp < startTimestamp) {
+                toast("End date and time cannot be before start date and time", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
                 });

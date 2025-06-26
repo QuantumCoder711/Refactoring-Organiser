@@ -79,6 +79,7 @@ export interface AddEventType {
     image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
     description: string;
     event_start_date: string;
+    event_end_date?: string;
     event_date: string;
     google_map_link: string;
     start_time: string; // New field for formatted start time (e.g., '16:05')
