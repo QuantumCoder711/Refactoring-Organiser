@@ -25,6 +25,7 @@ interface ApiType {
 
 const ExploreViewEvent: React.FC = () => {
     let { slug } = useParams<{ slug: string }>();
+    const urlSlug = slug?.split("_");
     const slugParts = slug?.split("_");
     slug = slugParts?.[0];
     const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +54,7 @@ const ExploreViewEvent: React.FC = () => {
 
     const [open, setOpen] = useState(false);
     const [companies, setCompanies] = useState<ApiType[]>([]);
-    
+
     const [userAccount, setUserAccount] = useState({
         first_name: '',
         last_name: '',
@@ -154,6 +155,12 @@ const ExploreViewEvent: React.FC = () => {
                 });
         }
     }, [currentEvent]);
+
+    useEffect(() => {
+        if (urlSlug && urlSlug.length > 0) {
+            axios.get(`${domain}/api/express-interest/${urlSlug.join("")}`);
+        }
+    }, [urlSlug]);
 
     useEffect(() => {
         if (currentEvent) {
@@ -342,7 +349,7 @@ const ExploreViewEvent: React.FC = () => {
     return (
         <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
             <div
-                dangerouslySetInnerHTML={{ __html: form as unknown as string}}
+                dangerouslySetInnerHTML={{ __html: form as unknown as string }}
                 style={{ opacity: 0 }}
             />
 
