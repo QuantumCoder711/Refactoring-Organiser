@@ -156,12 +156,20 @@ const ExploreViewEvent: React.FC = () => {
         }
     }, [currentEvent]);
 
+    // Express interest API call - run once when the slug (string) becomes available
     useEffect(() => {
-        if (urlSlug) {
+        if (urlSlug && slug) {
             const customs = urlSlug.slice(1);
-            axios.get(`${domain}/api/express-interest/${customs.join("_")}`);
+            axios.get(`${domain}/api/express-interest/${customs.join("_")}`).then(res => {
+                if (res.data.message) {
+                    toast(res.data.message, {
+                        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CheckCircle className='size-5' />
+                    });
+                }
+            });
         }
-    }, [urlSlug]);
+    }, [slug]);
 
     useEffect(() => {
         if (currentEvent) {
