@@ -25,10 +25,10 @@ const footerLinks = [
                 name: "Features",
                 path: "/features"
             },
-            {
-                name: "Pricing",
-                path: "/pricing"
-            },
+            // {
+            //     name: "Pricing",
+            //     path: "/pricing"
+            // },
             {
                 name: "Integrations",
                 path: "/integrations"
@@ -50,23 +50,23 @@ const footerLinks = [
                 name: "Careers",
                 path: "/careers"
             },
-            {
-                name: "Blog",
-                path: "/blog"
-            },
-            { 
-                name: "Contact Us",
-                path: "/contact-us"
-            }
+            // {
+            //     name: "Blog",
+            //     path: "/blog"
+            // },
+            // { 
+            //     name: "Contact Us",
+            //     path: "/contact-us"
+            // }
         ]
     },
     {
         title: "Resources",
         links: [
-            {
-                name: "Tutorials",
-                path: "/tutorials"
-            },
+            // {
+            //     name: "Tutorials",
+            //     path: "/tutorials"
+            // },
             {
                 name: "FAQs",
                 path: "/faq"
