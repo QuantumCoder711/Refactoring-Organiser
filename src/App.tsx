@@ -67,6 +67,7 @@ import InviteRegistrations from './pages/admin/send-invitations/invite-registrat
 import ChangePassword from '@/pages/admin/profile/change-password';
 import Features from './pages/guest/features';
 import Integrations from './pages/guest/integrations';
+import PrintBadges from './pages/admin/all-reports/print-badges';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -184,6 +185,7 @@ const App: React.FC = () => {
           <Route path='charts/:slug' element={<Charts />} />
           <Route path='ai-transcriber/:slug' element={<AiTranscriber />} />
           <Route path='ai-photos/:slug' element={<AiPhotos />} />
+          <Route path='print-badges/:slug' element={<PrintBadges />} />
         </Route>
       </Route>
 

@@ -1,4 +1,4 @@
-import { Brain, BrainCircuit, ChartPie, Mail, MapPin, MessageCircleMore } from 'lucide-react';
+import { Brain, BrainCircuit, ChartPie, Mail, MapPin, MessageCircleMore, Printer } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -39,13 +39,13 @@ const ReportCard: React.FC<ReportCardProps> = ({
 
     return (
         <div className="w-full max-w-lg flex rounded-xl shadow-blur-lg relative">
-            <div className="h-64 flex flex-col">
+            <div className="min-h-64 h-fit flex flex-col">
                 <div className='flex-1 overflow-hidden relative w-64'>
 
                     <img
                         src={image}
                         alt={imageAlt}
-                        className='w-full h-full object-cover rounded-t-xl'
+                        className='w-full h-60 object-cover rounded-t-xl'
                     />
                     <div className='h-1/2 bottom-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
                         <div className='w-full h-full flex justify-between items-end p-2'>
@@ -95,6 +95,11 @@ const ReportCard: React.FC<ReportCardProps> = ({
                     <Link to={`ai-transcriber/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-32 w-full'>
                             <BrainCircuit /> AI Transcriber
+                        </div>
+                    </Link>
+                    <Link to={`print-badges/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
+                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                            <Printer /> Print Badges
                         </div>
                     </Link>
                 </div>
