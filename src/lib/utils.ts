@@ -303,6 +303,13 @@ export const compressImage = async (file: File, maxSizeMB: number = 1): Promise<
   });
 }
 
+export const getStartEndTime = (event: EventType | AgendaType | null): string => {
+  if (!event) return '';
+  const startMinute = event.start_minute_time || '00';
+  const endMinute = event.end_minute_time || '00';
+  return `${event.start_time}:${startMinute} ${event.start_time_type} - ${event.end_time}:${endMinute} ${event.end_time_type}`;
+}
+
 // Badge printing utility
 // This function dynamically prints a given HTMLElement (usually your badge component)
 // onto a single sheet of paper. It automatically scales to the page size selected
@@ -343,19 +350,19 @@ export const printBadge = (
   } as CSSStyleDeclaration);
 
   printContainer.innerHTML = `
-    <div id="print-wrapper" style="width: ${width}; height: ${height}; display:flex; align-items:center; justify-content:center;">
-      ${container.outerHTML}
-    </div>
-  `;
+      <div id="print-wrapper" style="width: ${width}; height: ${height}; display:flex; align-items:center; justify-content:center;">
+        ${container.outerHTML}
+      </div>
+    `;
 
   document.body.appendChild(printContainer);
 
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-      @page { size: ${type}; margin: 0; }
-      html,body,#print-wrapper { width: 100%; height: 100%; margin: 0; padding:0; -webkit-print-color-adjust: exact; }
-      #print-wrapper > * { width:100% !important; height:100% !important; border-radius:0 !important; box-shadow:none !important; }
-  `;
+        @page { size: ${type}; margin: 0; }
+        html,body,#print-wrapper { width: 100%; height: 100%; margin: 0; padding:0; -webkit-print-color-adjust: exact; }
+        #print-wrapper > * { width:100% !important; height:100% !important; border-radius:0 !important; box-shadow:none !important; }
+    `;
   document.head.appendChild(styleSheet);
 
   const cleanup = () => {
@@ -370,10 +377,3 @@ export const printBadge = (
   // Fallback in case onafterprint does not fire (e.g. Safari)
   setTimeout(cleanup, 300);
 };
-
-export const getStartEndTime = (event: EventType | AgendaType | null): string => {
-  if (!event) return '';
-  const startMinute = event.start_minute_time || '00';
-  const endMinute = event.end_minute_time || '00';
-  return `${event.start_time}:${startMinute} ${event.start_time_type} - ${event.end_time}:${endMinute} ${event.end_time_type}`;
-}
