@@ -19,9 +19,9 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     }
 
     return (
-        <div className='max-w-80'>
-            {/* Card */}
-            <div ref={badgeRef} className='w-full mx-auto h-full flex flex-1'>
+        <div className='max-w-80 my-10'>
+            {/* Card For Printing... */}
+            <div ref={badgeRef} className='w-full mx-auto h-full flex flex-1 pb-4'>
                 <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
                     <img
                         // src={`${baseUrl}/${badgeData?.imageUrl}`}
@@ -31,17 +31,17 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                     />
                     
                     <div className='mx-4 pb-5 !capitalize'>
-                        <h3 className="font-bold text-5xl pt-5 mb-2">
+                        <h3 className="font-bold text-6xl pt-5 mb-2">
                             {attendee?.first_name + " " + attendee?.last_name || "Attendee Name"}
                         </h3>
                         <h3 className="font-medium text-3xl pt-3 mb-2">
                             {attendee?.job_title || "Designation"}
                         </h3>
-                        <span className="text-xl capitalize pt-3 pb-5">
+                        <span className="text-2xl capitalize pt-3 pb-5">
                             {attendee?.company_name || "Company"}
                         </span>
                     </div>
-                    <div className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r from-green-500 to-brand-primary text-white">
+                    <div className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r from-green-500 to-brand-primary text-white">
                         {attendee?.status || "Delegate"}
                     </div>
                 </div>
@@ -49,7 +49,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
 
 
             {print && (
-                <Button onClick={handlePrint} className='btn mt-4 btn-primary w-full flex items-center justify-center gap-2'>
+                <Button onClick={handlePrint} className='btn my-4 btn-primary w-full flex items-center justify-center gap-2'>
                     <Printer className="w-4 h-4" /> Print Badge
                 </Button>
             )}
