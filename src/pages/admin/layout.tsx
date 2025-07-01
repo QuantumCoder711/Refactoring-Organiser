@@ -35,7 +35,7 @@ const Layout: React.FC = () => {
         } else {
             setLoading(false);
         }
-    }, [token, getAllEvents, getAllEventsAttendees, getAllEventsSponsors, fetchExtras]);
+    }, [token]);
 
     const events = useEventStore((state) => state.events);
     useCheckInSocket(events);
