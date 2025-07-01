@@ -1,8 +1,8 @@
-import { Briefcase } from 'lucide-react';
-import React from 'react';
+import { Briefcase, Printer } from 'lucide-react';
+import React, { useRef } from 'react';
 import { AttendeeType } from '@/types';
-import { Button } from './ui/button';
-import { getImageUrl } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { getImageUrl, printBadge } from '@/lib/utils';
 
 interface PrintBadgeProps {
     attendee: AttendeeType;
@@ -10,10 +10,17 @@ interface PrintBadgeProps {
 }
 
 const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
+    const badgeRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = () => {
+        // Trigger print ensuring the badge scales to the currently selected page size
+        printBadge(badgeRef.current, '100%', '100%', 'auto');
+    }
+
     return (
         <div className='max-w-fit'>
             {/* Card */}
-            <div className="w-72 h-96 overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl relative flex flex-col">
+            <div ref={badgeRef} className="w-72 h-96 overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl relative flex flex-col">
                 {/* Ribbon */}
                 <div className="absolute -right-8 top-6 w-40 bg-cyan-500 shadow-lg text-white text-center text-sm font-bold py-1 transform rotate-45 z-10">
                     <span className="block uppercase">{attendee.status}</span>
@@ -50,7 +57,9 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                 </div>
             </div>
             {print && (
-                <Button className='btn btn-primary mt-4 w-full'>Print Badge</Button>
+                <Button onClick={handlePrint} className='btn btn-primary mt-4 w-full flex items-center justify-center gap-2'>
+                    <Printer className="w-4 h-4" /> Print Badge
+                </Button>
             )}
         </div>
     )

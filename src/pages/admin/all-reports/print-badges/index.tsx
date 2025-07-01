@@ -34,7 +34,7 @@ const PrintBadges: React.FC = () => {
 
             <div className='flex w-full gap-5 flex-wrap'>
                 {totalCheckedInAttendees.length > 0 ? totalCheckedInAttendees.map((attendee, index) => (
-                    <PrintBadge key={index} attendee={attendee} print={false}/>
+                    <PrintBadge key={index} attendee={attendee} print={true}/>
                 )) : <div className='w-full h-full grid place-content-center text-2xl font-semibold text-brand-dark-gray'>No Attendees Found</div>}
             </div>
         </div>
