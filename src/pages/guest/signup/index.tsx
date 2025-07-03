@@ -28,6 +28,7 @@ const Signup: React.FC = () => {
         first_name: "",
         last_name: "",
         email: "",
+        country_code: "91",
         mobile_number: "",
         password: "",
         company_name: "",
@@ -47,9 +48,10 @@ const Signup: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
+        const sanitizedValue = name === 'country_code' ? value.replace(/\+/g, '') : value;
         setUserAccount(prevState => ({
             ...prevState,
-            [name]: value
+            [name]: sanitizedValue
         }));
     };
 
@@ -69,7 +71,15 @@ const Signup: React.FC = () => {
     };
 
     const handleCreateAccount = async () => {
-        const { first_name, last_name, email, mobile_number, password, confirm_password, company_name, tnc, notifications, company } = userAccount;
+        const { first_name, last_name, email, country_code, mobile_number, password, confirm_password, company_name, tnc, notifications, company } = userAccount;
+
+        if (!country_code) {
+            toast("Country code is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
 
         if (!first_name) {
             toast("Please enter your first name", {
@@ -270,13 +280,30 @@ const Signup: React.FC = () => {
 
                             <div className='flex gap-2 flex-col w-full'>
                                 <Label className='font-semibold'>Mobile Number</Label>
-                                <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                    <Input
-                                        value={userAccount.mobile_number}
-                                        onChange={handleInputChange}
-                                        name='mobile_number'
-                                        className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                    />
+                                <div className='flex gap-2 w-full'>
+                                    <div className='w-24'>
+                                         <div className='input !h-12 relative !p-1 flex items-center'>
+                                             <span className='pl-2 pr-1 select-none'>+</span>
+                                             <Input
+                                                 value={userAccount.country_code}
+                                                 onChange={(e) => handleInputChange(e)}
+                                                 name='country_code'
+                                                 className='input !h-full w-full text-base z-10 border-none shadow-none bg-transparent pl-1'
+                                                 required
+                                             />
+                                         </div>
+                                     </div>
+                                    <div className='w-3/4'>
+                                        <div className='input !h-12 relative !p-1'>
+                                            <Input
+                                                value={userAccount.mobile_number}
+                                                onChange={handleInputChange}
+                                                name='mobile_number'
+                                                className='input !h-full w-full text-base z-10'
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
