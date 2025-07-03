@@ -232,7 +232,7 @@ const Signup: React.FC = () => {
     }
 
     return (
-        <div className='flex items-center h-full border-2 border-green-600 w-full justify-center p-4'>
+        <div className='flex items-center h-full w-full justify-center p-4'>
             <div className='max-w-xl w-full rounded-[10px] p-8'>
                 <h1 className='text-2xl font-semibold text-center mb-6'>Create Account</h1>
 
