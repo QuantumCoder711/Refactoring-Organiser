@@ -232,7 +232,7 @@ const Signup: React.FC = () => {
     }
 
     return (
-        <div className='flex items-center justify-center p-4'>
+        <div className='flex items-center h-full border-2 border-green-600 w-full justify-center p-4'>
             <div className='max-w-xl w-full rounded-[10px] p-8'>
                 <h1 className='text-2xl font-semibold text-center mb-6'>Create Account</h1>
 
@@ -278,22 +278,24 @@ const Signup: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className='flex gap-2 flex-col w-full'>
+                            <div className='flex items-center gap-2 w-full'>
+
+                                <div className='w-fit flex flex-col gap-2'>
+                                    <Label className='font-semibold'>Country Code</Label>
+                                    <div className='input !h-12 relative !p-1 flex items-center'>
+                                        <span className='pl-2 pr-1 select-none'>+</span>
+                                        <Input
+                                            value={userAccount.country_code}
+                                            onChange={(e) => handleInputChange(e)}
+                                            name='country_code'
+                                            className='input !h-full w-full text-base z-10 border-none shadow-none bg-transparent pl-1'
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className='flex flex-col gap-2 w-full'>
                                 <Label className='font-semibold'>Mobile Number</Label>
-                                <div className='flex gap-2 w-full'>
-                                    <div className='w-24'>
-                                         <div className='input !h-12 relative !p-1 flex items-center'>
-                                             <span className='pl-2 pr-1 select-none'>+</span>
-                                             <Input
-                                                 value={userAccount.country_code}
-                                                 onChange={(e) => handleInputChange(e)}
-                                                 name='country_code'
-                                                 className='input !h-full w-full text-base z-10 border-none shadow-none bg-transparent pl-1'
-                                                 required
-                                             />
-                                         </div>
-                                     </div>
-                                    <div className='w-3/4'>
+                                    <div className='w-full'>
                                         <div className='input !h-12 relative !p-1'>
                                             <Input
                                                 value={userAccount.mobile_number}
