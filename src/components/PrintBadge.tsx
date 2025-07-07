@@ -11,9 +11,10 @@ interface PrintBadgeProps {
 }
 
 const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
-    const fullName = `${attendee?.first_name} ${attendee?.last_name}`.trim();
+    const firstName = attendee?.first_name || '';
+    const lastName = attendee?.last_name || '';
     // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-    const isLongName = fullName.length > 15;
+    const isLongName = (firstName + lastName).length > 15;
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
@@ -34,9 +35,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                     />
                     
                     <div className='mx-4 pb-5 !capitalize'>
-                        <h3 className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5 mb-2`}>
-                            {fullName || 'Attendee Name'}
-                        </h3>
+                        <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
+                            <h3 className="mb-2">{firstName || 'First Name'}</h3>
+                            <h3 className="mb-2">{lastName || 'Last Name'}</h3>
+                        </div>
                         <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-3 mb-2`}>
                             {attendee?.job_title || "Designation"}
                         </h3>
