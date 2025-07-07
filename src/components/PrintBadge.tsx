@@ -26,7 +26,6 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
             const printWindow = window.open('', '_blank');
             if (!printWindow) return;
 
-            // Optional: get stylesheets from parent document (for Tailwind, etc.)
             const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
                 .map((el) => el.outerHTML)
                 .join('\n');
@@ -37,33 +36,40 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
           <title>Print Badge</title>
           ${styles}
           <style>
-            @page { size: auto; margin: 0; }
-            html, body, #print-wrapper {
-              width: 100%;
-              height: 100%;
+            @page {
+              size: A6 portrait;
+              margin: 0;
+            }
+            html, body {
               margin: 0;
               padding: 0;
-              background-color: white;
+              height: 100%;
+              width: 100%;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
+              background: white;
             }
             body {
-              display: grid;
-              place-items: center;
+              display: flex;
+              justify-content: center;
+              align-items: center;
               overflow: hidden;
+              height: 100vh;
+              width: 100vw;
             }
             #print-wrapper {
-              width: 100%;
-              height: 100%;
+              width: 100%; /* badge width */
+              height: 100%; /* badge height */
               display: flex;
-              align-items: center;
               justify-content: center;
+              align-items: center;
             }
             #print-wrapper > * {
               width: 100% !important;
               height: 100% !important;
-              border-radius: 0 !important;
               box-shadow: none !important;
+              border-radius: 0 !important;
+              overflow: hidden !important;
             }
           </style>
         </head>
@@ -85,10 +91,11 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     `);
             printWindow.document.close();
         } else {
-            // Use overlay method on desktop
+            // Desktop print using overlay
             printBadge(badgeRef.current, '100%', '100%', 'auto');
         }
     };
+
 
 
     return (
