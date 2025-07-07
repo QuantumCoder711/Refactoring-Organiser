@@ -2,7 +2,7 @@ import { Printer } from 'lucide-react';
 import React, { useRef } from 'react';
 import { AttendeeType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { printBadge } from '@/lib/utils';
+// import { printBadge } from '@/lib/utils';
 import BadgeBanner from "@/assets/badge-banner.jpg";
 
 interface PrintBadgeProps {
