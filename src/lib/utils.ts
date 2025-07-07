@@ -338,7 +338,7 @@ export const printBadge = (
   */
   const printContainer = document.createElement('div');
   Object.assign(printContainer.style, {
-    position: 'fixed',
+    position: 'absolute',
     inset: '0',
     padding: '0',
     margin: '0',
