@@ -22,20 +22,23 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
             /iPad|iPhone|iPod/.test(navigator.userAgent) &&
             !('MSStream' in window);
 
-
         if (!badgeRef.current) return;
 
         if (isIOS) {
-            // Use new window method for iOS
             const badgeHTML = badgeRef.current.outerHTML;
-
             const printWindow = window.open('', '_blank');
             if (!printWindow) return;
+
+            // Copy all <link> and <style> from parent
+            const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+                .map((el) => el.outerHTML)
+                .join('\n');
 
             printWindow.document.write(`
       <html>
         <head>
           <title>Print Badge</title>
+          ${styles}
           <style>
             @media print {
               body {
@@ -62,7 +65,6 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
               window.onafterprint = function() {
                 window.close();
               };
-              // Fallback for iOS Safari where onafterprint may not fire
               setTimeout(() => window.close(), 1000);
             };
           </script>
@@ -72,10 +74,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
 
             printWindow.document.close();
         } else {
-            // Use overlay method for other platforms
             printBadge(badgeRef.current, '100%', '100%', 'auto');
         }
     };
+
 
 
     return (
