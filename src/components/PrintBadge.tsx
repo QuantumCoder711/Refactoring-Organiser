@@ -18,65 +18,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
-        const isIOS =
-            /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-            !('MSStream' in window);
-
         if (!badgeRef.current) return;
-
-        if (isIOS) {
-            const badgeHTML = badgeRef.current.outerHTML;
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) return;
-
-            // Copy all <link> and <style> from parent
-            const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-                .map((el) => el.outerHTML)
-                .join('\n');
-
-            printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Badge</title>
-          ${styles}
-          <style>
-            @media print {
-              body {
-                margin: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-              }
-              #badge {
-                width: 100vw;
-                height: 100vh;
-              }
-            }
-            * {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-          </style>
-        </head>
-        <body>
-          <div id="badge">${badgeHTML}</div>
-          <script>
-            window.onload = function() {
-              window.print();
-              window.onafterprint = function() {
-                window.close();
-              };
-              setTimeout(() => window.close(), 1000);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-
-            printWindow.document.close();
-        } else {
-            printBadge(badgeRef.current, '100%', '100%', 'auto');
-        }
+        printBadge(badgeRef.current, '100%', '100%', 'auto');
     };
+
 
 
 
