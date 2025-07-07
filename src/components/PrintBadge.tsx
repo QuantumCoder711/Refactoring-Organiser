@@ -2,7 +2,7 @@ import { Printer } from 'lucide-react';
 import React, { useRef } from 'react';
 import { AttendeeType } from '@/types';
 import { Button } from '@/components/ui/button';
-// import { printBadge } from '@/lib/utils';
+import { printBadge } from '@/lib/utils';
 import BadgeBanner from "@/assets/badge-banner.jpg";
 
 interface PrintBadgeProps {
@@ -17,54 +17,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const isLongName = (firstName + lastName).length > 13;
     const badgeRef = useRef<HTMLDivElement>(null);
 
-    // const handlePrint = () => {
-    //     // Trigger print ensuring the badge scales to the currently selected page size
-    //     printBadge(badgeRef.current, '100%', '100%', 'auto');
-    // }
-
     const handlePrint = () => {
-        if (!badgeRef.current) return;
-
-        const badgeHTML = badgeRef.current.outerHTML;
-
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-
-        printWindow.document.write(`
-    <html>
-      <head>
-        <title>Print Badge</title>
-        <style>
-          @media print {
-            body {
-              margin: 0;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            #badge {
-              width: 100vw;
-              height: 100vh;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div id="badge">${badgeHTML}</div>
-        <script>
-          window.onload = () => {
-            window.print();
-            window.onafterprint = () => {
-              window.close();
-            };
-          };
-        </script>
-      </body>
-    </html>
-  `);
-
-        printWindow.document.close();
-    };
-
+        // Trigger print ensuring the badge scales to the currently selected page size
+        printBadge(badgeRef.current, '100%', '100%', 'auto');
+    }
 
     return (
         <div className='max-w-80 my-10'>
@@ -77,7 +33,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                         className="!h-[160px] w-full rounded-t mx-auto object-cover"
                         alt="Badge"
                     />
-
+                    
                     <div className='mx-4 pb-5 !capitalize'>
                         <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
                             <h3 className="mb-2">{firstName || 'First Name'}</h3>
