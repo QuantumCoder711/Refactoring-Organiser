@@ -39,6 +39,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
             @page {
               size: A6 portrait;
               margin: 0;
+              padding: 0;
             }
             html, body {
               margin: 0;
@@ -108,15 +109,15 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                         alt="Badge"
                     />
 
-                    <div className='mx-4 pb-5 !capitalize'>
+                    <div className='mx-4 pb-3 !capitalize'>
                         <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
                             <h3 className="mb-2">{firstName || 'First Name'}</h3>
                             <h3 className="mb-2">{lastName || 'Last Name'}</h3>
                         </div>
-                        <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-3 mb-2`}>
+                        <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
                             {attendee?.job_title || "Designation"}
                         </h3>
-                        <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-3 pb-5`}>
+                        <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-2 pb-2`}>
                             {attendee?.company_name || "Company"}
                         </span>
                     </div>
