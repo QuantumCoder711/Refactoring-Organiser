@@ -338,11 +338,11 @@ export const printBadge = (
   */
   const printContainer = document.createElement('div');
   Object.assign(printContainer.style, {
-    position: 'absolute',
+    position: 'fixed',
     inset: '0',
     padding: '0',
     margin: '0',
-    zIndex: '999 !important', // max available – ensures it overlays everything
+    zIndex: '2147483647', // max available – ensures it overlays everything
     backgroundColor: 'white',
     display: 'grid',
     placeItems: 'center',
