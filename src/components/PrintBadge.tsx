@@ -18,11 +18,77 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
         if (!badgeRef.current) return;
-        printBadge(badgeRef.current, '100%', '100%', 'auto');
+
+        if (isIOS) {
+            const badgeHTML = badgeRef.current.outerHTML;
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) return;
+
+            // Optional: get stylesheets from parent document (for Tailwind, etc.)
+            const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+                .map((el) => el.outerHTML)
+                .join('\n');
+
+            printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Badge</title>
+          ${styles}
+          <style>
+            @page { size: auto; margin: 0; }
+            html, body, #print-wrapper {
+              width: 100%;
+              height: 100%;
+              margin: 0;
+              padding: 0;
+              background-color: white;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            body {
+              display: grid;
+              place-items: center;
+              overflow: hidden;
+            }
+            #print-wrapper {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            #print-wrapper > * {
+              width: 100% !important;
+              height: 100% !important;
+              border-radius: 0 !important;
+              box-shadow: none !important;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="print-wrapper">
+            ${badgeHTML}
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+              setTimeout(() => window.close(), 1000);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+            printWindow.document.close();
+        } else {
+            // Use overlay method on desktop
+            printBadge(badgeRef.current, '100%', '100%', 'auto');
+        }
     };
-
-
 
 
     return (
@@ -49,7 +115,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                             {attendee?.company_name || "Company"}
                         </span>
                     </div>
-                    <div className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r from-green-500 to-brand-primary text-white">
+                    <div className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r from-blue-900 to-slate-900 text-white">
                         {attendee?.status || "Delegate"}
                     </div>
                 </div>
