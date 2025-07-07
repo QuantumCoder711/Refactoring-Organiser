@@ -210,16 +210,25 @@ const AddRequestedAttendee: React.FC = () => {
         return true;
     }, []);
 
-    // Handlers with debounce to reduce lag
+    // Handlers with cursor position preservation
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-
-        // Use requestAnimationFrame to batch updates and reduce lag
+        const { name, value, selectionStart } = e.target;
+        
+        // Store the cursor position
+        const cursorPosition = selectionStart;
+        
+        // Update the form data
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        
+        // Restore cursor position after state update
         requestAnimationFrame(() => {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
+            const input = e.target;
+            if (input) {
+                input.setSelectionRange(cursorPosition, cursorPosition);
+            }
         });
     }, []);
 
