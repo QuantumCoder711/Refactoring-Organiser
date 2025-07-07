@@ -5,6 +5,7 @@ import { getImageUrl } from '@/lib/utils';
 import useAuthStore from '@/store/authStore';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Coins from "@/assets/coins.svg";
 
 const Profile: React.FC = () => {
 
@@ -36,6 +37,17 @@ const Profile: React.FC = () => {
                     <p className='text-brand-dark-gray'>{user?.mobile_number}</p>
                     <p className='text-brand-dark-gray'>{user?.address + " " + user?.pincode}</p>
                 </div>
+
+                {/* Credits */}
+                <div className='p-3 rounded-md w-full flex justify-between bg-brand-primary/10'>
+                    <p className='flex items-center gap-2'>
+                        <img src={Coins} width={32} height={32} alt="Coins" className='inline-block' />
+                        Credits: {user?.wallet_balance}
+                    </p>
+
+                    <Button className='btn !font-normal !text-base'>Upgrade</Button>
+                </div>
+
                 <Link to="/update-profile">
                     <Button className='btn !h-12 !text-base w-full mt-[30px]'>Edit Profile</Button>
                 </Link>

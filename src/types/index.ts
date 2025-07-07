@@ -19,6 +19,7 @@ export interface UserType {
     company_name: string;
     designation_name: string;
     deleted_at: string | null;
+    wallet_balance: number;
 }
 
 export interface EventType {

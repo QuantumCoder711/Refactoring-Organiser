@@ -30,8 +30,8 @@ export const getProfile = async (token: string): Promise<ProfileResponse> => {
                 'Authorization': `Bearer ${token}`,
             }
         });
-
-        return response.data.user;
+        const user = {...response.data.user, wallet_balance: response.data.wallet_balance || 0};
+        return user;
     } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.message || "Failed to fetch profile");
