@@ -375,5 +375,5 @@ export const printBadge = (
   window.print();
 
   // Fallback in case onafterprint does not fire (e.g. Safari)
-  // setTimeout(cleanup, 300);
+  setTimeout(cleanup, 300);
 };
