@@ -54,8 +54,6 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
               justify-content: center;
               align-items: center;
               overflow: hidden;
-              height: 100vh;
-              width: 100vw;
             }
             #print-wrapper {
               width: 100%; /* badge width */
