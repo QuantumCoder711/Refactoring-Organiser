@@ -340,6 +340,8 @@ export const printBadge = (
   Object.assign(printContainer.style, {
     position: 'fixed',
     inset: '0',
+    width: "100%",
+    height: "100vh",
     padding: '0',
     margin: '0',
     zIndex: '2147483647', // max available – ensures it overlays everything
