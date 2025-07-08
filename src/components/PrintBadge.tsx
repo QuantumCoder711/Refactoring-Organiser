@@ -19,7 +19,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const jobTitle = attendee.job_title || '';
 
     // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-    const isLongName = (firstName + lastName).length > 13 || companyName.length > 15 || jobTitle.length > 15;
+    const isLongName = (firstName + lastName).length > 13 || companyName.length > 28 || jobTitle.length > 32;
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
@@ -115,18 +115,18 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
 
                     <div className='mx-4 pb-3 !capitalize'>
                         <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
-                            <h3 className="mb-2">{firstName || 'First Name'}</h3>
-                            <h3 className="mb-2">{lastName || 'Last Name'}</h3>
+                            <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'}</h3>
+                            <h3 className="mb-2">{lastName?.toLowerCase() || 'Last Name'}</h3>
                         </div>
                         <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
-                            {attendee?.job_title || "Designation"}
+                            {attendee?.job_title?.toLowerCase() || "Designation"}
                         </h3>
                         <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-2 pb-2`}>
-                            {attendee?.company_name || "Company"}
+                            {attendee?.company_name?.toLowerCase() || "Company"}
                         </span>
                     </div>
                     <div className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r from-blue-900 to-slate-900 text-white">
-                        {attendee?.status || "Delegate"}
+                        {attendee?.status?.toLowerCase() || "Delegate"}
                     </div>
                 </div>
             </div>
