@@ -13,8 +13,11 @@ interface PrintBadgeProps {
 const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const firstName = attendee?.first_name || '';
     const lastName = attendee?.last_name || '';
+    const companyName = attendee.company_name || '';
+    const jobTitle = attendee.job_title || '';
+
     // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-    const isLongName = (firstName + lastName).length > 13;
+    const isLongName = (firstName + lastName).length > 13 || companyName.length > 15 || jobTitle.length > 15;
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
