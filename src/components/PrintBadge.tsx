@@ -6,35 +6,35 @@ import { cn, printBadge } from '@/lib/utils';
 import BadgeBanner from "@/assets/badge-banner.jpg";
 
 interface PrintBadgeProps {
-    attendee: AttendeeType;
-    print?: boolean;
+  attendee: AttendeeType;
+  print?: boolean;
 }
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 
 const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
-    const firstName = attendee?.first_name || '';
-    const lastName = attendee?.last_name || '';
-    const companyName = attendee.company_name || '';
-    const jobTitle = attendee.job_title || '';
+  const firstName = attendee?.first_name || '';
+  const lastName = attendee?.last_name || '';
+  const companyName = attendee.company_name || '';
+  const jobTitle = attendee.job_title || '';
 
-    // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-    const isLongName = firstName.length > 13 || lastName.length > 13 || companyName.length > 28 || jobTitle.length > 32;
-    const badgeRef = useRef<HTMLDivElement>(null);
+  // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
+  const isLongName = firstName.length > 13 || lastName.length > 13 || companyName.length > 28 || jobTitle.length > 32;
+  const badgeRef = useRef<HTMLDivElement>(null);
 
-    const handlePrint = () => {
-        if (!badgeRef.current) return;
+  const handlePrint = () => {
+    if (!badgeRef.current) return;
 
-        if (isIOS) {
-            const badgeHTML = badgeRef.current.outerHTML;
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) return;
+    if (isIOS) {
+      const badgeHTML = badgeRef.current.outerHTML;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
 
-            const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-                .map((el) => el.outerHTML)
-                .join('\n');
+      const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+        .map((el) => el.outerHTML)
+        .join('\n');
 
-            printWindow.document.write(`
+      printWindow.document.write(`
       <html>
         <head>
           <title>Print Badge</title>
@@ -92,53 +92,63 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
         </body>
       </html>
     `);
-            printWindow.document.close();
-        } else {
-            // Desktop print using overlay
-            printBadge(badgeRef.current, '100%', '100%', 'auto');
-        }
-    };
+      printWindow.document.close();
+    } else {
+      // Desktop print using overlay
+      printBadge(badgeRef.current, '100%', '100%', 'auto');
+    }
+  };
 
 
 
-    return (
-        <div className='max-w-80 my-10'>
-            {/* Card For Printing... */}
-            <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-1', !isIOS && 'pb-4')}>
-                <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
-                    <img
-                        // src={`${baseUrl}/${badgeData?.imageUrl}`}
-                        src={BadgeBanner}
-                        className="!h-[160px] w-full rounded-t mx-auto object-cover"
-                        alt="Badge"
-                    />
+  return (
+    <div className='max-w-80 my-10'>
+      {/* Card For Printing... */}
+      <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-1', !isIOS && 'pb-4')}>
+        <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
+          <img
+            // src={`${baseUrl}/${badgeData?.imageUrl}`}
+            src={BadgeBanner}
+            className="!h-[160px] w-full rounded-t mx-auto object-cover"
+            alt="Badge"
+          />
 
-                    <div className='mx-4 pb-3 !capitalize'>
-                        <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
-                            <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'}</h3>
-                            <h3 className="mb-2">{lastName?.toLowerCase() || 'Last Name'}</h3>
-                        </div>
-                        <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
-                            {attendee?.job_title?.toLowerCase() || "Designation"}
-                        </h3>
-                        <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-2 pb-2`}>
-                            {attendee?.company_name?.toLowerCase() || "Company"}
-                        </span>
-                    </div>
-                    <div className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r from-blue-900 to-slate-900 text-white">
-                        {attendee?.status?.toLowerCase() || "Delegate"}
-                    </div>
-                </div>
+          <div className='mx-4 pb-3 !capitalize'>
+            <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
+              <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'}</h3>
+              <h3 className="mb-2">{lastName?.toLowerCase() || 'Last Name'}</h3>
             </div>
-
-
-            {print && (
-                <Button onClick={handlePrint} className='btn my-4 btn-primary w-full flex items-center justify-center gap-2'>
-                    <Printer className="w-4 h-4" /> Print Badge
-                </Button>
-            )}
+            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+              {attendee?.job_title?.toLowerCase() || "Designation"}
+            </h3>
+            <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-2 pb-2`}>
+              {attendee?.company_name?.toLowerCase() || "Company"}
+            </span>
+          </div>
+          <div
+            style={
+              attendee.status.toLowerCase() === "delegate"
+                ? { backgroundColor: 'white', color: 'black', border: '1px solid black' }
+                : attendee.status.toLowerCase() === "speaker"
+                  ? { backgroundColor: '#80365F', color: 'white' }
+                  : attendee.status.toLowerCase() === "sponsor"
+                    ? { backgroundColor: 'black', color: 'white' }
+                    : {}
+            }
+            className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r">
+            {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
+          </div>
         </div>
-    )
+      </div>
+
+
+      {print && (
+        <Button onClick={handlePrint} className='btn my-4 btn-primary w-full flex items-center justify-center gap-2'>
+          <Printer className="w-4 h-4" /> Print Badge
+        </Button>
+      )}
+    </div>
+  )
 }
 
 export default PrintBadge;
