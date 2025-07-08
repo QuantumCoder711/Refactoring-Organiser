@@ -2,13 +2,15 @@ import { Printer } from 'lucide-react';
 import React, { useRef } from 'react';
 import { AttendeeType } from '@/types';
 import { Button } from '@/components/ui/button';
-import { printBadge } from '@/lib/utils';
+import { cn, printBadge } from '@/lib/utils';
 import BadgeBanner from "@/assets/badge-banner.jpg";
 
 interface PrintBadgeProps {
     attendee: AttendeeType;
     print?: boolean;
 }
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
 
 const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const firstName = attendee?.first_name || '';
@@ -21,7 +23,6 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     const badgeRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window);
         if (!badgeRef.current) return;
 
         if (isIOS) {
@@ -68,6 +69,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
             }
             #print-wrapper > * {
               width: 100% !important;
+              height: 100% !important;
               box-shadow: none !important;
               border-radius: 0 !important;
               overflow: hidden !important;
@@ -102,7 +104,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     return (
         <div className='max-w-80 my-10'>
             {/* Card For Printing... */}
-            <div ref={badgeRef} className='w-full mx-auto h-full flex flex-1 pb-4'>
+            <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-1', !isIOS && 'pb-4')}>
                 <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
                     <img
                         // src={`${baseUrl}/${badgeData?.imageUrl}`}
