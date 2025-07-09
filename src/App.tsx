@@ -48,6 +48,10 @@ import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user
 import AddAgenda from '@/pages/admin/all-events/add-agenda';
 import UpdateProfile from '@/pages/admin/profile/update-profile';
 import Tutorials from '@/pages/admin/tutorials';
+import Vendors from '@/pages/admin/vendors';
+import AudienceAcquisition from '@/pages/admin/vendors/audience-acquisition';
+import Gifting from '@/pages/admin/vendors/gifting';
+import EventSetup from '@/pages/admin/vendors/event-setup';
 import MailReport from '@/pages/admin/all-reports/mail-report';
 import WhatsAppReport from '@/pages/admin/all-reports/whatsapp-report';
 import Charts from '@/pages/admin/all-reports/charts';
@@ -154,6 +158,12 @@ const App: React.FC = () => {
         <Route path="all-reports" element={<AllReports />} />
         <Route path="search-people" element={<SearchPeople />} />
         <Route path='tutorials' element={<Tutorials />} />
+        <Route path='vendors'>
+          <Route index element={<Vendors />} />
+          <Route path="audience-acquisition" element={<AudienceAcquisition />} />
+          <Route path="gifting" element={<Gifting />} />
+          <Route path="event-setup" element={<EventSetup />} />
+        </Route>
         <Route path="send-invitations" element={<SendInvitations />} />
         <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
         <Route path="send-invitations/edit-requested-attendee/:slug/:uuid" element={<EditRequestedAttendee />} />

@@ -24,10 +24,10 @@ const Error404: React.FC = () => {
           </p>
           <div className="pt-4">
             <Button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(-1)}
               className="bg-brand-primary hover:bg-brand-primary-dark cursor-pointer duration-300 text-white"
             >
-              Go Back Home
+              Go Back
             </Button>
           </div>
         </div>

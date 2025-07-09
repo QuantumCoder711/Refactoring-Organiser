@@ -251,3 +251,19 @@ export interface RequestedAttendeeType {
     created_at: string;
     updated_at: string;
 }
+
+
+
+// Vendors
+export interface VendorCompanyType {
+    id: number;
+    uuid: string;
+    agency_name: string;
+    agency_mail: string;
+    agency_contact_number: string;
+    agency_alternate_mail: string | null;
+    agency_alternate_contact_number: string | null;
+    agency_website: string;
+    agency_logo: string;
+    city: string[];
+}

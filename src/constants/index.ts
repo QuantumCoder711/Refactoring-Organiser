@@ -1,4 +1,4 @@
-import { LayoutDashboard, NotebookPen, Trophy, Users, Youtube } from "lucide-react";
+import { LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
@@ -28,6 +28,11 @@ export const sidebarItems = [
         label: "All Reports",
         icon: NotebookPen,
         path: "/all-reports",
+    },
+    {
+        label: "Vendors",
+        icon: UserCog,
+        path: "/vendors",
     },
     {
         label: "Tutorials",
