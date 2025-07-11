@@ -1,6 +1,6 @@
 import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
-import { appDomain, token, UserAvatar } from '@/constants';
+import { appDomain, UserAvatar } from '@/constants';
 import { getImageUrl } from '@/lib/utils';
 import useAuthStore from '@/store/authStore';
 import React, { useEffect, useRef, useState } from 'react';
@@ -21,15 +21,31 @@ import { toast } from 'sonner';
 import Wave from '@/components/Wave';
 
 const Profile: React.FC = () => {
-    const [credits, setCredits] = useState(10);
+    const [credits, setCredits] = useState(8);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const formContainerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [paymentFormHtml, setPaymentFormHtml] = useState<string>('');
-    const { user } = useAuthStore(state => state);
+
+
+    const { user, token, getUserProfile } = useAuthStore(state => state);
+
+    // Listen for profile update events
+    useEffect(() => {
+        const handleProfileUpdate = () => {
+            if (token) {
+                getUserProfile(token);
+            }
+        };
+
+        window.addEventListener('userProfileUpdated', handleProfileUpdate);
+        return () => {
+            window.removeEventListener('userProfileUpdated', handleProfileUpdate);
+        };
+    }, [token, getUserProfile]);
 
     // Calculate total price based on credits (1 credit = ₹8)
-    const totalPrice = credits * 8;
+    const totalPrice = credits * 1;
 
     // Handle slider change
     const handleSliderChange = (value: number[]) => {

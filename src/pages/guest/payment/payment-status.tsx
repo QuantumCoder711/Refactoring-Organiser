@@ -56,7 +56,17 @@ const PaymentStatus: React.FC = () => {
 
     useEffect(() => {
         if (isWallet && token) {
-            getUserProfile(token);
+            // Add a small delay to ensure the backend has processed the payment
+            const updateProfile = async () => {
+                try {
+                    await getUserProfile(token);
+                    // Force a re-render of components that depend on the user data
+                    window.dispatchEvent(new Event('userProfileUpdated'));
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                }
+            };
+            updateProfile();
         } else if (!isWallet) {
             const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
             if (pendingRegistrationData && status?.toLowerCase() === 'success') {
