@@ -11,7 +11,7 @@ interface AuthStore {
   login: (email: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
   setUser: (user: UserType) => void;
-  getProfile: (token: string) => void;
+  getUserProfile: (token: string) => void;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -45,11 +45,10 @@ const useAuthStore = create<AuthStore>()(
       setUser: (user: UserType) => {
         set({ user });
       },
-      getProfile: async (token: string) => {
+      getUserProfile: async (token: string) => {
         const response = await getProfile(token);
-        if (response.status === 200) {
-          const user = {...response.user, wallet_balance: response.user.wallet_balance || 0};
-          set({ user });
+        if (response) {
+          set({ user: response as unknown as UserType });
         }
         return response;
       }
