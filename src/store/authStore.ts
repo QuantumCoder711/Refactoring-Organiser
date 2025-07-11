@@ -48,7 +48,8 @@ const useAuthStore = create<AuthStore>()(
       getProfile: async (token: string) => {
         const response = await getProfile(token);
         if (response.status === 200) {
-          set({ user: response.user });
+          const user = {...response.user, wallet_balance: response.user.wallet_balance || 0};
+          set({ user });
         }
         return response;
       }
