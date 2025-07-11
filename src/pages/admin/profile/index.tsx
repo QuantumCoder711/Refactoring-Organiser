@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 import Wave from '@/components/Wave';
 
 const Profile: React.FC = () => {
-    const [credits, setCredits] = useState(8);
+    const [credits, setCredits] = useState(10);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const formContainerRef = useRef<HTMLDivElement>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +29,7 @@ const Profile: React.FC = () => {
     const { user } = useAuthStore(state => state);
 
     // Calculate total price based on credits (1 credit = ₹8)
-    const totalPrice = credits * 1;
+    const totalPrice = credits * 8;
 
     // Handle slider change
     const handleSliderChange = (value: number[]) => {
@@ -143,7 +143,7 @@ const Profile: React.FC = () => {
         setIsDialogOpen(false);
     };
 
-    if(isLoading) {
+    if (isLoading) {
         return <Wave />
     }
 
