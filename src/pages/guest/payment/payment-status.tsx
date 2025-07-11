@@ -3,8 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import { domain } from '@/constants';
+import { useLocation } from 'react-router-dom';
 
 const PaymentStatus: React.FC = () => {
+    const location = useLocation();
+    const isWallet = location.pathname.includes('wallet');
     const { status, id } = useParams<{ status: string, id: string }>();
     const [eventSlug, setEventSlug] = useState<string>('');
 
@@ -49,6 +52,7 @@ const PaymentStatus: React.FC = () => {
     };
 
     useEffect(() => {
+        if (isWallet) return;
         const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
         if (pendingRegistrationData && status?.toLowerCase() === 'success') {
             const newObj = JSON.parse(pendingRegistrationData);
@@ -87,7 +91,8 @@ const PaymentStatus: React.FC = () => {
                     <p className="text-gray-700 mb-6">{getStatusMessage()}</p>
 
                     {status === "success" && <p className="text-gray-700 mb-4 font-medium bg-green-50 p-3 rounded-lg border border-green-100">
-                        <span className="text-green-600">✓</span> You've successfully registered for this event!
+                        {!isWallet && <><span className="text-green-600">✓</span> You've successfully registered for this event!</>}
+                        {isWallet && <><span className="text-green-600">✓</span> Your wallet has been successfully created!</>}
                     </p>}
 
                     {id && status === "success" && (
@@ -99,7 +104,7 @@ const PaymentStatus: React.FC = () => {
 
                     <div className="flex gap-4 w-full">
                         <Link
-                            to={eventSlug ? `/events/${eventSlug}` : '/'}
+                            to={isWallet ? '/profile' : eventSlug ? `/events/${eventSlug}` : '/'}
                             className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
                         >
                             Go Back

@@ -1,9 +1,9 @@
 import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
-import { UserAvatar } from '@/constants';
+import { appDomain, token, UserAvatar } from '@/constants';
 import { getImageUrl } from '@/lib/utils';
 import useAuthStore from '@/store/authStore';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Coins from "@/assets/coins.svg";
 import {
@@ -15,16 +15,21 @@ import {
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, CircleX } from "lucide-react";
+import axios from 'axios';
+import { toast } from 'sonner';
+import Wave from '@/components/Wave';
 
 const Profile: React.FC = () => {
     const [credits, setCredits] = useState(10);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    const formContainerRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [paymentFormHtml, setPaymentFormHtml] = useState<string>('');
     const { user } = useAuthStore(state => state);
 
-    // Calculate total price based on credits (1 credit = ₹6)
-    const totalPrice = credits * 6;
+    // Calculate total price based on credits (1 credit = ₹8)
+    const totalPrice = credits * 8;
 
     // Handle slider change
     const handleSliderChange = (value: number[]) => {
@@ -47,11 +52,89 @@ const Profile: React.FC = () => {
         setCredits(prev => Math.max(prev - 10, 10));
     };
 
+    useEffect(() => {
+        if (paymentFormHtml) {
+            // Create a temporary div to parse the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = paymentFormHtml;
+
+            // Find the form element
+            const form = tempDiv.querySelector('form');
+            if (form) {
+                // Create a new form element in the DOM
+                const newForm = document.createElement('form');
+                newForm.id = form.id;
+                newForm.name = form.name;
+                newForm.method = form.method;
+                newForm.action = form.action;
+
+                // Copy all input fields
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(input => {
+                    const newInput = document.createElement('input');
+                    newInput.type = input.type;
+                    newInput.name = input.name;
+                    newInput.value = input.value;
+                    newInput.hidden = true;
+                    newForm.appendChild(newInput);
+                });
+
+                // Append the form to the body
+                document.body.appendChild(newForm);
+
+                // Submit the form
+                setTimeout(() => {
+                    newForm.submit();
+                }, 100);
+            }
+        }
+    }, [paymentFormHtml]);
+
     // Handle upgrade
-    const handleUpgrade = () => {
-        // TODO: Implement upgrade logic here
-        console.log(`Upgrading ${credits} credits for ₹${totalPrice}`);
-        setIsDialogOpen(false);
+    const handleUpgrade = async () => {
+        try {
+            setIsLoading(true);
+
+            // Call your API to process the credit purchase
+            const response = await axios.post(
+                `${appDomain}/api/v1/payment/wallet-topup`,
+                {
+                    amount: totalPrice,
+                    credits,
+                    firstname: user?.first_name,
+                    email: user?.email,
+                    mobile: user?.mobile_number,
+                    uuid: user?.uuid,
+                    token
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log("Payment response:", response.data);
+
+            // If the response contains HTML form data
+            if (response.data) {
+                setPaymentFormHtml(response.data);
+            } else {
+                setIsLoading(false);
+                toast("Failed to initiate payment. Please try again later.", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+        } catch (error) {
+            console.error("Error initiating payment:", error);
+            setIsLoading(false);
+            toast("Failed to initiate payment. Please try again later.", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        }
     };
 
     // Handle cancel
@@ -59,6 +142,10 @@ const Profile: React.FC = () => {
         setCredits(10);
         setIsDialogOpen(false);
     };
+
+    if(isLoading) {
+        return <Wave />
+    }
 
     return (
         <div className='relative h-full'>
@@ -106,7 +193,7 @@ const Profile: React.FC = () => {
                             <div className="space-y-6 py-4">
                                 {/* Credit rate */}
                                 <div className="text-center">
-                                    <p className="text-lg font-semibold">1 Credit = ₹6</p>
+                                    <p className="text-lg font-semibold">1 Credit = ₹8</p>
                                 </div>
 
                                 {/* Slider section */}
@@ -123,8 +210,8 @@ const Profile: React.FC = () => {
                                             className="w-full"
                                         />
                                         <div className="flex justify-between text-sm text-gray-500 mt-2">
-                                            <span>₹60 (10 credits)</span>
-                                            <span>₹6000 (1000 credits)</span>
+                                            <span>₹80 (10 credits)</span>
+                                            <span>₹8000 (1000 credits)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -173,17 +260,20 @@ const Profile: React.FC = () => {
                                     <Button
                                         onClick={handleCancel}
                                         variant="outline"
-                                        className="flex-1 bg-gray-400 hover:bg-gray-500 text-white border-gray-400 hover:border-gray-500"
+                                        className="flex-1 cursor-pointer bg-gray-400 hover:bg-gray-500 text-white border-gray-400 hover:border-gray-500"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         onClick={handleUpgrade}
-                                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                                        className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700"
                                     >
                                         Upgrade
                                     </Button>
                                 </div>
+
+                                {/* Hidden div to render the payment form */}
+                                <div ref={formContainerRef} style={{ display: 'none' }}></div>
                             </div>
                         </DialogContent>
                     </Dialog>
