@@ -8,7 +8,7 @@ import useAuthStore from '@/store/authStore';
 
 const PaymentStatus: React.FC = () => {
     const location = useLocation();
-    const {token, getProfile} = useAuthStore(state=>state)
+    const { token, getProfile } = useAuthStore(state => state)
     const isWallet = location.pathname.includes('wallet');
     const { status, id } = useParams<{ status: string, id: string }>();
     const [eventSlug, setEventSlug] = useState<string>('');
@@ -54,9 +54,10 @@ const PaymentStatus: React.FC = () => {
     };
 
     useEffect(() => {
-        if (isWallet) {
+        if (isWallet && status?.toLowerCase() === 'success') {
+            // Only fetch profile for wallet payments that were successful
             getProfile(token!);
-        } else {
+        } else if (!isWallet) {
             const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
             if (pendingRegistrationData && status?.toLowerCase() === 'success') {
                 const newObj = JSON.parse(pendingRegistrationData);
@@ -79,7 +80,7 @@ const PaymentStatus: React.FC = () => {
                     });
             }
         }
-    }, [status]);
+    }, [status, isWallet, token, getProfile]);
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
