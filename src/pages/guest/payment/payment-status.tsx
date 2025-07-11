@@ -4,9 +4,11 @@ import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import { domain } from '@/constants';
 import { useLocation } from 'react-router-dom';
+import useAuthStore from '@/store/authStore';
 
 const PaymentStatus: React.FC = () => {
     const location = useLocation();
+    const {token, getProfile} = useAuthStore(state=>state)
     const isWallet = location.pathname.includes('wallet');
     const { status, id } = useParams<{ status: string, id: string }>();
     const [eventSlug, setEventSlug] = useState<string>('');
@@ -52,27 +54,30 @@ const PaymentStatus: React.FC = () => {
     };
 
     useEffect(() => {
-        if (isWallet) return;
-        const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
-        if (pendingRegistrationData && status?.toLowerCase() === 'success') {
-            const newObj = JSON.parse(pendingRegistrationData);
+        if (isWallet) {
+            getProfile(token!);
+        } else {
+            const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
+            if (pendingRegistrationData && status?.toLowerCase() === 'success') {
+                const newObj = JSON.parse(pendingRegistrationData);
 
-            axios.post(`${domain}/api/request_event_invitation`, {
-                ...newObj
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-                .then(response => {
-                    console.log('Registration successful:', response.data);
-                    // Clear the stored data after successful registration
-                    localStorage.removeItem('pendingRegistrationData');
-                    localStorage.removeItem('pendingEventSlug');
+                axios.post(`${domain}/api/request_event_invitation`, {
+                    ...newObj
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 })
-                .catch(error => {
-                    console.error('Registration error:', error);
-                });
+                    .then(response => {
+                        console.log('Registration successful:', response.data);
+                        // Clear the stored data after successful registration
+                        localStorage.removeItem('pendingRegistrationData');
+                        localStorage.removeItem('pendingEventSlug');
+                    })
+                    .catch(error => {
+                        console.error('Registration error:', error);
+                    });
+            }
         }
     }, [status]);
 

@@ -11,6 +11,7 @@ interface AuthStore {
   login: (email: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
   setUser: (user: UserType) => void;
+  getProfile: (token: string) => void;
 }
 
 const useAuthStore = create<AuthStore>()(
@@ -25,7 +26,7 @@ const useAuthStore = create<AuthStore>()(
           // Fetch user profile after successful login
           const profile = await getProfile(response.access_token);
           if (profile) {
-            set({ 
+            set({
               isAuthenticated: true,
               token: response.access_token,
               user: profile as unknown as UserType
@@ -35,7 +36,7 @@ const useAuthStore = create<AuthStore>()(
         return response;
       },
       logout: () => {
-        set({ 
+        set({
           isAuthenticated: false,
           token: null,
           user: null
@@ -43,6 +44,13 @@ const useAuthStore = create<AuthStore>()(
       },
       setUser: (user: UserType) => {
         set({ user });
+      },
+      getProfile: async (token: string) => {
+        const response = await getProfile(token);
+        if (response.status === 200) {
+          set({ user: response.user });
+        }
+        return response;
       }
     }),
     {
