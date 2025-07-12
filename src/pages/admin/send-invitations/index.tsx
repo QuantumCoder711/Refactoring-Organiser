@@ -58,7 +58,7 @@ import * as XLSX from 'xlsx';
 const SendInvitations: React.FC = () => {
 
     const { slug } = useParams<{ slug: string }>();
-    const { user, token } = useAuthStore(state => state);
+    const { user, token, setUser } = useAuthStore(state => state);
     const event = useEventStore(state => state.getEventBySlug(slug));
     const [itemsPerPage, setItemsPerPage] = React.useState(10);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -286,6 +286,13 @@ const SendInvitations: React.FC = () => {
 
     // Add function to handle getting contacts
     const handleGetContacts = async () => {
+        if(user && user?.wallet_balance < selectedAttendees.size){
+            toast(`You need at least ${selectedAttendees.size} credits to get contacts. Please upgrade your plan.`, {
+                className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
         if (selectedAttendees.size === 0) {
             toast('Please select at least one attendee', {
                 className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -323,10 +330,11 @@ const SendInvitations: React.FC = () => {
             );
 
             if (response.data) {
-                toast(`Successfully retrieved contact information for ${selectedAttendeesData.length} attendees`, {
+                toast(`Successfully retrieved contact information for ${selectedAttendeesData.length} attendees, Please checkout after some time.`, {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
+                setUser({...user!, wallet_balance: user!.wallet_balance! - selectedAttendeesData.length});
             }
         } catch (error) {
             console.error('Error getting contacts:', error);

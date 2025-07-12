@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Logo from '@/assets/logo.svg';
 import WhiteLogo from '@/assets/white_logo.png';
 import { Button } from '@/components/ui/button';
+import Coins from '@/assets/coins.svg';
 import {
   Avatar,
   AvatarFallback,
@@ -32,6 +33,46 @@ import {
 } from "@/components/ui/drawer";
 import { AlignRight } from 'lucide-react';
 
+interface ProgressRingProps {
+  percentage: number;
+  size?: number;
+}
+
+const ProgressRing: React.FC<ProgressRingProps> = ({ percentage, size = 72 }) => {
+  const strokeWidth = 4;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className='-rotate-90'>
+      <circle
+        stroke='#E5E5EA'
+        strokeWidth={strokeWidth}
+        fill='transparent'
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+      />
+      <circle
+        stroke='#2563EB'
+        strokeWidth={strokeWidth}
+        fill='transparent'
+        r={radius}
+        cx={size / 2}
+        cy={size / 2}
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap='round'
+      />
+    </svg>
+  );
+};
+
+const formatNumber = (value: number): string => {
+  return new Intl.NumberFormat('en-US').format(value);
+};
+
 interface NavbarProps {
   isAuthenticated: boolean;
 }
@@ -43,6 +84,23 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const location = useLocation();
   const { pathname } = location;
   const [heading, setHeading] = React.useState<string>('');
+
+  // Wallet popup state
+  const [showWallet, setShowWallet] = React.useState<boolean>(false);
+  const walletTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleWalletEnter = () => {
+    if (walletTimeout.current) clearTimeout(walletTimeout.current);
+    setShowWallet(true);
+  };
+  const handleWalletLeave = () => {
+    walletTimeout.current = setTimeout(() => setShowWallet(false), 150);
+  };
+
+  // Wallet calculations
+  const walletTotal = 1000;
+  const walletRemaining = user?.wallet_balance ?? 0;
+  const walletRemainingPercent = (walletRemaining / walletTotal) * 100;
 
   useEffect(() => {
     const label = sidebarItems.find(item => item.path === pathname)?.label;
@@ -146,6 +204,51 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <Button className='btn-rounded !px-3'>Create New Event</Button>
               </Link>
             </li>
+
+            {/* Wallet Balance */}
+            <li
+              className='relative'
+              onMouseEnter={handleWalletEnter}
+              onMouseLeave={handleWalletLeave}
+            >
+              <span className='flex gap-2 items-center cursor-pointer'>
+                <img src={Coins} width={28} height={24} alt="coins" />
+                <span className='font-semibold text-sm'>{user?.wallet_balance} / 1000</span>
+              </span>
+
+              {/* Wallet popover */}
+              <div
+                className={`${showWallet ? 'flex' : 'hidden'} absolute top-10 left-1/2 -translate-x-1/2 z-50`}
+                onMouseEnter={handleWalletEnter}
+                onMouseLeave={handleWalletLeave}
+              >
+                <div className='flex items-center gap-8 rounded-xl border border-gray-200 bg-white shadow-lg px-6 py-5'>
+                  {/* Circular progress */}
+                  <div className='flex flex-col items-center'>
+                    <ProgressRing percentage={walletRemainingPercent} size={72} />
+                    <span className='mt-2 font-semibold text-sm'>Credits</span>
+                  </div>
+
+                  {/* Statistics */}
+                  <div className='flex flex-col gap-1'>
+                    <div className='flex items-center gap-6'>
+                      <span className='text-sm text-gray-500'>Total</span>
+                      <span className='font-semibold text-base'>{formatNumber(walletTotal)}</span>
+                    </div>
+                    <div className='flex items-center gap-6'>
+                      <span className='text-sm text-gray-500'>Remaining</span>
+                      <span className='font-semibold text-base'>{formatNumber(walletRemaining)}</span>
+                    </div>
+
+                    {/* Upgrade button */}
+                    <Button onClick={() => {navigate('/profile'); handleWalletLeave()}} className='btn-rounded px-6 mt-4 ml-auto'>
+                      Upgrade
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </li>
+
             <li className=''>
               <DropdownMenu>
                 <DropdownMenuTrigger className='flex gap-2 items-center cursor-pointer focus:outline-none'>
