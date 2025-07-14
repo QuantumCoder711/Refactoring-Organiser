@@ -104,24 +104,24 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
   return (
     <div className='max-w-80 my-10'>
       {/* Card For Printing... */}
-      <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-1', !isIOS && 'pb-4')}>
+      <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-col gap-3 flex-1', !isIOS && '')}>
         <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
-            className="!h-[160px] w-full rounded-t mx-auto object-cover"
+            className="!h-[140px] w-full rounded-t mx-auto object-cover"
             alt="Badge"
           />
 
           <div className='mx-4 pb-3 !capitalize'>
-            <div className={`font-bold ${isLongName ? 'text-4xl' : 'text-6xl'} pt-5`}>
-              <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'}</h3>
-              <h3 className="mb-2">{lastName?.toLowerCase() || 'Last Name'}</h3>
+            <div className={`font-bold ${isLongName ? 'text-3xl' : 'text-5xl'}`}>
+              <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
+              {/* <h3 className="mb-2">{}</h3> */}
             </div>
-            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+            <h3 className={`font-medium ${isLongName ? 'text-xl' : 'text-2xl'} pt-2 mb-2`}>
               {attendee?.job_title?.toLowerCase() || "Designation"}
             </h3>
-            <span className={`${isLongName ? 'text-xl' : 'text-2xl'} capitalize pt-2 pb-2`}>
+            <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
               {attendee?.company_name?.toLowerCase() || "Company"}
             </span>
           </div>
@@ -135,7 +135,41 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                     ? { backgroundColor: 'black', color: 'white' }
                     : {}
             }
-            className="py-4 text-2xl text-center capitalize font-semibold bg-gradient-to-r">
+            className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r">
+            {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
+          </div>
+        </div>
+        <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
+          <img
+            // src={`${baseUrl}/${badgeData?.imageUrl}`}
+            src={BadgeBanner}
+            className="!h-[140px] w-full rounded-t mx-auto object-contain"
+            alt="Badge"
+          />
+
+          <div className='mx-4 pb-3 !capitalize'>
+            <div className={`font-bold ${isLongName ? 'text-3xl' : 'text-5xl'}`}>
+              <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
+
+            </div>
+            <h3 className={`font-medium ${isLongName ? 'text-xl' : 'text-2xl'} pt-2 mb-2`}>
+              {attendee?.job_title?.toLowerCase() || "Designation"}
+            </h3>
+            <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
+              {attendee?.company_name?.toLowerCase() || "Company"}
+            </span>
+          </div>
+          <div
+            style={
+              attendee.status.toLowerCase() === "delegate"
+                ? { backgroundColor: 'white', color: 'black', border: '1px solid black' }
+                : attendee.status.toLowerCase() === "speaker"
+                  ? { backgroundColor: '#80365F', color: 'white' }
+                  : attendee.status.toLowerCase() === "sponsor"
+                    ? { backgroundColor: 'black', color: 'white' }
+                    : {}
+            }
+            className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r">
             {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
           </div>
         </div>

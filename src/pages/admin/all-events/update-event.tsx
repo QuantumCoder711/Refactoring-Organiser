@@ -233,11 +233,20 @@ const UpdateEvent: React.FC = () => {
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const { name, value } = e.target;
+    // Special handling for location input
+    if (name === 'google_map_link' || name === 'event_venue_address_1') {
+        setFormData(prevState => ({
+            ...prevState,
+            event_venue_address_1: value,
+            google_map_link: value
+        }));
+    } else {
         setFormData(prevState => ({
             ...prevState,
             [name]: value
         }));
+    }
     };
 
     const handleSwitchChange = (checked: boolean, name: string) => {
