@@ -194,11 +194,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
-            <li>
+            {!pathname.includes("/search-people") && <li>
               <Link to={`/search-people`}>
                 <Button className='btn-rounded !px-3'>Search People</Button>
               </Link>
-            </li>
+            </li>}
             <li>
               <Link to={"/add-event"}>
                 <Button className='btn-rounded !px-3'>Create New Event</Button>
@@ -213,7 +213,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
             >
               <span className='flex gap-2 items-center cursor-pointer'>
                 <img src={Coins} width={28} height={24} alt="coins" />
-                <span className='font-semibold text-sm'>{user?.wallet_balance} / 1000</span>
+                <span className='font-semibold text-sm'>{user?.wallet_balance}</span>
               </span>
 
               {/* Wallet popover */}
@@ -241,7 +241,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                     </div>
 
                     {/* Upgrade button */}
-                    <Button onClick={() => {navigate('/profile'); handleWalletLeave()}} className='btn-rounded px-6 mt-4 ml-auto'>
+                    <Button onClick={() => { navigate('/profile'); handleWalletLeave() }} className='btn-rounded px-6 mt-4 ml-auto'>
                       Upgrade
                     </Button>
                   </div>
