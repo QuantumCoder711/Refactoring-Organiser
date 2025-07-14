@@ -19,7 +19,9 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
   const jobTitle = attendee.job_title || '';
 
   // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-  const isLongName = firstName.length > 18 || lastName.length > 18 || companyName.length > 68 || jobTitle.length > 72;
+  const isLongName = (firstName.length + lastName.length) > 20; // Adjusted to consider both first and last name
+  const isLongCompanyName = companyName.length > 38;
+  const isLongJobTitle = jobTitle.length > 68;
   const badgeRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -119,10 +121,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
               {/* <h3 className="mb-2">{}</h3> */}
             </div>
-            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+            <h3 className={`font-medium ${isLongCompanyName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
               {attendee?.company_name?.toLowerCase() || "Company"}
             </h3>
-            <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
+            <span className={`${isLongJobTitle ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
               {attendee?.job_title?.toLowerCase() || "Designation"}
             </span>
           </div>
@@ -141,7 +143,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
           </div>
         </div>
         {/* Card 2 */}
-        <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between rotate-x-180 rotate-y-180 flex-1">
+        <div className="w-full rotate-x-180 rotate-y-180 mx-auto overflow-hidden rounded bg-white hidden print:flex flex-col justify-between flex-1">
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
@@ -154,10 +156,10 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
               {/* <h3 className="mb-2">{}</h3> */}
             </div>
-            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+            <h3 className={`font-medium ${isLongCompanyName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
               {attendee?.company_name?.toLowerCase() || "Company"}
             </h3>
-            <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
+            <span className={`${isLongJobTitle ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
               {attendee?.job_title?.toLowerCase() || "Designation"}
             </span>
           </div>
