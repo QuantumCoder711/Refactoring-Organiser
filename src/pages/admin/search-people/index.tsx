@@ -236,9 +236,22 @@ const SearchPeople: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className='flex gap-5 items-center'>
-                <GoBack />
-                <h1 className='text-xl font-semibold'>Add People</h1>
+            <div className='flex justify-between items-center'>
+                <div className='flex gap-5 items-center'>
+                    <GoBack />
+                    <h1 className='text-xl font-semibold'>Add People</h1>
+                </div>
+                <Button onClick={() => {
+                    setDataLoaded(false);
+                    setPeople([]);
+                    setFilters({
+                        designation: "",
+                        company: "",
+                        city: "",
+                        companySize: "",
+                        industry: ""
+                    });
+                }} hidden={!dataLoaded} className='btn'>Reset</Button>
             </div>
 
             {/* Initial Search UI - Show when no data is loaded */}
