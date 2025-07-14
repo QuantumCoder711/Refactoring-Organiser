@@ -19,7 +19,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
   const jobTitle = attendee.job_title || '';
 
   // Rough heuristic: if the name is very long (> 20 characters) it likely wraps to three lines on badge width
-  const isLongName = firstName.length > 13 || lastName.length > 13 || companyName.length > 28 || jobTitle.length > 32;
+  const isLongName = firstName.length > 18 || lastName.length > 18 || companyName.length > 68 || jobTitle.length > 72;
   const badgeRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = () => {
@@ -105,11 +105,12 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
     <div className='max-w-80 my-10'>
       {/* Card For Printing... */}
       <div ref={badgeRef} className={cn('w-full mx-auto h-full flex flex-col gap-3 flex-1', !isIOS && '')}>
+        {/* Card 1 */}
         <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
-            className="!h-[140px] w-full rounded-t mx-auto object-cover"
+            className="!h-[160px] w-full rounded-t mx-auto object-cover"
             alt="Badge"
           />
 
@@ -118,11 +119,11 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
               {/* <h3 className="mb-2">{}</h3> */}
             </div>
-            <h3 className={`font-medium ${isLongName ? 'text-xl' : 'text-2xl'} pt-2 mb-2`}>
-              {attendee?.job_title?.toLowerCase() || "Designation"}
+            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+              {attendee?.company_name?.toLowerCase() || "Company"}
             </h3>
             <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
-              {attendee?.company_name?.toLowerCase() || "Company"}
+              {attendee?.job_title?.toLowerCase() || "Designation"}
             </span>
           </div>
           <div
@@ -139,24 +140,25 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
             {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
           </div>
         </div>
-        <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between flex-1">
+        {/* Card 2 */}
+        <div className="w-full mx-auto overflow-hidden rounded bg-white flex flex-col justify-between rotate-x-180 rotate-y-180 flex-1">
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
-            className="!h-[140px] w-full rounded-t mx-auto object-contain"
+            className="!h-[160px] w-full rounded-t mx-auto object-cover"
             alt="Badge"
           />
 
           <div className='mx-4 pb-3 !capitalize'>
             <div className={`font-bold ${isLongName ? 'text-3xl' : 'text-5xl'}`}>
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
-
+              {/* <h3 className="mb-2">{}</h3> */}
             </div>
-            <h3 className={`font-medium ${isLongName ? 'text-xl' : 'text-2xl'} pt-2 mb-2`}>
-              {attendee?.job_title?.toLowerCase() || "Designation"}
+            <h3 className={`font-medium ${isLongName ? 'text-2xl' : 'text-3xl'} pt-2 mb-2`}>
+              {attendee?.company_name?.toLowerCase() || "Company"}
             </h3>
             <span className={`${isLongName ? 'text-lg' : 'text-xl'} capitalize pt-2 pb-2`}>
-              {attendee?.company_name?.toLowerCase() || "Company"}
+              {attendee?.job_title?.toLowerCase() || "Designation"}
             </span>
           </div>
           <div
@@ -174,7 +176,6 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
           </div>
         </div>
       </div>
-
 
       {print && (
         <Button onClick={handlePrint} className='btn my-4 btn-primary w-full flex items-center justify-center gap-2'>
