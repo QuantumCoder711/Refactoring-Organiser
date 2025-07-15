@@ -231,10 +231,10 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
                   {/* Statistics */}
                   <div className='flex flex-col gap-1'>
-                    <div className='flex items-center gap-6'>
+                    {/* <div className='flex items-center gap-6'>
                       <span className='text-sm text-gray-500'>Total</span>
                       <span className='font-semibold text-base'>{formatNumber(walletTotal)}</span>
-                    </div>
+                    </div> */}
                     <div className='flex items-center gap-6'>
                       <span className='text-sm text-gray-500'>Remaining</span>
                       <span className='font-semibold text-base'>{formatNumber(walletRemaining)}</span>
