@@ -112,11 +112,11 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
-            className="!h-[160px] w-full rounded-t mx-auto object-cover"
+            className="w-11/12 rounded-t mx-auto mt-[10px] object-contain"
             alt="Badge"
           />
 
-          <div className='mx-4 pb-3 !capitalize'>
+          <div className='mx-4 pb-3 !capitalize pl-1'>
             <div className={`font-bold ${isLongName ? 'text-3xl' : 'text-5xl'}`}>
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
               {/* <h3 className="mb-2">{}</h3> */}
@@ -147,11 +147,11 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
           <img
             // src={`${baseUrl}/${badgeData?.imageUrl}`}
             src={BadgeBanner}
-            className="!h-[160px] w-full rounded-t mx-auto object-cover"
+            className="w-11/12 rounded-t mx-auto mt-3 object-contain"
             alt="Badge"
           />
 
-          <div className='mx-4 pb-3 !capitalize'>
+          <div className='mx-4 pb-3 !capitalize pl-1'>
             <div className={`font-bold ${isLongName ? 'text-3xl' : 'text-5xl'}`}>
               <h3 className="mb-2">{firstName?.toLowerCase() || 'First Name'} {lastName?.toLowerCase() || 'Last Name'}</h3>
               {/* <h3 className="mb-2">{}</h3> */}

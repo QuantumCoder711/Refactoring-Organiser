@@ -4,12 +4,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
 import Panel from "@/assets/panel.svg";
 import Logo from "@/assets/logo.svg";
-// import useAuthStore from '@/store/authStore';
 
 const Sidebar: React.FC = () => {
     const path = useLocation();
     const [isOpen, setIsOpen] = useState<boolean>(true);
-    // const { user } = useAuthStore(state => state);
 
     const handleSidebarClose = () => {
         setIsOpen(prev => !prev);
@@ -19,7 +17,7 @@ const Sidebar: React.FC = () => {
         <aside className={`${isOpen ? 'w-52 lg:w-56 p-3 pt-5' : 'w-0'} sticky left-0 z-20 bg-brand-background h-full transition-all duration-300`}>
             <ul className={`flex flex-col gap-2 relative h-full overflow-hidden ${isOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
                 {sidebarItems.map((item) => (
-                    user?.email !== "raj@gainskillsmedia.com" && <li key={item.label}>
+                    <li key={item.label}>
                         <Link to={item.path} className={`flex items-center gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${path.pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
                             <item.icon className='size-5' />
                             {item.label}
