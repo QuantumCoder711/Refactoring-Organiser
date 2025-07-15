@@ -4,12 +4,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
 import Panel from "@/assets/panel.svg";
 import Logo from "@/assets/logo.svg";
-import useAuthStore from '@/store/authStore';
+// import useAuthStore from '@/store/authStore';
 
 const Sidebar: React.FC = () => {
     const path = useLocation();
     const [isOpen, setIsOpen] = useState<boolean>(true);
-    const { user } = useAuthStore(state => state);
+    // const { user } = useAuthStore(state => state);
 
     const handleSidebarClose = () => {
         setIsOpen(prev => !prev);
