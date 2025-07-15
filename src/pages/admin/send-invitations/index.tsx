@@ -224,7 +224,7 @@ const SendInvitations: React.FC = () => {
     const handleExportToExcel = (dataToExport?: RequestedAttendeeType[]) => {
         // If no data provided, use filtered attendees
         const data = dataToExport || filteredAttendees;
-        
+
         if (data.length === 0) {
             toast('No data to export', {
                 className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -249,7 +249,7 @@ const SendInvitations: React.FC = () => {
             // Create workbook and worksheet
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.json_to_sheet(exportData);
-            
+
             // Set column widths for better readability
             const wscols = [
                 { wch: 20 }, // First Name
@@ -262,14 +262,14 @@ const SendInvitations: React.FC = () => {
                 { wch: 15 }, // Status
             ];
             ws['!cols'] = wscols;
-            
+
             // Add worksheet to workbook
             XLSX.utils.book_append_sheet(wb, ws, 'Requested Attendees');
-            
+
             // Generate Excel file
             const fileName = `requested_attendees_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(wb, fileName);
-            
+
             // Show success message
             toast('Export successful!', {
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -286,7 +286,7 @@ const SendInvitations: React.FC = () => {
 
     // Add function to handle getting contacts
     const handleGetContacts = async () => {
-        if(user && user?.wallet_balance < selectedAttendees.size){
+        if (user && user?.wallet_balance < selectedAttendees.size) {
             toast(`You need at least ${selectedAttendees.size} credits to get contacts. Please upgrade your plan.`, {
                 className: "!bg-yellow-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
@@ -302,7 +302,7 @@ const SendInvitations: React.FC = () => {
         }
 
         // Get selected attendees with LinkedIn URLs
-        const selectedAttendeesData = filteredAttendees.filter(attendee => 
+        const selectedAttendeesData = filteredAttendees.filter(attendee =>
             selectedAttendees.has(attendee.id) && attendee.linkedin_url
         );
 
@@ -317,10 +317,10 @@ const SendInvitations: React.FC = () => {
         try {
             setIsLoadingContacts(true);
             const linkedin = selectedAttendeesData.map(attendee => attendee.linkedin_url);
-            
+
             const response = await axios.post(
                 `${appDomain}/api/mapping/v1/people/get-contact-signal`,
-                { linkedin },
+                { linkedin, userId: user?.id },
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -334,7 +334,7 @@ const SendInvitations: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
-                setUser({...user!, wallet_balance: user!.wallet_balance! - selectedAttendeesData.length});
+                setUser({ ...user!, wallet_balance: user!.wallet_balance! - selectedAttendeesData.length });
             }
         } catch (error) {
             console.error('Error getting contacts:', error);
@@ -360,13 +360,13 @@ const SendInvitations: React.FC = () => {
                 <div className='flex items-center gap-5'>
                     {selectedAttendees.size > 0 ? (
                         <div className="flex gap-2">
-                            <Button 
+                            <Button
                                 onClick={() => handleExportToExcel(filteredAttendees.filter(attendee => selectedAttendees.has(attendee.id)))}
                                 className='btn !rounded-[10px] !px-3 !bg-green-600 hover:!bg-green-700'
                             >
                                 Export Selected ({selectedAttendees.size})
                             </Button>
-                            <Button 
+                            <Button
                                 onClick={() => handleExportToExcel()}
                                 className='btn !rounded-[10px] !px-3'
                             >
@@ -374,7 +374,7 @@ const SendInvitations: React.FC = () => {
                             </Button>
                         </div>
                     ) : (
-                        <Button 
+                        <Button
                             onClick={() => handleExportToExcel()}
                             className='btn !rounded-[10px] !px-3'
                         >
@@ -526,7 +526,7 @@ const SendInvitations: React.FC = () => {
                                 </TableCell>
                                 <TableCell>
                                     {attendee.linkedin_url ? (
-                                        <a 
+                                        <a
                                             href={attendee.linkedin_url}
                                             target="_blank"
                                             rel="noopener noreferrer"

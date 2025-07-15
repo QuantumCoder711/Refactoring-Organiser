@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import EventCard from '@/components/EventCard';
 import useEventStore from '@/store/eventStore';
@@ -8,32 +8,9 @@ import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  const { events, getAllEvents } = useEventStore(state=>state);
-  const { allEventsAttendees, getAllEventsAttendees } = useAttendeeStore();
-  const { allEventsSponsors, getAllEventsSponsors } = useSponsorStore();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Get token from localStorage
-        const tokenData = localStorage.getItem("klout-organiser-storage");
-        const token = tokenData ? JSON.parse(tokenData).state.token : null;
-
-        if (token) {
-          // Fetch fresh data
-          await Promise.all([
-            getAllEvents(token),
-            getAllEventsAttendees(token),
-            getAllEventsSponsors(token)
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
-
-    fetchData();
-  }, [getAllEvents, getAllEventsAttendees, getAllEventsSponsors]);
+  const { events } = useEventStore(state=>state);
+  const { allEventsAttendees } = useAttendeeStore(state=>state);
+  const { allEventsSponsors } = useSponsorStore(state=>state);
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
   pastEvents.sort((a: any, b: any) => {

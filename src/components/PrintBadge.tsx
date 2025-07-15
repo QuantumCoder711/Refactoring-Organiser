@@ -138,7 +138,7 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                     ? { backgroundColor: 'black', color: 'white' }
                     : {}
             }
-            className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r">
+            className="py-3 text-2xl text-center capitalize font-semibold rounded-3xl max-w-11/12 mx-auto w-full bg-gradient-to-r">
             {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
           </div>
         </div>
@@ -173,7 +173,8 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({ attendee, print = true }) => {
                     ? { backgroundColor: 'black', color: 'white' }
                     : {}
             }
-            className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r">
+            // className="py-4 text-xl text-center capitalize font-semibold bg-gradient-to-r">
+            className="py-3 text-2xl text-center capitalize font-semibold rounded-3xl max-w-11/12 mx-auto w-full bg-gradient-to-r">
             {(attendee?.status?.toLowerCase() === "sponsor" ? "Partner" : attendee?.status?.toLowerCase()) || "Delegate"}
           </div>
         </div>

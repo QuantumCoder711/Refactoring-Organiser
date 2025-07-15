@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
@@ -19,28 +19,22 @@ const Layout: React.FC = () => {
     const { getAllEventsSponsors } = useSponsorStore();
     const { fetchExtras } = useExtrasStore();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         setLoading(true);
         if (token) {
-            // Load all data in parallel
-            Promise.all([
-                getAllEvents(token),
-                getAllEventsAttendees(token),
-                getAllEventsSponsors(token),
-                fetchExtras()
-            ])
-            .finally(() => {
-                setLoading(false);
-            });
+            getAllEvents(token).then(() => setLoading(false));
+            getAllEventsAttendees(token);
+            getAllEventsSponsors(token);
+            fetchExtras();
         } else {
             setLoading(false);
         }
-    }, [token]);
+    }, []);
 
     const events = useEventStore((state) => state.events);
     useCheckInSocket(events);
 
-    if(loading) {
+    if (loading) {
         return (
             <div className='w-full h-screen grid place-content-center'>
                 <Wave />
