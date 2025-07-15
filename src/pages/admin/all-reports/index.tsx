@@ -14,7 +14,9 @@ const AllReports: React.FC = () => {
             <GoBack />
             <div className='flex gap-5 flex-wrap mt-7'>
                 {
-                    events.map((event: EventType) => (
+                    events.sort((a: any, b: any) => {
+                        return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
+                    }).map((event: EventType) => (
                         <ReportCard
                             id={event.id}
                             key={event.slug}
