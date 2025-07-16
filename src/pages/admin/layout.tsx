@@ -22,13 +22,14 @@ const Layout: React.FC = () => {
     useEffect(() => {
         setLoading(true);
         if (token) {
-            getAllEvents(token).then(() => setLoading(false));
+            getAllEvents(token).then(()=>setLoading(false));
             getAllEventsAttendees(token);
             getAllEventsSponsors(token);
             fetchExtras();
         } else {
             setLoading(false);
         }
+        setLoading(false);
     }, []);
 
     const events = useEventStore((state) => state.events);
