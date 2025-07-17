@@ -78,6 +78,11 @@ import AddSponsor from './pages/admin/event-sponsors/add-sponsor';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+
+  const hasFeatureAccess = (feature: 'search_people' | 'vendor' | 'wallet') => {
+    return user?.feature_permission?.[feature] === 1;
+  };
 
   const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return isAuthenticated ? <>{children}</> : <Navigate to="/organiser/login" replace />;
@@ -97,7 +102,11 @@ const App: React.FC = () => {
         <Route path="events/:city" element={<ExploreAllEvents />} />
         <Route path="events/explore/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
-        <Route path="wallet/:status" element={<PaymentStatus />} />
+        {hasFeatureAccess('wallet') && (
+          <>
+            <Route path="wallet/:status" element={<PaymentStatus />} />
+          </>
+        )}
         <Route path="terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="refund-policy" element={<RefundPolicy />} />
         <Route path="privacy-policy" element={<PrivacyPolicy />} />
@@ -159,22 +168,29 @@ const App: React.FC = () => {
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
-        <Route path="search-people" element={<SearchPeople />} />
+        {hasFeatureAccess('search_people') && (
+          <Route path="search-people" element={<SearchPeople />} />
+        )}
+        
         <Route path='tutorials' element={<Tutorials />} />
         
-        <Route path="event-sponsors">
-          <Route index element={<EventSponsors />} />
-          <Route path=":slug" element={<ViewEventSponsors />} />
-          <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
-          <Route path=":slug/add-sponsor" element={<AddSponsor />} />
-        </Route>
+        {hasFeatureAccess('vendor') && (
+          <Route path="event-sponsors">
+            <Route index element={<EventSponsors />} />
+            <Route path=":slug" element={<ViewEventSponsors />} />
+            <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
+            <Route path=":slug/add-sponsor" element={<AddSponsor />} />
+          </Route>
+        )}
         
-        <Route path='vendors'>
-          <Route index element={<Vendors />} />
-          <Route path="audience-acquisition" element={<AudienceAcquisition />} />
-          <Route path="gifting" element={<Gifting />} />
-          <Route path="event-setup" element={<EventSetup />} />
-        </Route>
+        {hasFeatureAccess('vendor') && (
+          <Route path='vendors'>
+            <Route index element={<Vendors />} />
+            <Route path="audience-acquisition" element={<AudienceAcquisition />} />
+            <Route path="gifting" element={<Gifting />} />
+            <Route path="event-setup" element={<EventSetup />} />
+          </Route>
+        )}
         <Route path="send-invitations" element={<SendInvitations />} />
         <Route path="send-invitations/add-requested-attendee/:slug" element={<AddRequestedAttendee />} />
         <Route path="send-invitations/edit-requested-attendee/:slug/:uuid" element={<EditRequestedAttendee />} />

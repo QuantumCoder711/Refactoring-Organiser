@@ -80,7 +80,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
-  const user = useAuthStore(state => state.user);
+  const {user} = useAuthStore(state => state);
   const location = useLocation();
   const { pathname } = location;
   const [heading, setHeading] = React.useState<string>('');
@@ -194,7 +194,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
           <h2 className='text-xl font-semibold'>{heading}</h2>
           <ul className='flex gap-5 items-center'>
-            {!pathname.includes("/search-people") && <li>
+            {user?.feature_permission.search_people === 1 && !pathname.includes("/search-people") && <li>
               <Link to={`/search-people`}>
                 <Button className='btn-rounded !px-3'>Search People</Button>
               </Link>
@@ -206,7 +206,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
             </li>
 
             {/* Wallet Balance */}
-            <li
+            {user?.feature_permission.wallet === 1 && <li
               className='relative'
               onMouseEnter={handleWalletEnter}
               onMouseLeave={handleWalletLeave}
@@ -247,7 +247,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   </div>
                 </div>
               </div>
-            </li>
+            </li>}
 
             <li className=''>
               <DropdownMenu>

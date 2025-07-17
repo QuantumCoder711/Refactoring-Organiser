@@ -191,7 +191,7 @@ const Profile: React.FC = () => {
                 </div>
 
                 {/* Credits */}
-                <div className='p-3 rounded-md w-full flex justify-between bg-brand-primary/10'>
+                <div hidden={user?.feature_permission.wallet === 0} className='p-3 rounded-md w-full flex justify-between bg-brand-primary/10'>
                     <p className='flex items-center gap-2'>
                         <img src={Coins} width={32} height={32} alt="Coins" className='inline-block' />
                         Credits: {user?.wallet_balance}

@@ -20,6 +20,14 @@ export interface UserType {
     designation_name: string;
     deleted_at: string | null;
     wallet_balance: number;
+    feature_permission: {
+        id: number;
+        uuid: string;
+        user_id: number;
+        search_people: 0 | 1;
+        vendor: 0 | 1;
+        wallet: 0 | 1;
+    }
 }
 
 export interface EventType {
