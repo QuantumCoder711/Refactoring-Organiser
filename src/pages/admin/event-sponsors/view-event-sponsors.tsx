@@ -1,11 +1,11 @@
 import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
-import Wave from '@/components/Wave';
+// import Wave from '@/components/Wave';
 import { getImageUrl } from '@/lib/utils';
-import useAttendeeStore from '@/store/attendeeStore';
-import useAuthStore from '@/store/authStore';
-import useEventStore from '@/store/eventStore';
-import React, { useEffect } from 'react'
+// import useAttendeeStore from '@/store/attendeeStore';
+// import useAuthStore from '@/store/authStore';
+// import useEventStore from '@/store/eventStore';
+import React from 'react'
 import { Link, useParams } from 'react-router-dom';
 
 const Card: React.FC<{ image: string | null, title: string, id: string }> = ({ image, title, id }) => {
@@ -24,7 +24,7 @@ const Card: React.FC<{ image: string | null, title: string, id: string }> = ({ i
 }
 
 const ViewEventSponsors: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
+    // const { slug } = useParams<{ slug: string }>();
 
     return (
         <div>

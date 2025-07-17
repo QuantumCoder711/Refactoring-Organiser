@@ -1,8 +1,8 @@
 import GoBack from "@/components/GoBack";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 
 const ViewEventSponsorDetails: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    // const { id } = useParams<{ id: string }>();
     return (
         <div>
             <GoBack />
