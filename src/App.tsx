@@ -25,7 +25,7 @@ import AboutUs from './pages/guest/about-us';
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
 import AllAttendees from '@/pages/admin/all-attendees';
-import AllSponsors from '@/pages/admin/all-sponsors';
+import EventSponsors from '@/pages/admin/event-sponsors';
 import AllPhotos from '@/pages/admin/all-photos';
 import AllReports from '@/pages/admin/all-reports';
 import Profile from '@/pages/admin/profile';
@@ -72,6 +72,9 @@ import ChangePassword from '@/pages/admin/profile/change-password';
 import Features from './pages/guest/features';
 import Integrations from './pages/guest/integrations';
 import PrintBadges from './pages/admin/all-reports/print-badges';
+import ViewEventSponsors from './pages/admin/event-sponsors/view-event-sponsors';
+import ViewEventSponsorDetails from './pages/admin/event-sponsors/view-event-sponsor-details';
+import AddSponsor from './pages/admin/event-sponsors/add-sponsor';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -154,11 +157,18 @@ const App: React.FC = () => {
         <Route path="all-events" element={<AllEvents />} />
         <Route path="add-event" element={<AddEvent />} />
         <Route path="all-attendees" element={<AllAttendees />} />
-        <Route path="all-sponsors" element={<AllSponsors />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
         <Route path="search-people" element={<SearchPeople />} />
         <Route path='tutorials' element={<Tutorials />} />
+        
+        <Route path="event-sponsors">
+          <Route index element={<EventSponsors />} />
+          <Route path=":slug" element={<ViewEventSponsors />} />
+          <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
+          <Route path=":slug/add-sponsor" element={<AddSponsor />} />
+        </Route>
+        
         <Route path='vendors'>
           <Route index element={<Vendors />} />
           <Route path="audience-acquisition" element={<AudienceAcquisition />} />
