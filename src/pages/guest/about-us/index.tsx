@@ -1,16 +1,16 @@
-import { Separator } from '@/components/ui/separator';
+// import { Separator } from '@/components/ui/separator';
 import India from "@/assets/india.svg";
 import React from 'react';
 
 const AboutUs: React.FC = () => {
     return (
         <div className='min-h-screen w-full flex flex-col'>
-            <div className='max-w-6xl mx-auto my-10 w-full'>
+            {/* <div className='max-w-6xl mx-auto my-10 w-full'>
                 <h1 className='text-4xl font-bold text-black'>About Us</h1>
             </div>
-            <Separator className='bg-brand-dark max-w-6xl mx-auto' />
+            <Separator className='bg-brand-dark max-w-6xl mx-auto' /> */}
 
-            <h2 className='text-4xl font-semibold text-center mt-4'>We're not just about events. <br />
+            <h2 className='text-4xl font-semibold text-center mt-10'>We're not just about events. <br />
             We're about elevating human connection.</h2>
             <div className='max-w-5xl mx-auto my-10 space-y-8 text-black flex-grow'>
                 <div className='space-y-4'>
