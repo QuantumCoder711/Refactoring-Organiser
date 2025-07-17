@@ -1,4 +1,4 @@
-import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
+import { LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
