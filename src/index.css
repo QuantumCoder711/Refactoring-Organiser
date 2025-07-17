@@ -164,7 +164,7 @@
   }
 
   .input {
-    @apply max-w-64 w-full h-[30px] focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none;
+    @apply max-w-64 w-full h-9 focus-visible:ring-1 focus-visible:ring-brand-primary focus-visible:ring-offset-2 bg-white rounded-lg border-none;
   }
 
   @keyframes caret-blink {

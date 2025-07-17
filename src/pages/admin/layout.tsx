@@ -29,7 +29,6 @@ const Layout: React.FC = () => {
         } else {
             setLoading(false);
         }
-        setLoading(false);
     }, []);
 
     const events = useEventStore((state) => state.events);
