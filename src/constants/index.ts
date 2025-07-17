@@ -19,11 +19,11 @@ export const sidebarItems = [
         icon: Users,
         path: "/all-attendees",
     },
-    {
-        label: "Event Sponsors",
-        icon: HandHeart,
-        path: "/event-sponsors",
-    },
+    // {
+    //     label: "Event Sponsors",
+    //     icon: HandHeart,
+    //     path: "/event-sponsors",
+    // },
     {
         label: "All Reports",
         icon: NotebookPen,
