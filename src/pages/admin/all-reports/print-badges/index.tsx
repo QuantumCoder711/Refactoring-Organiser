@@ -17,6 +17,17 @@ const PrintBadges: React.FC = () => {
     const { token } = useAuthStore(state => state);
     const { singleEventAttendees, getSingleEventAttendees, loading } = useAttendeeStore(state => state);
 
+    const colors = {
+        backgroundColor: event?.badge_background_color || '#fff',
+        textColor: event?.badge_text_color || '#000',
+        statusColors: {
+            delegate: { background: event?.delegate_tag_color || '#0071E3', text: event?.delegate_text_color || '#fff' },
+            speaker: { background: event?.speaker_tag_color || '#0071E3', text: event?.speaker_text_color || '#fff' },
+            sponsor: { background: event?.sponsor_tag_color || '#0071E3', text: event?.sponsor_text_color || '#fff' },
+            panelist: { background: event?.panelist_tag_color || '#0071E3', text: event?.panelist_text_color || '#fff' },
+        },
+    };
+
     useEffect(() => {
         if (event && token)
             getSingleEventAttendees(token, event.uuid)
@@ -53,7 +64,7 @@ const PrintBadges: React.FC = () => {
 
             <div className='flex w-full gap-5 flex-wrap'>
                 {totalCheckedInAttendees.length > 0 ? totalCheckedInAttendees.map((attendee, index) => (
-                    <PrintBadge key={index} attendee={attendee} print={true}/>
+                    <PrintBadge key={index} attendee={attendee} colors={colors as any} print={true} image={event?.badge_banner}/>
                 )) : <div className='w-full h-full grid place-content-center text-2xl font-semibold text-brand-dark-gray'>No Attendees Found</div>}
             </div>
         </div>

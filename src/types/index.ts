@@ -82,6 +82,16 @@ export interface EventType {
     total_pending_delegate: number;
     break_out: number | string;
     badge_banner?: string | null;
+    badge_background_color?: string;
+    badge_text_color?: string;
+    delegate_tag_color?: string;
+    delegate_text_color?: string;
+    speaker_tag_color?: string;
+    speaker_text_color?: string;
+    sponsor_tag_color?: string;
+    sponsor_text_color?: string;
+    panelist_tag_color?: string;
+    panelist_text_color?: string;
 }
 
 export interface AddEventType {
