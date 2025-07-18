@@ -1,4 +1,4 @@
-import { MapPin, Trash } from 'lucide-react';
+import { MapPin, PrinterCheck, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -119,6 +119,9 @@ const EventCard: React.FC<EventCardProps> = ({
             <div className="h-64 flex flex-col">
                 <div className='flex-1 overflow-hidden relative w-64'>
 
+                    <Link to={`/create-badge/${slug}`}>
+                        <PrinterCheck className='h-8 w-8 p-2 text-white bg-brand-primary hover:bg-brand-primary-dark cursor-pointer rounded-full absolute top-2 right-12' />
+                    </Link>
 
                     <AlertDialog>
                         <AlertDialogTrigger
@@ -200,7 +203,7 @@ const EventCard: React.FC<EventCardProps> = ({
             {isLive && (
                 <div className='min-h-full w-full p-2 bg-white rounded-xl rounded-l-none'>
                     {renderStatItem('Registrations', total_attendees)}
-                    {renderStatItem('Attendees', (checkInCount||total_checked_in), total_attendees)}
+                    {renderStatItem('Attendees', (checkInCount || total_checked_in), total_attendees)}
                     {renderStatItem('Speakers', total_checkedin_speaker)}
                     {renderStatItem('Sponsors', total_checkedin_sponsor)}
                     {renderStatItem('Pending Delegates', total_pending_delegate)}

@@ -15,12 +15,12 @@ import ResetPassword from '@/pages/guest/reset-password';
 import Homepage from '@/pages/guest/homepage';
 import ExploreEvents from '@/pages/guest/explore-events';
 import AddFirstEvent from '@/pages/guest/add-first-event';
-import TermsAndConditions from './pages/guest/terms-and-conditions';
-import RefundPolicy from './pages/guest/refund-policy';
-import PrivacyPolicy from './pages/guest/privacy-policy';
-import FAQ from './pages/guest/faq';
-import SecurityAndCompilance from './pages/guest/security-and-compilance';
-import AboutUs from './pages/guest/about-us';
+import TermsAndConditions from '@/pages/guest/terms-and-conditions';
+import RefundPolicy from '@/pages/guest/refund-policy';
+import PrivacyPolicy from '@/pages/guest/privacy-policy';
+import FAQ from '@/pages/guest/faq';
+import SecurityAndCompilance from '@/pages/guest/security-and-compilance';
+import AboutUs from '@/pages/guest/about-us';
 // Admin Pages
 import Dashboard from '@/pages/admin/dashboard';
 import AllEvents from '@/pages/admin/all-events';
@@ -63,18 +63,19 @@ import ExploreViewEvent from '@/pages/guest/explore-view-event';
 import PaymentStatus from '@/pages/guest/payment/payment-status';
 import SendInvitations from '@/pages/admin/send-invitations';
 import AddRequestedAttendee from '@/pages/admin/send-invitations/add-requested-attendee';
-import EditAttendee from './pages/admin/all-events/edit-attendee';
-import EditRequestedAttendee from './pages/admin/send-invitations/edit-requested-attendee';
-import SearchPeople from './pages/admin/search-people';
-import CheckInPage from './pages/guest/check-in-page';
-import InviteRegistrations from './pages/admin/send-invitations/invite-registrations';
+import EditAttendee from '@/pages/admin/all-events/edit-attendee';
+import EditRequestedAttendee from '@/pages/admin/send-invitations/edit-requested-attendee';
+import SearchPeople from '@/pages/admin/search-people';
+import CheckInPage from '@/pages/guest/check-in-page';
+import InviteRegistrations from '@/pages/admin/send-invitations/invite-registrations';
 import ChangePassword from '@/pages/admin/profile/change-password';
-import Features from './pages/guest/features';
-import Integrations from './pages/guest/integrations';
-import PrintBadges from './pages/admin/all-reports/print-badges';
-import ViewEventSponsors from './pages/admin/event-sponsors/view-event-sponsors';
-import ViewEventSponsorDetails from './pages/admin/event-sponsors/view-event-sponsor-details';
-import AddSponsor from './pages/admin/event-sponsors/add-sponsor';
+import Features from '@/pages/guest/features';
+import Integrations from '@/pages/guest/integrations';
+import PrintBadges from '@/pages/admin/all-reports/print-badges';
+import ViewEventSponsors from '@/pages/admin/event-sponsors/view-event-sponsors';
+import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-sponsor-details';
+import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
+import CreateBadge from '@/pages/admin/all-events/create-badge';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -200,6 +201,7 @@ const App: React.FC = () => {
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
         <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />
+          <Route path="create-badge/:slug" element={<CreateBadge />} />
 
         {/* Event Related Routes */}
         <Route path="all-events">

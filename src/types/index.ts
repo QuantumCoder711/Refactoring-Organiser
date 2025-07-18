@@ -81,6 +81,7 @@ export interface EventType {
     total_checkedin_sponsor: number;
     total_pending_delegate: number;
     break_out: number | string;
+    badge_banner?: string | null;
 }
 
 export interface AddEventType {
@@ -274,4 +275,20 @@ export interface VendorCompanyType {
     agency_website: string;
     agency_logo: string;
     city: string[];
+}
+
+
+export interface BadgeData {
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  jobTitle: string;
+  image: string | null;
+  status: string;
+  speakerTagColor: string;
+  delegateTagColor: string;
+  sponsorTagColor: string;
+  speakerTextColor: string;
+  delegateTextColor: string;
+  sponsorTextColor: string;
 }
