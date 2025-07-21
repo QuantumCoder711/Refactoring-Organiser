@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { getImageUrl } from "@/lib/utils";
@@ -139,6 +139,136 @@ const CustomSelectSimple = React.memo(({
     </div>
 ));
 
+// Custom Combo Box Component for company names and job titles with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex flex-col gap-2" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="input !h-12 min-w-full text-base pr-10"
+                    />
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span>{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <Check className="size-4 text-brand-secondary" />
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No options found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
 const EditAttendee: React.FC = () => {
     const { slug, uuid } = useParams<{ slug: string; uuid: string }>();
     const navigate = useNavigate();
@@ -147,11 +277,7 @@ const EditAttendee: React.FC = () => {
     const { companies, jobTitles, industries, loading: extrasLoading } = useExtrasStore();
     const { updateAttendee, loading: attendeeLoading, singleEventAttendees, getSingleEventAttendees } = useAttendeeStore();
     const loading = extrasLoading || attendeeLoading;
-    const [showCustomCompany, setShowCustomCompany] = useState(false);
-    const [showCustomJobTitle, setShowCustomJobTitle] = useState(false);
     const [showCustomIndustry, setShowCustomIndustry] = useState(false);
-    const [customCompany, setCustomCompany] = useState('');
-    const [customJobTitle, setCustomJobTitle] = useState('');
     const [customIndustry, setCustomIndustry] = useState('');
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [formData, setFormData] = useState({
@@ -220,25 +346,7 @@ const EditAttendee: React.FC = () => {
                     award_winner: attendee.award_winner?.toString() || '0',
                 });
 
-                // Handle company dropdown
-                const companyMatch = companies.find(c => c.name.toLowerCase() === (attendee.company_name || '').toLowerCase());
-                if (companyMatch) {
-                    setFormData(prev => ({ ...prev, company_name: companyMatch.name }));
-                    setShowCustomCompany(false);
-                } else if (attendee.company_name) {
-                    setShowCustomCompany(true);
-                    setCustomCompany(attendee.company_name);
-                }
 
-                // Handle job title dropdown
-                const jobTitleMatch = jobTitles.find(j => j.name.toLowerCase() === (attendee.job_title || '').toLowerCase());
-                if (jobTitleMatch) {
-                    setFormData(prev => ({ ...prev, job_title: jobTitleMatch.name }));
-                    setShowCustomJobTitle(false);
-                } else if (attendee.job_title) {
-                    setShowCustomJobTitle(true);
-                    setCustomJobTitle(attendee.job_title);
-                }
 
                 // Handle industry dropdown
                 const industryMatch = industries.find(i => i.name.toLowerCase() === (attendee.industry || '').toLowerCase());
@@ -329,35 +437,7 @@ const EditAttendee: React.FC = () => {
         }
     }, []);
 
-    const handleCompanyChange = useCallback((value: string) => {
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            const selectedCompany = companies.find((company: { id: number, name: string }) => company.id.toString() === value);
-            setFormData(prev => ({
-                ...prev,
-                company_name: selectedCompany ? selectedCompany.name : value
-            }));
-            setShowCustomCompany(value === '439');
-            if (value !== '439') {
-                setCustomCompany('');
-            }
-        });
-    }, [companies]);
 
-    const handleJobTitleChange = useCallback((value: string) => {
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            const selectedJobTitle = jobTitles.find((jobTitle: { id: number, name: string }) => jobTitle.id.toString() === value);
-            setFormData(prev => ({
-                ...prev,
-                job_title: selectedJobTitle ? selectedJobTitle.name : value
-            }));
-            setShowCustomJobTitle(value === '252');
-            if (value !== '252') {
-                setCustomJobTitle('');
-            }
-        });
-    }, [jobTitles]);
 
     const handleIndustryChange = useCallback((value: string) => {
         // Use requestAnimationFrame to batch updates and reduce lag
@@ -380,12 +460,6 @@ const EditAttendee: React.FC = () => {
         // Use requestAnimationFrame to batch updates and reduce lag
         requestAnimationFrame(() => {
             switch (name) {
-                case 'custom_company':
-                    setCustomCompany(value);
-                    break;
-                case 'custom_job_title':
-                    setCustomJobTitle(value);
-                    break;
                 case 'custom_industry':
                     setCustomIndustry(value);
                     break;
@@ -429,8 +503,8 @@ const EditAttendee: React.FC = () => {
 
         // Prepare special fields that need custom handling
         const specialFields: Record<string, any> = {
-            company_name: showCustomCompany ? customCompany : processedFormData.company_name,
-            job_title: showCustomJobTitle ? customJobTitle : processedFormData.job_title,
+            company_name: processedFormData.company_name,
+            job_title: processedFormData.job_title,
             industry: showCustomIndustry ? customIndustry : processedFormData.industry,
             image: processedFormData.image,
             status: processedFormData.status.toLowerCase() // Ensure status is lowercase
@@ -554,49 +628,23 @@ const EditAttendee: React.FC = () => {
                                 required
                             />
 
-                            <CustomSelect
+                            <CustomComboBox
                                 label="Job Title"
-                                value={showCustomJobTitle ? '252' : 
-                                    (jobTitles.find(j => j.name.toLowerCase() === formData.job_title.toLowerCase())?.id.toString() || '0')}
-                                onValueChange={handleJobTitleChange}
-                                placeholder="Select Job Title"
-                                options={[{ id: 0, name: 'Select Job Title' }, ...jobTitles]}
+                                value={formData.job_title}
+                                onValueChange={(value: string) => setFormData(prev => ({ ...prev, job_title: value }))}
+                                placeholder="Type or select job title"
+                                options={jobTitles}
                                 required
                             />
 
-                            {showCustomJobTitle && (
-                                <CustomInput
-                                    label="Specify Job Title"
-                                    id="custom_job_title"
-                                    name="custom_job_title"
-                                    type="text"
-                                    value={customJobTitle}
-                                    onChange={handleCustomInputChange}
-                                    required
-                                />
-                            )}
-
-                            <CustomSelect
+                            <CustomComboBox
                                 label="Company Name"
-                                value={showCustomCompany ? '439' : 
-                                    (companies.find(c => c.name.toLowerCase() === formData.company_name.toLowerCase())?.id.toString() || '0')}
-                                onValueChange={handleCompanyChange}
-                                placeholder="Select Company"
-                                options={[{ id: 0, name: 'Select Company' }, ...companies]}
+                                value={formData.company_name}
+                                onValueChange={(value: string) => setFormData(prev => ({ ...prev, company_name: value }))}
+                                placeholder="Type or select company"
+                                options={companies}
                                 required
                             />
-
-                            {showCustomCompany && (
-                                <CustomInput
-                                    label="Specify Company"
-                                    id="custom_company"
-                                    name="custom_company"
-                                    type="text"
-                                    value={customCompany}
-                                    onChange={handleCustomInputChange}
-                                    required
-                                />
-                            )}
                         </div>
 
                         <div className="w-full mx-auto flex flex-col gap-2">
@@ -618,27 +666,6 @@ const EditAttendee: React.FC = () => {
                     </div>
 
                     <div className="flex gap-3.5 flex-col mt-2.5 w-full">
-                        <CustomSelect
-                            label="Industry"
-                            value={showCustomIndustry ? '212' : 
-                                (industries.find(i => i.name.toLowerCase() === formData.industry.toLowerCase())?.id.toString() || '0')}
-                            onValueChange={handleIndustryChange}
-                            placeholder="Select Industry"
-                            options={[{ id: 0, name: 'Select Industry' }, ...industries]}
-                            required
-                        />
-
-                        {showCustomIndustry && (
-                            <CustomInput
-                                label="Specify Industry"
-                                id="custom_industry"
-                                name="custom_industry"
-                                type="text"
-                                value={customIndustry}
-                                onChange={handleCustomInputChange}
-                                required
-                            />
-                        )}
 
                         <CustomInput
                             label="Employee Size"
