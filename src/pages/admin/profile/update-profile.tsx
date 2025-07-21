@@ -8,20 +8,143 @@ import useAuthStore from '@/store/authStore';
 import { CompanyType, UserType } from '@/types';
 import { JobTitleType } from '@/types';
 import axios from 'axios';
-import { CircleCheckBig, CircleX } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { CircleCheckBig, CircleX, ChevronDown, Check } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { getImageUrl } from '@/lib/utils';
 import Wave from '@/components/Wave';
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '@/api/auth';
+
+// Custom Combo Box Component for company names and job titles with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex flex-col gap-2 w-full" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="input !h-12 min-w-full text-base pr-10"
+                    />
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span>{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <Check className="size-4 text-brand-secondary" />
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No options found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
 
 const UpdateProfile: React.FC = () => {
     const { user, setUser, token } = useAuthStore(state => state);
@@ -55,6 +178,27 @@ const UpdateProfile: React.FC = () => {
         }
     }, [companies, designations]);
 
+    // Update form data when companies and designations are loaded and user data is available
+    useEffect(() => {
+        if (user && companies.length > 0 && designations.length > 0) {
+            // Find company name if only ID is available
+            if (user.company && !formData.company_name) {
+                const company = companies.find(c => c.id === Number(user.company));
+                if (company) {
+                    setFormData(prev => ({ ...prev, company_name: company.name }));
+                }
+            }
+
+            // Find designation name if only ID is available
+            if (user.designation && !formData.designation_name) {
+                const designation = designations.find(d => d.id === Number(user.designation));
+                if (designation) {
+                    setFormData(prev => ({ ...prev, designation_name: designation.name }));
+                }
+            }
+        }
+    }, [user, companies, designations, formData.company_name, formData.designation_name]);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, files } = e.target;
 
@@ -71,27 +215,7 @@ const UpdateProfile: React.FC = () => {
         }
     };
 
-    const handleCompanyChange = (value: string) => {
-        const companyId = parseInt(value);
-        const selectedCompany = companies.find(company => company.id === companyId);
 
-        setFormData(prev => ({
-            ...prev,
-            company: companyId,
-            company_name: selectedCompany?.name || ''
-        }));
-    };
-
-    const handleDesignationChange = (value: string) => {
-        const designationId = parseInt(value);
-        const selectedDesignation = designations.find(designation => designation.id === designationId);
-
-        setFormData(prev => ({
-            ...prev,
-            designation: designationId,
-            designation_name: selectedDesignation?.name || ''
-        }));
-    };
 
     const validateForm = () => {
         const requiredFields = [
@@ -99,8 +223,8 @@ const UpdateProfile: React.FC = () => {
             'last_name',
             'email',
             'mobile_number',
-            'company',
-            'designation',
+            'company_name',
+            'designation_name',
             'address',
             'pincode'
         ];
@@ -228,50 +352,30 @@ const UpdateProfile: React.FC = () => {
                 </div>
 
                 {/* Company */}
-                <div className="flex flex-col gap-2 w-full">
-                    <Label className="font-semibold" htmlFor='company'>
-                        Company <span className="text-brand-secondary">*</span>
-                    </Label>
-                    <Select onValueChange={handleCompanyChange} value={formData.company?.toString()}>
-                        <SelectTrigger className="w-full bg-white !h-12 cursor-pointer">
-                            <SelectValue placeholder="Select Company" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {companies.map((company: CompanyType) => (
-                                <SelectItem
-                                    key={company.id}
-                                    value={company.id.toString()}
-                                    className='cursor-pointer'
-                                >
-                                    {company.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <CustomComboBox
+                    label="Company"
+                    value={formData.company_name}
+                    onValueChange={(value: string) => {
+                        const id = companies.find(c => c.name === value)?.id || 439;
+                        setFormData(prev => ({ ...prev, company: id, company_name: value }))
+                    }}
+                    placeholder="Type or select company"
+                    options={companies}
+                    required
+                />
 
                 {/* Designation */}
-                <div className="flex flex-col gap-2 w-full">
-                    <Label className="font-semibold" htmlFor='designation'>
-                        Designation <span className="text-brand-secondary">*</span>
-                    </Label>
-                    <Select onValueChange={handleDesignationChange} value={formData.designation?.toString()}>
-                        <SelectTrigger className="w-full bg-white !h-12 cursor-pointer">
-                            <SelectValue placeholder="Select Designation" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {designations.map((designation: JobTitleType) => (
-                                <SelectItem
-                                    key={designation.id}
-                                    value={designation.id.toString()}
-                                    className='cursor-pointer'
-                                >
-                                    {designation.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <CustomComboBox
+                    label="Designation"
+                    value={formData.designation_name}
+                    onValueChange={(value: string) => {
+                        const id = designations.find(d => d.name === value)?.id || 252;
+                        setFormData(prev => ({ ...prev, designation: id, designation_name: value }))
+                    }}
+                    placeholder="Type or select designation"
+                    options={designations}
+                    required
+                />
 
                 {/* Address & Pincode */}
                 <div className='flex gap-5 justify-between'>

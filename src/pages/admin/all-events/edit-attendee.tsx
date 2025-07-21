@@ -55,47 +55,6 @@ const CustomInput = React.memo(({ label, id, name, type, value, onChange, requir
     </div>
 ));
 
-// Simple Select Component with React.memo to prevent unnecessary re-renders
-const CustomSelect = React.memo(({
-    label,
-    value,
-    onValueChange,
-    placeholder,
-    options,
-    required = false
-}: {
-    label: string;
-    value: string;
-    onValueChange: (value: string) => void;
-    placeholder: string;
-    options: { id: number; name: string }[];
-    required?: boolean;
-}) => (
-    <div className="flex flex-col gap-2">
-        <Label className="font-semibold">
-            {label} {required && <span className="text-brand-secondary">*</span>}
-        </Label>
-        <Select
-            value={value}
-            onValueChange={onValueChange}
-        >
-            <SelectTrigger className="input !h-12 min-w-full text-base cursor-pointer">
-                <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-                {options.map((option) => (
-                    <SelectItem
-                        key={option.id}
-                        value={option.id.toString()}
-                        className="cursor-pointer"
-                    >
-                        {option.name}
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    </div>
-));
 
 // Simple Select Component for string options with React.memo
 const CustomSelectSimple = React.memo(({
@@ -437,36 +396,6 @@ const EditAttendee: React.FC = () => {
         }
     }, []);
 
-
-
-    const handleIndustryChange = useCallback((value: string) => {
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            const selectedIndustry = industries.find((industry: { id: number, name: string }) => industry.id.toString() === value);
-            setFormData(prev => ({
-                ...prev,
-                industry: selectedIndustry ? selectedIndustry.name : value
-            }));
-            setShowCustomIndustry(value === '212');
-            if (value !== '212') {
-                setCustomIndustry('');
-            }
-        });
-    }, [industries]);
-
-    const handleCustomInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-
-        // Use requestAnimationFrame to batch updates and reduce lag
-        requestAnimationFrame(() => {
-            switch (name) {
-                case 'custom_industry':
-                    setCustomIndustry(value);
-                    break;
-            }
-        });
-    }, []);
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -494,12 +423,9 @@ const EditAttendee: React.FC = () => {
             ...formData,
             status: Array.isArray(formData.status) ? formData.status[0] : formData.status,
             company_name: Array.isArray(formData.company_name) ? formData.company_name[0] : formData.company_name,
-            industry: Array.isArray(formData.industry) ? formData.industry[0] : formData.industry,
+            industry: " ",
             job_title: Array.isArray(formData.job_title) ? formData.job_title[0] : formData.job_title
         };
-
-        // Log the processed form data
-        console.log('Processed form data:', processedFormData);
 
         // Prepare special fields that need custom handling
         const specialFields: Record<string, any> = {
