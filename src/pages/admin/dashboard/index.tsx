@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
         {[
           { title: 'Total Events', value: events.length },
           { title: 'Total Attendees', value: allEventsAttendees.length },
-          { title: 'Total Sponsers', value: allEventsSponsors.length },
+          { title: 'Total Sponsors', value: allEventsSponsors.length },
           { title: 'Upcoming Events', value: upcomingEvents.length }
         ].map((card, index) => (
           <div
