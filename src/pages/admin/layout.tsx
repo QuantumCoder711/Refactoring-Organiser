@@ -26,6 +26,7 @@ const Layout: React.FC = () => {
             getAllEventsAttendees(token);
             getAllEventsSponsors(token);
             fetchExtras();
+            setLoading(false);
         } else {
             setLoading(false);
         }
