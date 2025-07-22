@@ -426,9 +426,18 @@ export default EventCard;
 
 //     return (
 //         <div className='w-xl bg-brand-background rounded-xl h-80'>
-//             {/* Image Div */}
+//             {/* Normal Card */}
 //             <div className='h-full flex flex-col justify-between w-80 overflow-hidden rounded-xl p-1.5 border-2 border-teal-500'>
-//                 <img src={image} alt={imageAlt} className='object-center object-cover w-full rounded-xl max-h-44' />
+//                 {/* Image Div */}
+//                 <div className='max-h-44 relative h-full border-2 border-yellow-400'>
+//                     <img src={image} alt={imageAlt} className='object-center object-cover w-full rounded-xl h-full' />
+//                     <div className="absolute bottom-2 px-2 left-0 w-full flex justify-between items-center">
+//                         <span className='w-fit rounded-full px-3 py-1 text-xs border border-white text-white'>15 Feb, 2025</span>
+//                         <span className='rounded-full bg-red-500 p-1.5 grid place-content-center'>
+//                             <Trash className='text-white size-4 rounded-full' />
+//                         </span>
+//                     </div>
+//                 </div>
 //                 <h4 className='text-sm font-semibold text-nowrap text-ellipsis overflow-hidden uppercase mt-1'>{title}</h4>
 //                 <div className='overflow-hidden text-ellipsis text-nowrap flex gap-1 mt-1 items-center'>
 //                     <MapPin className='min-w-4 min-h-4 size-4' /> <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>{location}</span>
