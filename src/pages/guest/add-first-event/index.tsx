@@ -692,20 +692,6 @@ const AddFirstEvent: React.FC = () => {
                                             ))}
                                         </SelectContent>
                                     </Select>
-
-                                    {userAccount.company === 439 && (
-                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end mt-2'>
-                                            {/* Fixed: Use dedicated handler for custom company name */}
-                                            <Input
-                                                value={userAccount.company_name}
-                                                onChange={handleCompanyNameChange}
-                                                name='company_name'
-                                                type='text'
-                                                placeholder="Enter custom company name"
-                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                            />
-                                        </div>
-                                    )}
                                 </div>
                             </div>
 
