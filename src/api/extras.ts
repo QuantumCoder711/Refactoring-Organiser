@@ -1,29 +1,19 @@
-import { domain } from "@/constants";
-import { CompanyType, IndustryType, JobTitleType } from "@/types";
+import { appDomain } from "@/constants";
 import axios from "axios";
 
-export const getAllCompanies = async (): Promise<CompanyType[]> => {
+export const getAllCompanies = async (search?: string) => {
     try {
-        const response = await axios.get(`${domain}/api/companies`);
-        return response.data.data;
+        const response = await axios.get(`${appDomain}/api/mapping/v1/company-master/all-company?page=1&search=${search}&industry=&employeeSize=&logo=undefined`);
+        return response.data.data.companies;
     } catch (error) {
         throw error;
     }
 }
 
-export const getAllJobTitles = async (): Promise<JobTitleType[]> => {
+export const getAllDesignations = async (search?: string) => {
     try {
-        const response = await axios.get(`${domain}/api/job-titles`);
-        return response.data.data;
-    } catch (error) {
-        throw error;
-    }
-}
-
-export const getAllIndustries = async (): Promise<IndustryType[]> => {
-    try {
-        const response = await axios.get(`${domain}/api/get-industries`);
-        return response.data.data;
+        const response = await axios.get(`${appDomain}/api/mapping/v1/designation-master/all-designation?page=1&search=${search}`);
+        return response.data.data.designations;
     } catch (error) {
         throw error;
     }

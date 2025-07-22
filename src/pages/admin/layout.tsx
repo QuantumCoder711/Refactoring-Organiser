@@ -8,7 +8,6 @@ import useAttendeeStore from '@/store/attendeeStore';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 import useSponsorStore from '@/store/sponsorStore';
-import useExtrasStore from '@/store/extrasStore';
 import useCheckInSocket from "@/hooks/useCheckInSocket";
 
 const Layout: React.FC = () => {
@@ -17,7 +16,6 @@ const Layout: React.FC = () => {
     const { getAllEvents } = useEventStore();
     const { getAllEventsAttendees } = useAttendeeStore();
     const { getAllEventsSponsors } = useSponsorStore();
-    const { fetchExtras } = useExtrasStore();
 
     useEffect(() => {
         setLoading(true);
@@ -25,7 +23,6 @@ const Layout: React.FC = () => {
             getAllEvents(token).then(()=>setLoading(false));
             getAllEventsAttendees(token);
             getAllEventsSponsors(token);
-            fetchExtras();
         } else {
             setLoading(false);
         }

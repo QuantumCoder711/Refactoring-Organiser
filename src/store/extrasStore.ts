@@ -1,79 +1,27 @@
-import { getAllCompanies, getAllJobTitles, getAllIndustries } from "@/api/extras";
-import { CompanyType, IndustryType, JobTitleType } from "@/types";
+import { getAllCompanies, getAllDesignations } from "@/api/extras";
+import { CompanyType, DesignationType } from "@/types";
 import { create } from "zustand";
 
 interface ExtrasStore {
-    companies: CompanyType[];
-    jobTitles: JobTitleType[];
-    industries: IndustryType[];
     loading: boolean;
-    getAllCompanies: () => Promise<void>;
-    getAllJobTitles: () => Promise<void>;
-    getAllIndustries: () => Promise<void>;
-    fetchExtras: () => Promise<void>;
+    companies: CompanyType[];
+    designations: DesignationType[];
+    getCompanies: (search?: string) => Promise<void>;
+    getDesignations: (search?: string) => Promise<void>;
 }
 
 const useExtrasStore = create<ExtrasStore>((set) => ({
-    companies: [],
-    jobTitles: [],
-    industries: [],
     loading: false,
-    
-    getAllCompanies: async () => {
-        try {
-            set({ loading: true });
-            const response = await getAllCompanies();
-            set({ companies: response });
-        } catch (error) {
-            throw error;
-        } finally {
-            set({ loading: false });
-        }
+    companies: [],
+    designations: [],
+    getCompanies: async (search?: string) => {
+        const response = await getAllCompanies(search);
+        set({companies: response});
     },
-    
-    getAllJobTitles: async () => {
-        try {
-            set({ loading: true });
-            const response = await getAllJobTitles();
-            set({ jobTitles: response });
-        } catch (error) {
-            throw error;
-        } finally {
-            set({ loading: false });
-        }
+    getDesignations: async (search?: string) => {
+        const response = await getAllDesignations(search);
+        set({designations: response});
     },
-    
-    getAllIndustries: async () => {
-        try {
-            set({ loading: true });
-            const response = await getAllIndustries();
-            set({ industries: response });
-        } catch (error) {
-            throw error;
-        } finally {
-            set({ loading: false });
-        }
-    },
-    
-    fetchExtras: async () => {
-        try {
-            set({ loading: true });
-            const [companiesData, jobTitlesData, industriesData] = await Promise.all([
-                getAllCompanies(),
-                getAllJobTitles(),
-                getAllIndustries()
-            ]);
-            set({ 
-                companies: companiesData,
-                jobTitles: jobTitlesData,
-                industries: industriesData
-            });
-        } catch (error) {
-            throw error;
-        } finally {
-            set({ loading: false });
-        }
-    }
 }));
 
 export default useExtrasStore;

@@ -12,16 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface ApiType {
-    created_at: string;
-    id: number;
-    name: string;
-    parent_id: number;
-    updated_at: string;
-    uuid: string;
-}
+import useExtrasStore from '@/store/extrasStore';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -183,14 +174,13 @@ const ExploreViewEvent: React.FC = () => {
     });
 
     const [open, setOpen] = useState(false);
-    const [companies, setCompanies] = useState<ApiType[]>([]);
+    const { companies, getCompanies } = useExtrasStore(state => state);
 
     const [userAccount, setUserAccount] = useState({
         first_name: '',
         last_name: '',
         email_id: '',
         phone_number: '',
-        company: 0,
         company_name: '',
         acceptance: '1',
         industry: 'Others'
@@ -262,6 +252,10 @@ const ExploreViewEvent: React.FC = () => {
             }
         }
     }, [slug]);
+
+    useEffect(() => {
+        getCompanies(userAccount.company_name);
+    }, [userAccount.company_name])
 
     useEffect(() => {
         if (currentEvent) {
@@ -418,10 +412,6 @@ const ExploreViewEvent: React.FC = () => {
             formData.submit();
         }
     }, [form]);
-
-    useEffect(() => {
-        axios.get(`${domain}/api/companies`).then(res => setCompanies(res.data.data));
-    }, []);
 
     const isEventDatePassed = () => {
         if (!currentEvent?.event_start_date) return false;
@@ -732,12 +722,9 @@ const ExploreViewEvent: React.FC = () => {
                                 <CustomComboBox
                                     label="Company Name"
                                     value={userAccount.company_name}
-                                    onValueChange={(value: string) => {
-                                        const id = companies.find(c => c.name === value)?.id || 439;
-                                        setUserAccount(prev => ({ ...prev, company: id, company_name: value }))
-                                    }}
+                                    onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, company_name: value }))}
                                     placeholder="Type or select company"
-                                    options={companies}
+                                    options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                                     required
                                 />
                             </div>
