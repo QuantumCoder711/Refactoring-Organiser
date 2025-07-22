@@ -40,7 +40,7 @@ const GiftingPage: React.FC = () => {
     if(selectedCity === "all" || selectedCity === "") {
       setFilteredVendors(giftingVendors);
     } else {
-      const filtered = giftingVendors.filter((vendor) => vendor.city.includes(selectedCity.toLowerCase()));
+      const filtered = giftingVendors?.filter((vendor) => vendor?.city?.includes(selectedCity?.toLowerCase()));
       setFilteredVendors(filtered);
     }
   }, [selectedCity, giftingVendors]);

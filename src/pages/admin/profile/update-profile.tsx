@@ -1,12 +1,10 @@
-import { getAllCompanies, getAllJobTitles } from '@/api/extras';
 import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { domain, UserAvatar } from '@/constants';
 import useAuthStore from '@/store/authStore';
-import { CompanyType, UserType } from '@/types';
-import { JobTitleType } from '@/types';
+import { UserType } from '@/types';
 import axios from 'axios';
 import { CircleCheckBig, CircleX, ChevronDown, Check } from 'lucide-react';
 import React, { useEffect, useState, useRef } from 'react';
@@ -15,6 +13,7 @@ import { getImageUrl } from '@/lib/utils';
 import Wave from '@/components/Wave';
 import { useNavigate } from 'react-router-dom';
 import { getProfile } from '@/api/auth';
+import useExtrasStore from '@/store/extrasStore';
 
 // Custom Combo Box Component for company names and job titles with filtering and creation
 const CustomComboBox = React.memo(({
@@ -101,7 +100,7 @@ const CustomComboBox = React.memo(({
                         onChange={handleInputChange}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="input !h-12 min-w-full text-base pr-10"
+                        className="input capitalize !h-12 min-w-full text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -118,7 +117,7 @@ const CustomComboBox = React.memo(({
                             filteredOptions.map((option) => (
                                 <div
                                     key={option.id}
-                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    className="px-3 py-2 capitalize cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span>{option.name}</span>
@@ -150,16 +149,13 @@ const UpdateProfile: React.FC = () => {
     const { user, setUser, token } = useAuthStore(state => state);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
-    const [companies, setCompanies] = useState<CompanyType[]>([]);
-    const [designations, setDesignations] = useState<JobTitleType[]>([]);
+    const { companies, designations, getCompanies, getDesignations } = useExtrasStore(state => state);
     const [formData, setFormData] = useState({
         first_name: user?.first_name || '',
         last_name: user?.last_name || '',
         email: user?.email || '',
         mobile_number: user?.mobile_number || '',
-        company: user?.company || 0,
         company_name: user?.company_name || '',
-        designation: user?.designation || 0,
         designation_name: user?.designation_name || '',
         address: user?.address || '',
         pincode: user?.pincode || '',
@@ -167,37 +163,21 @@ const UpdateProfile: React.FC = () => {
         image: user?.image || null as File | string | null,
     });
 
-    useEffect(() => {
-        if (companies.length === 0 || designations.length === 0) {
-            getAllCompanies().then((companies) => {
-                setCompanies(companies);
-            });
-            getAllJobTitles().then((designations) => {
-                setDesignations(designations);
-            });
-        }
-    }, [companies, designations]);
+    // useEffect(() => {
+    //     if (companies.length === 0 || designations.length === 0) {
+    //         getAllCompanies().then((companies) => {
+    //             setCompanies(companies);
+    //         });
+    //         getAllJobTitles().then((designations) => {
+    //             setDesignations(designations);
+    //         });
+    //     }
+    // }, [companies, designations]);
 
-    // Update form data when companies and designations are loaded and user data is available
     useEffect(() => {
-        if (user && companies.length > 0 && designations.length > 0) {
-            // Find company name if only ID is available
-            if (user.company && !formData.company_name) {
-                const company = companies.find(c => c.id === Number(user.company));
-                if (company) {
-                    setFormData(prev => ({ ...prev, company_name: company.name }));
-                }
-            }
-
-            // Find designation name if only ID is available
-            if (user.designation && !formData.designation_name) {
-                const designation = designations.find(d => d.id === Number(user.designation));
-                if (designation) {
-                    setFormData(prev => ({ ...prev, designation_name: designation.name }));
-                }
-            }
-        }
-    }, [user, companies, designations, formData.company_name, formData.designation_name]);
+        getCompanies(formData.company_name);
+        getDesignations(formData.designation_name);
+    }, [formData.company_name, formData.designation_name]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, files } = e.target;
@@ -356,11 +336,10 @@ const UpdateProfile: React.FC = () => {
                     label="Company"
                     value={formData.company_name}
                     onValueChange={(value: string) => {
-                        const id = companies.find(c => c.name === value)?.id || 439;
-                        setFormData(prev => ({ ...prev, company: id, company_name: value }))
+                        setFormData(prev => ({ ...prev, company_name: value }))
                     }}
                     placeholder="Type or select company"
-                    options={companies}
+                    options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                     required
                 />
 
@@ -369,11 +348,10 @@ const UpdateProfile: React.FC = () => {
                     label="Designation"
                     value={formData.designation_name}
                     onValueChange={(value: string) => {
-                        const id = designations.find(d => d.name === value)?.id || 252;
-                        setFormData(prev => ({ ...prev, designation: id, designation_name: value }))
+                        setFormData(prev => ({ ...prev, designation_name: value }))
                     }}
                     placeholder="Type or select designation"
-                    options={designations}
+                    options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                     required
                 />
 

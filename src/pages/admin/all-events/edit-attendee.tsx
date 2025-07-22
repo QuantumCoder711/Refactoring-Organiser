@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,12 +22,6 @@ import useAuthStore from "@/store/authStore";
 import useEventStore from "@/store/eventStore";
 import Wave from "@/components/Wave";
 import GoBack from "@/components/GoBack";
-
-// Add custom function for image URL
-// const getImageUrl = (imageUrl: string | null): string => {
-//     if (!imageUrl) return UserAvatar;
-//     return `${imageUrl}`;
-// };
 
 // Simple Input Component with React.memo to prevent unnecessary re-renders
 const CustomInput = React.memo(({ label, id, name, type, value, onChange, required = false }: {
@@ -183,7 +176,7 @@ const CustomComboBox = React.memo(({
                         onChange={handleInputChange}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="input !h-12 min-w-full text-base pr-10"
+                        className="input capitalize !h-12 min-w-full text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -200,7 +193,7 @@ const CustomComboBox = React.memo(({
                             filteredOptions.map((option) => (
                                 <div
                                     key={option.id}
-                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    className="px-3 capitalize py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span>{option.name}</span>
@@ -233,11 +226,9 @@ const EditAttendee: React.FC = () => {
     const navigate = useNavigate();
     const { token } = useAuthStore();
     const { getEventBySlug } = useEventStore(state => state);
-    const { companies, jobTitles, industries, loading: extrasLoading } = useExtrasStore();
+    const { companies, designations, getDesignations, getCompanies, loading: extrasLoading } = useExtrasStore();
     const { updateAttendee, loading: attendeeLoading, singleEventAttendees, getSingleEventAttendees } = useAttendeeStore();
     const loading = extrasLoading || attendeeLoading;
-    const [showCustomIndustry, setShowCustomIndustry] = useState(false);
-    const [customIndustry, setCustomIndustry] = useState('');
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [formData, setFormData] = useState({
         first_name: '',
@@ -253,7 +244,6 @@ const EditAttendee: React.FC = () => {
         alternate_mobile_number: '',
         alternate_email: '',
         company_name: '',
-        industry: '',
         job_title: '',
         award_winner: '0',
     });
@@ -264,7 +254,7 @@ const EditAttendee: React.FC = () => {
     useEffect(() => {
         const loadAttendeeData = async () => {
             if (!token || !event || !uuid) return;
-            
+
             try {
                 await getSingleEventAttendees(token, event.uuid);
             } catch (error) {
@@ -278,6 +268,11 @@ const EditAttendee: React.FC = () => {
 
         loadAttendeeData();
     }, [token, event, uuid, getSingleEventAttendees]);
+
+    useEffect(() => {
+        getCompanies(formData.company_name);
+        getDesignations(formData.job_title);
+    }, [formData.company_name, formData.job_title]);
 
     // Set form data when attendee data is available
     useEffect(() => {
@@ -300,27 +295,14 @@ const EditAttendee: React.FC = () => {
                     alternate_mobile_number: attendee.alternate_mobile_number || '',
                     alternate_email: attendee.alternate_email || '',
                     company_name: attendee.company_name || '',
-                    industry: attendee.industry || '',
                     job_title: attendee.job_title || '',
                     award_winner: attendee.award_winner?.toString() || '0',
                 });
 
-
-
-                // Handle industry dropdown
-                const industryMatch = industries.find(i => i.name.toLowerCase() === (attendee.industry || '').toLowerCase());
-                if (industryMatch) {
-                    setFormData(prev => ({ ...prev, industry: industryMatch.name }));
-                    setShowCustomIndustry(false);
-                } else if (attendee.industry) {
-                    setShowCustomIndustry(true);
-                    setCustomIndustry(attendee.industry);
-                }
-
                 setIsDataLoaded(true);
             }
         }
-    }, [uuid, singleEventAttendees, companies, jobTitles, industries]);
+    }, [singleEventAttendees]);
 
     // Utility functions for form handling
     const createFormData = useCallback((data: Record<string, any>, specialFields?: Record<string, any>) => {
@@ -415,15 +397,11 @@ const EditAttendee: React.FC = () => {
             return;
         }
 
-        // Log the initial form data
-        console.log('Initial form data:', formData);
-
         // Create a new object with single values
         const processedFormData = {
             ...formData,
             status: Array.isArray(formData.status) ? formData.status[0] : formData.status,
             company_name: Array.isArray(formData.company_name) ? formData.company_name[0] : formData.company_name,
-            industry: " ",
             job_title: Array.isArray(formData.job_title) ? formData.job_title[0] : formData.job_title
         };
 
@@ -431,7 +409,6 @@ const EditAttendee: React.FC = () => {
         const specialFields: Record<string, any> = {
             company_name: processedFormData.company_name,
             job_title: processedFormData.job_title,
-            industry: showCustomIndustry ? customIndustry : processedFormData.industry,
             image: processedFormData.image,
             status: processedFormData.status.toLowerCase() // Ensure status is lowercase
         };
@@ -440,12 +417,6 @@ const EditAttendee: React.FC = () => {
         const finalFormData = createFormData(processedFormData, specialFields);
         finalFormData.append('event_id', event.id.toString());
         finalFormData.append('_method', 'PUT');
-
-        // Log the final form data
-        console.log('Final form data entries:');
-        for (let [key, value] of finalFormData.entries()) {
-            console.log(`${key}:`, value);
-        }
 
         try {
             const response = await updateAttendee(token, uuid, event.uuid, finalFormData);
@@ -559,7 +530,7 @@ const EditAttendee: React.FC = () => {
                                 value={formData.job_title}
                                 onValueChange={(value: string) => setFormData(prev => ({ ...prev, job_title: value }))}
                                 placeholder="Type or select job title"
-                                options={jobTitles}
+                                options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                                 required
                             />
 
@@ -568,7 +539,7 @@ const EditAttendee: React.FC = () => {
                                 value={formData.company_name}
                                 onValueChange={(value: string) => setFormData(prev => ({ ...prev, company_name: value }))}
                                 placeholder="Type or select company"
-                                options={companies}
+                                options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                                 required
                             />
                         </div>
@@ -577,14 +548,14 @@ const EditAttendee: React.FC = () => {
                             <Label className="font-semibold">Select Image</Label>
                             <div className="w-full h-full">
                                 <AspectRatio className="aspect-video w-full h-full">
-                                    <img 
+                                    <img
                                         src={
-                                            formData.image instanceof File 
-                                                ? URL.createObjectURL(formData.image) 
+                                            formData.image instanceof File
+                                                ? URL.createObjectURL(formData.image)
                                                 : getImageUrl(formData.image as string)
-                                        } 
-                                        alt="Attendee Image" 
-                                        className="rounded-md object-cover w-full h-full" 
+                                        }
+                                        alt="Attendee Image"
+                                        className="rounded-md object-cover w-full h-full"
                                     />
                                 </AspectRatio>
                             </div>
@@ -658,9 +629,9 @@ const EditAttendee: React.FC = () => {
                             options={[
                                 { value: 'delegate', label: 'Delegate' },
                                 ...roles.filter(role => role.toLowerCase() !== 'delegate')
-                                    .map(status => ({ 
-                                        value: status.toLowerCase(), 
-                                        label: status 
+                                    .map(status => ({
+                                        value: status.toLowerCase(),
+                                        label: status
                                     })),
                                 { value: 'others', label: 'Others' }
                             ]}

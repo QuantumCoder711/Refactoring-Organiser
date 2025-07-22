@@ -40,7 +40,7 @@ const EventSetupPage: React.FC = () => {
     if(selectedCity === "all" || selectedCity === "") {
       setFilteredVendors(eventSetupVendors);
     } else {
-      const filtered = eventSetupVendors.filter((vendor) => vendor.city.includes(selectedCity.toLowerCase()));
+      const filtered = eventSetupVendors?.filter((vendor) => vendor?.city?.includes(selectedCity?.toLowerCase()));
       setFilteredVendors(filtered);
     }
   }, [selectedCity, eventSetupVendors]);
@@ -79,7 +79,7 @@ const EventSetupPage: React.FC = () => {
 
       <div className="mt-10 flex gap-5">
         {/* Company Card */}
-        {filteredVendors.map((company, index) => (
+        {filteredVendors?.map((company, index) => (
           <VendorCompanyCard key={index} company={company} />
         ))}
       </div>

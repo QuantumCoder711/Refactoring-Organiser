@@ -71,6 +71,28 @@ const AddAgenda: React.FC = () => {
         }
     };
 
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>, timeType: 'start' | 'end') => {
+        const timeValue = e.target.value;
+        if (!timeValue) return;
+
+        // Split the time to get hours for AM/PM determination
+        const [hours] = timeValue.split(':').map(Number);
+
+        // Determine if it's AM or PM
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        setFormData(prevState => ({
+            ...prevState,
+            [`${timeType}_time`]: timeValue, // Keep 24-hour format for HTML input
+            [`${timeType}_time_type`]: ampm
+        }));
+
+        // Clear error when user changes time
+        if (errors[`${timeType}_time`]) {
+            setErrors(prev => ({ ...prev, [`${timeType}_time`]: '' }));
+        }
+    };
+
     const handleSpeakerSelect = (value: string) => {
         const selectedSpeaker = speakers.find(speaker => speaker.id.toString() === value);
         if (selectedSpeaker) {
@@ -114,20 +136,29 @@ const AddAgenda: React.FC = () => {
 
         setLoading(true);
         try {
-            // Split time into hours and minutes
-            const [startHour, startMinute] = formData.start_time.split(':');
-            const [endHour, endMinute] = formData.end_time.split(':');
+            // Convert 24-hour format to 12-hour format for API
+            const convertTo12Hour = (time24: string) => {
+                const [hours, minutes] = time24.split(':').map(Number);
+                const twelveHour = hours % 12 || 12;
+                return {
+                    hour: twelveHour.toString(),
+                    minute: minutes.toString().padStart(2, '0')
+                };
+            };
+
+            const startTime = convertTo12Hour(formData.start_time);
+            const endTime = convertTo12Hour(formData.end_time);
 
             const submissionData = {
                 title: formData.title,
                 description: formData.description,
                 event_date: formData.event_date,
-                start_time: startHour,
-                start_minute_time: startMinute,
-                end_time: endHour,
-                end_minute_time: endMinute,
-                start_time_type: formData.start_time_type || 'AM',
-                end_time_type: formData.end_time_type || 'AM',
+                start_time: startTime.hour,
+                start_minute_time: startTime.minute,
+                end_time: endTime.hour,
+                end_minute_time: endTime.minute,
+                start_time_type: formData.start_time_type,
+                end_time_type: formData.end_time_type,
                 position: formData.position,
                 event_id: formData.event_id,
                 tag_speakers: formData.tag_speakers.join(',') || ''
@@ -330,7 +361,7 @@ const AddAgenda: React.FC = () => {
                                     name='start_time'
                                     className='w-full custom-input h-full absolute opacity-0'
                                     value={formData.start_time}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleTimeChange(e, 'start')}
                                     required
                                 />
                                 <p className='h-full px-3 flex items-center text-nowrap'>
@@ -356,7 +387,7 @@ const AddAgenda: React.FC = () => {
                                     name='end_time'
                                     className='w-full custom-input h-full absolute opacity-0'
                                     value={formData.end_time}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => handleTimeChange(e, 'end')}
                                     required
                                 />
                                 <p className='h-full px-3 flex items-center text-nowrap'>

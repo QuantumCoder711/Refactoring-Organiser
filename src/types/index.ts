@@ -167,15 +167,30 @@ export interface AttendeeType {
     break_out_room_and_time: string[];
 }
 
-export interface CompanyType {
-    id: number;
-    parent_id: number;
-    name: string;
-    created_at: string;
-    updated_at: string;
-}
+// // Old Interface
+// export interface CompanyType {
+//     id: number;
+//     parent_id: number;
+//     name: string;
+//     created_at: string;
+//     updated_at: string;
+// }
+// // Old Interface
+// export interface JobTitleType extends CompanyType { }
 
-export interface JobTitleType extends CompanyType { }
+// New Interface
+export interface CompanyType {
+    _id: string;
+    company: string;
+    companySize: string;
+    headquarters: string;
+    companyLogo: string;
+}
+//New Interface
+export interface DesignationType {
+    _id: string;
+    designation: string;
+}
 
 export interface IndustryType extends CompanyType { }
 
@@ -289,16 +304,16 @@ export interface VendorCompanyType {
 
 
 export interface BadgeData {
-  firstName: string;
-  lastName: string;
-  companyName: string;
-  jobTitle: string;
-  image: string | null;
-  status: string;
-  speakerTagColor: string;
-  delegateTagColor: string;
-  sponsorTagColor: string;
-  speakerTextColor: string;
-  delegateTextColor: string;
-  sponsorTextColor: string;
+    firstName: string;
+    lastName: string;
+    companyName: string;
+    jobTitle: string;
+    image: string | null;
+    status: string;
+    speakerTagColor: string;
+    delegateTagColor: string;
+    sponsorTagColor: string;
+    speakerTextColor: string;
+    delegateTextColor: string;
+    sponsorTextColor: string;
 }

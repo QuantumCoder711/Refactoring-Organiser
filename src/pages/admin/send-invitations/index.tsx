@@ -334,7 +334,7 @@ const SendInvitations: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
-                setUser({ ...user!, wallet_balance: user!.wallet_balance! - selectedAttendeesData.length });
+                setUser({ ...user!, wallet_balance: user?.wallet_balance! - selectedAttendeesData.length });
             }
         } catch (error) {
             console.error('Error getting contacts:', error);

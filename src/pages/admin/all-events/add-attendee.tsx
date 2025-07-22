@@ -179,7 +179,7 @@ const CustomComboBox = React.memo(({
                         onChange={handleInputChange}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="input !h-12 min-w-full text-base pr-10"
+                        className="input capitalize !h-12 min-w-full text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -196,7 +196,7 @@ const CustomComboBox = React.memo(({
                             filteredOptions.map((option) => (
                                 <div
                                     key={option.id}
-                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    className="px-3 py-2 capitalize cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span>{option.name}</span>
@@ -228,11 +228,9 @@ const AddAttendee: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const { token } = useAuthStore();
     const { getEventBySlug } = useEventStore(state => state);
-    const { companies, jobTitles, loading: extrasLoading } = useExtrasStore();
+    const { companies, designations, getDesignations, getCompanies, loading: extrasLoading } = useExtrasStore();
     const { addAttendee, bulkUploadAttendees, loading: attendeeLoading } = useAttendeeStore();
     const loading = extrasLoading || attendeeLoading;
-    const [showCustomIndustry, setShowCustomIndustry] = useState(false);
-    const [customIndustry, setCustomIndustry] = useState('');
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -247,7 +245,6 @@ const AddAttendee: React.FC = () => {
         alternate_mobile_number: '',
         alternate_email: '',
         company_name: '',
-        industry: '',
         job_title: '',
         award_winner: '0',
     });
@@ -304,6 +301,11 @@ const AddAttendee: React.FC = () => {
 
         return true;
     }, []);
+
+    useEffect(() => {
+        getCompanies(formData.company_name);
+        getDesignations(formData.job_title);
+    }, [formData.company_name, formData.job_title]);
 
     // Handlers with debounce to reduce lag
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -426,7 +428,6 @@ const AddAttendee: React.FC = () => {
         const specialFields: Record<string, any> = {
             company_name: formData.company_name,
             job_title: formData.job_title,
-            industry: showCustomIndustry ? customIndustry : formData.industry,
             image: formData.image
         };
 
@@ -452,7 +453,6 @@ const AddAttendee: React.FC = () => {
                     alternate_mobile_number: '',
                     alternate_email: '',
                     company_name: '',
-                    industry: '',
                     job_title: '',
                     award_winner: '0',
                 });
@@ -580,7 +580,7 @@ const AddAttendee: React.FC = () => {
                                         value={formData.job_title}
                                         onValueChange={(value: string) => setFormData(prev => ({ ...prev, job_title: value }))}
                                         placeholder="Type or select job title"
-                                        options={jobTitles}
+                                        options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                                         required
                                     />
 
@@ -589,7 +589,7 @@ const AddAttendee: React.FC = () => {
                                         value={formData.company_name}
                                         onValueChange={(value: string) => setFormData(prev => ({ ...prev, company_name: value }))}
                                         placeholder="Type or select company"
-                                        options={companies}
+                                        options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                                         required
                                     />
                                 </div>
@@ -605,27 +605,6 @@ const AddAttendee: React.FC = () => {
                             </div>
 
                             <div className="flex gap-3.5 flex-col mt-2.5 w-full">
-                                {/* <CustomSelect
-                                    label="Industry"
-                                    value={industries.find((industry: { id: number, name: string }) => industry.name === formData.industry)?.id.toString() || formData.industry}
-                                    onValueChange={handleIndustryChange}
-                                    placeholder="Select Industry"
-                                    options={industries}
-                                    required
-                                />
-
-                                {showCustomIndustry && (
-                                    <CustomInput
-                                        label="Specify Industry"
-                                        id="custom_industry"
-                                        name="custom_industry"
-                                        type="text"
-                                        value={customIndustry}
-                                        onChange={handleCustomInputChange}
-                                        required
-                                    />
-                                )} */}
-
                                 <CustomInput
                                     label="Employee Size"
                                     id="employee_size"

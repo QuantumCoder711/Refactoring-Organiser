@@ -40,7 +40,7 @@ const AudienceAcquisitionPage: React.FC = () => {
     if(selectedCity === "all" || selectedCity === "") {
       setFilteredVendors(acquisitionVendors);
     } else {
-      const filtered = acquisitionVendors.filter((vendor) => vendor.city.includes(selectedCity.toLowerCase()));
+      const filtered = acquisitionVendors?.filter((vendor) => vendor?.city.includes(selectedCity.toLowerCase()));
       setFilteredVendors(filtered);
     }
   }, [selectedCity]);
@@ -80,7 +80,7 @@ const AudienceAcquisitionPage: React.FC = () => {
 
       <div className="mt-10 flex gap-5">
         {/* Company Card */}
-        {filteredVendors.map((company, index) => (
+        {filteredVendors?.map((company, index) => (
           <VendorCompanyCard key={index} company={company} />
         ))}
       </div>
