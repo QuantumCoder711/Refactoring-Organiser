@@ -87,7 +87,8 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
         "/terms-and-conditions",
         "/refund-policy",
         "/security-and-compilance",
-        "/features"
+        "/features",
+        "/careers"
     ];
     if (styledPaths.includes(path)) {
         type = "styled";
@@ -102,7 +103,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
             <img width={80} height={25} src={LogoFullWhite} className='invert' alt="logo" />
 
             <div className=''>
-                <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zercles Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
+                <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                 <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
                     <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                     <span className='text-brand'>|</span>
@@ -165,7 +166,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                     <img width={80} height={25} src={LogoFullWhite} alt="logo" />
 
                     <div className=''>
-                        <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zercles Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
+                        <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
                         <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
                             <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                             <span className='text-brand'>|</span>
