@@ -73,32 +73,32 @@ const ReportCard: React.FC<ReportCardProps> = ({
 
                 <div className='flex flex-col gap-2 h-full px-4 py-6 justify-between'>
                     <Link to={`mail-report/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Mail /> Mail
                         </div>
                     </Link>
                     <Link to={`whatsapp-report/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <MessageCircleMore /> WhatsApp
                         </div>
                     </Link>
                     <Link to={`charts/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <ChartPie /> Charts
                         </div>
                     </Link>
                     <Link to={`ai-photos/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Brain /> AI Photos
                         </div>
                     </Link>
                     <Link to={`ai-transcriber/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <BrainCircuit /> AI Transcriber
                         </div>
                     </Link>
                     <Link to={`print-badges/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
-                        <div className='flex gap-2 items-center max-w-32 w-full'>
+                        <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Printer /> Print Badges
                         </div>
                     </Link>

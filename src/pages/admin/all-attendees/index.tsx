@@ -43,6 +43,7 @@ const AllAttendees: React.FC = () => {
 
     // Fetch all attendees when component mounts
     useEffect(() => {
+        if(allEventsAttendees.length !== 0) return; // Avoid refetching if data is already present
         if (token) {
             getAllEventsAttendees(token);
         }

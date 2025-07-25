@@ -12,20 +12,13 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import useExtrasStore from '@/store/extrasStore';
 import { CompanyType } from '@/types';
 import Wave from '@/components/Wave';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CircleCheck, CircleX } from 'lucide-react';
+import { ChevronDown, CircleCheck, CircleX } from 'lucide-react';
 import axios from 'axios';
 import { domain, googleMapsApiKey, UserAvatar } from '@/constants';
 import { Autocomplete, useLoadScript } from '@react-google-maps/api';
@@ -43,8 +36,138 @@ import { Textarea } from '@/components/ui/textarea';
 import GoogleMap from '@/components/GoogleMap';
 import { login } from '@/api/auth';
 
-const AddFirstEvent: React.FC = () => {
+// Custom Combo Box Component for company names with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                    />
+                    {/* You may want to use a chevron icon here if available */}
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span className='capitalize'>{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <span className="size-4 text-brand-secondary">✔</span>
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No companies found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
+const AddFirstEvent: React.FC = () => {
     const { token } = useAuthStore(state => state);
     const [open, setOpen] = useState<boolean>(false);
     const [userAccount, setUserAccount] = useState({
@@ -54,7 +177,6 @@ const AddFirstEvent: React.FC = () => {
         mobile_number: "",
         password: "",
         company_name: "",
-        company: 0,
         confirm_password: "",
         tnc: false,
         notifications: false,
@@ -64,7 +186,7 @@ const AddFirstEvent: React.FC = () => {
         source_website: true,
     });
 
-    const { getAllCompanies, companies, loading } = useExtrasStore(state => state);
+    const { getCompanies, companies, loading } = useExtrasStore(state => state);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
@@ -122,6 +244,10 @@ const AddFirstEvent: React.FC = () => {
         event_venue_address_2: '',
         break_out: 0,
     });
+
+    useEffect(() => {
+        getCompanies(userAccount.company_name);
+    }, [userAccount.company_name]);
 
     const handlePlaceSelect = () => {
         if (autocomplete) {
@@ -378,10 +504,6 @@ const AddFirstEvent: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        getAllCompanies();
-    }, []);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
         setUserAccount(prevState => ({
@@ -390,24 +512,8 @@ const AddFirstEvent: React.FC = () => {
         }));
     };
 
-    const handleCompanyChange = (value: string) => {
-        const companyId = parseInt(value);
-        setUserAccount(prevState => ({
-            ...prevState,
-            company: companyId
-        }));
-    };
-
-    // Fixed: Added dedicated handler for custom company name input
-    const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUserAccount(prevState => ({
-            ...prevState,
-            company_name: e.target.value
-        }));
-    };
-
     const handleCreateAccount = async () => {
-        const { first_name, last_name, email, mobile_number, password, confirm_password, company_name, tnc, notifications, company } = userAccount;
+        const { first_name, last_name, email, mobile_number, password, confirm_password, company_name, tnc, notifications } = userAccount;
 
         // Fixed: Updated validation logic for company name
         if (!first_name) {
@@ -458,16 +564,7 @@ const AddFirstEvent: React.FC = () => {
             return;
         }
 
-        // Fixed: Updated company validation logic
-        if (company === 0) {
-            toast("Please select your company", {
-                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleX className='size-5' />
-            });
-            return;
-        }
-
-        if (company === 439 && !company_name) {
+        if (!company_name) {
             toast("Please enter your company name", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
@@ -675,37 +772,17 @@ const AddFirstEvent: React.FC = () => {
 
                             <div className='flex gap-5 justify-between mt-5'>
                                 <div className='flex gap-2 flex-col w-full'>
-                                    <Label className='font-semibold'>Company Name</Label>
-                                    <Select onValueChange={handleCompanyChange}>
-                                        <SelectTrigger className="w-full bg-white !h-12 cursor-pointer">
-                                            <SelectValue placeholder="Company Name" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {companies.map((company: CompanyType) => (
-                                                <SelectItem
-                                                    key={company.id}
-                                                    value={company.id.toString()}
-                                                    className='cursor-pointer'
-                                                >
-                                                    {company.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-
-                                    {userAccount.company === 439 && (
-                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end mt-2'>
-                                            {/* Fixed: Use dedicated handler for custom company name */}
-                                            <Input
-                                                value={userAccount.company_name}
-                                                onChange={handleCompanyNameChange}
-                                                name='company_name'
-                                                type='text'
-                                                placeholder="Enter custom company name"
-                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                            />
-                                        </div>
-                                    )}
+                                    {/* Company Name ComboBox from Signup */}
+                                    <CustomComboBox
+                                        label="Company Name"
+                                        value={userAccount.company_name}
+                                        onValueChange={(value: string) => {
+                                            setUserAccount(prev => ({ ...prev, company_name: value }))
+                                        }}
+                                        placeholder="Type or select company"
+                                        options={companies.map((company: CompanyType, index: number) => ({ id: index + 1, name: company.company }))}
+                                        required
+                                    />
                                 </div>
                             </div>
 

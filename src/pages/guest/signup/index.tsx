@@ -8,16 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import Wave from '@/components/Wave';
 import useExtrasStore from '@/store/extrasStore';
-import { CompanyType } from '@/types';
 import { domain } from '@/constants';
 
 // Custom Combo Box Component for company names with filtering and creation
@@ -152,7 +144,7 @@ const CustomComboBox = React.memo(({
 
 const Signup: React.FC = () => {
     const navigate = useNavigate();
-    const { getAllCompanies, companies, loading } = useExtrasStore(state => state);
+    const { getCompanies, companies, loading } = useExtrasStore(state => state);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [userAccount, setUserAccount] = useState({
         first_name: "",
@@ -162,7 +154,6 @@ const Signup: React.FC = () => {
         mobile_number: "",
         password: "",
         company_name: "",
-        company: 0,
         confirm_password: "",
         tnc: false,
         notifications: false,
@@ -173,8 +164,8 @@ const Signup: React.FC = () => {
     });
 
     useEffect(() => {
-        getAllCompanies();
-    }, []);
+        getCompanies(userAccount.company_name);
+    }, [userAccount.company_name]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -188,7 +179,7 @@ const Signup: React.FC = () => {
 
 
     const handleCreateAccount = async () => {
-        const { first_name, last_name, email, country_code, mobile_number, password, confirm_password, company_name, tnc, notifications, company } = userAccount;
+        const { first_name, last_name, email, country_code, mobile_number, password, confirm_password, company_name, tnc, notifications } = userAccount;
 
         if (!country_code) {
             toast("Country code is required", {
@@ -423,11 +414,10 @@ const Signup: React.FC = () => {
                             label="Company Name"
                             value={userAccount.company_name}
                             onValueChange={(value: string) => {
-                                const id = companies.find(c => c.name === value)?.id || 439;
-                                setUserAccount(prev => ({ ...prev, company: id, company_name: value }))
+                                setUserAccount(prev => ({ ...prev, company_name: value }))
                             }}
                             placeholder="Type or select company"
-                            options={companies}
+                            options={companies.map((company, index) => ({ id: index+1, name: company.company }))}
                             required
                         />
 

@@ -76,6 +76,7 @@ import ViewEventSponsors from '@/pages/admin/event-sponsors/view-event-sponsors'
 import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-sponsor-details';
 import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
 import CreateBadge from '@/pages/admin/all-events/create-badge';
+import Careers from './pages/guest/careers';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -114,6 +115,7 @@ const App: React.FC = () => {
         <Route path="security-and-compilance" element={<SecurityAndCompilance />} />
         <Route path="about-us" element={<AboutUs />} />
         <Route path="event/check-in" element={<CheckInPage />} />
+        <Route path="careers" element={<Careers />} />
         <Route path="features" element={<Features />} />
         <Route path="integrations" element={<Integrations />} />
         <Route path="faq" element={<FAQ />} />
@@ -172,9 +174,9 @@ const App: React.FC = () => {
         {hasFeatureAccess('search_people') && (
           <Route path="search-people" element={<SearchPeople />} />
         )}
-        
+
         <Route path='tutorials' element={<Tutorials />} />
-        
+
         {hasFeatureAccess('vendor') && (
           <Route path="event-sponsors">
             <Route index element={<EventSponsors />} />
@@ -183,7 +185,7 @@ const App: React.FC = () => {
             <Route path=":slug/add-sponsor" element={<AddSponsor />} />
           </Route>
         )}
-        
+
         {hasFeatureAccess('vendor') && (
           <Route path='vendors'>
             <Route index element={<Vendors />} />
@@ -201,7 +203,7 @@ const App: React.FC = () => {
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
         <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />
-          <Route path="create-badge/:slug" element={<CreateBadge />} />
+        <Route path="create-badge/:slug" element={<CreateBadge />} />
 
         {/* Event Related Routes */}
         <Route path="all-events">

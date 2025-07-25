@@ -78,6 +78,8 @@ export interface EventType {
     total_rejected: number;
     total_checkedin: number;
     total_checkedin_speaker: number;
+    total_speaker: number;
+    total_sponsor: number;
     total_checkedin_sponsor: number;
     total_pending_delegate: number;
     break_out: number | string;

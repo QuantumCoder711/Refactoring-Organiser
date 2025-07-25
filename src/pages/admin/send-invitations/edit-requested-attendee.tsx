@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { CircleCheck, CircleX } from "lucide-react";
+import { Check, ChevronDown, CircleCheck, CircleX } from "lucide-react";
 import { toast } from "sonner";
 import GoBack from "@/components/GoBack";
 import Wave from "@/components/Wave";
@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import useExtrasStore from "@/store/extrasStore";
 
 // Simple Input Component with React.memo to prevent unnecessary re-renders
 const CustomInput = React.memo(({ label, id, name, type, value, onChange, required = false, disabled = false }: {
@@ -94,6 +95,136 @@ const CustomSelect = React.memo(({
     </div>
 ));
 
+// Custom Combo Box Component for company names with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                    />
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span className="capitalize">{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <Check className="size-4 text-brand-secondary" />
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No companies found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
 const EditRequestedAttendee: React.FC = () => {
     const { slug, uuid } = useParams<{ slug: string; uuid: string }>();
     const navigate = useNavigate();
@@ -101,6 +232,7 @@ const EditRequestedAttendee: React.FC = () => {
     const event = useEventStore(state => state.getEventBySlug(slug));
     const [loading, setLoading] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const {companies, getCompanies, designations, getDesignations} = useExtrasStore(state=>state);
 
     const [formData, setFormData] = useState({
         first_name: '',
@@ -117,6 +249,11 @@ const EditRequestedAttendee: React.FC = () => {
         managed_by: '',
         remark: '',
     });
+
+    useEffect(()=>{
+        getCompanies(formData.company_name);
+        getDesignations(formData.job_title);
+    }, [formData.company_name, formData.job_title]);
 
     // Load attendee data
     useEffect(() => {
@@ -247,22 +384,24 @@ const EditRequestedAttendee: React.FC = () => {
                     </div>
 
                     <div className="flex gap-3.5 w-full mt-3.5">
-                        <CustomInput
+                        <CustomComboBox
                             label="Job Title"
-                            id="job_title"
-                            name="job_title"
-                            type="text"
                             value={formData.job_title}
-                            onChange={handleInputChange}
+                            onValueChange={(value: string) => {
+                                setFormData(prev => ({ ...prev, job_title: value }))
+                            }}
+                            placeholder="Select Job Title"
+                            options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                             required
                         />
-                        <CustomInput
+                        <CustomComboBox
                             label="Company Name"
-                            id="company_name"
-                            name="company_name"
-                            type="text"
                             value={formData.company_name}
-                            onChange={handleInputChange}
+                            onValueChange={(value: string) => {
+                                setFormData(prev => ({ ...prev, company_name: value }))
+                            }}
+                            placeholder="Select Company"
+                            options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                             required
                         />
                     </div>
