@@ -50,9 +50,9 @@ const Dashboard: React.FC = () => {
             <Link to='/all-events'><Button className='btn'>View All</Button></Link>
           </div>
 
-          <div className='mt-5 flex gap-10'>
+          <div className='mt-5 flex gap-10 overflow-scroll'>
             {upcomingEvents.slice(0, 3).map((event) => (
-              <div key={event.uuid} className='max-w-[405px]'>
+              <div key={event.uuid} className='w-fit'>
                 <EventCard
                   slug={event.slug}
                   title={event.title}
@@ -85,9 +85,9 @@ const Dashboard: React.FC = () => {
             <Link to='/all-events'><Button className='btn'>View All</Button></Link>
           </div>
 
-          <div className='mt-5 flex gap-10'>
+          <div className='mt-5 flex gap-10 overflow-scroll'>
             {pastEvents.slice(0, 3).map((event) => (
-              <div key={event.uuid} className='max-w-[405px]'>
+              <div key={event.uuid} className='w-fit'>
                 <EventCard
                   slug={event.slug}
                   title={event.title}

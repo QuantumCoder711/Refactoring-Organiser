@@ -21,7 +21,7 @@ const AllEvents: React.FC = () => {
   const eventsPerPage = 10; // Adjust as needed
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
-  
+
   pastEvents.sort((a: any, b: any) => {
     return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
   });
@@ -159,18 +159,21 @@ const AllEvents: React.FC = () => {
 
         {paginatedEvents.map((event) => (
           <EventCard
-            key={event.uuid}
+            slug={event.slug}
             title={event.title}
             location={event.event_venue_address_2}
-            date={event.event_date}
+            date={event.event_start_date}
             image={getImageUrl(event.image)}
             imageAlt={event.title}
             isLive={isEventLive(event)}
-            slug={event.slug}
+            isUpcoming={true}
+            isPast={false}
             id={event.id}
             uuid={event.uuid}
             total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
+            total_speaker={event.total_speaker}
+            total_sponsor={event.total_sponsor}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
             total_checked_in={event.total_checkedin}
@@ -183,17 +186,21 @@ const AllEvents: React.FC = () => {
       {activeTab === 'past' && <div className='mt-5 flex flex-wrap gap-6'>
         {paginatedEvents.map((event) => (
           <EventCard
-            key={event.uuid}
+            slug={event.slug}
             title={event.title}
             location={event.event_venue_address_2}
-            date={event.event_date}
+            date={event.event_start_date}
             image={getImageUrl(event.image)}
             imageAlt={event.title}
-            slug={event.slug}
+            isLive={isEventLive(event)}
+            isUpcoming={false}
+            isPast={true}
             id={event.id}
             uuid={event.uuid}
             total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
+            total_speaker={event.total_speaker}
+            total_sponsor={event.total_sponsor}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
             total_checked_in={event.total_checkedin}

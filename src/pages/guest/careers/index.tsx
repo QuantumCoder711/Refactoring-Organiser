@@ -156,7 +156,7 @@ const Careers: React.FC = () => {
                                 text: "First Event Hosted"
                             },
                             {
-                                heading: "1000+",
+                                heading: "100+",
                                 text: "Event Held"
                             },
                             {

@@ -470,7 +470,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </div>
 
                     {/* Upcoming Tag */}
-                    <div hidden={!isUpcoming} className='max-w-fit absolute overflow-hidden'>
+                    <div hidden={!isUpcoming || isLive} className='max-w-fit absolute overflow-hidden'>
                         <svg width="127" height="56" viewBox="0 0 127 56" className='-ml-[1px] -mt-[1px]' fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.00192035 14.0015C-0.0051926 21.5009 0.00974393 54.0001 0.00974393 54.0001L0.00974945 55.9744C0.0170754 47.4855 7.32604 42.0023 14.613 42.0023C20.1505 41.9987 81.8316 41.9987 94.7029 41.9987H95.8025C103.92 41.9987 112.443 36.3214 112.465 24.0029C112.467 22.9993 112.468 17.5067 112.465 14.0033C112.458 3.26056 122.308 -0.00311438 127 0.00048524C119.185 -0.000766513 20.8516 0.000431773 14.613 0.00375349C6.79837 0.000431773 -0.0053073 5.99843 0.00192035 14.0015Z" fill="#D9D9D9" />
                         </svg>
