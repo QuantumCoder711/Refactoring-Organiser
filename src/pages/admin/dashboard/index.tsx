@@ -8,9 +8,9 @@ import { filterEvents, getImageUrl, isEventLive } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
-  const { events } = useEventStore(state=>state);
-  const { allEventsAttendees } = useAttendeeStore(state=>state);
-  const { allEventsSponsors } = useSponsorStore(state=>state);
+  const { events } = useEventStore(state => state);
+  const { allEventsAttendees } = useAttendeeStore(state => state);
+  const { allEventsSponsors } = useSponsorStore(state => state);
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
   pastEvents.sort((a: any, b: any) => {
@@ -61,10 +61,14 @@ const Dashboard: React.FC = () => {
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
                   isLive={isEventLive(event)}
+                  isUpcoming={true}
+                  isPast={false}
                   id={event.id}
                   uuid={event.uuid}
                   total_attendees={event.total_attendee || 0}
                   total_checkedin_speaker={event.total_checkedin_speaker}
+                  total_speaker={event.total_speaker}
+                  total_sponsor={event.total_sponsor}
                   total_checkedin_sponsor={event.total_checkedin_sponsor}
                   total_pending_delegate={event.total_pending_delegate}
                   total_checked_in={event.total_checkedin}
@@ -92,10 +96,14 @@ const Dashboard: React.FC = () => {
                   image={getImageUrl(event.image)}
                   imageAlt={event.title}
                   isLive={isEventLive(event)}
+                  isUpcoming={false}
+                  isPast={true}
                   id={event.id}
                   uuid={event.uuid}
                   total_attendees={event.total_attendee || 0}
                   total_checkedin_speaker={event.total_checkedin_speaker}
+                  total_speaker={event.total_speaker}
+                  total_sponsor={event.total_sponsor}
                   total_checkedin_sponsor={event.total_checkedin_sponsor}
                   total_pending_delegate={event.total_pending_delegate}
                   total_checked_in={event.total_checkedin}
