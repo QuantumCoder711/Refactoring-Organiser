@@ -19,7 +19,7 @@ const EventSponsors: React.FC = () => {
                             <div className='relative h-48'>
                                 <img src={getImageUrl(event.image)} alt={event.title} className='rounded-2xl h-full w-full object-cover' />
                                 {/* Overlay */}
-                                <div className='absolute h-1/2 bottom-0 w-full bg-gradient-to-b from-black/0 via-black/40 to-black'>
+                                <div className='absolute h-1/2 bottom-0 w-full bg-gradient-to-b from-black/0 rounded-xl via-black/40 to-black'>
                                 <div className='border border-white rounded-full px-4 absolute bottom-2 left-2 text-white py-1 max-w-fit text-xs'>
                                     {formatDateTime(event.event_start_date)}
                                 </div>

@@ -1,4 +1,4 @@
-import { LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
+import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
@@ -19,11 +19,11 @@ export const sidebarItems = [
         icon: Users,
         path: "/all-attendees",
     },
-    // {
-    //     label: "Event Sponsors",
-    //     icon: HandHeart,
-    //     path: "/event-sponsors",
-    // },
+    {
+        label: "Event Sponsors",
+        icon: HandHeart,
+        path: "/event-sponsors",
+    },
     {
         label: "All Reports",
         icon: NotebookPen,
@@ -76,3 +76,4 @@ export const googleMapsApiKey: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 export const token: string | null = JSON.parse(localStorage.getItem("klout-organiser-storage") || '{}')?.state?.token || null;
 export const additionalDomain: string = import.meta.env.VITE_ADDITIONAL_URL;
 export const photoBucketUrl: string = import.meta.env.VITE_PHOTO_BUCKET_URL;
+export const sponsorPdfBucketUrl: string = import.meta.env.VITE_SPONSOR_PDF_BUCKET_URL;

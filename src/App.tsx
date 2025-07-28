@@ -177,14 +177,14 @@ const App: React.FC = () => {
 
         <Route path='tutorials' element={<Tutorials />} />
 
-        {hasFeatureAccess('vendor') && (
-          <Route path="event-sponsors">
-            <Route index element={<EventSponsors />} />
-            <Route path=":slug" element={<ViewEventSponsors />} />
-            <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
-            <Route path=":slug/add-sponsor" element={<AddSponsor />} />
-          </Route>
-        )}
+        {/* {hasFeatureAccess('vendor') && (
+        )} */}
+        <Route path="event-sponsors">
+          <Route index element={<EventSponsors />} />
+          <Route path=":slug" element={<ViewEventSponsors />} />
+          <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
+          <Route path=":slug/add-sponsor" element={<AddSponsor />} />
+        </Route>
 
         {hasFeatureAccess('vendor') && (
           <Route path='vendors'>
