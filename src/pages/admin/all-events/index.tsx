@@ -161,7 +161,7 @@ const AllEvents: React.FC = () => {
           <EventCard
             slug={event.slug}
             title={event.title}
-            location={event.event_venue_address_2}
+            location={event.city}
             date={event.event_start_date}
             image={getImageUrl(event.image)}
             imageAlt={event.title}
@@ -172,8 +172,8 @@ const AllEvents: React.FC = () => {
             uuid={event.uuid}
             total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
-            total_speaker={event.total_speaker}
-            total_sponsor={event.total_sponsor}
+            total_speaker={event.total_speaker || 0}
+            total_sponsor={event.total_sponsor || 0}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
             total_checked_in={event.total_checkedin}
@@ -188,7 +188,7 @@ const AllEvents: React.FC = () => {
           <EventCard
             slug={event.slug}
             title={event.title}
-            location={event.event_venue_address_2}
+            location={event.city}
             date={event.event_start_date}
             image={getImageUrl(event.image)}
             imageAlt={event.title}
@@ -199,8 +199,8 @@ const AllEvents: React.FC = () => {
             uuid={event.uuid}
             total_attendees={event.total_attendee || 0}
             total_checkedin_speaker={event.total_checkedin_speaker}
-            total_speaker={event.total_speaker}
-            total_sponsor={event.total_sponsor}
+            total_speaker={event.total_speaker || 0}
+            total_sponsor={event.total_sponsor || 0}
             total_checkedin_sponsor={event.total_checkedin_sponsor}
             total_pending_delegate={event.total_pending_delegate}
             total_checked_in={event.total_checkedin}
