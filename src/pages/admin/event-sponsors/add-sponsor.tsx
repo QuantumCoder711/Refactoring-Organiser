@@ -10,9 +10,13 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import { domain } from '@/constants';
 import useAuthStore from '@/store/authStore';
+import { useParams } from 'react-router-dom';
+import useEventStore from '@/store/eventStore';
 
 const AddSponsor: React.FC = () => {
-
+    const { slug } = useParams<{ slug: string | undefined }>();
+    console.log(slug);
+    const event = useEventStore(state => state).getEventBySlug(slug);
     const [bulkFile, setBulkFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState<number>(0);
     const [formData, setFormData] = useState({
@@ -73,7 +77,7 @@ const AddSponsor: React.FC = () => {
         }
 
         const form = new FormData();
-        form.append('event_id', '550');
+        form.append('event_id', String(event?.id));
         form.append('company_logo', formData.company_logo);
         form.append('company_name', formData.company_name);
         form.append('about_company', formData.about_company);
@@ -85,7 +89,7 @@ const AddSponsor: React.FC = () => {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
-                }, 
+                },
                 onUploadProgress: (progressEvent) => {
                     const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent?.total || 1));
                     setUploading(percentCompleted);
