@@ -18,3 +18,12 @@ export const getAllDesignations = async (search?: string) => {
         throw error;
     }
 }
+
+// Adding Non-Existing Company In Database
+export const addCompany = async (company: string) => {
+    axios.post(`${appDomain}/api/mapping/v1/company-master/add-unmapped-or-new-company`, { company: company.toLowerCase() }, {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+}
