@@ -5,10 +5,22 @@ import { domain, token } from '@/constants';
 import { getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import axios from 'axios';
-import { CircleX } from 'lucide-react';
+import { CircleCheck, CircleX, Edit, Trash } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface EventSponsor {
     id: number;
@@ -17,17 +29,65 @@ interface EventSponsor {
     company_logo: string;
 }
 
-const Card: React.FC<{ image: string | null, title: string, id: string }> = ({ image, title, id }) => {
+const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ image, title, id }) => {
     const { slug } = useParams<{ slug: string }>();
+
+    const handleDeleteSponsor = async (id: number) => {
+        const response = await axios.delete(`${domain}/api/delete-sponsor/${id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (response.data.success) {
+            toast(response.data.message || 'Sponsor Deleted Successfully', {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+        } else {
+            toast(response.data.message || 'Failed To Delete Sponsor', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        }
+        
+    }
+
     return (
         <div className='w-52 h-52 bg-brand-background flex justify-between flex-col rounded-lg p-4 shadow'>
             <div className='h-24 w-full grid place-content-center overflow-clip bg-white rounded-2xl'>
                 <img className='w-full h-full object-contain' src={getImageUrl(image)} alt={title} />
             </div>
             <h3 className='font-bold text-center capitalize'>{title}</h3>
-            <Link to={`/event-sponsors/${slug}/${id}`}>
-                <Button className='btn !rounded-full !w-full font-bold'>View Sponsor</Button>
-            </Link>
+            <div className='flex justify-between gap-2'>
+                <Link to={`/event-sponsors/${slug}/${id}`} className='w-full'>
+                    <Button className='btn !rounded-full !w-full font-bold'>View</Button>
+                </Link>
+
+                <Link to={`#`} className='p-2 bg-brand-primary hover:bg-brand-primary-dark duration-300 rounded-full text-white'>
+                    <Edit size={16} />
+                </Link>
+
+                <AlertDialog>
+                    <AlertDialogTrigger
+                        className='grid place-content-center text-white w-8 h-8 min-w-8 min-h-8 bg-brand-secondary hover:bg-brand-secondary/80 duration-300 cursor-pointer rounded-full z-50 top-2 right-2'
+                    >
+                        <Trash size={16} />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Do you really want to delete {title} ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete {title}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                            <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => handleDeleteSponsor(id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </div>
         </div>
     )
 }
@@ -74,7 +134,7 @@ const ViewEventSponsors: React.FC = () => {
                             key={sponsor.id}
                             image={sponsor.company_logo}
                             title={sponsor.company_name}
-                            id={sponsor.id.toString()}
+                            id={sponsor.id}
                         />
                     ))
                 }

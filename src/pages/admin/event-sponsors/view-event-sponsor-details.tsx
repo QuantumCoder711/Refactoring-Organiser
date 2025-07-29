@@ -26,7 +26,7 @@ interface SponsorDetails {
     company_logo: string;
     about_company: string;
     video_link: string;
-    upload_deck: string;
+    upload_deck: string[];
     attendees: EventSponsorAttendee[] | [];
 }
 
@@ -132,8 +132,8 @@ const ViewEventSponsorDetails: React.FC = () => {
                 )} */}
 
                 {data?.upload_deck && (
-                    <div className="h-60 w-full rounded-xl">
-                        <DocumentRenderer />
+                    <div className="w-full rounded-xl mt-10">
+                        <DocumentRenderer filePaths={data.upload_deck}/>
                     </div>
                 )}
             </div>

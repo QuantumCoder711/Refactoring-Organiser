@@ -191,7 +191,9 @@ const AddSponsor: React.FC = () => {
         accept: {
             'application/pdf': ['.pdf'],
             'application/vnd.ms-powerpoint': ['.ppt'],
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx']
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
+            'application/msword': ['.doc'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
         },
         multiple: false
     });
