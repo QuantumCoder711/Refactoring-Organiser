@@ -1,3 +1,4 @@
+import DocumentRenderer from "@/components/DocumentRenderer";
 import GoBack from "@/components/GoBack";
 import Wave from "@/components/Wave";
 import { domain, sponsorPdfBucketUrl, token } from "@/constants";
@@ -118,7 +119,7 @@ const ViewEventSponsorDetails: React.FC = () => {
                 )}
 
                 {/* Pdf */}
-                {data?.upload_deck && (
+                {/* {data?.upload_deck && (
                     <div className="w-full h-96 mt-10">
                         <iframe
                             src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(`${sponsorPdfBucketUrl}/${data.upload_deck}`)}`}
@@ -127,6 +128,12 @@ const ViewEventSponsorDetails: React.FC = () => {
                             height="100%"
                         />
 
+                    </div>
+                )} */}
+
+                {data?.upload_deck && (
+                    <div className="h-60 w-full rounded-xl">
+                        <DocumentRenderer />
                     </div>
                 )}
             </div>

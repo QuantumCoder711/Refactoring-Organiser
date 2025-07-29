@@ -2,20 +2,161 @@ import GoBack from '@/components/GoBack';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { FileUp, CircleX, FileText, CircleCheck } from 'lucide-react';
+import { FileUp, CircleX, FileText, CircleCheck, ChevronDown, Check } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import { domain } from '@/constants';
 import useAuthStore from '@/store/authStore';
 import { useParams } from 'react-router-dom';
 import useEventStore from '@/store/eventStore';
+import useExtrasStore from '@/store/extrasStore';
+
+// Custom Combo Box Component for company names with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false,
+    setFormData
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string; about: string }[];
+    required?: boolean;
+    setFormData: React.Dispatch<React.SetStateAction<{
+        company_logo: File | null;
+        company_name: string;
+        about_company: string;
+        video_link: string;
+        upload_deck: File | null;
+    }>>;
+
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string; about: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        console.log(option);
+        setFormData(prev => ({ ...prev, about_company: option.about }));
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex flex-col gap-2" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="input capitalize !h-12 min-w-full text-base pr-10"
+                    />
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 capitalize cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span>{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <Check className="size-4 text-brand-secondary" />
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No companies found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
 
 const AddSponsor: React.FC = () => {
     const { slug } = useParams<{ slug: string | undefined }>();
-    console.log(slug);
     const event = useEventStore(state => state).getEventBySlug(slug);
     const [bulkFile, setBulkFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState<number>(0);
@@ -26,6 +167,8 @@ const AddSponsor: React.FC = () => {
         video_link: '',
         upload_deck: bulkFile,
     });
+
+    const { companies, getCompanies } = useExtrasStore(state => state);
 
     const { token } = useAuthStore(state => state);
 
@@ -66,6 +209,9 @@ const AddSponsor: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        getCompanies(formData.company_name);
+    }, [formData.company_name]);
 
     const handleSubmit = async () => {
         if (!formData.company_logo || !formData.company_name || !formData.about_company) {
@@ -155,14 +301,20 @@ const AddSponsor: React.FC = () => {
 
                 {/* Company Name */}
                 <div className="flex flex-col gap-2 w-full">
-                    <Label className="font-semibold" htmlFor='company_name'>
-                        Company Name <span className='text-brand-secondary'>*</span>
-                    </Label>
-                    <Input
-                        id='company_name'
-                        name='company_name'
-                        onChange={(e) => handleFormChange(e)}
-                        className='input min-w-full text-base'
+                    <CustomComboBox
+                        label="Company Name"
+                        value={formData.company_name}
+                        onValueChange={(value: string) => setFormData(prev => ({ ...prev, company_name: value }))}
+                        placeholder="Type or select company"
+                        options={companies.map((company, index) => ({ id: index + 1, name: company.company, about: company.overview }))}
+                        required
+                        setFormData={setFormData as React.Dispatch<React.SetStateAction<{
+                            company_logo: File | null;
+                            company_name: string;
+                            about_company: string;
+                            video_link: string;
+                            upload_deck: File | null;
+                        }>>}
                     />
                 </div>
 
@@ -174,9 +326,11 @@ const AddSponsor: React.FC = () => {
                     <Textarea
                         id='about_company'
                         name='about_company'
+                        value={formData.about_company}
                         onChange={(e) => handleFormChange(e)}
-                        className='input min-w-full !h-32 text-base'
+                        className='input min-w-full !h-60 text-base'
                     />
+
                 </div>
 
                 {/* Video Link */}

@@ -186,6 +186,7 @@ export interface CompanyType {
     company: string;
     companySize: string;
     headquarters: string;
+    overview: string;
     companyLogo: string;
 }
 //New Interface
