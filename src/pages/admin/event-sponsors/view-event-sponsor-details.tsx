@@ -1,7 +1,7 @@
 import DocumentRenderer from "@/components/DocumentRenderer";
 import GoBack from "@/components/GoBack";
 import Wave from "@/components/Wave";
-import { domain, sponsorPdfBucketUrl, token } from "@/constants";
+import { domain, token } from "@/constants";
 import { getImageUrl } from "@/lib/utils";
 import axios from "axios";
 import { CircleCheck, CircleX } from "lucide-react";
