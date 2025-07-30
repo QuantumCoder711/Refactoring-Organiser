@@ -19,6 +19,7 @@ export interface UserType {
     company_name: string;
     designation_name: string;
     deleted_at: string | null;
+    role: "user" | "admin";
     wallet_balance: number;
     feature_permission: {
         id: number;
@@ -27,7 +28,7 @@ export interface UserType {
         search_people: 0 | 1;
         vendor: 0 | 1;
         wallet: 0 | 1;
-    }
+    };
 }
 
 export interface EventType {

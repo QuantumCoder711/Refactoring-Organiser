@@ -1,15 +1,18 @@
+import React from 'react';
 import { appDomain, domain } from '@/constants';
 import { EventType } from '@/types';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
-import { CircleCheck, CircleX } from 'lucide-react';
+import { CircleCheck, CircleX, ChevronDown, Check } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Wave from '@/components/Wave';
+import useExtrasStore from '@/store/extrasStore';
+import { useEffect as useExtrasEffect } from 'react';
 
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 
@@ -18,6 +21,136 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
+
+// Custom Combo Box Component for company names with filtering and creation
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false
+}: {
+    label: string;
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter options based on search term
+    const filteredOptions = options.filter(option =>
+        option.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Handle input change
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setInputValue(newValue);
+        setSearchTerm(newValue);
+        setIsOpen(true);
+        onValueChange(newValue);
+    };
+
+    // Handle option selection
+    const handleOptionSelect = (option: { id: number; name: string }) => {
+        setInputValue(option.name);
+        setSearchTerm('');
+        setIsOpen(false);
+        onValueChange(option.name);
+        inputRef.current?.blur();
+    };
+
+    // Handle creating new option
+    const handleCreateNew = () => {
+        setInputValue(searchTerm);
+        setIsOpen(false);
+        onValueChange(searchTerm);
+        inputRef.current?.blur();
+    };
+
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+                setSearchTerm('');
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Update input value when value prop changes
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    return (
+        <div className="flex flex-col gap-2" ref={dropdownRef}>
+            <Label className="font-semibold">
+                {label} {required && <span className="text-brand-secondary">*</span>}
+            </Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={() => setIsOpen(true)}
+                        placeholder={placeholder}
+                        className="input capitalize !h-12 min-w-full text-base pr-10"
+                    />
+                    <ChevronDown
+                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        onClick={() => {
+                            setIsOpen(!isOpen);
+                            inputRef.current?.focus();
+                        }}
+                    />
+                </div>
+
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option) => (
+                                <div
+                                    key={option.id}
+                                    className="px-3 py-2 capitalize cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    onClick={() => handleOptionSelect(option)}
+                                >
+                                    <span>{option.name}</span>
+                                    {inputValue === option.name && (
+                                        <Check className="size-4 text-brand-secondary" />
+                                    )}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                onClick={handleCreateNew}
+                            >
+                                Create "{searchTerm}"
+                            </div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">
+                                No companies found
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
 
 const CheckinPage: React.FC = () => {
     const location = useLocation();
@@ -38,6 +171,13 @@ const CheckinPage: React.FC = () => {
         eventName: event?.title || ''
     });
     const [isCheckedIn, setIsCheckedIn] = useState<boolean>(false);
+    const { companies, designations, getCompanies, getDesignations } = useExtrasStore();
+
+    // Fetch companies and designations
+    useExtrasEffect(() => {
+        getCompanies(formData.company);
+        getDesignations(formData.designation);
+    }, [formData.company, formData.designation]);
 
     useEffect(() => {
         // Fetch event details first
@@ -93,7 +233,7 @@ const CheckinPage: React.FC = () => {
     }, [eventUUID, breakoutRoom]);
 
     const sendOTP = async () => {
-        if(!formData.mobile) {
+        if (!formData.mobile) {
             toast("Please enter your mobile number", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
@@ -301,7 +441,7 @@ const CheckinPage: React.FC = () => {
                 ? `${domain}/api/breakout_room_checkin`
                 : `${domain}/api/accept_decline_event_invitation`;
 
-                if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile) {
+            if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile) {
                 toast("Please fill in all required fields", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
@@ -437,7 +577,7 @@ const CheckinPage: React.FC = () => {
                                         id="name"
                                         name="name"
                                         type="text"
-                                        className='input !h-12 min-w-full text-base'
+                                        className='input !h-12 min-w-full text-base capitalize'
                                         value={formData.name}
                                         onChange={handleInputChange}
                                         required
@@ -460,7 +600,7 @@ const CheckinPage: React.FC = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-2 w-full">
-                                    <Label className="font-semibold" htmlFor="designation">
+                                    {/* <Label className="font-semibold" htmlFor="designation">
                                         Job Title/Designation <span className='text-brand-secondary'>*</span>
                                     </Label>
                                     <Input
@@ -468,14 +608,23 @@ const CheckinPage: React.FC = () => {
                                         name="designation"
                                         type="text"
                                         required
-                                        className='input !h-12 min-w-full text-base'
+                                        className='input !h-12 min-w-full text-base capitalize'
                                         value={formData.designation}
                                         onChange={handleInputChange}
+                                    /> */}
+
+                                    <CustomComboBox
+                                        label="Job Title"
+                                        value={formData.designation}
+                                        onValueChange={(value: string) => setFormData(prev => ({ ...prev, designation: value }))}
+                                        placeholder="Type or select job title"
+                                        options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
+                                        required
                                     />
                                 </div>
 
                                 <div className="flex flex-col gap-2 w-full">
-                                    <Label className="font-semibold" htmlFor="company">
+                                    {/* <Label className="font-semibold" htmlFor="company">
                                         Company Name <span className="text-brand-secondary">*</span>
                                     </Label>
                                     <Input
@@ -483,9 +632,17 @@ const CheckinPage: React.FC = () => {
                                         name="company"
                                         type="text"
                                         required
-                                        className='input !h-12 min-w-full text-base'
+                                        className='input !h-12 min-w-full text-base capitalize'
                                         value={formData.company}
                                         onChange={handleInputChange}
+                                    /> */}
+                                    <CustomComboBox
+                                        label="Company Name"
+                                        value={formData.company}
+                                        onValueChange={(value: string) => setFormData(prev => ({ ...prev, company: value }))}
+                                        placeholder="Type or select company"
+                                        options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
+                                        required
                                     />
                                 </div>
 

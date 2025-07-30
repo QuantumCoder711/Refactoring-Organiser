@@ -77,6 +77,7 @@ import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-spo
 import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
 import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from './pages/guest/careers';
+import AddSubuser from './pages/admin/sub-users/add-subuser';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -173,6 +174,10 @@ const App: React.FC = () => {
         <Route path="all-reports" element={<AllReports />} />
         {hasFeatureAccess('search_people') && (
           <Route path="search-people" element={<SearchPeople />} />
+        )}
+
+        {user?.role === 'admin' && (
+          <Route path="add-subuser" element={<AddSubuser />} />
         )}
 
         <Route path='tutorials' element={<Tutorials />} />

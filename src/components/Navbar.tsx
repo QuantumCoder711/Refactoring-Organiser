@@ -264,6 +264,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
                   </Link>
+                  {user?.role === 'admin' && <Link to="/add-subuser">
+                    <DropdownMenuItem className='cursor-pointer'>Add Sub-User</DropdownMenuItem>
+                  </Link>}
                   <Link to="/organiser/change-password">
                     <DropdownMenuItem className='cursor-pointer'>Change Password</DropdownMenuItem>
                   </Link>
