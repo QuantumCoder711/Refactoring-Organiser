@@ -31,7 +31,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { AlignRight } from 'lucide-react';
+import { AlignRight, Plus, Search } from 'lucide-react';
 
 interface ProgressRingProps {
   percentage: number;
@@ -196,12 +196,12 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <ul className='flex gap-5 items-center'>
             {user?.feature_permission?.search_people === 1 && !pathname.includes("/search-people") && <li>
               <Link to={`/search-people`}>
-                <Button className='btn-rounded !px-3'>Search People</Button>
+                <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark'><Search size={16}/> Search People</Button>
               </Link>
             </li>}
             <li>
               <Link to={"/add-event"}>
-                <Button className='btn-rounded !px-3'>Create New Event</Button>
+                <Button className='btn-rounded !px-3 !h-8'><Plus size={16}/> Create New Event</Button>
               </Link>
             </li>
 
