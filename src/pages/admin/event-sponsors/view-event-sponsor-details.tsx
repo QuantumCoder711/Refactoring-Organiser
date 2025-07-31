@@ -1,12 +1,12 @@
 import DocumentRenderer from "@/components/DocumentRenderer";
 import GoBack from "@/components/GoBack";
 import Wave from "@/components/Wave";
-import { domain, sidebarItems, token } from "@/constants";
+import { domain, token } from "@/constants";
 import { getImageUrl } from "@/lib/utils";
 import axios from "axios";
 import { CircleCheck, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 interface EventSponsorAttendee {
@@ -34,9 +34,6 @@ const ViewEventSponsorDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState<boolean>(false);
     const [data, setData] = useState<SponsorDetails | null>(null);
-    const location = useLocation();
-    const { pathname } = location;
-    const [heading, setHeading] = useState<string>('');
 
     useEffect(() => {
         if (!id) return;
@@ -64,34 +61,15 @@ const ViewEventSponsorDetails: React.FC = () => {
         });
     }, [id]);
 
-    useEffect(() => {
-        const label = sidebarItems.find(item => item.path === pathname)?.label;
-        const segments = pathname.split('/');
-        if (segments.length === 2) {
-            setHeading(label || pathname.split('/')[pathname.split('/').length - 1]
-                .split('-')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-            );
-
-        } else {
-            setHeading(label || pathname.split('/')[pathname.split('/').length - 2]
-                .split('-')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ')
-            );
-        }
-    }, [location.pathname]);
-
     if (loading) {
         return <Wave />
     }
 
     return (
         <div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-5">
                 <GoBack />
-                <h2 className="text-xl font-semibold">{heading}</h2>
+                <h2 className="text-xl font-semibold capitalize">{data?.company_name}</h2>
             </div>
 
             <div className="max-w-2xl mx-auto p-5 bg-brand-background mt-5 rounded-2xl">

@@ -261,9 +261,9 @@ const AddSponsor: React.FC = () => {
 
     return (
         <div>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-5'>
                 <GoBack />
-                <h1 className='text-xl font-semibold'>Add Sponsor</h1>
+                <h1 className='text-xl font-semibold'>{event?.title}</h1>
             </div>
 
             <div className='mt-5 max-w-2xl flex flex-col gap-5 mx-auto bg-brand-background p-5 rounded-xl'>

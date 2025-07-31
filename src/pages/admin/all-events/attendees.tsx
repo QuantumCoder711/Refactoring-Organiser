@@ -1046,7 +1046,7 @@ const Attendees: React.FC = () => {
                   </Dialog>
 
                   {/* Edit Event */}
-                  <Link to={`/all-events/edit-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} className='size-4' /></Link>
+                  <Link to={`/all-events/${slug}/edit-attendee/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} className='size-4' /></Link>
 
                   {/* Custom Check-In User */}
                   {isEventLive(event) && <AlertDialog>

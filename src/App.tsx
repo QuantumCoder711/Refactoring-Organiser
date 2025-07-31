@@ -187,8 +187,8 @@ const App: React.FC = () => {
         <Route path="event-sponsors">
           <Route index element={<EventSponsors />} />
           <Route path=":slug" element={<ViewEventSponsors />} />
-          <Route path=":slug/:id" element={<ViewEventSponsorDetails />} />
-          <Route path=":slug/add-sponsor" element={<AddSponsor />} />
+          <Route path=":slug/sponsor-details/:id" element={<ViewEventSponsorDetails />} />
+          <Route path="add-sponsor/:slug" element={<AddSponsor />} />
         </Route>
 
         {hasFeatureAccess('vendor') && (
@@ -207,7 +207,7 @@ const App: React.FC = () => {
         <Route path="update-profile" element={<UpdateProfile />} />
         <Route path="all-agendas/:slug" element={<AllAgendas />} />
         <Route path="add-agenda/:slug" element={<AddAgenda />} />
-        <Route path="edit-agenda/:slug/:id" element={<EditAgenda />} />
+        <Route path="all-agendas/:slug/edit-agenda/:id" element={<EditAgenda />} />
         <Route path="create-badge/:slug" element={<CreateBadge />} />
 
         {/* Event Related Routes */}
@@ -216,7 +216,7 @@ const App: React.FC = () => {
           <Route path="attendees/:slug" element={<Attendees />} />
           <Route path="update-event/:slug" element={<UpdateEvent />} />
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
-          <Route path="edit-attendee/:slug/:uuid" element={<EditAttendee />} />
+          <Route path=":slug/edit-attendee/:uuid" element={<EditAttendee />} />
           <Route path="send-invitations/:slug" element={<SendInvitations />} />
 
           {/* Message Template Routes */}

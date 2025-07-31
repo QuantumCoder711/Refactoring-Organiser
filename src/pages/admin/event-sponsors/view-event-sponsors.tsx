@@ -50,7 +50,7 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
                 icon: <CircleX className='size-5' />
             });
         }
-        
+
     }
 
     return (
@@ -60,7 +60,7 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
             </div>
             <h3 className='font-bold text-center capitalize'>{title}</h3>
             <div className='flex justify-between gap-2'>
-                <Link to={`/event-sponsors/${slug}/${id}`} className='w-full'>
+                <Link to={`/event-sponsors/${slug}/sponsor-details/${id}`} className='w-full'>
                     <Button className='btn !rounded-full !w-full font-bold'>View</Button>
                 </Link>
 
@@ -125,7 +125,10 @@ const ViewEventSponsors: React.FC = () => {
 
     return (
         <div>
-            <GoBack />
+            <div className="flex items-center gap-5">
+                <GoBack />
+                <h2 className="text-xl font-semibold capitalize">{event?.title}</h2>
+            </div>
 
             <div className='flex gap-5 mt-5 flex-wrap'>
                 {

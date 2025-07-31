@@ -38,7 +38,7 @@ const EventSponsors: React.FC = () => {
                                 <Separator />
                                 <div className='flex justify-center mt-2 gap-2 text-sm'>
                                     <Link to={`/event-sponsors/${event.slug}`} className='bg-white rounded-full px-5 py-1 w-full grid place-content-center text-brand-primary'>View Sponsors</Link>
-                                    <Link to={`/event-sponsors/${event.slug}/add-sponsor`} className='bg-white rounded-full px-5 py-1 w-full grid place-content-center text-brand-primary'>Add Sponsors</Link>
+                                    <Link to={`/event-sponsors/add-sponsor/${event.slug}`} className='bg-white rounded-full px-5 py-1 w-full grid place-content-center text-brand-primary'>Add Sponsors</Link>
                                 </div>
                             </div>
                         </div>
