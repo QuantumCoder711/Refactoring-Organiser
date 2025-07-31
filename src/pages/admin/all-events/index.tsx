@@ -12,12 +12,15 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Input } from '@/components/ui/input';
+import { X } from 'lucide-react';
 
 const AllEvents: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const { events } = useEventStore(state => state);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const eventsPerPage = 10; // Adjust as needed
 
   const { upcomingEvents, pastEvents } = filterEvents(events);
@@ -29,8 +32,11 @@ const AllEvents: React.FC = () => {
   upcomingEvents.sort((a: any, b: any) => {
     return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
   });
-  const currentEvents = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
-  const totalPages = Math.ceil(currentEvents.length / eventsPerPage);
+  const filteredEvents = (activeTab === 'upcoming' ? upcomingEvents : pastEvents).filter(event =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+  const currentEvents = filteredEvents;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -61,7 +67,7 @@ const AllEvents: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <Pagination className='mt-[26px] flex justify-end'>
+        <Pagination className='flex justify-end'>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
@@ -152,6 +158,26 @@ const AllEvents: React.FC = () => {
             </PaginationItem>
           </PaginationContent>
         </Pagination>
+      </div>
+
+
+      {/* Searchbar */}
+      <div className="relative max-w-fit py-5 mx-auto">
+        <Input
+          type="text"
+          placeholder="Search for events..."
+          className="input !min-w-80 !text-base !bg-brand-background/80"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Reset to first page when searching
+          }}
+        />
+        {searchTerm && (
+          <X
+            onClick={() => setSearchTerm('')}
+            className="w-4 h-4 absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" />
+        )}
       </div>
 
       {/* Upcoming Events */}
