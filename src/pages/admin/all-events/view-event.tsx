@@ -24,6 +24,7 @@ import useAgendaStore from '@/store/agendaStore';
 import Wave from '@/components/Wave';
 import { useLoadScript } from '@react-google-maps/api';
 import GoBack from '@/components/GoBack';
+import { Helmet } from 'react-helmet';
 
 const createQRCode = (uuid: string | undefined, break_out: number | undefined): string => {
     return `https://kloutclub.page.link/?link=${encodeURIComponent(
@@ -217,28 +218,85 @@ const ViewEvent: React.FC = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-brand-foreground text-black'>
-            <div className='sticky top-0 z-50 bg-brand-foreground'>
-                <GoBack />
-            </div>
-            <div className='max-w-2xl mx-auto bg-brand-background rounded-lg px-4 py-8'>
-                <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
-                <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-
-                {/* Time */}
-                <div className='text-xs flex gap-2.5 mt-5 justify-center'>
-                    {event && (
-                        <>
-                            <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).dateRange}</span>
-                            <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).timeRange}</span>
-                        </>
-                    )}
+        <React.Fragment>
+            <Helmet>
+                <title>{event?.title}</title>
+            </Helmet>
+            <div className='w-full min-h-screen bg-brand-foreground text-black'>
+                <div className='sticky top-0 z-50 bg-brand-foreground'>
+                    <GoBack />
                 </div>
+                <div className='max-w-2xl mx-auto bg-brand-background rounded-lg px-4 py-8'>
+                    <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
+                    <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
 
-                <div className='flex flex-col gap-3 justify-center items-center'>
-                    {isLive && (
-                        <React.Fragment>
-                            <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                    {/* Time */}
+                    <div className='text-xs flex gap-2.5 mt-5 justify-center'>
+                        {event && (
+                            <>
+                                <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).dateRange}</span>
+                                <span className='border border-brand-light-gray px-3 rounded-md'>{formatEventDateTime(event).timeRange}</span>
+                            </>
+                        )}
+                    </div>
+
+                    <div className='flex flex-col gap-3 justify-center items-center'>
+                        {isLive && (
+                            <React.Fragment>
+                                <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button className='btn-rounded h-6'>View QR Code</Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                                <DialogDescription className="text-center">
+                                                    <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
+                                                    <Button
+                                                        onClick={() => handleDownload(event?.qr_code)}
+                                                        className='btn mx-auto mt-6'
+                                                        disabled={isDownloading}
+                                                    >
+                                                        {isDownloading ? 'Downloading...' : 'Download'}
+                                                    </Button>
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                        </DialogContent>
+                                    </Dialog>
+                                    <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                                </div>
+                                {/* For breakout rooms */}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button className='btn-rounded h-6'>Breakout QR Code</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
+                                        <DialogHeader>
+                                            <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                            <DialogDescription className="text-center grid grid-cols-5 gap-7">
+                                                {
+                                                    Array.from({ length: Number(event?.break_out) }, (_, index) => (
+                                                        // <img
+                                                        //     key={index}
+                                                        //     className='w-[100px] h-[100px] rounded-lg'
+                                                        //     alt="QR Code"
+                                                        //     src={createQRCode(event?.uuid, index + 1)}
+                                                        // />
+                                                        <div className='flex flex-col gap-3'>
+                                                            <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
+                                                            <p>Breakout : {index + 1}</p>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
+                            </React.Fragment>
+                        )}
+                        {(isUpcoming && !isLive) && (
+                            <div className='col-span-2 gap-3 flex justify-center'>
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <Button className='btn-rounded h-6'>View QR Code</Button>
@@ -259,197 +317,145 @@ const ViewEvent: React.FC = () => {
                                         </DialogHeader>
                                     </DialogContent>
                                 </Dialog>
-                                <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+
+                                {/* For breakout rooms */}
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button className='btn-rounded h-6'>Breakout QR Code</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
+                                        <DialogHeader>
+                                            <DialogTitle className='text-center'>{event?.title}</DialogTitle>
+                                            <DialogDescription className="text-center grid grid-cols-5 gap-7">
+                                                {
+                                                    Array.from({ length: Number(event?.break_out) }, (_, index) => (
+                                                        // <img
+                                                        //     key={index}
+                                                        //     className='w-[100px] h-[100px] rounded-lg'
+                                                        //     alt="QR Code"
+                                                        //     src={createQRCode(event?.uuid, index + 1)}
+                                                        // />
+
+                                                        <div className='flex flex-col gap-3'>
+                                                            <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
+                                                            <p>Breakout : {index + 1}</p>
+                                                            <Button
+                                                                onClick={() => handleDownload(createQRCode(event?.uuid, index + 1))}
+                                                                className='btn mx-auto mt-2'
+                                                                disabled={isDownloading}
+                                                            >
+                                                                {isDownloading ? 'Downloading...' : 'Download'}
+                                                            </Button>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
-                            {/* For breakout rooms */}
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button className='btn-rounded h-6'>Breakout QR Code</Button>
-                                </DialogTrigger>
-                                <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
-                                    <DialogHeader>
-                                        <DialogTitle className='text-center'>{event?.title}</DialogTitle>
-                                        <DialogDescription className="text-center grid grid-cols-5 gap-7">
-                                            {
-                                                Array.from({ length: Number(event?.break_out) }, (_, index) => (
-                                                    // <img
-                                                    //     key={index}
-                                                    //     className='w-[100px] h-[100px] rounded-lg'
-                                                    //     alt="QR Code"
-                                                    //     src={createQRCode(event?.uuid, index + 1)}
-                                                    // />
-                                                    <div className='flex flex-col gap-3'>
-                                                        <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
-                                                        <p>Breakout : {index + 1}</p>
-                                                    </div>
-                                                ))
-                                            }
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                </DialogContent>
-                            </Dialog>
-                        </React.Fragment>
-                    )}
-                    {(isUpcoming && !isLive) && (
-                        <div className='col-span-2 gap-3 flex justify-center'>
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button className='btn-rounded h-6'>View QR Code</Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle className='text-center'>{event?.title}</DialogTitle>
-                                        <DialogDescription className="text-center">
-                                            <img src={getImageUrl(event?.qr_code)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
-                                            <Button
-                                                onClick={() => handleDownload(event?.qr_code)}
-                                                className='btn mx-auto mt-6'
-                                                disabled={isDownloading}
-                                            >
-                                                {isDownloading ? 'Downloading...' : 'Download'}
-                                            </Button>
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                </DialogContent>
-                            </Dialog>
+                        )}
+                    </div>
 
-                            {/* For breakout rooms */}
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button className='btn-rounded h-6'>Breakout QR Code</Button>
-                                </DialogTrigger>
-                                <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
-                                    <DialogHeader>
-                                        <DialogTitle className='text-center'>{event?.title}</DialogTitle>
-                                        <DialogDescription className="text-center grid grid-cols-5 gap-7">
-                                            {
-                                                Array.from({ length: Number(event?.break_out) }, (_, index) => (
-                                                    // <img
-                                                    //     key={index}
-                                                    //     className='w-[100px] h-[100px] rounded-lg'
-                                                    //     alt="QR Code"
-                                                    //     src={createQRCode(event?.uuid, index + 1)}
-                                                    // />
-                                                    
-                                                    <div className='flex flex-col gap-3'>
-                                                        <CreateQRCode key={index + Math.random()} value={createQRCode(event?.uuid, index + 1)} fgColor='#000' className='w-full h-full mx-auto' />
-                                                        <p>Breakout : {index + 1}</p>
-                                                        <Button
-                                                            onClick={() => handleDownload(createQRCode(event?.uuid, index + 1))}
-                                                            className='btn mx-auto mt-2'
-                                                            disabled={isDownloading}
-                                                        >
-                                                            {isDownloading ? 'Downloading...' : 'Download'}
-                                                        </Button>
-                                                    </div>
-                                                ))
-                                            }
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                </DialogContent>
-                            </Dialog>
+                    {/* Description */}
+                    <div className='border-t mt-3 p-5 border-white'>
+                        <h3 className='font-semibold'>Description</h3>
+                        <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
+                    </div>
+
+                    {/* Event OTP & Agenda By */}
+                    <div className='p-5 border-t border-white flex justify-between'>
+                        <div className='w-1/2'>
+                            <h3 className='font-semibold'>Event OTP</h3>
+                            <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
                         </div>
-                    )}
-                </div>
-
-                {/* Description */}
-                <div className='border-t mt-3 p-5 border-white'>
-                    <h3 className='font-semibold'>Description</h3>
-                    <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
-                </div>
-
-                {/* Event OTP & Agenda By */}
-                <div className='p-5 border-t border-white flex justify-between'>
-                    <div className='w-1/2'>
-                        <h3 className='font-semibold'>Event OTP</h3>
-                        <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
-                    </div>
-                    <div className='w-1/2 border-l border-white pl-5'>
-                        <h3 className='font-semibold'>View Agenda By</h3>
-                        <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by == 0 ? "All" : "Checked In"}</p>
-                    </div>
-                </div>
-
-                {/* Event Location */}
-                <div className='p-5 border-t border-white'>
-                    <h3 className='font-semibold'>Location</h3>
-                    <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>{event?.event_venue_name}</p>
-                    <p className='text-sm text-brand-dark-gray'>{event?.event_venue_address_1}</p>
-
-                    {/* Map Component */}
-                    <div className='h-60 mt-3 rounded-lg shadow-blur overflow-hidden'>
-                        <div className='relative w-full h-full'>
-                            <GoogleMap
-                                isLoaded={isLoaded}
-                                latitude={mapCoordinates.lat}
-                                longitude={mapCoordinates.lng}
-                                zoom={15}
-                            />
+                        <div className='w-1/2 border-l border-white pl-5'>
+                            <h3 className='font-semibold'>View Agenda By</h3>
+                            <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by == 0 ? "All" : "Checked In"}</p>
                         </div>
                     </div>
-                </div>
 
-                {/* Content Container */}
-                <div className='mt-4'>
-                    {/* Agenda Details */}
+                    {/* Event Location */}
                     <div className='p-5 border-t border-white'>
-                        <h3 className='font-semibold'>Agenda</h3>
-                        {agendaData.length > 0 ? agendaData.map((agenda) => (
-                            <div key={agenda.id} className='!my-4'>
-                                <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time} {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
-                                <p className='font-light'>{agenda.description}</p>
-                                <div className='flex gap-5 my-3'>
-                                    <div className='grid grid-cols-2 gap-5'>
-                                        {agenda.speakers.map((speaker: any) => (
-                                            <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
-                                                <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
-                                                <div className='space-y-1'>
-                                                    <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
-                                                    <p className='text-sm leading-none'>{speaker.company_name}</p>
-                                                    <p className='text-xs leading-none'>{speaker.job_title}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                        <h3 className='font-semibold'>Location</h3>
+                        <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>{event?.event_venue_name}</p>
+                        <p className='text-sm text-brand-dark-gray'>{event?.event_venue_address_1}</p>
+
+                        {/* Map Component */}
+                        <div className='h-60 mt-3 rounded-lg shadow-blur overflow-hidden'>
+                            <div className='relative w-full h-full'>
+                                <GoogleMap
+                                    isLoaded={isLoaded}
+                                    latitude={mapCoordinates.lat}
+                                    longitude={mapCoordinates.lng}
+                                    zoom={15}
+                                />
                             </div>
-                        )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
-                    </div>
-
-                    {/* Event Speakers */}
-                    <div className='p-5 border-t border-white'>
-                        <h3 className='font-semibold'>Speakers</h3>
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
-                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
-                                <div key={index} className='text-sm text-center space-y-2 max-w-56'>
-                                    <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
-                                    <h4 className='font-semibold leading-none'>{speaker.first_name} {speaker.last_name}</h4>
-                                    <p className='leading-none'>{speaker.company_name}</p>
-                                    <p className='leading-none font-light'>{speaker.job_title}</p>
-                                </div>
-                            )) : <p className='text-brand-gray mb-10'>No speakers available</p>}
                         </div>
                     </div>
 
-                    {/* Jury */}
-                    {allJury.length > 0 && (
+                    {/* Content Container */}
+                    <div className='mt-4'>
+                        {/* Agenda Details */}
                         <div className='p-5 border-t border-white'>
-                            <h3 className='font-semibold'>Jury</h3>
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
-                                {allJury.map((jury, index) => (
-                                    <div key={index} className='text-sm space-y-2 text-center max-w-28 border-2'>
-                                        <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
-                                        <h4 className='font-semibold leading-none'>{jury.first_name} {jury.last_name}</h4>
-                                        <p className='leading-none'>{jury.company_name}</p>
-                                        <p className='leading-none font-light'>{jury.job_title}</p>
+                            <h3 className='font-semibold'>Agenda</h3>
+                            {agendaData.length > 0 ? agendaData.map((agenda) => (
+                                <div key={agenda.id} className='!my-4'>
+                                    <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time} {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                    <p className='font-light'>{agenda.description}</p>
+                                    <div className='flex gap-5 my-3'>
+                                        <div className='grid grid-cols-2 gap-5'>
+                                            {agenda.speakers.map((speaker: any) => (
+                                                <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
+                                                    <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
+                                                    <div className='space-y-1'>
+                                                        <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
+                                                        <p className='text-sm leading-none'>{speaker.company_name}</p>
+                                                        <p className='text-xs leading-none'>{speaker.job_title}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                ))}
+                                </div>
+                            )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                        </div>
+
+                        {/* Event Speakers */}
+                        <div className='p-5 border-t border-white'>
+                            <h3 className='font-semibold'>Speakers</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
+                                {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
+                                    <div key={index} className='text-sm text-center space-y-2 max-w-56'>
+                                        <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
+                                        <h4 className='font-semibold leading-none'>{speaker.first_name} {speaker.last_name}</h4>
+                                        <p className='leading-none'>{speaker.company_name}</p>
+                                        <p className='leading-none font-light'>{speaker.job_title}</p>
+                                    </div>
+                                )) : <p className='text-brand-gray mb-10'>No speakers available</p>}
                             </div>
                         </div>
-                    )}
+
+                        {/* Jury */}
+                        {allJury.length > 0 && (
+                            <div className='p-5 border-t border-white'>
+                                <h3 className='font-semibold'>Jury</h3>
+                                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
+                                    {allJury.map((jury, index) => (
+                                        <div key={index} className='text-sm space-y-2 text-center max-w-28 border-2'>
+                                            <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
+                                            <h4 className='font-semibold leading-none'>{jury.first_name} {jury.last_name}</h4>
+                                            <p className='leading-none'>{jury.company_name}</p>
+                                            <p className='leading-none font-light'>{jury.job_title}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 };
 

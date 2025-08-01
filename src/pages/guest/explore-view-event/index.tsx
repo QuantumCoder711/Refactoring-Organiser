@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import useExtrasStore from '@/store/extrasStore';
+import { Helmet } from 'react-helmet';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -464,277 +465,282 @@ const ExploreViewEvent: React.FC = () => {
     }
 
     return (
-        <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
-            <div
-                dangerouslySetInnerHTML={{ __html: form as unknown as string }}
-                style={{ opacity: 0 }}
-            />
+        <React.Fragment>
+            <Helmet>
+                <title>{currentEvent?.title}</title>
+            </Helmet>
+            <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
+                <div
+                    dangerouslySetInnerHTML={{ __html: form as unknown as string }}
+                    style={{ opacity: 0 }}
+                />
 
-            <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto space-y-4 px-5'>
-                {/* Left Div */}
-                <div className='space-y-4'>
-                    <span className='text-gray-700 text-sm'>By {currentEvent?.title}</span>
+                <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto space-y-4 px-5'>
+                    {/* Left Div */}
+                    <div className='space-y-4'>
+                        <span className='text-gray-700 text-sm'>By {currentEvent?.title}</span>
 
-                    <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='inline-block ml-2 text-white bg-brand-primary text-brand-text font-normal px-2 py-0.5 rounded-full text-xs'>
-                        Paid
-                    </span>}</h1>
+                        <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='inline-block ml-2 text-white bg-brand-primary text-brand-text font-normal px-2 py-0.5 rounded-full text-xs'>
+                            Paid
+                        </span>}</h1>
 
-                    {/* Row for Start Date */}
-                    <div className='flex gap-2'>
-                        <div className='rounded-md grid place-content-center size-10 bg-white'>
-                            <p className='uppercase text-orange-500 font-semibold text-xs text-center'>
-                                {startTime ? new Date(startTime).toLocaleString('en-US', { weekday: 'short' }).toUpperCase() : ''}
-                            </p>
-                            <p className='text-2xl leading-none font-semibold text-brand-gray'>
-                                {startTime ? new Date(startTime).getDate() : ''}
-                            </p>
-                        </div>
-                        <div>
-                            <h4 className='font-semibold'>{formatDateTime(startTime)}</h4>
-                            <p className='text-sm text-brand-gray'>{currentEvent?.start_time}:{currentEvent?.start_minute_time}  {currentEvent?.start_time_type} - {currentEvent?.end_time}:{currentEvent?.end_minute_time} {currentEvent?.end_time_type}</p>
-                        </div>
-                    </div>
-
-                    {/* Row for Location */}
-                    <div className='flex gap-2'>
-                        <a href={currentEvent?.google_map_link} className='flex gap-2'>
-                            <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                <MapPin size={30} className='text-brand-gray' />
-                            </div>
-
-                            <div>
-                                <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
-                                <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
-                            </div>
-                        </a>
-                    </div>
-
-                    {/* Row for Event Fee */}
-                    {currentEvent?.paid_event === 1 && <div className='flex gap-2'>
+                        {/* Row for Start Date */}
                         <div className='flex gap-2'>
                             <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                <IndianRupee size={30} className='text-brand-gray' />
+                                <p className='uppercase text-orange-500 font-semibold text-xs text-center'>
+                                    {startTime ? new Date(startTime).toLocaleString('en-US', { weekday: 'short' }).toUpperCase() : ''}
+                                </p>
+                                <p className='text-2xl leading-none font-semibold text-brand-gray'>
+                                    {startTime ? new Date(startTime).getDate() : ''}
+                                </p>
                             </div>
-
                             <div>
-                                <h4 className='font-semibold flex items-center'>Event Fee</h4>
-                                <p className='text-sm text-brand-primary font-bold'>{currentEvent?.event_fee} /-</p>
+                                <h4 className='font-semibold'>{formatDateTime(startTime)}</h4>
+                                <p className='text-sm text-brand-gray'>{currentEvent?.start_time}:{currentEvent?.start_minute_time}  {currentEvent?.start_time_type} - {currentEvent?.end_time}:{currentEvent?.end_minute_time} {currentEvent?.end_time_type}</p>
                             </div>
                         </div>
-                    </div>}
 
-                    {/* Row for Registration */}
-                    <div className='border border-white rounded-[10px]'>
-                        <p className='text-sm p-[10px]'>
-                            {isEventDatePassed() ?
-                                'Registration Closed' :
-                                'Registration'
-                            }
-                        </p>
-
-                        <div className={`rounded-b-[10px] bg-white ${isEventDatePassed() ? 'opacity-50' : ''}`}>
-                            <div className={`flex gap-2 p-[10px] border-b ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
+                        {/* Row for Location */}
+                        <div className='flex gap-2'>
+                            <a href={currentEvent?.google_map_link} className='flex gap-2'>
                                 <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                    <UserRoundCheck size={30} className='text-brand-gray' />
+                                    <MapPin size={30} className='text-brand-gray' />
                                 </div>
 
-                                <div className=''>
-                                    <h4 className='!font-semibold flex items-center'>Pending Approval</h4>
-                                    <p className='text-sm -mt-1'>Your registration requires approval from the host.</p>
+                                <div>
+                                    <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
+                                    <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
+                                </div>
+                            </a>
+                        </div>
+
+                        {/* Row for Event Fee */}
+                        {currentEvent?.paid_event === 1 && <div className='flex gap-2'>
+                            <div className='flex gap-2'>
+                                <div className='rounded-md grid place-content-center size-10 bg-white'>
+                                    <IndianRupee size={30} className='text-brand-gray' />
+                                </div>
+
+                                <div>
+                                    <h4 className='font-semibold flex items-center'>Event Fee</h4>
+                                    <p className='text-sm text-brand-primary font-bold'>{currentEvent?.event_fee} /-</p>
                                 </div>
                             </div>
+                        </div>}
 
-                            <div className={`p-[10px] ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
-                                <p className='text-sm'>Welcome! Register below to request event access.</p>
-                                <Button disabled={isEventDatePassed()} onClick={() => setOpen(true)} className='w-full mt-[10px] !py-6 text-base hover:bg-brand-primary-dark cursor-pointer duration-300 bg-brand-primary rounded-lg text-white'>
-                                    Get an Invite
-                                </Button>
+                        {/* Row for Registration */}
+                        <div className='border border-white rounded-[10px]'>
+                            <p className='text-sm p-[10px]'>
+                                {isEventDatePassed() ?
+                                    'Registration Closed' :
+                                    'Registration'
+                                }
+                            </p>
+
+                            <div className={`rounded-b-[10px] bg-white ${isEventDatePassed() ? 'opacity-50' : ''}`}>
+                                <div className={`flex gap-2 p-[10px] border-b ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
+                                    <div className='rounded-md grid place-content-center size-10 bg-white'>
+                                        <UserRoundCheck size={30} className='text-brand-gray' />
+                                    </div>
+
+                                    <div className=''>
+                                        <h4 className='!font-semibold flex items-center'>Pending Approval</h4>
+                                        <p className='text-sm -mt-1'>Your registration requires approval from the host.</p>
+                                    </div>
+                                </div>
+
+                                <div className={`p-[10px] ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
+                                    <p className='text-sm'>Welcome! Register below to request event access.</p>
+                                    <Button disabled={isEventDatePassed()} onClick={() => setOpen(true)} className='w-full mt-[10px] !py-6 text-base hover:bg-brand-primary-dark cursor-pointer duration-300 bg-brand-primary rounded-lg text-white'>
+                                        Get an Invite
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Event Details */}
-                    <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Event Details</h3>
-                        <hr className='border-t-2 border-white my-[10px]' />
-                        <p className='text-brand-gray'>{currentEvent?.description}</p>
-                    </div>
-
-                    {/* Speakers */}
-                    <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Speakers</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-                        <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
-                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
-                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
-                                    <img
-                                        src={speaker.image ? domain + "/" + speaker.image : UserAvatar}
-                                        alt="Speaker"
-                                        className='rounded-full mx-auto size-24'
-                                    />
-                                    <p className='font-semibold text-wrap capitalize'>{speaker.first_name + ' ' + speaker.last_name}</p>
-                                    <p className='text-wrap text-sm capitalize'>{speaker.job_title}</p>
-                                    <p className='text-sm font-bold text-wrap capitalize'>{speaker.company_name}</p>
-                                </div>
-                            )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                        {/* Event Details */}
+                        <div className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Event Details</h3>
+                            <hr className='border-t-2 border-white my-[10px]' />
+                            <p className='text-brand-gray'>{currentEvent?.description}</p>
                         </div>
-                    </div>
 
-                    {/* Jury */}
-                    {(allJury.length > 0) && <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Jury</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-                        <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
-                            {allJury.map((jury, index) => (
-                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
-                                    <img
-                                        src={jury.image ? domain + "/" + jury.image : UserAvatar}
-                                        alt="Jury"
-                                        className='rounded-full mx-auto size-24'
-                                    />
-                                    <p className='font-semibold text-wrap capitalize'>{jury.first_name + ' ' + jury.last_name}</p>
-                                    <p className='text-wrap text-sm capitalize'>{jury.job_title}</p>
-                                    <p className='text-sm font-bold text-wrap capitalize'>{jury.company_name}</p>
-                                </div>
-                            ))}
+                        {/* Speakers */}
+                        <div className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Speakers</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+                                {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
+                                    <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                        <img
+                                            src={speaker.image ? domain + "/" + speaker.image : UserAvatar}
+                                            alt="Speaker"
+                                            className='rounded-full mx-auto size-24'
+                                        />
+                                        <p className='font-semibold text-wrap capitalize'>{speaker.first_name + ' ' + speaker.last_name}</p>
+                                        <p className='text-wrap text-sm capitalize'>{speaker.job_title}</p>
+                                        <p className='text-sm font-bold text-wrap capitalize'>{speaker.company_name}</p>
+                                    </div>
+                                )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                            </div>
                         </div>
-                    </div>}
 
-                    {/* Agenda Details */}
-                    {viewAgendaBy == 0 && <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Agenda Details</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-                        <div>
+                        {/* Jury */}
+                        {(allJury.length > 0) && <div className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Jury</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+                                {allJury.map((jury, index) => (
+                                    <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                        <img
+                                            src={jury.image ? domain + "/" + jury.image : UserAvatar}
+                                            alt="Jury"
+                                            className='rounded-full mx-auto size-24'
+                                        />
+                                        <p className='font-semibold text-wrap capitalize'>{jury.first_name + ' ' + jury.last_name}</p>
+                                        <p className='text-wrap text-sm capitalize'>{jury.job_title}</p>
+                                        <p className='text-sm font-bold text-wrap capitalize'>{jury.company_name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>}
+
+                        {/* Agenda Details */}
+                        {viewAgendaBy == 0 && <div className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Agenda Details</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
                             <div>
-                                {agendaData.length > 0 ? agendaData.map((agenda) => (
-                                    <div key={agenda.id} className='!my-4'>
-                                        <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
-                                        <p className='font-light'>{agenda.description}</p>
-                                        <div className='flex gap-5 my-3'>
-                                            <div className='grid grid-cols-2 gap-5'>
-                                                {agenda.speakers.map((speaker) => (
-                                                    <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
-                                                        <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
-                                                        <div className='space-y-1'>
-                                                            <p className='font-semibold text-lg leading-none capitalize'>{speaker.first_name} {speaker.last_name}</p>
-                                                            <p className='text-sm leading-none capitalize'>{speaker.company_name}</p>
-                                                            <p className='text-xs leading-none capitalize'>{speaker.job_title}</p>
+                                <div>
+                                    {agendaData.length > 0 ? agendaData.map((agenda) => (
+                                        <div key={agenda.id} className='!my-4'>
+                                            <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                            <p className='font-light'>{agenda.description}</p>
+                                            <div className='flex gap-5 my-3'>
+                                                <div className='grid grid-cols-2 gap-5'>
+                                                    {agenda.speakers.map((speaker) => (
+                                                        <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
+                                                            <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
+                                                            <div className='space-y-1'>
+                                                                <p className='font-semibold text-lg leading-none capitalize'>{speaker.first_name} {speaker.last_name}</p>
+                                                                <p className='text-sm leading-none capitalize'>{speaker.company_name}</p>
+                                                                <p className='text-xs leading-none capitalize'>{speaker.job_title}</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                                    )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                                </div>
+                            </div>
+                        </div>}
+
+                        <div className='mt-10 md:hidden md:mt-[5.8rem]'>
+                            <h3 className='font-semibold text-lg'>Location</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
+                                {currentEvent?.event_venue_address_2}</p>
+                            <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
+                                <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
                             </div>
                         </div>
-                    </div>}
+                    </div>
 
-                    <div className='mt-10 md:hidden md:mt-[5.8rem]'>
-                        <h3 className='font-semibold text-lg'>Location</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-                        <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
-                            {currentEvent?.event_venue_address_2}</p>
-                        <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
-                            <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
+                    {/* Right Div */}
+                    <div className='max-w-full mx-auto md:max-w-[300px]'>
+                        <img src={domain + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
+
+                        <div className='mt-10 hidden md:block md:mt-[5.8rem]'>
+                            <h3 className='font-semibold text-lg'>Location</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
+                                {currentEvent?.event_venue_address_2}</p>
+                            <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
+                                <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Div */}
-                <div className='max-w-full mx-auto md:max-w-[300px]'>
-                    <img src={domain + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogContent className='bg-brand-light'>
+                        <DialogHeader>
+                            <DialogTitle className='text-center text-2xl'>Get an Invite</DialogTitle>
 
-                    <div className='mt-10 hidden md:block md:mt-[5.8rem]'>
-                        <h3 className='font-semibold text-lg'>Location</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-                        <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
-                            {currentEvent?.event_venue_address_2}</p>
-                        <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
-                            <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
-                        </div>
-                    </div>
-                </div>
+                            <div>
+                                {/* First Name & Last Name */}
+                                <div className='flex gap-5 justify-between'>
+                                    <div className='flex mt-5 gap-2 flex-col w-full'>
+                                        <Label className='font-semibold'>First Name</Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                value={userAccount.first_name}
+                                                onChange={handleInputChange}
+                                                name='first_name'
+                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className='flex mt-5 gap-2 flex-col w-full'>
+                                        <Label className='font-semibold'>Last Name</Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                value={userAccount.last_name}
+                                                onChange={handleInputChange}
+                                                name='last_name'
+                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Email & Mobile Number */}
+                                <div className='flex gap-5 justify-between mt-5'>
+                                    <div className='flex gap-2 flex-col w-full'>
+                                        <Label className='font-semibold'>Email</Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                value={userAccount.email_id}
+                                                onChange={handleInputChange}
+                                                name='email_id'
+                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className='flex gap-2 flex-col w-full'>
+                                        <Label className='font-semibold'>Mobile Number</Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                value={userAccount.phone_number}
+                                                onChange={handleInputChange}
+                                                name='phone_number'
+                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Company Name */}
+                                <div className='flex gap-5 justify-between mt-5'>
+                                    <CustomComboBox
+                                        label="Company Name"
+                                        value={userAccount.company_name}
+                                        onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, company_name: value }))}
+                                        placeholder="Type or select company"
+                                        options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
+                                        required
+                                    />
+                                </div>
+
+                                <Button onClick={handleCreateAccount} className='mt-5 btn mx-auto w-full'>Submit</Button>
+                            </div>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
             </div>
-
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className='bg-brand-light'>
-                    <DialogHeader>
-                        <DialogTitle className='text-center text-2xl'>Get an Invite</DialogTitle>
-
-                        <div>
-                            {/* First Name & Last Name */}
-                            <div className='flex gap-5 justify-between'>
-                                <div className='flex mt-5 gap-2 flex-col w-full'>
-                                    <Label className='font-semibold'>First Name</Label>
-                                    <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                        <Input
-                                            value={userAccount.first_name}
-                                            onChange={handleInputChange}
-                                            name='first_name'
-                                            className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className='flex mt-5 gap-2 flex-col w-full'>
-                                    <Label className='font-semibold'>Last Name</Label>
-                                    <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                        <Input
-                                            value={userAccount.last_name}
-                                            onChange={handleInputChange}
-                                            name='last_name'
-                                            className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Email & Mobile Number */}
-                            <div className='flex gap-5 justify-between mt-5'>
-                                <div className='flex gap-2 flex-col w-full'>
-                                    <Label className='font-semibold'>Email</Label>
-                                    <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                        <Input
-                                            value={userAccount.email_id}
-                                            onChange={handleInputChange}
-                                            name='email_id'
-                                            className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className='flex gap-2 flex-col w-full'>
-                                    <Label className='font-semibold'>Mobile Number</Label>
-                                    <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                        <Input
-                                            value={userAccount.phone_number}
-                                            onChange={handleInputChange}
-                                            name='phone_number'
-                                            className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Company Name */}
-                            <div className='flex gap-5 justify-between mt-5'>
-                                <CustomComboBox
-                                    label="Company Name"
-                                    value={userAccount.company_name}
-                                    onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, company_name: value }))}
-                                    placeholder="Type or select company"
-                                    options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
-                                    required
-                                />
-                            </div>
-
-                            <Button onClick={handleCreateAccount} className='mt-5 btn mx-auto w-full'>Submit</Button>
-                        </div>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-        </div>
+        </React.Fragment>
     );
 };
 

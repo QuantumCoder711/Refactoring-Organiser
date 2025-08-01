@@ -20,6 +20,7 @@ import useEventStore from '@/store/eventStore';
 import { toast } from 'sonner';
 import { CircleCheck, CircleX } from 'lucide-react';
 import Wave from '@/components/Wave';
+import { Helmet } from 'react-helmet';
 
 const AddEvent: React.FC = () => {
 
@@ -434,11 +435,16 @@ const AddEvent: React.FC = () => {
     }
 
     return (
-        <div className=''>
-
-            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background'>
-                {/* Event Name */}
-                <div className="flex flex-col gap-2 w-full">
+        <React.Fragment>
+            <Helmet>
+                <title>Add Your Event | Effortless Event Setup With Klout Club</title>
+                <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
+                <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
+            </Helmet>
+            <div className=''>
+                <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background'>
+                    {/* Event Name */}
+                    <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='title'>
                         Event Name <span className="text-brand-secondary">*</span>
                     </Label>
@@ -811,6 +817,7 @@ const AddEvent: React.FC = () => {
                 <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-80 mx-auto'>Submit</Button>
             </div>
         </div>
+    </React.Fragment>
     )
 }
 
