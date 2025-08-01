@@ -1,4 +1,4 @@
-import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
+import { LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
@@ -19,11 +19,11 @@ export const sidebarItems = [
         icon: Users,
         path: "/all-attendees",
     },
-    {
-        label: "Event Sponsors",
-        icon: HandHeart,
-        path: "/event-sponsors",
-    },
+    // {
+    //     label: "Event Sponsors",
+    //     icon: HandHeart,
+    //     path: "/event-sponsors",
+    // },
     {
         label: "All Reports",
         icon: NotebookPen,
