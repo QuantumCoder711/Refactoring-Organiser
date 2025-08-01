@@ -11,10 +11,28 @@ export default defineConfig({
     tailwindcss(),
     viteImagemin({
       pngquant: {
-        quality: [0.6, 0.8], // Set the quality range for PNG images
+        quality: [0.4, 0.6], // More aggressive PNG compression (lower quality range)
+        speed: 3, // Compress at a slower speed for better results (1-10, where 10 is fastest)
+      },
+      optipng: {
+        optimizationLevel: 7, // Max optimization level for PNG
+      },
+      mozjpeg: {
+        quality: 60, // Lower quality for JPEG (you can go as low as 50 for aggressive compression)
+        progressive: true, // Enables progressive JPEGs, which are smaller
       },
       webp: {
-        quality: 75, // Convert PNGs and other supported formats to WebP with this quality
+        quality: 50, // Aggressive compression for WebP (lower quality)
+      },
+      gifsicle: {
+        optimizationLevel: 3, // Max optimization for GIFs
+      },
+      // Optional: You can also add svg compression if you are using SVGs
+      svgo: {
+        plugins: [
+          { removeViewBox: false }, // Keep the viewBox attribute (important for responsive SVGs)
+          { cleanupIDs: false }, // Remove unnecessary IDs
+        ],
       },
     }),
   ],
