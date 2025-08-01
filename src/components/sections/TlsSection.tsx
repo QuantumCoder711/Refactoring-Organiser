@@ -15,7 +15,7 @@ const TlsSection: React.FC = () => {
                 </div>
             </div>
             <div className='w-1/2'>
-                <img src={Tls} alt="TLS" className='h-full' />
+                <img src={Tls} width={484} height={551} alt="TLS" className='h-full' />
             </div>
         </section>
     )

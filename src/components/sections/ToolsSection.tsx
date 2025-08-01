@@ -59,7 +59,7 @@ const ToolsSection: React.FC = () => {
                         className="bg-brand-background shadow-blur p-6 rounded-[10px] h-[300px] cursor-pointer group flex flex-col justify-between"
                     >
                         <div className='flex flex-col gap-5'>
-                            <img src={tool.image} alt={tool.heading} className='h-[75px] w-fit' />
+                            <img src={tool.image} alt={tool.heading} height={75} width={75} className='h-[75px] w-fit' />
                             <h2 className="text-2xl font-medium group-hover:text-brand-primary duration-300">{tool.heading}</h2>
                             <p className='text-lg'>{tool.paragraph}</p>
                         </div>
