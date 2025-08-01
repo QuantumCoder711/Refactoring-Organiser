@@ -24,23 +24,23 @@ const Herosection: React.FC = () => {
             <div className='w-full lg:w-1/2 relative flex justify-center mt-11 lg:mt-0'>
                 {/* Center user image */}
                 <div className='relative flex items-center justify-center'>
-                    <img src={KloutUser} alt="Klout User" className="z-10" width={320} />
+                    <img src={KloutUser} alt="Klout User" className="z-10" width={320} height={500} />
 
                     {/* Feature icons positioned around the user */}
                     <div className='absolute bottom-0 -right-20 z-20 rounded-xl'>
-                        <img src={Network} alt="Network" width={186} />
+                        <img src={Network} alt="Network" width={186} height={186} />
                     </div>
 
                     <div className='absolute top-2/4 -left-24 z-20 rounded-xl'>
-                        <img src={Handshake} alt="Handshake" width={128} />
+                        <img src={Handshake} alt="Handshake" width={128} height={128} />
                     </div>
 
                     <div className='absolute top-10 left-5 rounded-xl'>
-                        <img src={QrCode} alt="QrCode" width={86} />
+                        <img src={QrCode} alt="QrCode" width={86} height={86} />
                     </div>
 
                     <div className='absolute top-24 -right-8 rounded-xl'>
-                        <img src={AiFile} alt="AiFile" width={74} />
+                        <img src={AiFile} alt="AiFile" width={74} height={74}/>
                     </div>
                 </div>
             </div>
