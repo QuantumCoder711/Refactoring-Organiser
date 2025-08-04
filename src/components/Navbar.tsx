@@ -307,13 +307,25 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   </DrawerTitle>
                   <DrawerDescription>
                     {/* Profile */}
-                    <div className='flex gap-2 justify-end items-center w-full cursor-pointer mt-5 focus:outline-none'>
+                    <div className='flex gap-2 justify-end items-center w-full cursor-pointer my-5 focus:outline-none'>
                       <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
                       <Avatar className='w-10 h-10'>
                         <AvatarImage src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt="User" />
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
                     </div>
+
+                    {/* Links */}
+                    <ul className="flex flex-col gap-2 relative h-full overflow-hidden text-black">
+                      {sidebarItems.map((item) => (
+                        <li hidden={item.label === "Vendors" && user?.feature_permission?.vendor === 0} key={item.label}>
+                          <Link to={item.path} className={`flex items-center justify-end gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
+                            <item.icon className='size-5' />
+                            {item.label}
+                          </Link>
+                        </li>)
+                      )}
+                    </ul>
 
 
                   </DrawerDescription>
