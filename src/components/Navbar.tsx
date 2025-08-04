@@ -26,12 +26,13 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { AlignRight, Plus, Search } from 'lucide-react';
+import { AlignRight, Plus, Search, X } from 'lucide-react';
 
 interface ProgressRingProps {
   percentage: number;
@@ -192,7 +193,8 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           </div>
         </Link>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
-          <h2 className='xl:text-xl font-semibold'>{heading}</h2>
+          <h2 className='hidden md:block xl:text-xl font-semibold'>{heading}</h2>
+          <img src={Logo} width={72} height={40} className='w-28 md:hidden' />
 
           {/* Desktop Rendering */}
           <ul className='hidden md:flex gap-5 items-center'>
@@ -283,8 +285,47 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           </ul>
 
           {/* Mobile Rendering */}
-          <ul className='md:hidden'>
+          <ul className='md:hidden flex gap-3 items-center'>
+            {user?.feature_permission?.search_people === 1 && !pathname.includes("/search-people") && <li>
+              <Link to={`/search-people`}>
+                <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
+              </Link>
+            </li>}
+            <li>
+              <Link to={"/add-event"}>
+                <Button className='btn-rounded !px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
+              </Link>
+            </li>
 
+            <Drawer direction='right'>
+              <DrawerTrigger asChild className='cursor-pointer hover:bg-brand-light-gray size-8 p-1 rounded'><AlignRight /></DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle className='flex justify-between items-center'>
+                    <X className='text-brand-dark-gray size-4' />
+                    <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" width={72} height={32} className='max-h-10 w-fit object-contain object-center' />
+                  </DrawerTitle>
+                  <DrawerDescription>
+                    {/* Profile */}
+                    <div className='flex gap-2 justify-end items-center w-full cursor-pointer mt-5 focus:outline-none'>
+                      <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
+                      <Avatar className='w-10 h-10'>
+                        <AvatarImage src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt="User" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </div>
+
+
+                  </DrawerDescription>
+                </DrawerHeader>
+                <DrawerFooter>
+                  <Button>Submit</Button>
+                  <DrawerClose>
+                    <Button variant="outline">Cancel</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
           </ul>
         </nav>
       </header>
