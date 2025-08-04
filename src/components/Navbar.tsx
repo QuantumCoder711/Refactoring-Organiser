@@ -346,7 +346,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 </div>
 
                 {/* Fixed Footer */}
-                <DrawerFooter className='p-4 border-t shadow-blur !shadow-t'>
+                <DrawerFooter className='p-4 pb-10 border-t shadow-blur !shadow-t'>
                   <div className='w-full p-4 rounded-lg bg-white shadow-blur'>
                     <h4 className='text-center font-semibold'>Credits</h4>
                     <div className='mt-2 flex justify-between items-center'>
