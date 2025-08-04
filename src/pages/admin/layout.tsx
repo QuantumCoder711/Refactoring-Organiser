@@ -20,7 +20,7 @@ const Layout: React.FC = () => {
     useEffect(() => {
         setLoading(true);
         if (token) {
-            getAllEvents(token).then(()=>setLoading(false));
+            getAllEvents(token).then(() => setLoading(false));
             getAllEventsAttendees(token);
             getAllEventsSponsors(token);
             // setLoading(false);
@@ -46,7 +46,9 @@ const Layout: React.FC = () => {
             <Navbar isAuthenticated={true} />
 
             <section className="flex flex-1 overflow-hidden">
-                <Sidebar />
+                <div className='hidden md:block'>
+                    <Sidebar />
+                </div>
                 <div className='flex-1 flex flex-col overflow-y-scroll'>
                     <div className='p-5 md:p-10 flex-1'>
                         <Outlet />

@@ -186,22 +186,24 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
       </header>
       :
       <header className='flex items-center bg-brand-background max-h-16'>
-        <Link to="/">
+        <Link to="/" className='hidden md:block'>
           <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
             <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" className='h-14 object-contain object-center' />
           </div>
         </Link>
         <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
-          <h2 className='text-xl font-semibold'>{heading}</h2>
-          <ul className='flex gap-5 items-center'>
+          <h2 className='xl:text-xl font-semibold'>{heading}</h2>
+
+          {/* Desktop Rendering */}
+          <ul className='hidden md:flex gap-5 items-center'>
             {user?.feature_permission?.search_people === 1 && !pathname.includes("/search-people") && <li>
               <Link to={`/search-people`}>
-                <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark'><Search size={16} /> Search People</Button>
+                <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
               </Link>
             </li>}
             <li>
               <Link to={"/add-event"}>
-                <Button className='btn-rounded !px-3 !h-8'><Plus size={16} /> Create New Event</Button>
+                <Button className='btn-rounded !px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
               </Link>
             </li>
 
@@ -278,6 +280,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
+          </ul>
+
+          {/* Mobile Rendering */}
+          <ul className='md:hidden'>
+
           </ul>
         </nav>
       </header>
