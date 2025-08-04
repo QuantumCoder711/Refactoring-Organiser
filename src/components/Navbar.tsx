@@ -300,8 +300,8 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
             <Drawer direction='right' open={open} onOpenChange={setOpen}>
               <DrawerTrigger asChild className='cursor-pointer hover:bg-brand-light-gray size-8 p-1 rounded'><AlignRight /></DrawerTrigger>
-              <DrawerContent className='overflow-y-scroll'>
-                <DrawerHeader>
+              <DrawerContent className='overflow-y-scroll overflow-x-hidden'>
+                <DrawerHeader className='p-2'>
                   <DrawerTitle className='flex justify-between items-center'>
                     <X onClick={() => { setOpen(false) }} className='text-brand-dark-gray size-4 cursor-pointer' />
                     <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" width={72} height={32} className='max-h-10 w-fit object-contain object-center' />
@@ -330,12 +330,13 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
                   </DrawerDescription>
                 </DrawerHeader>
-                <DrawerFooter className='h-full'>
+                <DrawerFooter className='h-full p-2'>
                   {/* Credits */}
                   <div className='w-full h-full p-2 px-4 rounded-lg bg-white shadow-blur'>
                     <h4 className='text-center font-semibold'>Credits</h4>
-                    <div className='mt-2'>
+                    <div className='mt-2 flex justify-between items-center'>
                       <ProgressRing percentage={walletRemainingPercent} size={72} />
+                      <span className='font-semibold text-xs'>Remaining: {formatNumber(walletRemaining)}</span>
                     </div>
                   </div>
                   {/* <DrawerClose>
