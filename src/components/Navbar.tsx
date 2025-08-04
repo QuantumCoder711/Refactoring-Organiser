@@ -300,50 +300,67 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
             <Drawer direction='right' open={open} onOpenChange={setOpen}>
               <DrawerTrigger asChild className='cursor-pointer hover:bg-brand-light-gray size-8 p-1 rounded'><AlignRight /></DrawerTrigger>
-              <DrawerContent className='overflow-y-scroll overflow-x-hidden'>
+              <DrawerContent className='h-screen flex flex-col'>
                 <DrawerHeader className='p-2'>
+                  {/* Top section (logo, close button, user profile) */}
                   <DrawerTitle className='flex justify-between items-center'>
-                    <X onClick={() => { setOpen(false) }} className='text-brand-dark-gray size-4 cursor-pointer' />
-                    <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" width={72} height={32} className='max-h-10 w-fit object-contain object-center' />
+                    <img
+                      src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo}
+                      alt="logo"
+                      width={72}
+                      height={32}
+                      className='max-h-10 w-fit object-contain object-center'
+                    />
+                    <X onClick={() => setOpen(false)} className='text-brand-dark-gray size-4 cursor-pointer' />
                   </DrawerTitle>
-                  <DrawerDescription>
-                    {/* Profile */}
-                    <div className='flex gap-2 justify-end items-center w-full cursor-pointer my-5 focus:outline-none'>
-                      <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
-                      <Avatar className='w-10 h-10'>
-                        <AvatarImage src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt="User" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                    </div>
 
-                    {/* Links */}
-                    <ul className="flex flex-col gap-2 relative h-80 overflow-y-auto text-black">
-                      {sidebarItems.map((item) => (
-                        <li hidden={item.label === "Vendors" && user?.feature_permission?.vendor === 0} key={item.label}>
-                          <Link onClick={() => { setOpen(false) }} to={item.path} className={`flex items-center justify-end gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
-                            {item.label}
-                            <item.icon className='size-5' />
-                          </Link>
-                        </li>)
-                      )}
-                    </ul>
-
-                  </DrawerDescription>
+                  {/* Profile */}
+                  <div className='flex gap-2 items-center w-full cursor-pointer mt-5'>
+                    <Avatar className='w-10 h-10'>
+                      <AvatarImage src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt="User" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <span className='font-semibold text-sm'>{user?.first_name + ' ' + user?.last_name}</span>
+                  </div>
                 </DrawerHeader>
-                <DrawerFooter className='h-full p-2'>
-                  {/* Credits */}
-                  <div className='w-full h-full p-2 px-4 rounded-lg bg-white shadow-blur'>
+
+                {/* Scrollable Links Section */}
+                <div className="flex-1 overflow-y-auto px-2">
+                  <ul className="flex flex-col gap-2">
+                    {sidebarItems.map((item) => (
+                      <li
+                        hidden={item.label === "Vendors" && user?.feature_permission?.vendor === 0}
+                        key={item.label}
+                      >
+                        <Link
+                          onClick={() => setOpen(false)}
+                          to={item.path}
+                          className={`flex items-center gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''
+                            }`}
+                        >
+                          <item.icon className='size-5' />
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Fixed Footer */}
+                <DrawerFooter className='p-4 border-t shadow-blur !shadow-t'>
+                  <div className='w-full p-4 rounded-lg bg-white shadow-blur'>
                     <h4 className='text-center font-semibold'>Credits</h4>
                     <div className='mt-2 flex justify-between items-center'>
                       <ProgressRing percentage={walletRemainingPercent} size={72} />
                       <span className='font-semibold text-xs'>Remaining: {formatNumber(walletRemaining)}</span>
                     </div>
+                    <Button onClick={() => { navigate('/profile'); setOpen(false); }} className='btn px-6 w-full mt-2'>
+                      Upgrade
+                    </Button>
                   </div>
-                  {/* <DrawerClose>
-                    <Button variant="outline">Cancel</Button>
-                  </DrawerClose> */}
                 </DrawerFooter>
               </DrawerContent>
+
             </Drawer>
           </ul>
         </nav>
