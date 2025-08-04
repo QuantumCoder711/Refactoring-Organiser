@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Logo from '@/assets/logo.svg';
 import WhiteLogo from '@/assets/white_logo.png';
 import { Button } from '@/components/ui/button';
@@ -85,6 +85,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const location = useLocation();
   const { pathname } = location;
   const [heading, setHeading] = React.useState<string>('');
+  const [open, setOpen] = useState<boolean>(false);
 
   // Wallet popup state
   const [showWallet, setShowWallet] = React.useState<boolean>(false);
@@ -297,12 +298,12 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
               </Link>
             </li>
 
-            <Drawer direction='right'>
+            <Drawer direction='right' open={open} onOpenChange={setOpen}>
               <DrawerTrigger asChild className='cursor-pointer hover:bg-brand-light-gray size-8 p-1 rounded'><AlignRight /></DrawerTrigger>
-              <DrawerContent>
+              <DrawerContent className='overflow-y-scroll'>
                 <DrawerHeader>
                   <DrawerTitle className='flex justify-between items-center'>
-                    <X className='text-brand-dark-gray size-4' />
+                    <X onClick={() => { setOpen(false) }} className='text-brand-dark-gray size-4 cursor-pointer' />
                     <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" width={72} height={32} className='max-h-10 w-fit object-contain object-center' />
                   </DrawerTitle>
                   <DrawerDescription>
@@ -316,25 +317,30 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                     </div>
 
                     {/* Links */}
-                    <ul className="flex flex-col gap-2 relative h-full overflow-hidden text-black">
+                    <ul className="flex flex-col gap-2 relative h-80 overflow-y-auto text-black">
                       {sidebarItems.map((item) => (
                         <li hidden={item.label === "Vendors" && user?.feature_permission?.vendor === 0} key={item.label}>
-                          <Link to={item.path} className={`flex items-center justify-end gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
-                            <item.icon className='size-5' />
+                          <Link onClick={() => { setOpen(false) }} to={item.path} className={`flex items-center justify-end gap-3 p-3 hover:bg-brand-light-gray rounded-lg ${pathname.includes(item.path) ? 'bg-brand-light-gray shadow-blur' : ''}`}>
                             {item.label}
+                            <item.icon className='size-5' />
                           </Link>
                         </li>)
                       )}
                     </ul>
 
-
                   </DrawerDescription>
                 </DrawerHeader>
-                <DrawerFooter>
-                  <Button>Submit</Button>
-                  <DrawerClose>
+                <DrawerFooter className='h-full'>
+                  {/* Credits */}
+                  <div className='w-full h-full p-2 px-4 rounded-lg bg-white shadow-blur'>
+                    <h4 className='text-center font-semibold'>Credits</h4>
+                    <div className='mt-2'>
+                      <ProgressRing percentage={walletRemainingPercent} size={72} />
+                    </div>
+                  </div>
+                  {/* <DrawerClose>
                     <Button variant="outline">Cancel</Button>
-                  </DrawerClose>
+                  </DrawerClose> */}
                 </DrawerFooter>
               </DrawerContent>
             </Drawer>
