@@ -181,7 +181,7 @@ const AllEvents: React.FC = () => {
       </div>
 
       {/* Upcoming Events */}
-      {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-6 justify-center'>
+      {activeTab === 'upcoming' && <div className='mt-5 hidden lg:flex flex-wrap gap-6 justify-center'>
 
         {paginatedEvents.map((event) => (
           <EventCard
@@ -207,10 +207,61 @@ const AllEvents: React.FC = () => {
         ))}
       </div>}
 
+      {activeTab === 'upcoming' && <div className='mt-5 flex lg:hidden flex-wrap gap-6 justify-center'>
+
+        {upcomingEvents.map((event) => (
+          <EventCard
+            slug={event.slug}
+            title={event.title}
+            location={event.city}
+            date={event.event_start_date}
+            image={getImageUrl(event.image)}
+            imageAlt={event.title}
+            isLive={isEventLive(event)}
+            isUpcoming={true}
+            isPast={false}
+            id={event.id}
+            uuid={event.uuid}
+            total_attendees={event.total_attendee || 0}
+            total_checkedin_speaker={event.total_checkedin_speaker}
+            total_speaker={event.total_speaker || 0}
+            total_sponsor={event.total_sponsor || 0}
+            total_checkedin_sponsor={event.total_checkedin_sponsor}
+            total_pending_delegate={event.total_pending_delegate}
+            total_checked_in={event.total_checkedin}
+          />
+        ))}
+      </div>}
+
 
       {/* Past Events */}
-      {activeTab === 'past' && <div className='mt-5 flex flex-wrap gap-6 justify-center'>
+      {activeTab === 'past' && <div className='mt-5 hidden lg:flex flex-wrap gap-6 justify-center'>
         {paginatedEvents.map((event) => (
+          <EventCard
+            slug={event.slug}
+            title={event.title}
+            location={event.city}
+            date={event.event_start_date}
+            image={getImageUrl(event.image)}
+            imageAlt={event.title}
+            isLive={isEventLive(event)}
+            isUpcoming={false}
+            isPast={true}
+            id={event.id}
+            uuid={event.uuid}
+            total_attendees={event.total_attendee || 0}
+            total_checkedin_speaker={event.total_checkedin_speaker}
+            total_speaker={event.total_speaker || 0}
+            total_sponsor={event.total_sponsor || 0}
+            total_checkedin_sponsor={event.total_checkedin_sponsor}
+            total_pending_delegate={event.total_pending_delegate}
+            total_checked_in={event.total_checkedin}
+          />
+        ))}
+      </div>}
+
+      {activeTab === 'past' && <div className='mt-5 flex lg:hidden flex-wrap gap-6 justify-center'>
+        {pastEvents?.map((event) => (
           <EventCard
             slug={event.slug}
             title={event.title}

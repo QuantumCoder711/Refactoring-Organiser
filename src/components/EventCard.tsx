@@ -226,7 +226,6 @@ const EventCard: React.FC<EventCardProps> = ({
                 {/* Live Counts */}
                 <div className='flex flex-col gap-2'>
                     <div className='flex gap-2'>
-
                         <div className='w-full border-2 border-brand-primary/80 h-14 rounded-2xl p-2 px-2.5 bg-brand-light-gray'>
                             <h6 className='font-semibold text-sm'>Registrations</h6>
                             <p className='text-xs mt-1'>{total_checked_in}/{total_attendees}</p>
