@@ -74,7 +74,7 @@ const WhatsAppReport: React.FC = () => {
         }, {} as Record<string, number>);
 
         return [
-            { title: 'Sent Messages', value: statusCounts.sent || 0, status: "sent" },
+            { title: 'Sent Messages', value: (statusCounts?.delivered || 0) + (statusCounts?.read || 0) + (statusCounts?.failed || 0) + (statusCounts?.sent || 0), status: "sent" },
             { title: 'Delivered Messages', value: statusCounts.delivered || 0, status: "delivered" },
             { title: 'Read Messages', value: statusCounts.read || 0, status: "read" },
             { title: 'Failed Messages', value: statusCounts.failed || 0, status: "failed" }
@@ -153,7 +153,7 @@ const WhatsAppReport: React.FC = () => {
                 {whatsappLabels.map((card, index) => (
                     <div
                         key={index}
-                        onClick={() => {setSelectedStatus(card.status as "sent" | "delivered" | "read" | "failed"); setCurrentPage(1);}}
+                        onClick={() => { setSelectedStatus(card.status as "sent" | "delivered" | "read" | "failed"); setCurrentPage(1); }}
                         className={`min-w-40 w-full cursor-pointer duration-300 hover:bg-brand-background bg-brand-background rounded-lg h-9 px-4 shadow-blur flex justify-between items-center ${selectedStatus === card.status ? '!font-semibold' : ''}`}
                     >
                         <span>{card.title}</span>
@@ -166,12 +166,12 @@ const WhatsAppReport: React.FC = () => {
                 <div className='flex w-full justify-between items-baseline'>
                     <div className='flex w-full gap-2.5'>
                         <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                            <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] cursor-pointer border-1 border-brand-light-gray flex items-center justify-center text-sm">
                                 <SelectValue placeholder={`${itemsPerPage}/Page`} />
                             </SelectTrigger>
                             <SelectContent>
                                 {[10, 25, 50, 100].map(value => (
-                                    <SelectItem key={value} value={value.toString()}>{value}</SelectItem>
+                                    <SelectItem key={value} value={value.toString()} className='cursor-pointer'>{value}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
