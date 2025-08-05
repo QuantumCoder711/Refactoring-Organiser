@@ -299,7 +299,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
             <Drawer direction='right' open={open} onOpenChange={setOpen}>
               <DrawerTrigger asChild className='cursor-pointer hover:bg-brand-light-gray size-8 p-1 rounded'><AlignRight /></DrawerTrigger>
-              <DrawerContent className='h-screen flex flex-col'>
+              <DrawerContent>
                 <DrawerHeader className='p-2'>
                   {/* Top section (logo, close button, user profile) */}
                   <DrawerTitle className='flex justify-between items-center'>
