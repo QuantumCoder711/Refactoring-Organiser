@@ -14,7 +14,6 @@ import { useParams } from 'react-router-dom';
 import useEventStore from '@/store/eventStore';
 import useExtrasStore from '@/store/extrasStore';
 import { Progress } from '@/components/ui/progress';
-import Wave from '@/components/Wave';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
