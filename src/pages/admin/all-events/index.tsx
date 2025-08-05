@@ -67,7 +67,7 @@ const AllEvents: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        <Pagination className='flex justify-end'>
+        <Pagination className='hidden lg:flex justify-end'>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
@@ -181,7 +181,7 @@ const AllEvents: React.FC = () => {
       </div>
 
       {/* Upcoming Events */}
-      {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-6'>
+      {activeTab === 'upcoming' && <div className='mt-5 flex flex-wrap gap-6 justify-center'>
 
         {paginatedEvents.map((event) => (
           <EventCard
@@ -209,7 +209,7 @@ const AllEvents: React.FC = () => {
 
 
       {/* Past Events */}
-      {activeTab === 'past' && <div className='mt-5 flex flex-wrap gap-6'>
+      {activeTab === 'past' && <div className='mt-5 flex flex-wrap gap-6 justify-center'>
         {paginatedEvents.map((event) => (
           <EventCard
             slug={event.slug}

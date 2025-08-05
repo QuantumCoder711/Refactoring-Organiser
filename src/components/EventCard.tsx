@@ -119,7 +119,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (loading) return <Wave />
 
     return (
-        <div className={`flex bg-brand-background rounded-xl h-80 ${isLive ? 'w-xl' : 'max-w-80'}`}>
+        <div className={`flex scale-95 sm:scale-100 bg-brand-background rounded-xl h-80 ${isLive ? 'w-xl' : 'max-w-80'}`}>
             {/* Image Div */}
             <div className='h-full flex flex-col relative justify-between min-w-80 overflow-hidden bg-brand-light-gray rounded-xl p-1.5'>
                 <div className='max-h-44 relative overflow-hidden'>
