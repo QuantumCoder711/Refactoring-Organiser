@@ -13,6 +13,8 @@ import useAuthStore from '@/store/authStore';
 import { useParams } from 'react-router-dom';
 import useEventStore from '@/store/eventStore';
 import useExtrasStore from '@/store/extrasStore';
+import { Progress } from '@/components/ui/progress';
+import Wave from '@/components/Wave';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -168,6 +170,8 @@ const AddSponsor: React.FC = () => {
         upload_deck: bulkFile,
     });
 
+    const [loading, setLoading] = useState<boolean>(false);
+
     const { companies, getCompanies } = useExtrasStore(state => state);
 
     const { token } = useAuthStore(state => state);
@@ -224,6 +228,8 @@ const AddSponsor: React.FC = () => {
             return;
         }
 
+        setLoading(true);
+
         const form = new FormData();
         form.append('event_id', String(event?.id));
         form.append('company_logo', formData.company_logo);
@@ -255,9 +261,14 @@ const AddSponsor: React.FC = () => {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
+        } finally {
+            setLoading(false);
         }
-
     }
+
+    // if (loading && uploading === 100) {
+    //     return <Wave />
+    // }
 
     return (
         <div>
@@ -381,9 +392,15 @@ const AddSponsor: React.FC = () => {
                 </div>
 
                 {/* Progress Bar */}
-                <div hidden={uploading === 0} className='w-full rounded-full p-1 relative'>
+                {/* <div hidden={uploading === 0} className='w-full rounded-full p-1 relative'>
                     <div style={{ width: `${uploading}%` }} className='h-full bg-brand-primary absolute top-0 left-0 rounded-full' />
                     <p className='text-center font-semibold invert-0 text-sm text-brand-secondary'>Uploaded {uploading}%</p>
+                </div> */}
+
+                <div hidden={uploading === 0} className='relative'>
+                    <Progress value={uploading} className='h-6' />
+                    <p hidden={uploading === 100} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Uploaded {uploading}%</p>
+                    <p hidden={(loading && uploading === 100) ? false : true} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Processing...</p>
                 </div>
 
                 <Button onClick={handleSubmit} className='btn w-fit mx-auto'>Submit</Button>

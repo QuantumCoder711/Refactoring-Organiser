@@ -44,6 +44,7 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleCheck className='size-5' />
             });
+            window.location.reload();
         } else {
             toast(response.data.message || 'Failed To Delete Sponsor', {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
