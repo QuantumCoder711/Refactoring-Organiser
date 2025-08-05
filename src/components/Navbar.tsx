@@ -31,7 +31,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { AlignRight, Plus, Search, X } from 'lucide-react';
+import { AlignRight, LogOut, Plus, Search, X } from 'lucide-react';
 
 interface ProgressRingProps {
   percentage: number;
@@ -342,11 +342,15 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                         </Link>
                       </li>
                     ))}
+                    <li onClick={handleLogout} className='flex items-center cursor-pointer gap-3 p-3 hover:bg-brand-light-gray rounded-lg text-brand-secondary'>
+                      <LogOut className='size-5'/>
+                      Logout
+                    </li>
                   </ul>
                 </div>
 
                 {/* Fixed Footer */}
-                <DrawerFooter className='p-4 pb-20 border-t shadow-blur !shadow-t'>
+                <DrawerFooter className='p-4 border-t shadow-blur !shadow-t'>
                   <div className='w-full p-4 rounded-lg bg-white shadow-blur'>
                     <h4 className='text-center font-semibold'>Credits</h4>
                     <div className='mt-2 flex justify-between items-center'>
