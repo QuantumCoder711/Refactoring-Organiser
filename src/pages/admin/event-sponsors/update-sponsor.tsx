@@ -66,7 +66,6 @@ const CustomComboBox = React.memo(({
     const handleOptionSelect = (option: { id: number; name: string; about: string }) => {
         setInputValue(option.name);
         setSearchTerm('');
-        console.log(option);
         setFormData(prev => ({ ...prev, about_company: option.about }));
         setIsOpen(false);
         onValueChange(option.name);
@@ -268,9 +267,10 @@ const UpdateSponsor: React.FC = () => {
         form.append('about_company', formData.about_company);
         form.append('video_link', formData.video_link);
         form.append('upload_deck', bulkFile || '');
+        form.append('_method', "PUT");
 
         try {
-            const response = await axios.post(`${domain}/api/sponsors`, form, {
+            const response = await axios.post(`${domain}/api/update-sponsor/${id}`, form, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -282,7 +282,7 @@ const UpdateSponsor: React.FC = () => {
             });
             if (response.data.success) {
                 setUploading(0);
-                toast(response.data.message || 'Sponsor added successfully', {
+                toast(response.data.message || 'Sponsor Updated successfully', {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
