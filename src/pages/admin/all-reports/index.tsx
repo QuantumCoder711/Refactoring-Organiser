@@ -2,17 +2,13 @@ import ReportCard from '@/components/ReportCard';
 import { getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
 import { EventType } from '@/types';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 
 const AllReports: React.FC = () => {
     const { events } = useEventStore(state => state);
     const [searchTerm, setSearchTerm] = useState<string>("");
-
-    useEffect(() => {
-        console.log(events);
-    }, [searchTerm]);
 
     return (
         <div>
