@@ -76,8 +76,9 @@ import ViewEventSponsors from '@/pages/admin/event-sponsors/view-event-sponsors'
 import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-sponsor-details';
 import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
 import CreateBadge from '@/pages/admin/all-events/create-badge';
-import Careers from './pages/guest/careers';
-import AddSubuser from './pages/admin/sub-users/add-subuser';
+import Careers from '@/pages/guest/careers';
+import AddSubuser from '@/pages/admin/sub-users/add-subuser';
+import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -188,6 +189,7 @@ const App: React.FC = () => {
           <Route index element={<EventSponsors />} />
           <Route path=":slug" element={<ViewEventSponsors />} />
           <Route path=":slug/sponsor-details/:id" element={<ViewEventSponsorDetails />} />
+          <Route path=":slug/update-sponsor/:id" element={<UpdateSponsor />} />
           <Route path="add-sponsor/:slug" element={<AddSponsor />} />
         </Route>
 
