@@ -10,10 +10,6 @@ const AllReports: React.FC = () => {
     const { events } = useEventStore(state => state);
     const [searchTerm, setSearchTerm] = useState<string>("");
 
-    useEffect(() => {
-        console.log(events);
-    }, [searchTerm]);
-
     return (
         <div>
             {/* Searchbar */}
