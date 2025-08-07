@@ -16,6 +16,7 @@ import useExtrasStore from '@/store/extrasStore';
 import { Progress } from '@/components/ui/progress';
 import { getImageUrl } from '@/lib/utils';
 import DocumentRenderer from '@/components/DocumentRenderer';
+import Wave from '@/components/Wave';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -297,9 +298,9 @@ const UpdateSponsor: React.FC = () => {
         }
     }
 
-    // if (loading && uploading === 100) {
-    //     return <Wave />
-    // }
+    if (loading && uploading === 0) {
+        return <Wave />
+    }
 
     return (
         <div>
@@ -313,12 +314,22 @@ const UpdateSponsor: React.FC = () => {
                 {/* Company Logo */}
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-4">
+
                         <div className='size-28 rounded-full bg-brand-primary/10 flex items-center justify-center overflow-hidden'>
                             {/* Logo preview will be shown here */}
-                            {formData.company_logo ? <div>
-                                <img src={getImageUrl(formData?.company_logo)} alt="Logo Preview" className="object-cover w-full h-full" />
-                            </div> : <span className="text-brand-primary text-sm font-medium">Logo</span>}
+                            {formData.company_logo ? (
+                                <div>
+                                    <img
+                                        src={formData.company_logo as any instanceof File ? URL.createObjectURL(formData.company_logo) : getImageUrl(formData.company_logo)}
+                                        alt="Logo Preview"
+                                        className="object-cover w-full h-full"
+                                    />
+                                </div>
+                            ) : (
+                                <span className="text-brand-primary text-sm font-medium">Logo</span>
+                            )}
                         </div>
+
                         <div className="flex-1 gap-2 flex flex-col">
                             <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-brand-secondary'>*</span></Label>
                             <div className='flex gap-4'>
@@ -447,7 +458,7 @@ const UpdateSponsor: React.FC = () => {
                     <p hidden={(loading && uploading === 100) ? false : true} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Processing...</p>
                 </div>
 
-                <Button onClick={handleSubmit} className='btn w-fit mx-auto'>Submit</Button>
+                <Button disabled={loading && uploading!==100} onClick={handleSubmit} className='btn w-fit mx-auto'>Submit</Button>
             </div>
         </div>
     )
