@@ -4,7 +4,7 @@ import axios from 'axios';
 import { googleMapsApiKey, domain, appDomain, UserAvatar } from '@/constants';
 import Wave from '@/components/Wave';
 import GoogleMap from '@/components/GoogleMap';
-import { AgendaType, EventType } from '@/types';
+import { AgendaType, AttendeeType, EventType } from '@/types';
 import { toast } from 'sonner';
 import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
@@ -161,6 +161,7 @@ const ExploreViewEvent: React.FC = () => {
 
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
     const [allJury, setAllJury] = useState<any[]>([]);
+    const [allSponsors, setAllSponsors] = useState<AttendeeType[]>([]);
     const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
 
     const [form, setForm] = useState({
@@ -301,6 +302,7 @@ const ExploreViewEvent: React.FC = () => {
                     setAllSpeakers(res.data.data.speakers);
                     setAllJury(res.data.data.jury);
                     setViewAgendaBy(res.data.data.view_agenda_by);
+                    setAllSponsors(res.data.data.sponsor);
                 })
                 .catch((err) => {
                     console.log("The error is", err);
@@ -566,7 +568,7 @@ const ExploreViewEvent: React.FC = () => {
                         </div>
 
                         {/* Speakers */}
-                        <div className='mt-6'>
+                        <div hidden={allSpeakers.length === 0} className='mt-6'>
                             <h3 className='font-semibold text-lg'>Speakers</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
@@ -585,8 +587,28 @@ const ExploreViewEvent: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Sponsors */}
+                        <div hidden={allSponsors.length === 0} className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Sponsors</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+                                {allSponsors.length > 0 ? allSponsors.map((sponsor, index) => (
+                                    <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                        <img
+                                            src={sponsor.image ? domain + "/" + sponsor.image : UserAvatar}
+                                            alt="Sponsor"
+                                            className='rounded-full mx-auto size-24'
+                                        />
+                                        <p className='font-semibold text-wrap capitalize'>{sponsor.first_name + ' ' + sponsor.last_name}</p>
+                                        <p className='text-wrap text-sm capitalize'>{sponsor.job_title}</p>
+                                        <p className='text-sm font-bold text-wrap capitalize'>{sponsor.company_name}</p>
+                                    </div>
+                                )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                            </div>
+                        </div>
+
                         {/* Jury */}
-                        {(allJury.length > 0) && <div className='mt-6'>
+                        <div hidden={allJury.length === 0} className='mt-6'>
                             <h3 className='font-semibold text-lg'>Jury</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
@@ -603,7 +625,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
-                        </div>}
+                        </div>
 
                         {/* Agenda Details */}
                         {viewAgendaBy == 0 && <div className='mt-6'>
