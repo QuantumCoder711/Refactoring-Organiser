@@ -298,7 +298,8 @@ const UpdateSponsor: React.FC = () => {
         }
     }
 
-    if (loading && uploading === 0) {
+    // Show Wave component only for initial loading, not during file upload
+    if (loading && uploading === 0 && !formData.company_name) {
         return <Wave />
     }
 
@@ -452,7 +453,9 @@ const UpdateSponsor: React.FC = () => {
                     <p hidden={(loading && uploading === 100) ? false : true} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Processing...</p>
                 </div>
 
-                <Button disabled={loading && uploading!==100} onClick={handleSubmit} className='btn w-fit mx-auto'>Submit</Button>
+                <Button disabled={loading || uploading > 0} onClick={handleSubmit} className='btn w-fit mx-auto'>
+                    {uploading > 0 && uploading < 100 ? 'Uploading...' : loading ? 'Processing...' : 'Submit'}
+                </Button>
             </div>
         </div>
     )
