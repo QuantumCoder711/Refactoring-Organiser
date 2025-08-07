@@ -99,23 +99,41 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
     // Removed subscribe functionality
 
     return (
-        type === "basic" ? <footer className='flex items-center justify-between p-3'>
-            <img width={80} height={25} src={LogoFullWhite} className='invert' alt="logo" />
+        type === "basic" ? <footer className='flex flex-col gap-3 md:flex-row md:items-center justify-between p-3'>
+            <img width={80} height={25} src={LogoFullWhite} className='invert hidden md:block' alt="logo" />
+
+            <div className='md:hidden flex justify-between'>
+                <img width={80} height={25} src={LogoFullWhite} className='invert' alt="logo" />
+                <div className='flex items-center gap-4'>
+                    <Link target='_blank' to="https://www.facebook.com/thekloutclub">
+                        <img src={Facebook} alt="facebook" />
+                    </Link>
+                    <Link to="https://twitter.com/thekloutclub">
+                        <img src={Twitter} alt="twitter" />
+                    </Link>
+                    <Link to="https://www.linkedin.com/company/klout-club">
+                        <img src={Linkedin} alt="linkedin" />
+                    </Link>
+                    <Link to="https://www.instagram.com/klout_club">
+                        <img src={Instagram} alt="instagram" />
+                    </Link>
+                </div>
+            </div>
 
             <div className=''>
-                <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
-                <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
+                <p className='font-light text-xs text-brand mb-2 md:mb-0'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <span className='text-base'>&#9825;</span></p>
+                <p className='flex gap-x-5 gap-y-2 md:gap-2 items-center md:justify-center flex-wrap md:flex-nowrap font-light text-xs text-brand'>
                     <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
-                    <span className='text-brand'>|</span>
+                    <span className='text-brand lg:block hidden'>|</span>
                     <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
-                    <span className='text-brand'>|</span>
+                    <span className='text-brand lg:block hidden'>|</span>
                     <Link to="/refund-policy" className='underline'>Refund Policy</Link>
-                    <span className='text-brand'>|</span>
+                    <span className='text-brand lg:block hidden'>|</span>
                     <Link to="/faq" className='underline'>FAQ</Link>
                 </p>
             </div>
 
-            <div className='flex items-center gap-4'>
+            <div className='hidden md:flex items-center gap-4'>
                 <Link target='_blank' to="https://www.facebook.com/thekloutclub">
                     <img src={Facebook} alt="facebook" />
                 </Link>
