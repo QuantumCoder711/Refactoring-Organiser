@@ -65,7 +65,7 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
                     <Button className='btn !rounded-full !w-full font-bold'>View</Button>
                 </Link>
 
-                <Link to={`#`} className='p-2 bg-brand-primary hover:bg-brand-primary-dark duration-300 rounded-full text-white'>
+                <Link to={`/event-sponsors/${slug}/update-sponsor/${id}`} className='p-2 bg-brand-primary hover:bg-brand-primary-dark duration-300 rounded-full text-white'>
                     <Edit size={16} />
                 </Link>
 
