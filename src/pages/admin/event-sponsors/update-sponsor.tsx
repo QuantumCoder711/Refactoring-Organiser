@@ -418,7 +418,7 @@ const UpdateSponsor: React.FC = () => {
                         <Label className="font-semibold">
                             Upload File
                         </Label>
-                        <Button onClick={() => setShowUpload(prev => !prev)} className='btn'>Show Preview</Button>
+                        <Button onClick={() => {setShowUpload(prev => !prev); setBulkFile(null)}} className='btn'>Show Preview</Button>
                     </div>
 
                     <div className="w-full">
@@ -445,12 +445,6 @@ const UpdateSponsor: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Progress Bar */}
-                {/* <div hidden={uploading === 0} className='w-full rounded-full p-1 relative'>
-                    <div style={{ width: `${uploading}%` }} className='h-full bg-brand-primary absolute top-0 left-0 rounded-full' />
-                    <p className='text-center font-semibold invert-0 text-sm text-brand-secondary'>Uploaded {uploading}%</p>
-                </div> */}
 
                 <div hidden={uploading === 0} className='relative'>
                     <Progress value={uploading} className='h-6' />
