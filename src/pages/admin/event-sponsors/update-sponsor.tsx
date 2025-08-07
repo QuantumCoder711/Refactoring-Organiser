@@ -298,7 +298,8 @@ const UpdateSponsor: React.FC = () => {
         }
     }
 
-    if (loading && uploading === 0) {
+    // Show Wave component only for initial loading, not during file upload
+    if (loading && uploading === 0 && !formData.company_name) {
         return <Wave />
     }
 
@@ -418,7 +419,7 @@ const UpdateSponsor: React.FC = () => {
                         <Label className="font-semibold">
                             Upload File
                         </Label>
-                        <Button onClick={() => setShowUpload(prev => !prev)} className='btn'>Show Preview</Button>
+                        <Button onClick={() => {setShowUpload(prev => !prev); setBulkFile(null)}} className='btn'>Show Preview</Button>
                     </div>
 
                     <div className="w-full">
@@ -446,19 +447,15 @@ const UpdateSponsor: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Progress Bar */}
-                {/* <div hidden={uploading === 0} className='w-full rounded-full p-1 relative'>
-                    <div style={{ width: `${uploading}%` }} className='h-full bg-brand-primary absolute top-0 left-0 rounded-full' />
-                    <p className='text-center font-semibold invert-0 text-sm text-brand-secondary'>Uploaded {uploading}%</p>
-                </div> */}
-
                 <div hidden={uploading === 0} className='relative'>
                     <Progress value={uploading} className='h-6' />
                     <p hidden={uploading === 100} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Uploaded {uploading}%</p>
                     <p hidden={(loading && uploading === 100) ? false : true} className='absolute text-center top-0 right-0 left-0 text-brand-secondary font-semibold'>Processing...</p>
                 </div>
 
-                <Button disabled={loading && uploading!==100} onClick={handleSubmit} className='btn w-fit mx-auto'>Submit</Button>
+                <Button disabled={loading || uploading > 0} onClick={handleSubmit} className='btn w-fit mx-auto'>
+                    {uploading > 0 && uploading < 100 ? 'Uploading...' : loading ? 'Processing...' : 'Submit'}
+                </Button>
             </div>
         </div>
     )
