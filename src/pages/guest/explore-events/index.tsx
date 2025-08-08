@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import EventsBg from '@/assets/eventsBg.png';
 import { Link } from 'react-router-dom';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -10,6 +10,8 @@ import { Helmet } from 'react-helmet';
 const ExploreEvents: React.FC = () => {
 
     const [isMuted, setIsMuted] = useState<boolean>(true);
+
+    const footerRef = useRef<HTMLDivElement | null>(null);
 
     // State to control hover effect
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -28,6 +30,15 @@ const ExploreEvents: React.FC = () => {
         event.stopPropagation(); // Prevent click from bubbling up to the video div
         setIsMuted(prevState => !prevState); // Toggle mute state
     };
+
+    useEffect(() => {
+        if (!footerRef.current) return;
+
+        const images = footerRef.current.querySelectorAll('img');
+        images.forEach((img) => {
+            img.style.filter = 'brightness(0) invert(1)'; // Makes the image white
+        });
+    }, []);
 
     return (
         <React.Fragment>
@@ -95,9 +106,10 @@ const ExploreEvents: React.FC = () => {
                     </div>
                 </div>
 
-                <div className='mt-5 invert-50'>
-                    <Footer type='basic' />
+                <div ref={footerRef} className="pt-10">
+                    <Footer type="basic" />
                 </div>
+
             </main>
         </React.Fragment>
     )

@@ -121,8 +121,8 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
             </div>
 
             <div className=''>
-                <p className='font-light text-xs text-brand mb-2 md:mb-0'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <span className='text-base'>&#9825;</span></p>
-                <p className='flex gap-x-5 gap-y-2 md:gap-2 items-center md:justify-center flex-wrap md:flex-nowrap font-light text-xs text-brand'>
+                <p className='text-xs text-brand mb-2 md:mb-0'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <span className='text-base'>&#9825;</span></p>
+                <p className='flex gap-x-5 gap-y-2 md:gap-2 items-center md:justify-center flex-wrap md:flex-nowrap text-xs text-brand'>
                     <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                     <span className='text-brand lg:block hidden'>|</span>
                     <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
@@ -169,7 +169,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
 
                                     <ul>
                                         {item.links.map((link, linkIndex) => (
-                                            <li key={linkIndex} className='text-white text-base font-light my-2'>
+                                            <li key={linkIndex} className='text-white text-base my-2'>
                                                 <Link to={link.path}>{link.name}</Link>
                                             </li>
                                         ))}
@@ -184,8 +184,8 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                     <img width={80} height={25} src={LogoFullWhite} alt="logo" />
 
                     <div className=''>
-                        <p className='flex gap-1 items-center font-light text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
-                        <p className='flex gap-2 items-center justify-center font-light text-xs text-brand'>
+                        <p className='flex gap-1 items-center text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
+                        <p className='flex gap-2 items-center justify-center text-xs text-brand'>
                             <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
                             <span className='text-brand'>|</span>
                             <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
