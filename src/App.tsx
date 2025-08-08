@@ -103,7 +103,7 @@ const App: React.FC = () => {
         <Route index element={<Homepage />} />
         <Route path="organiser" element={<ExploreEvents />} />
         <Route path="add-first-event" element={<AddFirstEvent />} />
-        <Route path="events/:city" element={<ExploreAllEvents />} />
+        <Route path="events" element={<ExploreAllEvents />} />
         <Route path="events/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
         {hasFeatureAccess('wallet') && (
