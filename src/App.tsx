@@ -101,10 +101,10 @@ const App: React.FC = () => {
       {/* Guest Routes */}
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
-        <Route path="organiser/event" element={<ExploreEvents />} />
+        <Route path="organiser" element={<ExploreEvents />} />
         <Route path="add-first-event" element={<AddFirstEvent />} />
         <Route path="events/:city" element={<ExploreAllEvents />} />
-        <Route path="events/explore/:slug" element={<ExploreViewEvent />} />
+        <Route path="events/:slug" element={<ExploreViewEvent />} />
         <Route path="payment/:status/:id" element={<PaymentStatus />} />
         {hasFeatureAccess('wallet') && (
           <>

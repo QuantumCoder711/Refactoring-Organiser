@@ -129,10 +129,10 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
   return (
     !isAuthenticated ?
-      <header className={`flex justify-between p-3 ${location.pathname === "/organiser/event" ? 'bg-black/10 backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
+      <header className={`flex justify-between p-3 ${location.pathname === "/organiser" ? 'bg-black/10 backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
         <nav className='w-full flex justify-between items-center'>
           <Link to="/">
-            <img width={152} src={location.pathname === "/organiser/event" ? WhiteLogo : Logo} alt="logo" />
+            <img width={152} src={location.pathname === "/organiser" ? WhiteLogo : Logo} alt="logo" />
           </Link>
 
           <ul className='hidden sm:flex gap-7 items-center'>
