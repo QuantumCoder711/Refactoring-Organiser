@@ -18,7 +18,7 @@ const GuestLayout: React.FC = () => {
 
             {path !== "/" && <section className='flex-1 h-full overflow-y-scroll'>
                 <Outlet />
-                {(path !== "/" && path !== "/organiser/event") && <Footer type='basic' />}
+                {(path !== "/" && path !== "/organiser") && <Footer type='basic' />}
             </section>}
         </main>
     )
