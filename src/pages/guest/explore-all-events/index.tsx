@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { domain } from '@/constants';
 import Wave from '@/components/Wave';
 import { Calendar, ChevronDown, MapPin } from 'lucide-react';
@@ -8,12 +8,10 @@ import { formatDateTime } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
 
 const ExploreAllEvents: React.FC = () => {
-  const { city } = useParams<{ city: string }>();
-  const navigate = useNavigate();
   const [allEvents, setAllEvents] = useState<any[]>([]);
   const [pastEvents, setPastEvents] = useState<any[]>([]);
   const [selectedType, setSelectedType] = useState<string>("upcoming");
-  const [selectedCity, setSelectedCity] = useState<string>(city?.toLowerCase().replace(/ /g, '-') || "all");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
   const [cities, setCities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
@@ -78,7 +76,6 @@ const ExploreAllEvents: React.FC = () => {
     setSelectedCity(newCity);
     setUpcomingCurrentPage(1);
     setPastCurrentPage(1);
-    navigate(`/events/${newCity.replace(/ /g, '-')}`);
   };
 
   const filterEventsByCity = (events: any[]) => {
@@ -167,7 +164,7 @@ const ExploreAllEvents: React.FC = () => {
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
             {getCurrentEvents().map((event, index) => (
-              <Link to={`/events/explore/${event.slug}`} key={index}>
+              <Link to={`/events/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={domain + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
                   <div className='space-y-2 overflow-hidden'>

@@ -48,11 +48,11 @@ export const navbarLinks = [
     },
     {
         label: "Events",
-        path: "/organiser/event",
+        path: "/organiser",
     },
     {
         label: "Explore",
-        path: "/events/all",
+        path: "/events",
     },
     // {
     //     label: "Feature",
