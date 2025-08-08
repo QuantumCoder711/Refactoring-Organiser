@@ -302,7 +302,7 @@ const ExploreViewEvent: React.FC = () => {
                     setAllSpeakers(res.data.data.speakers);
                     setAllJury(res.data.data.jury);
                     setViewAgendaBy(res.data.data.view_agenda_by);
-                    setAllSponsors(res.data.data.sponsor);
+                    setAllSponsors(res?.data?.data?.sponsor);
                 })
                 .catch((err) => {
                     console.log("The error is", err);
@@ -588,11 +588,11 @@ const ExploreViewEvent: React.FC = () => {
                         </div>
 
                         {/* Sponsors */}
-                        <div hidden={allSponsors.length === 0} className='mt-6'>
+                        <div hidden={allSponsors?.length === 0} className='mt-6'>
                             <h3 className='font-semibold text-lg'>Sponsors</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
-                                {allSponsors.length > 0 ? allSponsors.map((sponsor, index) => (
+                                {allSponsors?.length > 0 ? allSponsors?.map((sponsor, index) => (
                                     <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
                                         <img
                                             src={sponsor.image ? domain + "/" + sponsor.image : UserAvatar}
