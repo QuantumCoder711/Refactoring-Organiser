@@ -4,7 +4,7 @@ import Wave from "@/components/Wave";
 import { domain, token } from "@/constants";
 import { getImageUrl } from "@/lib/utils";
 import axios from "axios";
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -90,7 +90,7 @@ const ViewEventSponsorDetails: React.FC = () => {
                         <div key={attendee.id} className="flex flex-col gap-1 mb-5 items-center">
                             {
                                 attendee.image ? <img src={getImageUrl(attendee.image)} alt={`${attendee.first_name} ${attendee.last_name}`} className="size-28 object-cover object-center rounded-full" />
-                                    : <div className="size-28 bg-brand-primary/30 rounded-full" />
+                                    : <span className="bg-brand-light p-2 rounded-full"><User className="size-16 text-brand-dark-gray" /></span>
                             }
                             <h5 className="font-semibold capitalize">{attendee.first_name} {attendee.last_name}</h5>
                             <span className="text-sm leading-0 capitalize mt-0.5">{attendee.job_title}</span>
