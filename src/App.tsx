@@ -77,7 +77,7 @@ import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-spo
 import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
 import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from '@/pages/guest/careers';
-import AddSubuser from '@/pages/admin/sub-users/add-subuser';
+import AddSubuser from '@/pages/admin/profile/sub-users/add-subuser';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 
 const App: React.FC = () => {
@@ -177,7 +177,8 @@ const App: React.FC = () => {
           <Route path="search-people" element={<SearchPeople />} />
         )}
 
-        {user?.role === 'admin' && (
+        {/* Condition need to be added for admin */}
+        {(
           <Route path="add-subuser" element={<AddSubuser />} />
         )}
 

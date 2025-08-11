@@ -268,7 +268,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
                   </Link>
-                  {user?.role === 'admin' && <Link to="/add-subuser">
+                  {<Link to="/add-subuser">
                     <DropdownMenuItem className='cursor-pointer'>Add Sub-User</DropdownMenuItem>
                   </Link>}
                   <Link to="/organiser/change-password">
@@ -343,7 +343,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                       </li>
                     ))}
                     <li onClick={handleLogout} className='flex items-center cursor-pointer gap-3 p-3 hover:bg-brand-light-gray rounded-lg text-brand-secondary'>
-                      <LogOut className='size-5'/>
+                      <LogOut className='size-5' />
                       Logout
                     </li>
                   </ul>
