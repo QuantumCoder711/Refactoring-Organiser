@@ -209,7 +209,7 @@ const UpdateSponsor: React.FC = () => {
     useEffect(() => {
         if (!id && formData) return;
         setLoading(true);
-        axios.get(`${domain}/api/display-sponsors/${id}`, {
+        axios.post(`${domain}/api/display-sponsors/${id}`, {}, {
             headers: {
                 "Authorization": `Bearer ${token}`,
             }

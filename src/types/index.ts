@@ -1,3 +1,13 @@
+export interface SubUserType {
+    id: number;
+    uuid: string;
+    name: string;
+    email: string;
+    role: string;
+    event_permission: [];
+    created_at: string;
+}
+
 export interface UserType {
     id: number;
     uuid: string;
@@ -19,7 +29,7 @@ export interface UserType {
     company_name: string;
     designation_name: string;
     deleted_at: string | null;
-    role: "user" | "admin";
+    role: "subuser" | "admin";
     wallet_balance: number;
     feature_permission: {
         id: number;
@@ -29,6 +39,7 @@ export interface UserType {
         vendor: 0 | 1;
         wallet: 0 | 1;
     };
+    sub_users: SubUserType[];
 }
 
 export interface EventType {
