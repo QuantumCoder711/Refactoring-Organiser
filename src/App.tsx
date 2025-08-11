@@ -77,8 +77,8 @@ import ViewEventSponsorDetails from '@/pages/admin/event-sponsors/view-event-spo
 import AddSponsor from '@/pages/admin/event-sponsors/add-sponsor';
 import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from '@/pages/guest/careers';
-import AddSubuser from '@/pages/admin/profile/sub-users/add-subuser';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
+import SubUsers from '@/pages/admin/profile/sub-users';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -178,8 +178,8 @@ const App: React.FC = () => {
         )}
 
         {/* Condition need to be added for admin */}
-        {(
-          <Route path="add-subuser" element={<AddSubuser />} />
+        {user?.role === "admin" && (
+          <Route path="sub-users" element={<SubUsers />} />
         )}
 
         <Route path='tutorials' element={<Tutorials />} />

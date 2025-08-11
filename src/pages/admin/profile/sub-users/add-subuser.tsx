@@ -28,9 +28,7 @@ const AddSubuser: React.FC = () => {
 
     return (
         <div className='w-full h-full'>
-            <div className='max-w-lg w-full rounded-[10px]'>
-                <h1 className='text-2xl font-semibold text-center mb-6'>Change Password</h1>
-
+            <div className='max-w-lg w-full mt-10 mx-auto rounded-[10px]'>
                 <div className='space-y-5 p-8 shadow-blur-lg rounded-2xl'>
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold' htmlFor='name'>Name</Label>
@@ -79,7 +77,7 @@ const AddSubuser: React.FC = () => {
                     </div>
 
                     <Button onClick={handleSubmit} className='btn mx-auto w-full'>
-                        Change Password
+                        Add User
                     </Button>
                 </div>
             </div>

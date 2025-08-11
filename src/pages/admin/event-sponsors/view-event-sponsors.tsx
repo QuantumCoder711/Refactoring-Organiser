@@ -102,7 +102,7 @@ const ViewEventSponsors: React.FC = () => {
     useEffect(() => {
         if (!event) return;
         setLoading(true);
-        axios.get(`${domain}/api/get-sponsors/${event.id}`, {
+        axios.post(`${domain}/api/get-sponsors/${event.id}`, {}, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

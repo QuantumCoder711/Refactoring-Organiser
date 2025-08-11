@@ -30,7 +30,7 @@ export const getProfile = async (token: string): Promise<ProfileResponse> => {
                 'Authorization': `Bearer ${token}`,
             }
         });
-        const user = {...response.data.user, wallet_balance: response.data?.wallet_balance || 0, feature_permission: response.data?.feature_permission};
+        const user = {...response.data.user, wallet_balance: response.data?.wallet_balance || 0, feature_permission: response.data?.feature_permission, sub_users: response.data?.sub_users};
         return user;
     } catch (error) {
         if (axios.isAxiosError(error)) {
