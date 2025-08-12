@@ -10,7 +10,7 @@ import useAuthStore from '@/store/authStore';
 import Wave from '@/components/Wave';
 
 const AddSubuser: React.FC = () => {
-    const { user, token } = useAuthStore(state => state);
+    const { user, token, getUserProfile } = useAuthStore(state => state);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -45,6 +45,8 @@ const AddSubuser: React.FC = () => {
                     "Content-Type": "application/json"
                 }
             });
+
+            await getUserProfile(token || "");
 
             if (response.data.status === 201) {
                 toast(response.data.message || "Subuser added successfully", {
