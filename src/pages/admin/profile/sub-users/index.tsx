@@ -49,8 +49,8 @@ const SubUsers: React.FC = () => {
     const subUsers = useAuthStore(state => state.user?.sub_users);
 
     return (
-        <div>
-            <Tabs defaultValue="view-user" className="w-full">
+        <div className='h-full w-full'>
+            <Tabs defaultValue="view-user" className="w-full h-full">
                 <TabsList className='bg-brand-light mx-auto'>
                     <TabsTrigger value="view-user" className='cursor-pointer'>View Users</TabsTrigger>
                     <TabsTrigger value="add-user" className='cursor-pointer'>Add Users</TabsTrigger>
@@ -64,7 +64,7 @@ const SubUsers: React.FC = () => {
                     </div>
                 </TabsContent>
 
-                <TabsContent value="add-user">
+                <TabsContent value="add-user" className='h-full w-full'>
                     <AddSubuser />
                 </TabsContent>
             </Tabs>
