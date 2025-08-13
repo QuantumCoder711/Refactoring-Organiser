@@ -6,7 +6,7 @@ import Share from "@/assets/share.png";
 const PrivacySection: React.FC = () => {
     return (
         <section className='max-w-[1205px] flex items-center flex-col justify-center mx-auto p-5'>
-            <h2 className='capitalize text-center mt-14 mb-[70px] text-[40px] font-bold'>Your Data, Your Rules</h2>
+            <h2 className='capitalize text-center mt-14 mb-[70px] text-2xl lg:text-[40px] font-bold'>Your Data, Your Rules</h2>
 
             <div className='lg:hidden mx-auto bg-white/20 px-6 py-4 shadow-blur rounded-[10px] max-w-[370px] font-semibold text-2xl text-center'>We built Klout Club with privacy at the core.</div>
             <div className='flex flex-col sm:flex-row mt-8 gap-8 lg:gap-12'>
