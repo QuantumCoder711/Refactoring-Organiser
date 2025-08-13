@@ -52,7 +52,7 @@ const Features: React.FC = () => {
 
     return (
         <section className='p-5 mt-7 max-w-[1205px] mx-auto'>
-            <h2 className='text-[40px] font-bold text-center'>How Klout Works</h2>
+            <h2 className='text-2xl sm:text-[40px] font-bold text-center'>How Klout Works</h2>
 
             <div className='mt-[66px] flex flex-row justify-center gap-5'>
                 {features.map((feature, index) => (

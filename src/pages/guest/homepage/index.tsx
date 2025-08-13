@@ -10,7 +10,7 @@ import React from 'react';
 
 const Homepage: React.FC = () => {
   return (
-    <div className='w-full h-full'>
+    <div className='w-full h-full overflow-hidden'>
 
       {/* Herosection */}
       <div className='flex flex-col lg:flex-1 min-h-fit'>
