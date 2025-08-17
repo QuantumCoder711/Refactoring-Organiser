@@ -5,6 +5,7 @@ export interface SubUserType {
     email: string;
     role: string;
     event_permission: [];
+    event_ids: number[] | [];
     created_at: string;
 }
 

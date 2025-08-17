@@ -701,7 +701,6 @@ const AddAttendee: React.FC = () => {
                                         'last_name': 'Doe',
                                         'job_title': 'CEO',
                                         'company_name': 'Digimantra',
-                                        'industry': 'IT',
                                         'email': 'johndoe@example.com',
                                         'phone_number': '8709289369',
                                         'alternate_mobile_number': '7865656575',
@@ -723,7 +722,6 @@ const AddAttendee: React.FC = () => {
                                         { wch: 15 }, // last_name
                                         { wch: 15 }, // job_title
                                         { wch: 15 }, // company_name
-                                        { wch: 15 }, // industry
                                         { wch: 25 }, // email
                                         { wch: 15 }, // phone_number
                                         { wch: 20 }, // alternate_mobile_number

@@ -125,7 +125,7 @@ export const addAttendee = async (token: string, attendeeData: FormData): Promis
 // Bulk Upload Attendees
 export const bulkUploadAttendees = async (token: string, uuid: string, file: File): Promise<AddBulkAttendeeResponse> => {
     try {
-        const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, { file }, {
+        const response = await axios.post(`${domain}/api/attendees/upload/${uuid}`, { file: file, user_id: 10 }, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`

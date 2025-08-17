@@ -45,7 +45,7 @@ const SubUser = (subUser: SubUserType) => {
         return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
     });
 
-    const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
+    const [selectedEvents, setSelectedEvents] = useState<number[]>(subUser.event_ids);
 
     const handleDelete = async () => {
         try {
