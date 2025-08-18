@@ -148,55 +148,101 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                 </Link>
             </div>
         </footer> :
-            <footer className='w-full' style={{ backgroundImage: `url(${FooterBg})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-                <div className='max-w-7xl flex mx-auto gap-40 p-5 py-10'>
-                    <div className='flex flex-col gap-[60px] w-1/2'>
-                        <img src={LogoWhite} alt="logo" className='w-[200px] h-[50px]' />
+            <footer
+                className="w-full"
+                style={{
+                    backgroundImage: `url(${FooterBg})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                }}
+            >
+                <div className="max-w-7xl mx-auto p-5 py-10 flex flex-col lg:flex-row gap-10 lg:gap-40">
+                    {/* Left Section */}
+                    <div className="flex flex-col items-center lg:items-start gap-6 lg:gap-[60px] w-full lg:w-1/2">
+                        {/* Logo */}
+                        <img
+                            src={LogoWhite}
+                            alt="logo"
+                            className="w-[140px] sm:w-[160px] lg:w-[200px] h-auto"
+                        />
 
-                        <div className='flex items-center gap-10 invert'>
+                        {/* Store Buttons */}
+                        <div className="flex items-center justify-center lg:justify-start gap-4 invert flex-wrap">
                             <AppleStore />
                             <GooglePlay />
                         </div>
-                        <img src={AwsSsl} width={220} alt="AWS SSL" />
+
+                        {/* AWS SSL Badge */}
+                        <img
+                            src={AwsSsl}
+                            alt="AWS SSL"
+                            className="w-[150px] sm:w-[180px] lg:w-[220px] mt-2"
+                        />
                     </div>
 
-                    <div className='w-full flex justify-between items-center text-xl text-brand-light-gray'>
 
-                        <div className='flex justify-between w-full'>
-                            {footerLinks.map((item, index) => (
-                                <div key={index}>
-                                    <h5 className='text-xl font-semibold text-white mb-8'>{item.title}</h5>
-
-                                    <ul>
-                                        {item.links.map((link, linkIndex) => (
-                                            <li key={linkIndex} className='text-white text-base my-2'>
-                                                <Link to={link.path}>{link.name}</Link>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
+                    {/* Right Section */}
+                    <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-8 text-brand-light-gray">
+                        {footerLinks.map((item, index) => (
+                            <div key={index}>
+                                <h5 className="text-lg lg:text-xl font-semibold text-white mb-4 lg:mb-8">
+                                    {item.title}
+                                </h5>
+                                <ul>
+                                    {item.links.map((link, linkIndex) => (
+                                        <li
+                                            key={linkIndex}
+                                            className="text-white text-sm lg:text-base my-2"
+                                        >
+                                            <Link to={link.path}>{link.name}</Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className='flex items-center justify-between text-white p-3'>
-                    <img width={80} height={25} src={LogoFullWhite} alt="logo" />
+                {/* Bottom Bar */}
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-0 text-white p-5 border-t border-white/20">
+                    {/* Logo */}
+                    <img
+                        width={80}
+                        height={25}
+                        src={LogoFullWhite}
+                        alt="logo"
+                        className="order-1 lg:order-none"
+                    />
 
-                    <div className=''>
-                        <p className='flex gap-1 items-center text-xs text-brand'>Copyright &copy; {currentYear} - {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights reserved | The Klout Club is made with <HeartIcon className='w-4 h-4 stroke-1' /></p>
-                        <p className='flex gap-2 items-center justify-center text-xs text-brand'>
-                            <Link to="/privacy-policy" className='underline'>Privacy Policy</Link>
-                            <span className='text-brand'>|</span>
-                            <Link to="/terms-and-conditions" className='underline'>Terms and Conditions</Link>
-                            <span className='text-brand'>|</span>
-                            <Link to="/refund-policy" className='underline'>Refund Policy</Link>
-                            <span className='text-brand'>|</span>
-                            <Link to="/faq" className='underline'>FAQ</Link>
+                    {/* Copyright + Links */}
+                    <div className="order-3 lg:order-none text-center lg:text-left">
+                        <p className="flex flex-wrap justify-center lg:justify-start gap-1 items-center text-xs text-brand mb-1">
+                            Copyright &copy; {currentYear} -{" "}
+                            {(currentYear + 1).toString().slice(2)} Zirclez Innovation. All rights
+                            reserved | The Klout Club is made with{" "}
+                            <HeartIcon className="w-4 h-4 stroke-1" />
+                        </p>
+                        <p className="flex flex-wrap justify-center lg:justify-start gap-2 text-xs text-brand">
+                            <Link to="/privacy-policy" className="underline">
+                                Privacy Policy
+                            </Link>
+                            <span className="hidden sm:block">|</span>
+                            <Link to="/terms-and-conditions" className="underline">
+                                Terms and Conditions
+                            </Link>
+                            <span className="hidden sm:block">|</span>
+                            <Link to="/refund-policy" className="underline">
+                                Refund Policy
+                            </Link>
+                            <span className="hidden sm:block">|</span>
+                            <Link to="/faq" className="underline">
+                                FAQ
+                            </Link>
                         </p>
                     </div>
 
-                    <div className='flex items-center gap-4 invert'>
+                    {/* Social Icons */}
+                    <div className="order-2 lg:order-none flex items-center justify-center gap-4 invert">
                         <Link to="https://www.facebook.com/thekloutclub">
                             <img src={Facebook} alt="facebook" />
                         </Link>
@@ -212,6 +258,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                     </div>
                 </div>
             </footer>
+
     )
 }
 
