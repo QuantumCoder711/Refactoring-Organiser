@@ -11,11 +11,6 @@ interface AuthStore {
   token: string | null;
   user: UserType | null;
   isSubuser: boolean;
-  subuserData: {
-    subuser_id: number | null;
-    user_id: number | null;
-    event_permission: number[];
-  } | null;
   login: (email: string, password: string) => Promise<LoginResponse>;
   loginSubuser: (email: string, password: string) => Promise<any>;
   logout: () => void;
@@ -30,11 +25,6 @@ const useAuthStore = create<AuthStore>()(
       token: null,
       user: null,
       isSubuser: false,
-      subuserData: {
-        subuser_id: null,
-        user_id: null,
-        event_permission: []
-      },
       login: async (email: string, password: string) => {
         const response = await login(email, password);
         if (response.status === 200) {
@@ -46,11 +36,6 @@ const useAuthStore = create<AuthStore>()(
               token: response.access_token,
               user: profile as unknown as UserType,
               isSubuser: false,
-              subuserData: {
-                subuser_id: null,
-                user_id: null,
-                event_permission: []
-              }
             });
           }
         }
@@ -63,17 +48,15 @@ const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             token: response.data.access_token,
             isSubuser: true,
-            subuserData: {
-              subuser_id: response.data.subuser_id,
-              user_id: response.data.user_id,
-              event_permission: response.data.event_permission || []
-            },
             user: {
               id: response.data.user_id,
               email: response.data.email,
-              name: response.data.email.split('@')[0],
+              first_name: response.data.name.split(" ")[0],
+              last_name: response.data.name.split(" ")[1] || '',
               role: 'subuser',
-              sub_users: []
+              sub_users: [],
+              subuser_id: response.data.subuser_id,
+              user_id: response.data.user_id
             } as unknown as UserType
           });
         }
@@ -85,11 +68,6 @@ const useAuthStore = create<AuthStore>()(
           token: null,
           user: null,
           isSubuser: false,
-          subuserData: {
-            subuser_id: null,
-            user_id: null,
-            event_permission: []
-          }
         });
       },
       setUser: (user: UserType) => {

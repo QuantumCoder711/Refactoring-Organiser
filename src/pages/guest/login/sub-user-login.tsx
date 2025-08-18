@@ -70,7 +70,7 @@ const SubUserLogin: React.FC = () => {
 
       <div className='h-full w-full grid place-content-center'>
         <div className='w-80 h-[356px] text-center p-5 shadow-blur-lg rounded-lg'>
-          <h1 className='text-2xl font-semibold text-center'>Login</h1>
+          <h1 className='text-2xl font-semibold text-center'>Subuser Login</h1>
 
           <form onSubmit={handleLogin} className='mt-8 flex flex-col gap-5 text-sm'>
             <div className='w-full max-w-64 mx-auto flex flex-col gap-2'>
