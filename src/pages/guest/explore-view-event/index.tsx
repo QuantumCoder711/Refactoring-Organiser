@@ -635,7 +635,8 @@ const ExploreViewEvent: React.FC = () => {
                                 <div>
                                     {agendaData.length > 0 ? agendaData.map((agenda) => (
                                         <div key={agenda.id} className='!my-4'>
-                                            <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                            <h3 className='font-semibold'>{agenda.title}</h3>
+                                            <h5 className='text-sm text-brand-dark-gray font-medium mb-2'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
                                             <p className='font-light'>{agenda.description}</p>
                                             <div className='flex gap-5 my-3'>
                                                 <div className='grid grid-cols-2 gap-5'>
