@@ -75,7 +75,7 @@ const Features: React.FC = () => {
                                 {feature.heading}
                             </h4>
                         </div>
-                        {activeIndex === index && <p className='text-lg mt-5'>{feature.description}</p>}
+                        {activeIndex === index && <p className='text-sm lg:text-lg mt-5'>{feature.description}</p>}
                         {activeIndex === index && <img src={feature.image} alt={feature.heading} className='mt-5 absolute right-0 left-4' />}
                     </div>
                 ))}

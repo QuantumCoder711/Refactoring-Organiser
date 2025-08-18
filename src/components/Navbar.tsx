@@ -124,7 +124,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/organiser/login');
   }
 
   return (
@@ -265,19 +265,19 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <DropdownMenuContent className='w-40'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <Link to="/profile">
+                  {user?.role ===  "admin" && <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
-                  </Link>
+                  </Link>}
                   {user?.role === "admin" && <Link to="/sub-users">
                     <DropdownMenuItem className='cursor-pointer'>Sub Users</DropdownMenuItem>
                   </Link>}
-                  <Link to="/organiser/change-password">
+                  {user?.role === "admin" && <Link to="/organiser/change-password">
                     <DropdownMenuItem className='cursor-pointer'>Change Password</DropdownMenuItem>
-                  </Link>
+                  </Link>}
                   {/* <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem> */}
-                  <DropdownMenuSeparator />
+                  {user?.role === "admin" && <DropdownMenuSeparator />}
                   <DropdownMenuItem onClick={handleLogout} className='cursor-pointer !text-destructive'>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
