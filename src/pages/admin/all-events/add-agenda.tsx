@@ -44,17 +44,26 @@ const AddAgenda: React.FC = () => {
         }
     }, [event?.id]);
 
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        tag_speakers: [] as string[],
-        event_date: '',
-        position: '',
-        start_time: '',
-        start_time_type: 'PM',
-        end_time: '',
-        end_time_type: 'PM',
-        event_id: event?.id
+    const [formData, setFormData] = useState(() => {
+        // Format the event date to YYYY-MM-DD format for the date input
+        const formatDate = (dateString?: string) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        };
+
+        return {
+            title: '',
+            description: '',
+            tag_speakers: [] as string[],
+            event_date: formatDate(event?.event_date),
+            position: '',
+            start_time: '',
+            start_time_type: 'PM',
+            end_time: '',
+            end_time_type: 'PM',
+            event_id: event?.id
+        };
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
