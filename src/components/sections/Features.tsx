@@ -52,7 +52,7 @@ const Features: React.FC = () => {
 
     return (
         <section className='p-5 mt-7 max-w-[1205px] mx-auto'>
-            <h2 className='text-[40px] font-bold text-center'>How Klout Works</h2>
+            <h2 className='text-2xl sm:text-[40px] font-bold text-center'>How Klout Works</h2>
 
             <div className='mt-[66px] flex flex-row justify-center gap-5'>
                 {features.map((feature, index) => (
@@ -75,7 +75,7 @@ const Features: React.FC = () => {
                                 {feature.heading}
                             </h4>
                         </div>
-                        {activeIndex === index && <p className='text-lg mt-5'>{feature.description}</p>}
+                        {activeIndex === index && <p className='text-sm lg:text-lg mt-5'>{feature.description}</p>}
                         {activeIndex === index && <img src={feature.image} alt={feature.heading} className='mt-5 absolute right-0 left-4' />}
                     </div>
                 ))}

@@ -50,18 +50,18 @@ const ToolsSection: React.FC = () => {
     
     return (
         <section className='max-w-[1205px] flex items-center flex-col justify-center mx-auto p-5'>
-            <h2 className='capitalize text-center mt-14 mb-[70px] text-[40px] font-bold'>Everything you need, in one simple tool</h2>
+            <h2 className='capitalize text-center mt-14 mb-[70px] text-2xl lg:text-[40px] font-bold'>Everything you need, in one simple tool</h2>
             <div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-12'>
                 {toolsData.map((tool, index) => (
                     <div
                         key={index}
                         onClick={() => tool.link}
-                        className="bg-brand-background shadow-blur p-6 rounded-[10px] h-[300px] cursor-pointer group flex flex-col justify-between"
+                        className="bg-brand-background shadow-blur p-6 rounded-[10px] max-h-96 cursor-pointer group flex flex-col justify-between"
                     >
                         <div className='flex flex-col gap-5'>
                             <img src={tool.image} alt={tool.heading} height={75} width={75} className='h-[75px] w-fit' />
                             <h2 className="text-2xl font-medium group-hover:text-brand-primary duration-300">{tool.heading}</h2>
-                            <p className='text-lg'>{tool.paragraph}</p>
+                            <p className=''>{tool.paragraph}</p>
                         </div>
 
                         <div className='w-full flex justify-end'>
