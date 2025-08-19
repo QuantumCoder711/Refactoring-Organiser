@@ -279,8 +279,7 @@ const CheckinPage: React.FC = () => {
                 {
                     mobileNumber: Number(formData.mobile),
                     otp: formData.otp,
-                    eventOtp: event?.event_otp,
-                    eventID: event?.id
+                    eventOtp: event?.event_otp
                 },
                 {
                     headers: {
