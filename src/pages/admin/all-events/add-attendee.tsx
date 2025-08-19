@@ -226,7 +226,7 @@ const CustomComboBox = React.memo(({
 
 const AddAttendee: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
-    const { token } = useAuthStore();
+    const { token, user } = useAuthStore();
     const { getEventBySlug } = useEventStore(state => state);
     const { companies, designations, getDesignations, getCompanies, loading: extrasLoading } = useExtrasStore();
     const { addAttendee, bulkUploadAttendees, loading: attendeeLoading } = useAttendeeStore();
@@ -367,7 +367,7 @@ const AddAttendee: React.FC = () => {
         }
 
         try {
-            const response = await bulkUploadAttendees(token, event.uuid, bulkFile);
+            const response = await bulkUploadAttendees(token, event.uuid, bulkFile, user?.id as number);
 
             if (response.status === 200) {
                 toast(response.message || "Attendees uploaded successfully", {

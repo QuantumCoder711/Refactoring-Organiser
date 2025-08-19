@@ -13,7 +13,7 @@ interface AttendeeStore {
     customCheckIn: (uuid: string, event_uuid: string, event_id: number, user_id: number, token: string) => Promise<CustomCheckInResponse>;
     bulkDeleteAttendees: (token: string, ids: number[]) => Promise<BulkDeleteAttendeesResponse>;
     addAttendee: (token: string, uuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
-    bulkUploadAttendees: (token: string, uuid: string, file: File) => Promise<AddBulkAttendeeResponse>;
+    bulkUploadAttendees: (token: string, uuid: string, file: File, userId: number) => Promise<AddBulkAttendeeResponse>;
     updateAttendee: (token: string, uuid: string, eventUuid: string, attendeeData: FormData) => Promise<AddAttendeeResponse>;
 }
 
@@ -137,12 +137,12 @@ const useAttendeeStore = create<AttendeeStore>((set) => ({
     },
 
     // Bulk Upload Attendees
-    bulkUploadAttendees: async (token: string, uuid: string, file: File) => {
+    bulkUploadAttendees: async (token: string, uuid: string, file: File, userId: number) => {
         try {
             set({ loading: true });
 
             // Call the API with token
-            const response = await bulkUploadAttendees(token, uuid, file);
+            const response = await bulkUploadAttendees(token, uuid, file, userId);
 
             if (response.status === 200) {
                 // Refresh the attendees list for this event
