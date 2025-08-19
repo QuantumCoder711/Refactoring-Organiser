@@ -105,7 +105,7 @@ const SubUserLogin: React.FC = () => {
             </div>
           </form>
           <div className='max-w-64 w-full text-left px-3'>
-            <Link to='/organiser/forgot-password' className='text-brand-primary text-xs'>Forgot Password?</Link>
+            <Link to='/organiser/forgot-password' className='text-brand-primary text-xs'>Contact Administrator</Link>
           </div>
 
           <Button
@@ -115,10 +115,6 @@ const SubUserLogin: React.FC = () => {
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </Button>
-
-          <p className='text-center mt-5 text-xs'>
-            Don't have an account? <Link to='/organiser/signup' className='text-brand-primary'>Signup Here</Link>
-          </p>
         </div>
       </div>
     </React.Fragment>
