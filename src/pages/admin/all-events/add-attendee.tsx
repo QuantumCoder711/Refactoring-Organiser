@@ -434,6 +434,7 @@ const AddAttendee: React.FC = () => {
         // Create FormData using our utility function
         const finalFormData = createFormData(formData, specialFields);
         finalFormData.append('event_id', event.id.toString());
+        finalFormData.append('user_id', String(user?.id));
 
         try {
             const response = await addAttendee(token, event.uuid, finalFormData);
