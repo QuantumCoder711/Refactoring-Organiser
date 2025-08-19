@@ -14,7 +14,7 @@ export const templates = [
     title: "Send Reminder",
     path: `/all-events/event/all-template-messages/send-reminder`,
     sendBy: "both",
-    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event will be held on <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team <strong>{company_name}</strong> <br></p>`,
+    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event will be held on <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team <strong>{company_name}</strong> <br></p>`,
     icon: SendReminderIcon,
     sendTo: false,
     paragraph: "Send a follow-up reminder message to all your guests. Ideally, send it one day before the event."
@@ -22,7 +22,7 @@ export const templates = [
   {
     title: "Send Same Day Reminder",
     path: `/all-events/event/all-template-messages/send-same-day-reminder`,
-    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event is scheduled for <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team  <strong>{company_name}</strong> <br></p>`,
+    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event is scheduled for <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team  <strong>{company_name}</strong> <br></p>`,
     icon: SendSameDayReminderIcon,
     sendBy: "whatsapp",
     sendTo: true,
@@ -50,7 +50,7 @@ export const templates = [
     title: "Day Two Reminder",
     path: `/all-events/event/all-template-messages/day-two-reminder`,
     icon: DayTwoReminderIcon,
-    message: `<br>This is a friendly reminder that Day 2 of <strong>{title}</strong> will commence at <strong>{start_time}</strong> at <strong>{event_venue_name}</strong> <br> <br>We request you to check in and mark your attendance by scanning the QR code at the registration desk. <br><br>The agenda, speaker details, and participant list are all available on the Klout Club app <strong>"Link"</strong> <br> <br>Looking forward to seeing you. <br><br>Regards, <br><strong>{company_name}</strong></p>`,
+    message: `<br>This is a friendly reminder that Day 2 of <strong>{title}</strong> will commence at <strong>{start_time}</strong> at <strong>{event_venue_name}</strong> <br> <br>We request you to check in and mark your attendance by scanning the QR code at the registration desk. <br><br>The agenda, speaker details, and participant list are all available on the Klout Club app <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong> <br> <br>Looking forward to seeing you. <br><br>Regards, <br><strong>{company_name}</strong></p>`,
     sendBy: "whatsapp",
     sendTo: true,
     paragraph: "Send a follow-up reminder message to all your guests for Day 2 of the event. Ideally, send it the evening before the event."

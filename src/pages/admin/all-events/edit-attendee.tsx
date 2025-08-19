@@ -224,7 +224,7 @@ const CustomComboBox = React.memo(({
 const EditAttendee: React.FC = () => {
     const { slug, uuid } = useParams<{ slug: string; uuid: string }>();
     const navigate = useNavigate();
-    const { token } = useAuthStore();
+    const { token, user } = useAuthStore();
     const { getEventBySlug } = useEventStore(state => state);
     const { companies, designations, getDesignations, getCompanies, loading: extrasLoading } = useExtrasStore();
     const { updateAttendee, loading: attendeeLoading, singleEventAttendees, getSingleEventAttendees } = useAttendeeStore();
@@ -416,6 +416,7 @@ const EditAttendee: React.FC = () => {
         // Create FormData using our utility function
         const finalFormData = createFormData(processedFormData, specialFields);
         finalFormData.append('event_id', event.id.toString());
+        finalFormData.append('user_id', String(user?.id));
         finalFormData.append('_method', 'PUT');
 
         try {
