@@ -79,7 +79,6 @@ import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from '@/pages/guest/careers';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 import SubUsers from '@/pages/admin/profile/sub-users';
-import SubUserLogin from '@/pages/guest/login/sub-user-login';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -136,14 +135,6 @@ const App: React.FC = () => {
           element={
             <GuestRoute>
               <Signup />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="organiser/sub-user-login"
-          element={
-            <GuestRoute>
-              <SubUserLogin />
             </GuestRoute>
           }
         />
