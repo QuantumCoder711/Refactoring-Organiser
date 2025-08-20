@@ -160,13 +160,13 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({
                 ? (
                   <img
                     src={image}
-                    className="rounded-t w-full mx-auto object-contain max-h-[160px]"
+                    className="rounded-t w-full mx-auto object-cover max-h-[160px]"
                     alt="Badge"
                   />
                 ) : (
                   <img
                     src={getImageUrl(image)}
-                    className="rounded-t w-full mx-auto object-contain max-h-[160px]"
+                    className="rounded-t w-full mx-auto object-cover max-h-[160px]"
                     alt="Badge"
                   />
                 )
@@ -212,13 +212,13 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({
                 ? (
                   <img
                     src={image}
-                    className="rounded-t w-full mx-auto object-contain max-h-[160px]"
+                    className="rounded-t w-full mx-auto object-cover max-h-[160px]"
                     alt="Badge"
                   />
                 ) : (
                   <img
                     src={getImageUrl(image)}
-                    className="rounded-t w-full mx-auto object-contain max-h-[160px]"
+                    className="rounded-t w-full mx-auto object-cover max-h-[160px]"
                     alt="Badge"
                   />
                 )
