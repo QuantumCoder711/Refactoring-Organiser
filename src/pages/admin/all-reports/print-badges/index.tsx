@@ -63,7 +63,14 @@ const PrintBadges: React.FC = () => {
             </div>
 
             <div className='flex w-full gap-5 flex-wrap'>
-                {totalCheckedInAttendees.length > 0 ? totalCheckedInAttendees.map((attendee, index) => (
+                {totalCheckedInAttendees.length > 0 ? totalCheckedInAttendees
+                  .slice()
+                  .sort((a, b) => {
+                    const timeA = new Date(a.check_in_time || 0).getTime();
+                    const timeB = new Date(b.check_in_time || 0).getTime();
+                    return timeB - timeA;
+                  })
+                  .map((attendee, index) => (
                     <PrintBadge key={index} attendee={attendee} colors={colors as any} print={true} image={event?.badge_banner}/>
                 )) : <div className='w-full h-full grid place-content-center text-2xl font-semibold text-brand-dark-gray'>No Attendees Found</div>}
             </div>
