@@ -100,7 +100,7 @@ const CustomComboBox = React.memo(({
                         onChange={handleInputChange}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full bg-white !h-12 text-base pr-10"
+                        className="w-full bg-white !capitalize !h-12 text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -120,7 +120,7 @@ const CustomComboBox = React.memo(({
                                     className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
                                     onClick={() => handleOptionSelect(option)}
                                 >
-                                    <span>{option.name}</span>
+                                    <span className='capitalize'>{option.name}</span>
                                     {inputValue === option.name && (
                                         <Check className="size-4 text-brand-secondary" />
                                     )}
@@ -176,7 +176,7 @@ const ExploreViewEvent: React.FC = () => {
     });
 
     const [open, setOpen] = useState(false);
-    const { companies, getCompanies } = useExtrasStore(state => state);
+    const { companies, getCompanies, designations, getDesignations } = useExtrasStore(state => state);
 
     const [userAccount, setUserAccount] = useState({
         first_name: '',
@@ -184,8 +184,8 @@ const ExploreViewEvent: React.FC = () => {
         email_id: '',
         phone_number: '',
         company_name: '',
-        acceptance: '1',
-        industry: 'Others'
+        job_title: '',
+        acceptance: '1'
     });
 
     const validateForm = () => {
@@ -196,7 +196,7 @@ const ExploreViewEvent: React.FC = () => {
             phone_number: '',
             email_id: '',
             company_name: '',
-            custom_company_name: ''
+            job_title: ''
         };
 
         if (!userAccount.first_name.trim()) {
@@ -230,6 +230,11 @@ const ExploreViewEvent: React.FC = () => {
             isValid = false;
         }
 
+        if (!userAccount.job_title.trim()) {
+            errors.job_title = 'Please select a job title';
+            isValid = false;
+        }
+
         return isValid;
     };
 
@@ -257,7 +262,8 @@ const ExploreViewEvent: React.FC = () => {
 
     useEffect(() => {
         getCompanies(userAccount.company_name);
-    }, [userAccount.company_name])
+        getDesignations(userAccount.job_title);
+    }, [userAccount.company_name, userAccount.job_title])
 
     useEffect(() => {
         if (currentEvent) {
@@ -753,6 +759,18 @@ const ExploreViewEvent: React.FC = () => {
                                         onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, company_name: value }))}
                                         placeholder="Type or select company"
                                         options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Designation */}
+                                <div className='flex gap-5 justify-between mt-5'>
+                                    <CustomComboBox
+                                        label="Designation"
+                                        value={userAccount.job_title}
+                                        onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, job_title: value }))}
+                                        placeholder="Type or select designation"
+                                        options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                                         required
                                     />
                                 </div>
