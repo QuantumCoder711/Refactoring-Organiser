@@ -14,11 +14,7 @@ export const templates = [
     title: "Send Reminder",
     path: `/all-events/event/all-template-messages/send-reminder`,
     sendBy: "both",
-<<<<<<< HEAD
-    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event will be held on <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team <strong>{company_name}</strong> <br></p>`,
-=======
     message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event will be held on <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, <br>Team <strong>{company_name}</strong> <br></p>`,
->>>>>>> main
     icon: SendReminderIcon,
     sendTo: false,
     paragraph: "Send a follow-up reminder message to all your guests. Ideally, send it one day before the event."
@@ -26,11 +22,7 @@ export const templates = [
   {
     title: "Send Same Day Reminder",
     path: `/all-events/event/all-template-messages/send-same-day-reminder`,
-<<<<<<< HEAD
-    message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event is scheduled for <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, Team  <strong>{company_name}</strong> <br></p>`,
-=======
     message: `<br>Thank you for registering for <strong>{title}</strong>. <br>This is a reminder message that the event is scheduled for <strong>{event_start_date}</strong> at <strong>{event_venue_name}</strong>. <br><br>Registration and check-in for the event will happen with the Klout Club app. <br>To ensure a smooth check-in and networking experience. You can download it here: <strong><a href="https://onelink.to/r3fzb9">https://onelink.to/r3fzb9</a></strong>. <br>We look forward to welcoming you to the event! <br><br>Regards, <br>Team  <strong>{company_name}</strong> <br></p>`,
->>>>>>> main
     icon: SendSameDayReminderIcon,
     sendBy: "whatsapp",
     sendTo: true,
