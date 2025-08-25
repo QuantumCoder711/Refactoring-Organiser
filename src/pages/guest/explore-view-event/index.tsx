@@ -577,7 +577,7 @@ const ExploreViewEvent: React.FC = () => {
                                         <img
                                             src={speaker.image ? domain + "/" + speaker.image : UserAvatar}
                                             alt="Speaker"
-                                            className='rounded-full mx-auto size-24'
+                                            className='rounded-full mx-auto size-24 object-cover object-top'
                                         />
                                         <p className='font-semibold text-wrap capitalize'>{speaker.first_name + ' ' + speaker.last_name}</p>
                                         <p className='text-wrap text-sm capitalize'>{speaker.job_title}</p>
@@ -597,7 +597,7 @@ const ExploreViewEvent: React.FC = () => {
                                         <img
                                             src={sponsor.image ? domain + "/" + sponsor.image : UserAvatar}
                                             alt="Sponsor"
-                                            className='rounded-full mx-auto size-24'
+                                            className='rounded-full mx-auto size-24 object-cover object-top'
                                         />
                                         <p className='font-semibold text-wrap capitalize'>{sponsor.first_name + ' ' + sponsor.last_name}</p>
                                         <p className='text-wrap text-sm capitalize'>{sponsor.job_title}</p>
@@ -639,14 +639,14 @@ const ExploreViewEvent: React.FC = () => {
                                             <h5 className='text-sm text-brand-dark-gray font-medium mb-2'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
                                             <p className='font-light'>{agenda.description}</p>
                                             <div className='flex gap-5 my-3'>
-                                                <div className='grid grid-cols-2 gap-5'>
+                                                <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
                                                     {agenda.speakers.map((speaker) => (
                                                         <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
-                                                            <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
+                                                            <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full object-cover object-top' />
                                                             <div className='space-y-1'>
                                                                 <p className='font-semibold text-lg leading-none capitalize'>{speaker.first_name} {speaker.last_name}</p>
-                                                                <p className='text-sm leading-none capitalize'>{speaker.company_name}</p>
-                                                                <p className='text-xs leading-none capitalize'>{speaker.job_title}</p>
+                                                                <p className='text-sm leading-none text-wrap capitalize'>{speaker.company_name}</p>
+                                                                <p className='text-xs leading-none text-wrap capitalize'>{speaker.job_title}</p>
                                                             </div>
                                                         </div>
                                                     ))}
