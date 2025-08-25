@@ -641,11 +641,11 @@ const UpdateEvent: React.FC = () => {
 
     return (
         <div className='relative w-full'>
-            <div className='absolute top-0 left-0'>
+            <div className='top-0 left-0'>
                 <GoBack />
             </div>
 
-            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background mt-10'>
+            <div className='max-w-[700px] mx-auto rounded-[10px] p-5 lg:p-8 bg-brand-background mt-5'>
                 {/* Event Name */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='title'>
@@ -662,7 +662,7 @@ const UpdateEvent: React.FC = () => {
                 </div>
 
                 {/* Event Type, Image, and Choose Banner Image Button */}
-                <div className='flex gap-7 mt-5 items-center'>
+                <div className='flex sm:flex-row flex-col gap-7 mt-5 items-center'>
                     <div className='flex flex-col w-full gap-5'>
                         {/* Event Type */}
                         <div className="flex flex-col gap-2 w-full">
@@ -770,7 +770,7 @@ const UpdateEvent: React.FC = () => {
 
                 {/* Template Images Section */}
                 {showTemplates && (
-                    <div className='flex justify-between mt-5'>
+                    <div className='flex justify-between gap-3 mt-5 w-full overflow-x-scroll'>
                         {templates.map((template, index) => (
                             <img
                                 onClick={() => handleTemplateSelect(template)}
@@ -787,8 +787,8 @@ const UpdateEvent: React.FC = () => {
 
                 {/* Text Size and Color for Templates */}
                 {showTemplates && (
-                    <div className='flex justify-between items-center mt-[26px] gap-9'>
-                        <div className='flex gap-[18px] items-center flex-1'>
+                    <div className='flex !flex-col sm:!flex-row w-full sm:justify-between sm:items-center mt-[26px] gap-4 sm:gap-9'>
+                        <div className='flex gap-[18px] w-full items-center'>
                             <Label className='font-semibold text-nowrap'>Text Size: </Label>
                             <Slider
                                 defaultValue={[textConfig.size]}
@@ -822,7 +822,7 @@ const UpdateEvent: React.FC = () => {
                 </div>
 
                 {/* Start Time & End Time */}
-                <div className='flex gap-5 w-full mt-5'>
+                <div className='flex flex-col sm:flex-row gap-5 w-full mt-5'>
                     {/* Start Time */}
                     <div className='flex flex-col gap-2 w-full'>
                         <Label className='font-semibold'>
@@ -839,7 +839,7 @@ const UpdateEvent: React.FC = () => {
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData.event_start_date))}</p>
+                                <p className='h-full px-3 flex text-sm items-center'>{beautifyDate(new Date(formData.event_start_date))}</p>
                             </div>
 
                             {/* For Time */}
@@ -851,7 +851,7 @@ const UpdateEvent: React.FC = () => {
                                     onChange={(e) => handleTimeChange(e, 'start')}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center text-nowrap'>
+                                <p className='h-full px-3 flex items-center !text-sm text-nowrap'>
                                     {`${formData.start_time || ''}:${formData.start_minute_time || ''} ${formData.start_time_type || ''}`}
                                 </p>
                             </div>
@@ -874,7 +874,7 @@ const UpdateEvent: React.FC = () => {
                                     onChange={handleInputChange}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center'>{beautifyDate(new Date(formData?.event_end_date || ''))}</p>
+                                <p className='h-full px-3 flex items-center text-sm'>{beautifyDate(new Date(formData?.event_end_date || ''))}</p>
                             </div>
 
                             {/* For Time */}
@@ -886,7 +886,7 @@ const UpdateEvent: React.FC = () => {
                                     onChange={(e) => handleTimeChange(e, 'end')}
                                     className='w-full custom-input h-full absolute opacity-0'
                                 />
-                                <p className='h-full px-3 flex items-center text-nowrap'>
+                                <p className='h-full px-3 flex items-center text-sm text-nowrap'>
                                     {`${formData.end_time || ''}:${formData.end_minute_time || ''} ${formData.end_time_type || ''}`}
                                 </p>
                             </div>
@@ -935,11 +935,11 @@ const UpdateEvent: React.FC = () => {
 
                 </div>
 
-                {/* Printers Count */}
-                <div className='flex items-center justify-between gap-5 mt-5'>
+                {/* Printers Count, Breakout Rooms and View Agenda By */}
+                <div className='flex flex-col sm:flex-row items-center justify-between gap-5 mt-5'>
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='printer_count'>
-                            No. of Printers <span className="text-brand-secondary">*</span>
+                            No. of Printers
                         </Label>
                         <Input
                             id="printer_count"
@@ -969,7 +969,7 @@ const UpdateEvent: React.FC = () => {
                     {/* View Agenda By */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='view_agenda_by'>
-                            View Agenda By <span className="text-brand-secondary">*</span>
+                            View Agenda By
                         </Label>
                         <div className='input !h-12 min-w-full flex items-center text-base px-4'>
                             <div className='flex gap-4 items-center text-brand-dark-gray'>
@@ -1006,7 +1006,7 @@ const UpdateEvent: React.FC = () => {
                     </div>
                 </div>
 
-                <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-80 mx-auto'>Update</Button>
+                <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-full max-w-80 mx-auto'>Update</Button>
             </div>
         </div>
     );

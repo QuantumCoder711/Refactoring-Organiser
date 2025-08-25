@@ -25,6 +25,7 @@ import Wave from '@/components/Wave';
 import { useLoadScript } from '@react-google-maps/api';
 import GoBack from '@/components/GoBack';
 import { Helmet } from 'react-helmet';
+import { AttendeeType } from '@/types';
 
 const createQRCode = (uuid: string | undefined, break_out: number | undefined): string => {
     return `https://kloutclub.page.link/?link=${encodeURIComponent(
@@ -223,10 +224,10 @@ const ViewEvent: React.FC = () => {
                 <title>{event?.title}</title>
             </Helmet>
             <div className='w-full min-h-screen bg-brand-foreground text-black'>
-                <div className='sticky top-0 z-50 bg-brand-foreground'>
+                <div className='top-0 z-50 bg-brand-foreground'>
                     <GoBack />
                 </div>
-                <div className='max-w-2xl mx-auto bg-brand-background rounded-lg px-4 py-8'>
+                <div className='max-w-2xl mt-5 mx-auto bg-brand-background rounded-lg md:px-4 md:py-8'>
                     <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
                     <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
 
@@ -399,35 +400,38 @@ const ViewEvent: React.FC = () => {
                         {/* Agenda Details */}
                         <div className='p-5 border-t border-white'>
                             <h3 className='font-semibold'>Agenda</h3>
-                            {agendaData.length > 0 ? agendaData.map((agenda) => (
-                                <div key={agenda.id} className='!my-4'>
-                                    <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time} {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
-                                    <p className='font-light'>{agenda.description}</p>
-                                    <div className='flex gap-5 my-3'>
-                                        <div className='grid grid-cols-2 gap-5'>
-                                            {agenda.speakers.map((speaker: any) => (
-                                                <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
-                                                    <img src={`${domain}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
-                                                    <div className='space-y-1'>
-                                                        <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
-                                                        <p className='text-sm leading-none'>{speaker.company_name}</p>
-                                                        <p className='text-xs leading-none'>{speaker.job_title}</p>
+                            <div>
+                                {agendaData.length > 0 ? agendaData.map((agenda) => (
+                                    <div key={agenda.id} className='!my-4'>
+                                        <h3 className='font-semibold'>{agenda.title}</h3>
+                                        <h5 className='text-sm text-brand-dark-gray font-medium mb-2'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                        <p className='font-light'>{agenda.description}</p>
+                                        <div className='flex gap-5 my-3'>
+                                            <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+                                                {agenda.speakers.map((speaker: AttendeeType) => (
+                                                    <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
+                                                        <img src={speaker.image ? `${domain}/${speaker.image}` : UserAvatar} alt="user" className='size-14 rounded-full object-cover object-top' />
+                                                        <div className='space-y-1'>
+                                                            <p className='font-semibold text-lg leading-none capitalize'>{speaker.first_name} {speaker.last_name}</p>
+                                                            <p className='text-sm leading-none text-wrap capitalize'>{speaker.company_name}</p>
+                                                            <p className='text-xs leading-none text-wrap capitalize'>{speaker.job_title}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                                )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                            </div>
                         </div>
 
                         {/* Event Speakers */}
                         <div className='p-5 border-t border-white'>
                             <h3 className='font-semibold'>Speakers</h3>
-                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
+                            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 place-items-center gap-4 space-y-8'>
                                 {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
-                                    <div key={index} className='text-sm text-center space-y-2 max-w-56'>
-                                        <img src={speaker.image ? domain + "/" + speaker.image : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
+                                    <div key={index} className='text-sm text-center capitalize space-y-2 max-w-56'>
+                                        <img src={speaker.image ? getImageUrl(speaker.image) : UserAvatar} alt="Speaker Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
                                         <h4 className='font-semibold leading-none'>{speaker.first_name} {speaker.last_name}</h4>
                                         <p className='leading-none'>{speaker.company_name}</p>
                                         <p className='leading-none font-light'>{speaker.job_title}</p>
@@ -442,7 +446,7 @@ const ViewEvent: React.FC = () => {
                                 <h3 className='font-semibold'>Jury</h3>
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
                                     {allJury.map((jury, index) => (
-                                        <div key={index} className='text-sm space-y-2 text-center max-w-28 border-2'>
+                                        <div key={index} className='text-sm capitalize space-y-2 text-center max-w-28 border-2'>
                                             <img src={jury.image ? domain + "/" + jury.image : UserAvatar} alt="Jury Avatar" width={48} height={48} className='rounded-full mx-auto size-20' />
                                             <h4 className='font-semibold leading-none'>{jury.first_name} {jury.last_name}</h4>
                                             <p className='leading-none'>{jury.company_name}</p>
