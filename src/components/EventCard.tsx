@@ -17,6 +17,7 @@ import {
 import Wave from '@/components/Wave';
 import useEventStore from '@/store/eventStore';
 import { Separator } from '@/components/ui/separator';
+import useAuthStore from '@/store/authStore';
 
 interface EventCardProps {
     title: string;
@@ -80,6 +81,8 @@ const EventCard: React.FC<EventCardProps> = ({
     const checkInCounts = useEventStore((s) => s.checkInCounts);
     const checkInCount = checkInCounts[uuid] || 0;
 
+    const {user} = useAuthStore(state=>state);
+
     // Format date from YYYY-MM-DD to DD-MMM-YYYY
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
@@ -134,7 +137,7 @@ const EventCard: React.FC<EventCardProps> = ({
                                 <Printer size={16} />
                             </Link>
 
-                            <AlertDialog>
+                            {user?.role === 'admin' && <AlertDialog>
                                 <AlertDialogTrigger
                                     className='grid place-content-center text-white w-8 h-8 bg-brand-secondary hover:bg-brand-secondary cursor-pointer rounded-full z-50 top-2 right-2'
                                 >
@@ -152,7 +155,7 @@ const EventCard: React.FC<EventCardProps> = ({
                                         <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={handleDeleteEvent}>Delete</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
-                            </AlertDialog>
+                            </AlertDialog>}
                         </div>
                     </div>
 
@@ -204,11 +207,13 @@ const EventCard: React.FC<EventCardProps> = ({
                 <Separator className='bg-white !h-[1px] mt-1' />
                 {/* Buttons */}
                 <div className='grid grid-row-2 gap-2 mt-1'>
-                    <div className='grid grid-cols-3 gap-2'>
+                    <div className={`grid gap-2 ${user?.role === "subuser" ? "grid-cols-2":"grid-cols-3"}`}>
                         {buttonLinks.slice(0, 3).map((button, index) => (
-                            <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-brand-primary text-center px-2 py-1 grid place-content-center text-sm'>
-                                {button.label}
-                            </Link>
+                            button.path === "/all-events/update-event/" && user?.role === 'subuser' ? null : (
+                                <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-brand-primary text-center px-2 py-1 grid place-content-center text-sm'>
+                                    {button.label}
+                                </Link>
+                            )
                         ))}
                     </div>
                     <div className='grid grid-cols-2 gap-2'>
