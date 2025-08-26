@@ -46,7 +46,7 @@ const ExploreAllEvents: React.FC = () => {
 
         // Extract unique cities from events and convert to lowercase
         const uniqueCities: any[] = Array.from(new Set(filteredEvents.map((event: any) => {
-          return event.city.toLowerCase();
+          return event?.city?.toLowerCase();
         })));
 
         setCities(uniqueCities);
@@ -81,7 +81,7 @@ const ExploreAllEvents: React.FC = () => {
   const filterEventsByCity = (events: any[]) => {
     if (selectedCity === "all") return events;
     return events.filter(event => {
-      return event.city.toLowerCase() === selectedCity.replace(/-/g, ' ');
+      return event?.city?.toLowerCase() === selectedCity.replace(/-/g, ' ');
     });
   };
 
