@@ -6,14 +6,33 @@ import Wave from '@/components/Wave';
 import GoogleMap from '@/components/GoogleMap';
 import { AgendaType, AttendeeType, EventType } from '@/types';
 import { toast } from 'sonner';
-import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check } from 'lucide-react';
-import { formatDateTime } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check, CircleXIcon } from 'lucide-react';
+import { formatDateTime, getImageUrl } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import useExtrasStore from '@/store/extrasStore';
 import { Helmet } from 'react-helmet';
+import DocumentRenderer from '@/components/DocumentRenderer';
+
+interface CompanySponsor {
+    id: number;
+    event_id: number;
+    company_name: string;
+    company_logo: string;
+}
+
+interface Sponsor extends CompanySponsor {
+    uuid: string;
+    user_id: number;
+    about_company: string;
+    video_link: string | null;
+    upload_deck: string[];
+    created_at: string;
+    updated_at: string;
+    attendees: AttendeeType[];
+}
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -162,7 +181,10 @@ const ExploreViewEvent: React.FC = () => {
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
     const [allJury, setAllJury] = useState<any[]>([]);
     const [allSponsors, setAllSponsors] = useState<AttendeeType[]>([]);
+    const [allCompanySponsors, setAllCompanySponsors] = useState<CompanySponsor[]>([]);
     const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
+    const [singleCompanySponsor, setSingleCompanySponsor] = useState<Sponsor | null>(null);
+    const [singleSponsorLoading, setSingleSponsorLoading] = useState<boolean>(false);
 
     const [form, setForm] = useState({
         amount: 0,
@@ -202,37 +224,75 @@ const ExploreViewEvent: React.FC = () => {
         if (!userAccount.first_name.trim()) {
             errors.first_name = 'First name is required';
             isValid = false;
+            toast("First name is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.last_name.trim()) {
             errors.last_name = 'Last name is required';
             isValid = false;
+            toast("Last name is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.phone_number.trim()) {
             errors.phone_number = 'Mobile number is required';
             isValid = false;
+            toast("Mobile number is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
         } else if (!/^\d{10}$/.test(userAccount.phone_number)) {
             errors.phone_number = 'Please enter a valid 10-digit mobile number';
             isValid = false;
+            toast("Please enter a valid 10-digit mobile number", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.email_id.trim()) {
             errors.email_id = 'Email is required';
             isValid = false;
+            toast("Email is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
         } else if (!/\S+@\S+\.\S+/.test(userAccount.email_id)) {
             errors.email_id = 'Please enter a valid email address';
             isValid = false;
+            toast("Please enter a valid email address", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.company_name.trim()) {
             errors.company_name = 'Please select a company';
             isValid = false;
+            toast("Please select a company", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.job_title.trim()) {
             errors.job_title = 'Please select a job title';
             isValid = false;
+            toast("Please select a job title", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         return isValid;
@@ -313,8 +373,36 @@ const ExploreViewEvent: React.FC = () => {
                 .catch((err) => {
                     console.log("The error is", err);
                 });
+
+            axios.post(`${domain}/api/get-sponsors/${currentEvent.id}`)
+                .then((res) => {
+                    if (res.data.success) {
+                        setAllCompanySponsors(res.data.data);
+                        console.log(res.data.data);
+                    }
+                })
+                .catch((err) => {
+                    console.log("The error is", err);
+                });
         }
     }, [currentEvent]);
+
+    const getSingleSponsor = async (id: number) => {
+        try {
+            setSingleSponsorLoading(true);
+            const response = await axios.post(`${domain}/api/display-sponsors/${id}`);
+            if (response.data.success) {
+                setSingleCompanySponsor({ ...response.data.sponsor, attendees: response.data.attendees });
+            }
+        } catch (error) {
+            toast("Something went wrong", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className="size-5" />
+            });
+        } finally {
+            setSingleSponsorLoading(false);
+        }
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -475,8 +563,17 @@ const ExploreViewEvent: React.FC = () => {
     return (
         <React.Fragment>
             <Helmet>
+                {/* Regular title for the browser tab */}
                 <title>{currentEvent?.title}</title>
+
+                {/* Open Graph Meta Tags for social sharing */}
+                <meta property="og:title" content={currentEvent?.title} />
+                <meta property="og:description" content={currentEvent?.description || "Event description not available"} />
+                <meta property="og:image" content={getImageUrl(currentEvent?.image) || "default-image-url.jpg"} />
+                <meta property="og:url" content={window.location.href} />
+                <meta property="og:type" content="website" />
             </Helmet>
+
             <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
                 <div
                     dangerouslySetInnerHTML={{ __html: form as unknown as string }}
@@ -633,6 +730,97 @@ const ExploreViewEvent: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Sponsors */}
+                        <div hidden={allCompanySponsors.length === 0} className='mt-6'>
+                            <h3 className='font-semibold text-lg'>Company Sponsors</h3>
+                            <hr className='border-t-2 border-white !my-[10px]' />
+                            <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+                                {allCompanySponsors.map((sponsor, index) => (
+                                    <div key={index} className='max-w-60 max-h-96 flex flex-col gap-2 overflow-hidden text-ellipsis text-center'>
+                                        <img
+                                            src={sponsor.company_logo ? domain + "/" + sponsor.company_logo : UserAvatar}
+                                            alt="Sponsor"
+                                            className='rounded-full mx-auto size-24'
+                                        />
+                                        <p className='font-semibold text-wrap capitalize'>{sponsor.company_name}</p>
+                                        {/* <Button className='btn btn-primary'>View Details</Button> */}
+
+                                        <Dialog>
+                                            <DialogTrigger onClick={() => getSingleSponsor(sponsor.id)} className='underline underline-offset-1 text-brand-primary hover:text-brand-primary-dark transition-colors duration-300 cursor-pointer'>View Details</DialogTrigger>
+                                            <DialogContent className='w-3xl h-10/12 overflow-scroll'>
+                                                {singleSponsorLoading ? <Wave /> :
+                                                    <>
+                                                        <DialogHeader>
+                                                            <DialogTitle>
+                                                                <div className="flex gap-5 items-center mb-5">
+                                                                    {
+                                                                        sponsor?.company_logo ? <img src={getImageUrl(sponsor.company_logo)} alt={sponsor.company_name} className="size-28 border-2 object-contain rounded-full" />
+                                                                            : <div className="size-28 bg-brand-primary/30 rounded-full" />
+                                                                    }
+                                                                    <h3 className="font-semibold capitalize">{sponsor?.company_name}</h3>
+                                                                </div>
+                                                            </DialogTitle>
+                                                            <DialogDescription>
+                                                                <h3 className='font-semibold text-black'>About Company</h3>
+                                                                <div className="mt-2">
+                                                                    <p>{singleCompanySponsor?.about_company}</p>
+                                                                </div>
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+
+                                                        {/* Attendees */}
+                                                        <div className="grid grid-cols-3 gap-5 mt-5">
+                                                            {singleCompanySponsor?.attendees.map(attendee => (
+                                                                <div key={index} className='max-w-60 max-h-96 flex flex-col gap-1 overflow-hidden text-ellipsis text-center'>
+                                                                    <img
+                                                                        src={attendee.image ? domain + "/" + attendee.image : UserAvatar}
+                                                                        alt="Sponsor"
+                                                                        className='rounded-full mx-auto size-24 object-cover object-top'
+                                                                    />
+                                                                    <p className='font-semibold text-sm text-wrap capitalize'>{attendee.first_name + ' ' + attendee.last_name}</p>
+                                                                    <p className='text-wrap text-xs capitalize'>{attendee.job_title}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Video Link */}
+                                                        {singleCompanySponsor?.video_link && (
+                                                            <div className="w-full h-80 rounded-xl mt-10">
+                                                                {(() => {
+                                                                    const link = singleCompanySponsor.video_link;
+                                                                    // Check for YouTube
+                                                                    const youtubeMatch = link.match(/(?:youtu.be\/|youtube.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                                                                    if (youtubeMatch) {
+                                                                        const videoId = youtubeMatch[1];
+                                                                        return (
+                                                                            <iframe
+                                                                                src={`https://www.youtube.com/embed/${videoId}`}
+                                                                                title="Sponsor Video"
+                                                                                className="w-full h-full rounded-xl"
+                                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                                allowFullScreen
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                })()}
+
+                                                                {singleCompanySponsor?.upload_deck && (
+                                                                    <div className="w-full rounded-xl mt-10">
+                                                                        <DocumentRenderer filePaths={singleCompanySponsor.upload_deck} />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                }
+                                            </DialogContent>
+                                        </Dialog>
+
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         {/* Agenda Details */}
                         {viewAgendaBy == 0 && <div className='mt-6'>
                             <h3 className='font-semibold text-lg'>Agenda Details</h3>
@@ -700,7 +888,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* First Name & Last Name */}
                                 <div className='flex gap-5 justify-between'>
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>First Name</Label>
+                                        <Label className='font-semibold'>First Name <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.first_name}
@@ -712,7 +900,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
 
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Last Name</Label>
+                                        <Label className='font-semibold'>Last Name <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.last_name}
@@ -727,7 +915,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* Email & Mobile Number */}
                                 <div className='flex gap-5 justify-between mt-5'>
                                     <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Email</Label>
+                                        <Label className='font-semibold'>Email <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.email_id}
@@ -739,7 +927,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
 
                                     <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Mobile Number</Label>
+                                        <Label className='font-semibold'>Mobile Number <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.phone_number}
