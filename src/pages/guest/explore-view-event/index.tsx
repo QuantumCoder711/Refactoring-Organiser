@@ -563,15 +563,23 @@ const ExploreViewEvent: React.FC = () => {
     return (
         <React.Fragment>
             <Helmet>
-                {/* Regular title for the browser tab */}
                 <title>{currentEvent?.title}</title>
+                <meta name="description" content={currentEvent?.description} />
 
-                {/* Open Graph Meta Tags for social sharing */}
-                <meta property="og:title" content={currentEvent?.title} />
-                <meta property="og:description" content={currentEvent?.description || "Event description not available"} />
-                <meta property="og:image" content={getImageUrl(currentEvent?.image) || "default-image-url.jpg"} />
+                {/* Facebook Meta Tags */}
                 <meta property="og:url" content={window.location.href} />
                 <meta property="og:type" content="website" />
+                <meta property="og:title" content={currentEvent?.title} />
+                <meta property="og:description" content={currentEvent?.description} />
+                <meta property="og:image" content={getImageUrl(currentEvent?.image)} />
+
+                {/* Twitter Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta property="twitter:domain" content="klout.club" />
+                <meta property="twitter:url" content={window.location.href} />
+                <meta name="twitter:title" content={currentEvent?.title} />
+                <meta name="twitter:description" content={currentEvent?.description} />
+                <meta name="twitter:image" content={getImageUrl(currentEvent?.image)} />
             </Helmet>
 
             <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
