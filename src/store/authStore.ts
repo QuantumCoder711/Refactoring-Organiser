@@ -53,10 +53,12 @@ const useAuthStore = create<AuthStore>()(
               email: response.data.email,
               first_name: response.data.name.split(" ")[0],
               last_name: response.data.name.split(" ")[1] || '',
-              role: 'subuser',
-              sub_users: [],
+              role: response.data.role,
               subuser_id: response.data.subuser_id,
-              user_id: response.data.user_id
+              user_id: response.data.user_id,
+              wallet_balance: response.data.wallet_balance,
+              feature_permission: response.data.feature_permission,
+              sub_users: response.data.event_permission
             } as unknown as UserType
           });
         }

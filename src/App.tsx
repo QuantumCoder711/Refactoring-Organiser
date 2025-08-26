@@ -217,7 +217,7 @@ const App: React.FC = () => {
         <Route path="all-events">
           <Route path="view/:slug" element={<ViewEvent />} />
           <Route path="attendees/:slug" element={<Attendees />} />
-          <Route path="update-event/:slug" element={<UpdateEvent />} />
+          {user?.role === 'admin' &&<Route path="update-event/:slug" element={<UpdateEvent />} />}
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
           <Route path=":slug/edit-attendee/:uuid" element={<EditAttendee />} />
           <Route path="send-invitations/:slug" element={<SendInvitations />} />
