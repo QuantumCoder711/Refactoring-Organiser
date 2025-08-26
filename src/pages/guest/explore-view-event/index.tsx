@@ -6,7 +6,7 @@ import Wave from '@/components/Wave';
 import GoogleMap from '@/components/GoogleMap';
 import { AgendaType, AttendeeType, EventType } from '@/types';
 import { toast } from 'sonner';
-import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check } from 'lucide-react';
+import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check, CircleXIcon } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -100,7 +100,7 @@ const CustomComboBox = React.memo(({
                         onChange={handleInputChange}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full bg-white !h-12 text-base pr-10"
+                        className="w-full bg-white !capitalize !h-12 text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -120,7 +120,7 @@ const CustomComboBox = React.memo(({
                                     className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
                                     onClick={() => handleOptionSelect(option)}
                                 >
-                                    <span>{option.name}</span>
+                                    <span className='capitalize'>{option.name}</span>
                                     {inputValue === option.name && (
                                         <Check className="size-4 text-brand-secondary" />
                                     )}
@@ -176,7 +176,7 @@ const ExploreViewEvent: React.FC = () => {
     });
 
     const [open, setOpen] = useState(false);
-    const { companies, getCompanies } = useExtrasStore(state => state);
+    const { companies, getCompanies, designations, getDesignations } = useExtrasStore(state => state);
 
     const [userAccount, setUserAccount] = useState({
         first_name: '',
@@ -184,8 +184,8 @@ const ExploreViewEvent: React.FC = () => {
         email_id: '',
         phone_number: '',
         company_name: '',
-        acceptance: '1',
-        industry: 'Others'
+        job_title: '',
+        acceptance: '1'
     });
 
     const validateForm = () => {
@@ -196,38 +196,81 @@ const ExploreViewEvent: React.FC = () => {
             phone_number: '',
             email_id: '',
             company_name: '',
-            custom_company_name: ''
+            job_title: ''
         };
 
         if (!userAccount.first_name.trim()) {
             errors.first_name = 'First name is required';
             isValid = false;
+            toast("First name is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.last_name.trim()) {
             errors.last_name = 'Last name is required';
             isValid = false;
+            toast("Last name is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.phone_number.trim()) {
             errors.phone_number = 'Mobile number is required';
             isValid = false;
+            toast("Mobile number is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
         } else if (!/^\d{10}$/.test(userAccount.phone_number)) {
             errors.phone_number = 'Please enter a valid 10-digit mobile number';
             isValid = false;
+            toast("Please enter a valid 10-digit mobile number", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.email_id.trim()) {
             errors.email_id = 'Email is required';
             isValid = false;
+            toast("Email is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
         } else if (!/\S+@\S+\.\S+/.test(userAccount.email_id)) {
             errors.email_id = 'Please enter a valid email address';
             isValid = false;
+            toast("Please enter a valid email address", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         if (!userAccount.company_name.trim()) {
             errors.company_name = 'Please select a company';
             isValid = false;
+            toast("Please select a company", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
+        }
+
+        if (!userAccount.job_title.trim()) {
+            errors.job_title = 'Please select a job title';
+            isValid = false;
+            toast("Please select a job title", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
         }
 
         return isValid;
@@ -257,7 +300,8 @@ const ExploreViewEvent: React.FC = () => {
 
     useEffect(() => {
         getCompanies(userAccount.company_name);
-    }, [userAccount.company_name])
+        getDesignations(userAccount.job_title);
+    }, [userAccount.company_name, userAccount.job_title])
 
     useEffect(() => {
         if (currentEvent) {
@@ -694,7 +738,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* First Name & Last Name */}
                                 <div className='flex gap-5 justify-between'>
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>First Name</Label>
+                                        <Label className='font-semibold'>First Name <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.first_name}
@@ -706,7 +750,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
 
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Last Name</Label>
+                                        <Label className='font-semibold'>Last Name <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.last_name}
@@ -721,7 +765,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* Email & Mobile Number */}
                                 <div className='flex gap-5 justify-between mt-5'>
                                     <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Email</Label>
+                                        <Label className='font-semibold'>Email <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.email_id}
@@ -733,7 +777,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
 
                                     <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Mobile Number</Label>
+                                        <Label className='font-semibold'>Mobile Number <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.phone_number}
@@ -753,6 +797,18 @@ const ExploreViewEvent: React.FC = () => {
                                         onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, company_name: value }))}
                                         placeholder="Type or select company"
                                         options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
+                                        required
+                                    />
+                                </div>
+
+                                {/* Designation */}
+                                <div className='flex gap-5 justify-between mt-5'>
+                                    <CustomComboBox
+                                        label="Designation"
+                                        value={userAccount.job_title}
+                                        onValueChange={(value: string) => setUserAccount(prev => ({ ...prev, job_title: value }))}
+                                        placeholder="Type or select designation"
+                                        options={designations.map((designation, index) => ({ id: index + 1, name: designation.designation }))}
                                         required
                                     />
                                 </div>
