@@ -85,6 +85,8 @@ export interface EventType {
     event_otp: string;
     paid_event: number;
     event_fee: string;
+    event_mode: 0 | 1;
+    webinar_link: string;
     total_attendee: number;
     total_accepted: number;
     total_not_accepted: number;
@@ -130,6 +132,8 @@ export interface AddEventType {
     event_fee: string;
     paid_event: number;
     printer_count: number | null;
+    event_mode: 0 | 1;
+    webinar_link: string;
     event_venue_name: string;
     event_venue_address_1: string;
     event_venue_address_2: string;

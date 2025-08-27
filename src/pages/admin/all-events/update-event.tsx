@@ -23,6 +23,8 @@ import GoBack from '@/components/GoBack';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as htmlToImage from 'html-to-image';
 
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 const UpdateEvent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
@@ -64,6 +66,8 @@ const UpdateEvent: React.FC = () => {
         event_fee: "0",
         paid_event: 0,
         printer_count: 0,
+        event_mode: 0,
+        webinar_link: "",
         pincode: '',
         state: '',
         city: '',
@@ -160,6 +164,8 @@ const UpdateEvent: React.FC = () => {
                 event_fee: event.event_fee || "0",
                 paid_event: event.paid_event || 0,
                 printer_count: event.printer_count || 0,
+                event_mode: event.event_mode || 0,
+                webinar_link: event.webinar_link || "",
                 pincode: event.pincode || '',
                 state: event.state || '',
                 city: event.city || '',
@@ -390,8 +396,8 @@ const UpdateEvent: React.FC = () => {
 
     // Validation function
     const validateForm = useCallback((data: AddEventType) => {
-        // Define required fields based on UI asterisks
-        const requiredFields: (keyof AddEventType)[] = [
+        // Define base required fields
+        const baseRequiredFields: (keyof AddEventType)[] = [
             'title',
             'description',
             'image',
@@ -403,8 +409,18 @@ const UpdateEvent: React.FC = () => {
             'end_time',
             'end_minute_time',
             'end_time_type',
-            'google_map_link',
         ];
+
+        // Add conditional required fields based on event mode
+        let requiredFields = [...baseRequiredFields];
+
+        if (data.event_mode === 0) {
+            // In Person mode - require location fields
+            requiredFields.push('google_map_link');
+        } else if (data.event_mode === 1) {
+            // Online mode - require webinar link
+            requiredFields.push('webinar_link');
+        }
 
         // Check required fields
         const missingFields = requiredFields.filter(field => {
@@ -498,6 +514,33 @@ const UpdateEvent: React.FC = () => {
         try {
             const eventUuid = event.uuid;
             let dataToSubmit = { ...formData };
+
+            // Prepare form data based on event mode
+            if (dataToSubmit.event_mode === 0) {
+                // In Person mode - set webinar_link to empty and keep location fields
+                dataToSubmit = {
+                    ...dataToSubmit,
+                    webinar_link: ""
+                };
+            } else if (dataToSubmit.event_mode === 1) {
+                // Online mode - set location-related fields to empty/default values and ensure webinar_link is included
+                dataToSubmit = {
+                    ...dataToSubmit,
+                    google_map_link: "",
+                    event_venue_name: "",
+                    event_venue_address_1: "",
+                    event_venue_address_2: "",
+                    pincode: "",
+                    state: "",
+                    city: "",
+                    country: "",
+                    printer_count: 0,
+                    break_out: 0,
+                    view_agenda_by: 0,
+                    event_otp: "",
+                    webinar_link: formData.webinar_link
+                };
+            }
 
             // Handle template image if selected
             if (imageSource === 'template' && selectedTemplate && imageRef.current) {
@@ -894,8 +937,35 @@ const UpdateEvent: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Location */}
+                {/* Event Mode */}
                 <div className='flex flex-col gap-2 mt-5'>
+                    <Label className='font-semibold' htmlFor='event_mode'>Event Mode</Label>
+                    <Select
+                        value={formData.event_mode.toString()}
+                        onValueChange={(value) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                event_mode: parseInt(value) as 0 | 1,
+                                // Reset related fields when mode changes
+                                // webinar_link: parseInt(value) === 1 ? "" : prev.webinar_link,
+                                // google_map_link: parseInt(value) === 0 ? "" : prev.google_map_link,
+                            }));
+                        }}
+                    >
+                        <SelectTrigger className="w-full input !h-12 !min-w-full cursor-pointer">
+                            <SelectValue placeholder="Select Event Mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value="0" className='cursor-pointer'>In Person</SelectItem>
+                                <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Location */}
+                <div hidden={formData.event_mode === 1} className='flex flex-col gap-2 mt-5'>
                     <Label className='font-semibold' htmlFor='google_map_link'>
                         Location <span className="text-brand-secondary">*</span>
                     </Label>
@@ -935,8 +1005,27 @@ const UpdateEvent: React.FC = () => {
 
                 </div>
 
+                {/* Webinar Link */}
+                <div hidden={formData.event_mode === 0} className='flex flex-col gap-2 mt-5'>
+                    <Label className='font-semibold' htmlFor='webinar_link'>
+                        Webinar Link <span className="text-brand-secondary">*</span>
+                    </Label>
+                    <div className='relative'>
+                        <Input
+                            id='webinar_link'
+                            name='webinar_link'
+                            type='text'
+                            value={formData.webinar_link}
+                            onChange={handleInputChange}
+                            placeholder='Enter Webinar Link'
+                            className='input !h-12 min-w-full text-base'
+                        />
+
+                    </div>
+                </div>
+
                 {/* Printers Count, Breakout Rooms and View Agenda By */}
-                <div className='flex flex-col sm:flex-row items-center justify-between gap-5 mt-5'>
+                <div hidden={formData.event_mode === 1} className='flex flex-col sm:flex-row items-center justify-between gap-5 mt-5'>
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='printer_count'>
                             No. of Printers
@@ -988,7 +1077,7 @@ const UpdateEvent: React.FC = () => {
                     </div>
                 </div>
 
-                <div className='flex mt-5 gap-2 flex-col'>
+                <div hidden={formData.event_mode === 1} className='flex mt-5 gap-2 flex-col'>
                     <Label className='font-semibold'>Event OTP</Label>
                     <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                         <Input

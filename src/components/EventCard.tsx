@@ -1,4 +1,4 @@
-import { MapPin, Printer, Trash } from 'lucide-react';
+import { Globe, MapPin, Printer, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -81,7 +81,7 @@ const EventCard: React.FC<EventCardProps> = ({
     const checkInCounts = useEventStore((s) => s.checkInCounts);
     const checkInCount = checkInCounts[uuid] || 0;
 
-    const {user} = useAuthStore(state=>state);
+    const { user } = useAuthStore(state => state);
 
     // Format date from YYYY-MM-DD to DD-MMM-YYYY
     const formatDate = (dateString: string) => {
@@ -200,14 +200,25 @@ const EventCard: React.FC<EventCardProps> = ({
                 </div>
                 <h4 className='text-sm font-semibold text-nowrap text-ellipsis overflow-hidden uppercase mt-1'>{title}</h4>
                 <div className='overflow-hidden text-ellipsis text-nowrap flex gap-1 mt-1 items-center'>
-                    {!isLive ? <><MapPin className='min-w-4 min-h-4 size-4' /> <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>{location}</span></> : <div className='text-brand-primary font-medium text-sm'>
+                    {!isLive ? <>
+                        {location ?
+                            <>
+                                <MapPin className='min-w-4 min-h-4 size-4' />
+                                <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>{location}</span>
+                            </> :
+                            <>
+                                <Globe className='min-w-4 min-h-4 size-4' />
+                                <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>Online</span>
+                            </>
+                        }
+                    </> : <div className='text-brand-primary font-medium text-sm'>
                         Live CheckIn Count - {checkInCount || total_checked_in}
                     </div>}
                 </div>
                 <Separator className='bg-white !h-[1px] mt-1' />
                 {/* Buttons */}
                 <div className='grid grid-row-2 gap-2 mt-1'>
-                    <div className={`grid gap-2 ${user?.role === "subuser" ? "grid-cols-2":"grid-cols-3"}`}>
+                    <div className={`grid gap-2 ${user?.role === "subuser" ? "grid-cols-2" : "grid-cols-3"}`}>
                         {buttonLinks.slice(0, 3).map((button, index) => (
                             button.path === "/all-events/update-event/" && user?.role === 'subuser' ? null : (
                                 <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-brand-primary text-center px-2 py-1 grid place-content-center text-sm'>
