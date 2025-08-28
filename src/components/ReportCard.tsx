@@ -22,22 +22,6 @@ const ReportCard: React.FC<ReportCardProps> = ({
     slug,
 }) => {
 
-    // Format date from YYYY-MM-DD to DD-MMM-YYYY
-    const formatDate = (dateString: string) => {
-        if (!dateString) return '';
-
-        try {
-            const date = new Date(dateString);
-            const day = date.getDate();
-            const month = date.toLocaleString('default', { month: 'short' });
-            const year = date.getFullYear();
-
-            return `${day}-${month}-${year}`;
-        } catch (error) {
-            return dateString; // Return original if parsing fails
-        }
-    };
-
     return (
         <div className="w-full max-w-lg flex rounded-xl shadow-blur-lg relative">
             <div className="min-h-64 h-fit flex flex-col">
