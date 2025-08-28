@@ -6,7 +6,7 @@ import Wave from '@/components/Wave';
 import GoogleMap from '@/components/GoogleMap';
 import { AgendaType, AttendeeType, EventType } from '@/types';
 import { toast } from 'sonner';
-import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check, CircleXIcon } from 'lucide-react';
+import { ArrowRight, CheckCircle, CircleX, IndianRupee, MapPin, UserRoundCheck, ChevronDown, Check, CircleXIcon, Globe } from 'lucide-react';
 import { formatDateTime, getImageUrl } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -170,7 +170,7 @@ const ExploreViewEvent: React.FC = () => {
     const slugParts = slug?.split("_");
     slug = slugParts?.[0];
     const [isLoading, setIsLoading] = useState(false);
-    const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
+    const [currentEvent, setCurrentEvent] = useState<(EventType & { company_name: string }) | null>(null);
     const startTime = currentEvent?.event_date || "";
     const [agendaData, setAgendaData] = useState<AgendaType[]>([]);
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
@@ -583,7 +583,7 @@ const ExploreViewEvent: React.FC = () => {
                 <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto space-y-4 px-5'>
                     {/* Left Div */}
                     <div className='space-y-4'>
-                        <span className='text-gray-700 text-sm'>By {currentEvent?.title}</span>
+                        <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
                         <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='inline-block ml-2 text-white bg-brand-primary text-brand-text font-normal px-2 py-0.5 rounded-full text-xs'>
                             Paid
@@ -607,14 +607,22 @@ const ExploreViewEvent: React.FC = () => {
 
                         {/* Row for Location */}
                         <div className='flex gap-2'>
-                            <a href={currentEvent?.google_map_link} className='flex gap-2'>
-                                <div className='rounded-md grid place-content-center size-10 bg-white'>
+                            <a href={currentEvent?.google_map_link} className='flex gap-2 items-center'>
+                                <div hidden={currentEvent?.event_mode == 1} className='rounded-md grid place-content-center size-10 bg-white'>
                                     <MapPin size={30} className='text-brand-gray' />
                                 </div>
 
-                                <div>
+                                <div hidden={currentEvent?.event_mode == 0} className='rounded-md grid place-content-center size-10 bg-white'>
+                                    <Globe size={30} className='text-brand-gray' />
+                                </div>
+
+                                <div hidden={currentEvent?.event_mode == 1}>
                                     <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
                                     <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
+                                </div>
+
+                                <div hidden={currentEvent?.event_mode == 0}>
+                                    <h4 className='font-semibold flex items-center'>Online</h4>
                                 </div>
                             </a>
                         </div>
@@ -852,7 +860,7 @@ const ExploreViewEvent: React.FC = () => {
                             </div>
                         </div>}
 
-                        <div className='mt-10 md:hidden md:mt-[5.8rem]'>
+                        <div hidden={currentEvent?.event_mode == 1} className='mt-10 md:hidden md:mt-[5.8rem]'>
                             <h3 className='font-semibold text-lg'>Location</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
@@ -867,7 +875,7 @@ const ExploreViewEvent: React.FC = () => {
                     <div className='max-w-full mx-auto md:max-w-[300px]'>
                         <img src={domain + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
 
-                        <div className='mt-10 hidden md:block md:mt-[5.8rem]'>
+                        <div hidden={currentEvent?.event_mode == 1} className='mt-10 hidden md:block md:mt-[5.8rem]'>
                             <h3 className='font-semibold text-lg'>Location</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
