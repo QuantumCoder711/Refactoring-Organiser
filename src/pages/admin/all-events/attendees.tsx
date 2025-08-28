@@ -637,7 +637,7 @@ const Attendees: React.FC = () => {
             {selectedAttendees.size > 0 ? `Export Selected (${selectedAttendees.size})` : 'Export Data'}
           </Button>
 
-          <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+          {event?.event_mode == 0 && <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 className='btn !rounded-[10px] !px-3'
@@ -679,7 +679,7 @@ const Attendees: React.FC = () => {
                 </Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog>
+          </Dialog>}
         </div>
       </div>
 

@@ -133,9 +133,9 @@ const EventCard: React.FC<EventCardProps> = ({
                             {formatDate(date)}
                         </span>
                         <div className='flex gap-2 items-center'>
-                            <Link to={`/create-badge/${slug}`} className='p-2 bg-brand-primary rounded-full text-white'>
+                            {location && <Link to={`/create-badge/${slug}`} className='p-2 bg-brand-primary rounded-full text-white'>
                                 <Printer size={16} />
-                            </Link>
+                            </Link>}
 
                             {user?.role === 'admin' && <AlertDialog>
                                 <AlertDialogTrigger

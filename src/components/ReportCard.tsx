@@ -1,4 +1,5 @@
-import { Brain, BrainCircuit, ChartPie, Mail, MapPin, MessageCircleMore, Printer } from 'lucide-react';
+import { formatDateTime } from '@/lib/utils';
+import { Brain, BrainCircuit, ChartPie, Globe, Mail, MapPin, MessageCircleMore, Printer } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -48,10 +49,8 @@ const ReportCard: React.FC<ReportCardProps> = ({
                         className='w-full h-60 object-cover rounded-t-xl'
                     />
                     <div className='h-1/2 bottom-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
-                        <div className='w-full h-full flex justify-between items-end p-2'>
-                            <span className='rounded-full border text-white text-xs h-[15px] w-20 grid place-content-center'>
-                                {formatDate(date)}
-                            </span>
+                        <div className='border border-white rounded-full px-4 absolute bottom-2 left-2 text-white py-1 max-w-fit text-xs'>
+                            {formatDateTime(date)}
                         </div>
                     </div>
                 </div>
@@ -59,10 +58,17 @@ const ReportCard: React.FC<ReportCardProps> = ({
                     <h3 className='text-sm uppercase font-medium text-nowrap text-ellipsis overflow-hidden'>
                         {title}
                     </h3>
-                    <div className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
-                        <MapPin size={24} className='min-w-2 min-h-3 fill-black stroke-white' />
+                    <div hidden={location ? false : true} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
+                        <MapPin size={24} className='min-w-6 min-h-6 fill-black stroke-white' />
                         <span className='overflow-hidden text-ellipsis'>
                             {location}
+                        </span>
+                    </div>
+
+                    <div hidden={location ? true : false} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
+                        <Globe size={24} className='min-w-6 min-h-6 fill-black stroke-white' />
+                        <span className='overflow-hidden text-ellipsis'>
+                            Online
                         </span>
                     </div>
 
@@ -71,7 +77,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
 
             <div className='min-h-full w-full bg-white rounded-xl rounded-l-none'>
 
-                <div className='flex flex-col gap-2 h-full px-4 py-6 justify-between'>
+                <div className='flex flex-col gap-3 items-center justify-center h-full px-4 py-6'>
                     <Link to={`mail-report/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Mail /> Mail
@@ -82,11 +88,11 @@ const ReportCard: React.FC<ReportCardProps> = ({
                             <MessageCircleMore /> WhatsApp
                         </div>
                     </Link>
-                    <Link to={`charts/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
+                    {location && <Link to={`charts/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-36 w-full'>
                             <ChartPie /> Charts
                         </div>
-                    </Link>
+                    </Link>}
                     <Link to={`ai-photos/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Brain /> AI Photos
@@ -97,11 +103,11 @@ const ReportCard: React.FC<ReportCardProps> = ({
                             <BrainCircuit /> AI Transcriber
                         </div>
                     </Link>
-                    <Link to={`print-badges/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
+                    {location && <Link to={`print-badges/${slug}`} className='text-white flex bg-brand-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Printer /> Print Badges
                         </div>
-                    </Link>
+                    </Link>}
                 </div>
             </div>
         </div>

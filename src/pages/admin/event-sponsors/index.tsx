@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import useEventStore from '@/store/eventStore';
 import { EventType } from '@/types';
 import { formatDateTime, getImageUrl } from '@/lib/utils';
-import { MapPin } from 'lucide-react';
+import { Globe, MapPin } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -50,10 +50,16 @@ const EventSponsors: React.FC = () => {
                                 <h3 className='text-sm uppercase font-medium text-nowrap text-ellipsis overflow-hidden'>
                                     {event.title}
                                 </h3>
-                                <div className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
+                                <div hidden={event.event_mode == 1} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
                                     <MapPin width={8} height={12} className='!size-5 fill-black stroke-brand-light-gray' />
                                     <span className='overflow-hidden text-ellipsis'>
                                         {event.event_venue_name}
+                                    </span>
+                                </div>
+                                <div hidden={event.event_mode == 0} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
+                                    <Globe width={8} height={12} className='!size-5 fill-black stroke-brand-light-gray' />
+                                    <span className='overflow-hidden text-ellipsis'>
+                                        Online
                                     </span>
                                 </div>
                                 <Separator />

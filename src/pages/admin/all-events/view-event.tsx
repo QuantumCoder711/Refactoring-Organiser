@@ -297,7 +297,7 @@ const ViewEvent: React.FC = () => {
                             </React.Fragment>
                         )}
                         {(isUpcoming && !isLive) && (
-                            <div className='col-span-2 gap-3 flex justify-center'>
+                            <div hidden={event?.event_mode == 1} className='col-span-2 gap-3 flex justify-center'>
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <Button className='btn-rounded h-6'>View QR Code</Button>
@@ -365,7 +365,7 @@ const ViewEvent: React.FC = () => {
                     </div>
 
                     {/* Event OTP & Agenda By */}
-                    <div className='p-5 border-t border-white flex justify-between'>
+                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-white flex justify-between'>
                         <div className='w-1/2'>
                             <h3 className='font-semibold'>Event OTP</h3>
                             <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
@@ -377,7 +377,7 @@ const ViewEvent: React.FC = () => {
                     </div>
 
                     {/* Event Location */}
-                    <div className='p-5 border-t border-white'>
+                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-white'>
                         <h3 className='font-semibold'>Location</h3>
                         <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>{event?.event_venue_name}</p>
                         <p className='text-sm text-brand-dark-gray'>{event?.event_venue_address_1}</p>
