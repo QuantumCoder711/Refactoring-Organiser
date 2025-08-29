@@ -20,14 +20,14 @@ export const filterEvents = (events: EventType[]): { upcomingEvents: EventType[]
   today.setHours(0, 0, 0, 0);
 
   const upcomingEvents = events.filter(event => {
-    if (!event.event_date) return false;
+    if (!event?.event_date) return false;
     const eventDate = new Date(event.event_date);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate >= today;
   });
 
   const pastEvents = events.filter(event => {
-    if (!event.event_date) return false;
+    if (!event?.event_date) return false;
     const eventDate = new Date(event.event_date);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate < today;
