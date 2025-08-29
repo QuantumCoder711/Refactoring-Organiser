@@ -60,7 +60,7 @@ export const addEvent = async (eventData: AddEventType, token: string) => {
                     formData.append(key, value);
                 } else if (key === 'image' && typeof value === 'string') {
                     // If image is a string (existing image URL), don't send it
-                    console.log("Keeping existing image, not sending in request");
+                    // console.log("Keeping existing image, not sending in request");
                 } else if (key !== 'image' || value === null) {
                     // For non-image fields or when image is null
                     formData.append(key, String(value));
@@ -71,16 +71,6 @@ export const addEvent = async (eventData: AddEventType, token: string) => {
         // Make sure event_end_date is set if not already
         if (!formData.has('event_end_date') && eventData.event_date) {
             formData.append('event_end_date', String(eventData.event_date));
-        }
-
-        // Log the form data for debugging
-        console.log("FormData entries:");
-        for (const pair of formData.entries()) {
-            if (pair[0] === 'image' && pair[1] instanceof File) {
-                console.log(pair[0], `File: ${(pair[1] as File).name}, size: ${((pair[1] as File).size / 1024 / 1024).toFixed(2)}MB`);
-            } else {
-                console.log(pair[0], pair[1]);
-            }
         }
 
         const response = await axios.post(`${domain}/api/events`, formData, {
@@ -126,7 +116,7 @@ export const updateEvent = async (id: string, eventData: AddEventType, token: st
                 } else if (key === 'image' && typeof value === 'string') {
                     // If image is a string (existing image URL), don't send it
                     // This prevents the API from trying to process a string as a file
-                    console.log("Keeping existing image, not sending in request");
+                    // console.log("Keeping existing image, not sending in request");
                 } else if (key !== 'image' || value === null) {
                     // For non-image fields or when image is null
                     formData.append(key, String(value));
@@ -140,16 +130,6 @@ export const updateEvent = async (id: string, eventData: AddEventType, token: st
         // Make sure event_end_date is set if not already
         if (!formData.has('event_end_date') && eventData.event_date) {
             formData.append('event_end_date', String(eventData.event_date));
-        }
-
-        // Log the form data for debugging
-        console.log("FormData entries:");
-        for (const pair of formData.entries()) {
-            if (pair[0] === 'image' && pair[1] instanceof File) {
-                console.log(pair[0], `File: ${(pair[1] as File).name}, size: ${((pair[1] as File).size / 1024 / 1024).toFixed(2)}MB`);
-            } else {
-                console.log(pair[0], pair[1]);
-            }
         }
 
         const response = await axios.post(`${domain}/api/events/${id}`, formData, {

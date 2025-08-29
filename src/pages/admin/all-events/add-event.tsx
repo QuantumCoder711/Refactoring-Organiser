@@ -3,7 +3,7 @@ import * as htmlToImage from 'html-to-image';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { googleMapsApiKey, UserAvatar } from '@/constants';
+import { googleMapsApiKey, token, UserAvatar } from '@/constants';
 import Template1 from "@/assets/templates/template_1.jpg";
 import Template2 from "@/assets/templates/template_2.jpg";
 import Template3 from "@/assets/templates/template_3.jpg";
@@ -22,11 +22,11 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import Wave from '@/components/Wave';
 import { Helmet } from 'react-helmet';
 import GoBack from '@/components/GoBack';
-
+import { useNavigate } from 'react-router-dom';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const AddEvent: React.FC = () => {
-
+    const navigate = useNavigate();
     const { isLoaded } = useLoadScript({
         googleMapsApiKey,
         libraries: ['places'],
@@ -400,9 +400,8 @@ const AddEvent: React.FC = () => {
 
                 // Reset form on success
                 resetForm();
-
-                // Redirect to dashboard
-                window.location.href = '/dashboard';
+                useEventStore.getState().getAllEvents(token as string);
+                navigate('/dashboard');
             } else {
                 toast(response.message, {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",

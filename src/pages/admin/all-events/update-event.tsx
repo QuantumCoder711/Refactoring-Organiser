@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { domain, googleMapsApiKey, UserAvatar } from '@/constants';
+import { domain, googleMapsApiKey, token, UserAvatar } from '@/constants';
 import Template1 from "@/assets/templates/template_1.jpg";
 import Template2 from "@/assets/templates/template_2.jpg";
 import Template3 from "@/assets/templates/template_3.jpg";
@@ -629,6 +629,7 @@ const UpdateEvent: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
+                useEventStore.getState().getAllEvents(token as string);
                 navigate('/dashboard');
             } else {
                 toast(response.errors?.event_end_date[0] || "Failed to update event", {

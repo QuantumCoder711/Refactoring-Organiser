@@ -9,8 +9,8 @@ export default function useCheckInSocket(events: any[]) {
     if (!events) return;
 
     const joinRoom = () => {
-      events.forEach((event) => {
-        if (!event.uuid) {
+      events?.forEach((event) => {
+        if (!event?.uuid) {
           console.warn('Event missing uuid:', event);
           return;
         }
@@ -26,7 +26,7 @@ export default function useCheckInSocket(events: any[]) {
     });
 
     socket.on("checkInCountUpdated", (data) => {
-      setCheckInCount(data.eventUuid, data.updatedCheckInCount);
+      setCheckInCount(data?.eventUuid, data?.updatedCheckInCount);
     });
 
     return () => {
