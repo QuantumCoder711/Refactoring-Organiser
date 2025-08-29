@@ -36,6 +36,7 @@ import { Textarea } from '@/components/ui/textarea';
 import GoogleMap from '@/components/GoogleMap';
 import { login } from '@/api/auth';
 import { Helmet } from 'react-helmet';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -244,6 +245,8 @@ const AddFirstEvent: React.FC = () => {
         event_venue_address_1: '',
         event_venue_address_2: '',
         break_out: 0,
+        event_mode: 0,
+        webinar_link: "",
     });
 
     useEffect(() => {
@@ -363,7 +366,8 @@ const AddFirstEvent: React.FC = () => {
     };
 
     const validateForm = useCallback((data: AddEventType) => {
-        const requiredFields: (keyof AddEventType)[] = [
+        // Define base required fields
+        const baseRequiredFields: (keyof AddEventType)[] = [
             'title',
             'description',
             'image',
@@ -375,9 +379,20 @@ const AddFirstEvent: React.FC = () => {
             'end_time',
             'end_minute_time',
             'end_time_type',
-            'google_map_link',
         ];
 
+        // Add conditional required fields based on event mode
+        let requiredFields = [...baseRequiredFields];
+
+        if (data.event_mode === 0) {
+            // In Person mode - require location fields
+            requiredFields.push('google_map_link');
+        } else if (data.event_mode === 1) {
+            // Online mode - require webinar link
+            requiredFields.push('webinar_link');
+        }
+
+        // Check required fields
         const missingFields = requiredFields.filter(field => {
             if (field === 'image') {
                 return !data[field];
@@ -386,7 +401,6 @@ const AddFirstEvent: React.FC = () => {
         });
 
         if (missingFields.length > 0) {
-            console.log(missingFields);
             toast("Please fill in all required fields marked with *", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
@@ -394,6 +408,7 @@ const AddFirstEvent: React.FC = () => {
             return false;
         }
 
+        // Validate dates
         if (data.event_start_date && data.event_date) {
             const startDate = new Date(data.event_start_date);
             const endDate = new Date(data.event_date);
@@ -407,16 +422,18 @@ const AddFirstEvent: React.FC = () => {
             }
         }
 
-        if (isNaN(Number(data.printer_count)) || Number(data.printer_count) < 0) {
-            toast("Printer count must be a valid number", {
+        // Validate printer count - must not be negative
+        if (data.printer_count !== null && data.printer_count < 0) {
+            toast("Printer count cannot be negative", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
             return false;
         }
 
-        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) <= 0)) {
-            toast("Please enter a valid event fee", {
+        // If paid event, validate event fee - must be at least 1
+        if (data.paid_event === 1 && (isNaN(Number(data.event_fee)) || Number(data.event_fee) < 1)) {
+            toast("Paid events must have a fee of at least 1", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleX className='size-5' />
             });
@@ -483,8 +500,37 @@ const AddFirstEvent: React.FC = () => {
                 }
             }
 
+            // Prepare form data based on event mode
+            let finalFormData = { ...updatedFormData };
+
+            if (updatedFormData.event_mode === 0) {
+                // In Person mode - set webinar_link to empty and keep location fields
+                finalFormData = {
+                    ...finalFormData,
+                    webinar_link: ""
+                };
+            } else if (updatedFormData.event_mode === 1) {
+                // Online mode - set location-related fields to empty/default values and ensure webinar_link is included
+                finalFormData = {
+                    ...finalFormData,
+                    google_map_link: "",
+                    event_venue_name: "",
+                    event_venue_address_1: "",
+                    event_venue_address_2: "",
+                    pincode: "",
+                    state: "",
+                    city: "",
+                    country: "",
+                    printer_count: 0,
+                    break_out: 0,
+                    view_agenda_by: 0,
+                    event_otp: "",
+                    webinar_link: updatedFormData.webinar_link
+                };
+            }
+
             if (token) {
-                const response = await useEventStore.getState().addEvent(updatedFormData);
+                const response = await useEventStore.getState().addEvent(finalFormData);
                 if (response.status === 200) {
                     toast("Event added successfully", {
                         className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -687,7 +733,36 @@ const AddFirstEvent: React.FC = () => {
                         }
                     }
 
-                    const response = await useEventStore.getState().addEvent(updatedFormData, loginResponse.access_token);
+                    // Prepare form data based on event mode
+                    let finalFormData = { ...updatedFormData };
+
+                    if (updatedFormData.event_mode === 0) {
+                        // In Person mode - set webinar_link to empty and keep location fields
+                        finalFormData = {
+                            ...finalFormData,
+                            webinar_link: ""
+                        };
+                    } else if (updatedFormData.event_mode === 1) {
+                        // Online mode - set location-related fields to empty/default values and ensure webinar_link is included
+                        finalFormData = {
+                            ...finalFormData,
+                            google_map_link: "",
+                            event_venue_name: "",
+                            event_venue_address_1: "",
+                            event_venue_address_2: "",
+                            pincode: "",
+                            state: "",
+                            city: "",
+                            country: "",
+                            printer_count: 0,
+                            break_out: 0,
+                            view_agenda_by: 0,
+                            event_otp: "",
+                            webinar_link: updatedFormData.webinar_link
+                        };
+                    }
+
+                    const response = await useEventStore.getState().addEvent(finalFormData, loginResponse.access_token);
                     if (response.status === 200) {
                         toast("Event added successfully", {
                             className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -1131,7 +1206,35 @@ const AddFirstEvent: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Event Mode */}
                         <div className='flex flex-col gap-2 mt-5'>
+                            <Label className='font-semibold' htmlFor='event_mode'>Event Mode</Label>
+                            <Select
+                                value={formData.event_mode.toString()}
+                                onValueChange={(value) => {
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        event_mode: parseInt(value) as 0 | 1,
+                                        // Reset related fields when mode changes
+                                        // webinar_link: parseInt(value) === 1 ? "" : prev.webinar_link,
+                                        // google_map_link: parseInt(value) === 0 ? "" : prev.google_map_link,
+                                    }));
+                                }}
+                            >
+                                <SelectTrigger className="w-full input !h-12 !min-w-full cursor-pointer">
+                                    <SelectValue placeholder="Select Event Mode" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="0" className='cursor-pointer'>In Person</SelectItem>
+                                        <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Location */}
+                        <div hidden={formData.event_mode === 1} className='flex flex-col gap-2 mt-5'>
                             <Label className='font-semibold' htmlFor='google_map_link'>
                                 Location <span className="text-brand-secondary">*</span>
                             </Label>
@@ -1167,9 +1270,30 @@ const AddFirstEvent: React.FC = () => {
                             <div className='w-full h-60'>
                                 <GoogleMap isLoaded={isLoaded} latitude={coords.lat} longitude={coords.lng} />
                             </div>
+
                         </div>
 
-                        <div className='flex items-center justify-between gap-5 mt-5'>
+                        {/* Webinar Link */}
+                        <div hidden={formData.event_mode === 0} className='flex flex-col gap-2 mt-5'>
+                            <Label className='font-semibold' htmlFor='webinar_link'>
+                                Webinar Link <span className="text-brand-secondary">*</span>
+                            </Label>
+                            <div className='relative'>
+                                <Input
+                                    id='webinar_link'
+                                    name='webinar_link'
+                                    type='text'
+                                    value={formData.webinar_link}
+                                    onChange={handleInputChangeEventForm}
+                                    placeholder='Enter Webinar Link'
+                                    className='input !h-12 min-w-full text-base'
+                                />
+
+                            </div>
+                        </div>
+
+                        {/* Printers Count, Breakout Rooms and View Agenda By */}
+                        <div hidden={formData.event_mode === 1} className='flex items-center justify-between gap-5 mt-5'>
                             <div className="flex flex-col gap-2 w-full">
                                 <Label className="font-semibold" htmlFor='printer_count'>
                                     No. of Printers
@@ -1221,7 +1345,7 @@ const AddFirstEvent: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className='flex mt-5 gap-2 flex-col'>
+                        <div hidden={formData.event_mode === 1} className='flex mt-5 gap-2 flex-col'>
                             <Label className='font-semibold'>Event OTP</Label>
                             <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                 <Input
