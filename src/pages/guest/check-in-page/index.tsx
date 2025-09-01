@@ -324,7 +324,7 @@ const CheckinPage: React.FC = () => {
                         email: userData.email,
                         designation: userData.designation,
                         company: userData.company,
-                        role: userData.role
+                        status: userData.status,
                     }));
                 }
                 setSteps(3);
