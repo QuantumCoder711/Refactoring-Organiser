@@ -1,5 +1,5 @@
 import React from 'react';
-import { appDomain, domain } from '@/constants';
+import { appDomain, domain, roles } from '@/constants';
 import { EventType } from '@/types';
 import axios from 'axios';
 import { useEffect, useState, useRef } from 'react';
@@ -21,6 +21,7 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Custom Combo Box Component for company names with filtering and creation
 const CustomComboBox = React.memo(({
@@ -166,6 +167,7 @@ const CheckinPage: React.FC = () => {
         email: '',
         mobile: '',
         designation: '',
+        status: 'delegate',
         company: '',
         otp: '',
         eventName: event?.title || ''
@@ -215,7 +217,8 @@ const CheckinPage: React.FC = () => {
                                     name: userData.name,
                                     email: userData.email,
                                     designation: userData.designation,
-                                    company: userData.company
+                                    company: userData.company,
+                                    role: userData.role
                                 }));
                                 setSteps(3); // Go directly to form
                             } else {
@@ -320,7 +323,8 @@ const CheckinPage: React.FC = () => {
                         name: userData.name,
                         email: userData.email,
                         designation: userData.designation,
-                        company: userData.company
+                        company: userData.company,
+                        role: userData.role
                     }));
                 }
                 setSteps(3);
@@ -369,6 +373,7 @@ const CheckinPage: React.FC = () => {
                     mobile: Number(formData.mobile),
                     designation: formData.designation,
                     company: formData.company,
+                    status: formData.status,
                     eventID: event?.id,
                     userID: event?.user_id
                 },
@@ -394,6 +399,7 @@ const CheckinPage: React.FC = () => {
                     designation: '',
                     company: '',
                     otp: '',
+                    status: 'delegate',
                     eventName: event?.title || ''
                 });
             } else {
@@ -442,7 +448,7 @@ const CheckinPage: React.FC = () => {
                 ? `${domain}/api/breakout_room_checkin`
                 : `${domain}/api/accept_decline_event_invitation`;
 
-            if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile) {
+            if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile || !formData.status) {
                 toast("Please fill in all required fields", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
@@ -459,6 +465,7 @@ const CheckinPage: React.FC = () => {
                     phone_number: formData.mobile,
                     acceptance: '1',
                     first_name: getFirstName(formData.name),
+                    status: formData.status,
                     last_name: getLastName(formData.name),
                     job_title: formData.designation,
                     company_name: formData.company,
@@ -472,6 +479,7 @@ const CheckinPage: React.FC = () => {
                     phone_number: formData.mobile,
                     acceptance: '1',
                     first_name: getFirstName(formData.name),
+                    status: formData.status,
                     last_name: getLastName(formData.name),
                     job_title: formData.designation,
                     company_name: formData.company,
@@ -645,6 +653,27 @@ const CheckinPage: React.FC = () => {
                                         options={companies.map((company, index) => ({ id: index + 1, name: company.company }))}
                                         required
                                     />
+                                </div>
+
+                                <div className="flex flex-col gap-2 w-full">
+                                    <Label className="font-semibold" htmlFor="status">
+                                        Status
+                                    </Label>
+                                    <Select 
+                                        value={formData.status}
+                                        onValueChange={(value: string) => setFormData(prev => ({ ...prev, status: value }))}
+                                    >
+                                        <SelectTrigger className="w-full input !h-12 min-w-full text-base capitalize cursor-pointer">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {roles.map((role, index) => (
+                                                <SelectItem key={index} value={role.toLowerCase()} className='cursor-pointer'>
+                                                    {role}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
                                 <div className="flex flex-col gap-2 mt-2">
