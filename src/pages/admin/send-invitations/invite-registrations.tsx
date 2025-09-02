@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Quill from "quill";
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import "quill/dist/quill.snow.css";
 import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -12,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageTemplateType } from '@/types';
 import { toast } from 'sonner';
 import { CircleX, CircleCheck, Info } from 'lucide-react';
@@ -29,14 +28,13 @@ const InviteRegistrations: React.FC = () => {
 
     const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
     const [allSelected, setAllSelected] = useState(true);
-    const quillRef = useRef<HTMLDivElement | null>(null);
+    const [selectedTemplate, setSelectedTemplate] = useState<string>("template1");
 
-    const [formData, setFormData] = useState<MessageTemplateType>({
-        event_id: event?.uuid as string,
-        send_to: selectedRoles.join(','),
-        send_method: 'email',
-        subject: `Exclusive Invitation: ${event?.title}- Join Industry Leaders!`,
-        message: `<p>
+    // Email template definitions
+    const emailTemplates = {
+        template1: {
+            subject: `Exclusive Invitation: ${event?.title}- Join Industry Leaders!`,
+            message: `<p>
                                     We are delighted to invite you to the ${event?.title}, an exclusive gathering of top thought
                                     leaders and industry experts. This premier event is designed to foster meaningful
                                     discussions, networking, and recognition of excellence in the industry.<br /><br />
@@ -52,7 +50,64 @@ const InviteRegistrations: React.FC = () => {
                                     Best regards,<br />
                                     ${user?.first_name} ${user?.last_name}<br />
                                     ${user?.company_name}
-                                </p>`,
+                                </p>`
+        },
+        template2: {
+            subject: `You're Invited: ${event?.title} - Premium Networking Event`,
+            message: `<p>
+                                    <strong>Dear Industry Leader,</strong><br /><br />
+
+                                    It is our pleasure to extend a personal invitation to you for <strong>${event?.title}</strong>,
+                                    a distinguished gathering that brings together visionary leaders and innovators from across industries.<br /><br />
+
+                                    <strong>Event Details:</strong><br />
+                                    🗓️ <strong>Date:</strong> ${event?.event_start_date}<br />
+                                    🏢 <strong>Venue:</strong> ${event?.event_venue_name}<br />
+                                    ⏰ <strong>Time:</strong> ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type}<br /><br />
+
+                                    This exclusive event offers unparalleled opportunities for strategic networking,
+                                    knowledge sharing, and collaborative discussions that drive industry advancement.<br /><br />
+
+                                    Your expertise and insights would be invaluable to our community of leaders.<br /><br />
+
+                                    Warm regards,<br />
+                                    <strong>${user?.first_name} ${user?.last_name}</strong><br />
+                                    ${user?.company_name}
+                                </p>`
+        },
+        template3: {
+            subject: `Special Invitation: ${event?.title} - Connect, Learn, Lead`,
+            message: `<p>
+                                    Greetings!<br /><br />
+
+                                    We cordially invite you to join us at <strong>${event?.title}</strong>, where industry excellence meets innovation.<br /><br />
+
+                                    <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
+                                        <strong>📋 Event Information</strong><br />
+                                        <strong>Event:</strong> ${event?.title}<br />
+                                        <strong>Date:</strong> ${event?.event_start_date}<br />
+                                        <strong>Location:</strong> ${event?.event_venue_name}<br />
+                                        <strong>Duration:</strong> ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type} - ${event?.end_time}:${event?.end_minute_time} ${event?.end_time_type}
+                                    </div>
+
+                                    This premier gathering is designed for forward-thinking professionals who are shaping the future of their industries.
+                                    Experience meaningful connections, gain valuable insights, and be part of conversations that matter.<br /><br />
+
+                                    We would be honored by your presence at this exceptional event.<br /><br />
+
+                                    Best wishes,<br />
+                                    ${user?.first_name} ${user?.last_name}<br />
+                                    <em>${user?.company_name}</em>
+                                </p>`
+        }
+    };
+
+    const [formData, setFormData] = useState<MessageTemplateType>({
+        event_id: event?.uuid as string,
+        send_to: selectedRoles.join(','),
+        send_method: 'email',
+        subject: emailTemplates.template1.subject,
+        message: emailTemplates.template1.message,
         start_date: event?.event_start_date as string,
         delivery_schedule: 'now',
         start_date_time: event?.start_time as string,
@@ -111,33 +166,18 @@ const InviteRegistrations: React.FC = () => {
         }
     };
 
-    // Initialize Quill editor
-    useEffect(() => {
+    // Template selection handler
+    const handleTemplateChange = (templateKey: string) => {
+        setSelectedTemplate(templateKey);
+        const template = emailTemplates[templateKey as keyof typeof emailTemplates];
+        setFormData(prev => ({
+            ...prev,
+            subject: template.subject,
+            message: template.message
+        }));
+    };
 
-        if (quillRef.current && formData.send_method === "email") {
-            const quill = new Quill(quillRef.current, {
-                theme: "snow",
-                placeholder: "Type your message here...",
-            });
 
-            // Set initial content if message exists
-            if (formData.message) {
-                quill.clipboard.dangerouslyPasteHTML(formData.message);
-            }
-
-            quill.on('text-change', () => {
-                const content = quill.root.innerHTML;
-                setFormData(prev => ({
-                    ...prev,
-                    message: content
-                }));
-            });
-
-            return () => {
-                quill.off('text-change');
-            };
-        }
-    }, [quillRef, formData.send_method === "email"]);
 
     // Update formData when selectedRoles changes
     useEffect(() => {
@@ -270,7 +310,7 @@ const InviteRegistrations: React.FC = () => {
                         {/* MessageBox */}
                         <div className='mt-[30px] flex-1 flex flex-col'>
                             {formData.send_method === "email" ? (
-                                <>
+                                <div className='flex-1 flex flex-col'>
                                     <Input
                                         type='text'
                                         value={formData.subject}
@@ -278,10 +318,82 @@ const InviteRegistrations: React.FC = () => {
                                         className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
                                         placeholder='Subject *'
                                     />
-                                    <div className='flex-1 flex flex-col'>
-                                        <div ref={quillRef} className={`flex-1 border bg-white rounded-[10px] rounded-t-none`}></div>
-                                    </div>
-                                </>
+
+                                    {/* Email Template Tabs */}
+                                    <Tabs value={selectedTemplate} onValueChange={handleTemplateChange} className="flex-1 flex flex-col">
+                                        <TabsList className="bg-white p-0 w-fit mx-auto mt-4 mb-2 !max-h-9">
+                                            <TabsTrigger
+                                                value="template1"
+                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                            >
+                                                Template 1
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="template2"
+                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                            >
+                                                Template 2
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="template3"
+                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                            >
+                                                Template 3
+                                            </TabsTrigger>
+                                        </TabsList>
+
+                                        <TabsContent value="template1" className="flex-1 flex flex-col mt-0">
+                                            <div className='flex-1 flex justify-center'>
+                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
+                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 1 Preview</h4>
+                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                        <div className='mb-4 pb-3 border-b'>
+                                                            <strong>Subject:</strong> {emailTemplates.template1.subject}
+                                                        </div>
+                                                        <div className='mb-4 flex justify-center'>
+                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                        </div>
+                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template1.message }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+
+                                        <TabsContent value="template2" className="flex-1 flex flex-col mt-0">
+                                            <div className='flex-1 flex justify-center'>
+                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
+                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 2 Preview</h4>
+                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                        <div className='mb-4 pb-3 border-b'>
+                                                            <strong>Subject:</strong> {emailTemplates.template2.subject}
+                                                        </div>
+                                                        <div className='mb-4 flex justify-center'>
+                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                        </div>
+                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template2.message }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+
+                                        <TabsContent value="template3" className="flex-1 flex flex-col mt-0">
+                                            <div className='flex-1 flex justify-center'>
+                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
+                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 3 Preview</h4>
+                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                        <div className='mb-4 pb-3 border-b'>
+                                                            <strong>Subject:</strong> {emailTemplates.template3.subject}
+                                                        </div>
+                                                        <div className='mb-4 flex justify-center'>
+                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                        </div>
+                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template3.message }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+                                    </Tabs>
+                                </div>
                             ) : (
                                 <div className='flex-1 flex flex-col'>
                                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-start gap-3">
