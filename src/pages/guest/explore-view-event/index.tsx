@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { googleMapsApiKey, domain, appDomain, UserAvatar } from '@/constants';
 import Wave from '@/components/Wave';
@@ -607,24 +607,30 @@ const ExploreViewEvent: React.FC = () => {
 
                         {/* Row for Location */}
                         <div className='flex gap-2'>
-                            <a href={currentEvent?.google_map_link} className='flex gap-2 items-center'>
-                                <div hidden={currentEvent?.event_mode == 1} className='rounded-md grid place-content-center size-10 bg-white'>
-                                    <MapPin size={30} className='text-brand-gray' />
-                                </div>
+                            <Link to={currentEvent?.event_mode === 1 ? currentEvent?.webinar_link : currentEvent?.google_map_link || ""} target="_blank" className='flex gap-2 items-center cursor-pointer'>
 
-                                <div hidden={currentEvent?.event_mode == 0} className='rounded-md grid place-content-center size-10 bg-white'>
-                                    <Globe size={30} className='text-brand-gray' />
-                                </div>
+                                {currentEvent?.event_mode === 0 ? <React.Fragment>
+                                    <div className='rounded-md grid place-content-center size-10 bg-white'>
+                                        <MapPin size={30} className='text-brand-gray' />
+                                    </div>
 
-                                <div hidden={currentEvent?.event_mode == 1}>
-                                    <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
-                                    <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
-                                </div>
+                                    <div>
+                                        <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
+                                        <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
+                                    </div>
+                                </React.Fragment>
+                                    :
+                                    <React.Fragment>
+                                        <div className='rounded-md grid place-content-center size-10 bg-white'>
+                                            <Globe size={30} className='text-brand-gray' />
+                                        </div>
 
-                                <div hidden={currentEvent?.event_mode == 0}>
-                                    <h4 className='font-semibold flex items-center'>Online</h4>
-                                </div>
-                            </a>
+                                        <div>
+                                            <h4 className='font-semibold flex items-center'>Online</h4>
+                                        </div>
+                                    </React.Fragment>
+                                }
+                            </Link>
                         </div>
 
                         {/* Row for Event Fee */}
