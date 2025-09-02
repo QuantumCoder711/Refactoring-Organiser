@@ -208,10 +208,10 @@ const CustomComboBox = React.memo(({
                             ))
                         ) : searchTerm ? (
                             <div
-                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm font-medium"
                                 onClick={handleCreateNew}
                             >
-                                Create "{searchTerm}"
+                                {searchTerm}
                             </div>
                         ) : (
                             <div className="px-3 py-2 text-gray-500 text-sm">
