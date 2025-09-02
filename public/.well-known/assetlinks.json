@@ -1,9 +1,16 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.klout.app",
-    "sha256_cert_fingerprints":
-    ["41:12:10:0B:1A:2F:12:A7:32:9F:D4:81:86:97:7C:BD:32:EF:B5:8C:1D:BB:DF:66:E8:2E:6A:9A:25:E9:AC:BB"]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.klout.app",
+      "sha256_cert_fingerprints": [
+        "41:12:10:0B:1A:2F:12:A7:32:9F:D4:81:86:97:7C:BD:32:EF:B5:8C:1D:BB:DF:66:E8:2E:6A:9A:25:E9:AC:BB",
+        "98:F6:6A:C1:66:33:B7:59:C5:A5:EB:B2:31:52:C4:67:19:20:3D:5A:46:A5:B6:49:E4:93:5B:35:F3:D1:00:72"
+      ]
+    }
   }
-}]
+]
