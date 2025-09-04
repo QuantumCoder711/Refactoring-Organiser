@@ -11,9 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from '@/components/ui/textarea';
 import { MessageTemplateType } from '@/types';
 import { toast } from 'sonner';
-import { CircleX, CircleCheck, Info } from 'lucide-react';
+import { CircleX, CircleCheck, Info, Upload } from 'lucide-react';
 import { inviteRegistrations } from '@/api/messageTemplates';
 import Wave from '@/components/Wave';
 import useAuthStore from '@/store/authStore';
@@ -29,6 +30,8 @@ const InviteRegistrations: React.FC = () => {
     const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
     const [allSelected, setAllSelected] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState<string>("template1");
+    const [bannerImage, setBannerImage] = useState<File | null>(null);
+    const [bannerError, setBannerError] = useState<string>('');
 
     // Email template definitions
     const emailTemplates = {
@@ -107,7 +110,7 @@ const InviteRegistrations: React.FC = () => {
         send_to: selectedRoles.join(','),
         send_method: 'email',
         subject: emailTemplates.template1.subject,
-        message: emailTemplates.template1.message,
+        message: '',
         start_date: event?.event_start_date as string,
         delivery_schedule: 'now',
         start_date_time: event?.start_time as string,
@@ -119,6 +122,7 @@ const InviteRegistrations: React.FC = () => {
         hour_interval: 1,
         status: 1,
         check_in: 2,
+        template_banner: null,
     });
 
     const whatsappMessage = `<p>Hello, this is a follow-up reminder for the email sent for <strong>${event?.title}</strong> happening on <strong>${event?.event_start_date}</strong> at <strong>${event?.event_venue_name}</strong>. <br /><br />
@@ -129,6 +133,7 @@ const InviteRegistrations: React.FC = () => {
     ${user?.company_name}</p>`;
 
     const handleSubmit = async () => {
+        // Validate required fields
         if (formData.send_method === "email" && (!formData.message || !formData.subject)) {
             toast("Please fill in all required fields", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -137,10 +142,26 @@ const InviteRegistrations: React.FC = () => {
             return;
         }
 
+        // Validate banner image is required
+        if (!bannerImage) {
+            setBannerError("Template banner image is required");
+            toast("Template banner image is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
+        setBannerError('');
         setLoading(true);
 
         try {
-            const response = await inviteRegistrations(formData);
+            // Update formData with banner image before sending
+            const updatedFormData = {
+                ...formData,
+                template_banner: bannerImage
+            };
+            const response = await inviteRegistrations(updatedFormData);
 
             // Check if response exists and has a message property
             if (response.status == 200) {
@@ -173,7 +194,7 @@ const InviteRegistrations: React.FC = () => {
         setFormData(prev => ({
             ...prev,
             subject: template.subject,
-            message: template.message
+            message: stripHtmlTags(template.message)
         }));
     };
 
@@ -191,6 +212,16 @@ const InviteRegistrations: React.FC = () => {
     useEffect(() => {
         setAllSelected(selectedRoles.length === roles.length);
     }, [selectedRoles]);
+
+    // Initialize message content with stripped HTML
+    useEffect(() => {
+        if (formData.message === '') {
+            setFormData(prev => ({
+                ...prev,
+                message: stripHtmlTags(emailTemplates.template1.message)
+            }));
+        }
+    }, []);
 
     const handleRoleChange = (role: string) => {
         setSelectedRoles(prev => {
@@ -245,6 +276,54 @@ const InviteRegistrations: React.FC = () => {
             ...prev,
             subject: e.target.value
         }));
+    };
+
+    const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setFormData(prev => ({
+            ...prev,
+            message: e.target.value
+        }));
+    };
+
+    // Helper function to strip HTML tags from text
+    const stripHtmlTags = (html: string) => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
+    const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setBannerError('Please select a valid image file');
+                toast('Please select a valid image file', {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+                return;
+            }
+
+            // Validate file size (max 10MB)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                setBannerError('File size must be less than 10MB');
+                toast('File size must be less than 10MB', {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+                return;
+            }
+
+            setBannerImage(file);
+            setBannerError('');
+        }
+    };
+
+    const triggerFileUpload = () => {
+        const fileInput = document.getElementById('banner-upload') as HTMLInputElement;
+        fileInput?.click();
     };
 
     if (loading) return <Wave />
@@ -311,13 +390,26 @@ const InviteRegistrations: React.FC = () => {
                         <div className='mt-[30px] flex-1 flex flex-col'>
                             {formData.send_method === "email" ? (
                                 <div className='flex-1 flex flex-col'>
-                                    <Input
+                                    {/* Commented out subject input as requested */}
+                                    {/* <Input
                                         type='text'
                                         value={formData.subject}
                                         onChange={handleSubjectChange}
                                         className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
                                         placeholder='Subject *'
-                                    />
+                                    /> */}
+
+                                    {/* Subject Input - Commented out as requested */}
+                                    {/* <div className='mb-4'>
+                                        <Label className="font-semibold mb-2 block">Subject</Label>
+                                        <Input
+                                            type='text'
+                                            value={formData.subject}
+                                            onChange={handleSubjectChange}
+                                            className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-12'
+                                            placeholder='Enter email subject'
+                                        />
+                                    </div> */}
 
                                     {/* Email Template Tabs */}
                                     <Tabs value={selectedTemplate} onValueChange={handleTemplateChange} className="flex-1 flex flex-col">
@@ -348,12 +440,48 @@ const InviteRegistrations: React.FC = () => {
                                                     <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 1 Preview</h4>
                                                     <div className='bg-white rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
-                                                            <strong>Subject:</strong> {emailTemplates.template1.subject}
+                                                            <Label className="font-semibold mb-2 block">Subject</Label>
+                                                            <Input
+                                                                type='text'
+                                                                value={formData.subject}
+                                                                onChange={handleSubjectChange}
+                                                                className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-10'
+                                                                placeholder='Enter email subject'
+                                                            />
                                                         </div>
                                                         <div className='mb-4 flex justify-center'>
-                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                            <div
+                                                                onClick={triggerFileUpload}
+                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                style={{ aspectRatio: '16/9' }}
+                                                            >
+                                                                {bannerImage ? (
+                                                                    <img
+                                                                        src={URL.createObjectURL(bannerImage)}
+                                                                        alt="Template Banner"
+                                                                        className='w-full h-full object-cover rounded-lg'
+                                                                    />
+                                                                ) : (
+                                                                    <div className='text-center'>
+                                                                        <Upload className='mx-auto mb-2' size={32} />
+                                                                        <p>Click to upload banner image</p>
+                                                                        <p className='text-xs text-gray-400 mt-1'>Recommended: 16:9 aspect ratio</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template1.message }} />
+                                                        <div className='mb-4'>
+                                                            <Label className="font-semibold mb-2 block">Message Content</Label>
+                                                            <Textarea
+                                                                value={formData.message}
+                                                                onChange={handleMessageChange}
+                                                                className='w-full min-h-[200px] bg-white rounded-[10px] text-base focus-visible:ring-0 border'
+                                                                placeholder='Enter email message content'
+                                                            />
+                                                        </div>
+                                                        {bannerError && (
+                                                            <p className="text-red-500 text-sm mb-4">{bannerError}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -365,12 +493,48 @@ const InviteRegistrations: React.FC = () => {
                                                     <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 2 Preview</h4>
                                                     <div className='bg-white rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
-                                                            <strong>Subject:</strong> {emailTemplates.template2.subject}
+                                                            <Label className="font-semibold mb-2 block">Subject</Label>
+                                                            <Input
+                                                                type='text'
+                                                                value={formData.subject}
+                                                                onChange={handleSubjectChange}
+                                                                className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-10'
+                                                                placeholder='Enter email subject'
+                                                            />
                                                         </div>
                                                         <div className='mb-4 flex justify-center'>
-                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                            <div
+                                                                onClick={triggerFileUpload}
+                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                style={{ aspectRatio: '16/9' }}
+                                                            >
+                                                                {bannerImage ? (
+                                                                    <img
+                                                                        src={URL.createObjectURL(bannerImage)}
+                                                                        alt="Template Banner"
+                                                                        className='w-full h-full object-cover rounded-lg'
+                                                                    />
+                                                                ) : (
+                                                                    <div className='text-center'>
+                                                                        <Upload className='mx-auto mb-2' size={32} />
+                                                                        <p>Click to upload banner image</p>
+                                                                        <p className='text-xs text-gray-400 mt-1'>Recommended: 16:9 aspect ratio</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template2.message }} />
+                                                        <div className='mb-4'>
+                                                            <Label className="font-semibold mb-2 block">Message Content</Label>
+                                                            <Textarea
+                                                                value={formData.message}
+                                                                onChange={handleMessageChange}
+                                                                className='w-full min-h-[200px] bg-white rounded-[10px] text-base focus-visible:ring-0 border'
+                                                                placeholder='Enter email message content'
+                                                            />
+                                                        </div>
+                                                        {bannerError && (
+                                                            <p className="text-red-500 text-sm mb-4">{bannerError}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -382,17 +546,62 @@ const InviteRegistrations: React.FC = () => {
                                                     <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 3 Preview</h4>
                                                     <div className='bg-white rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
-                                                            <strong>Subject:</strong> {emailTemplates.template3.subject}
+                                                            <Label className="font-semibold mb-2 block">Subject</Label>
+                                                            <Input
+                                                                type='text'
+                                                                value={formData.subject}
+                                                                onChange={handleSubjectChange}
+                                                                className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-10'
+                                                                placeholder='Enter email subject'
+                                                            />
                                                         </div>
                                                         <div className='mb-4 flex justify-center'>
-                                                            <img src={getImageUrl(event?.image)} alt={event?.title} className='w-96 h-96 object-cover rounded-lg' />
+                                                            <div
+                                                                onClick={triggerFileUpload}
+                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                style={{ aspectRatio: '16/9' }}
+                                                            >
+                                                                {bannerImage ? (
+                                                                    <img
+                                                                        src={URL.createObjectURL(bannerImage)}
+                                                                        alt="Template Banner"
+                                                                        className='w-full h-full object-cover rounded-lg'
+                                                                    />
+                                                                ) : (
+                                                                    <div className='text-center'>
+                                                                        <Upload className='mx-auto mb-2' size={32} />
+                                                                        <p>Click to upload banner image</p>
+                                                                        <p className='text-xs text-gray-400 mt-1'>Recommended: 16:9 aspect ratio</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div dangerouslySetInnerHTML={{ __html: emailTemplates.template3.message }} />
+                                                        <div className='mb-4'>
+                                                            <Label className="font-semibold mb-2 block">Message Content</Label>
+                                                            <Textarea
+                                                                value={formData.message}
+                                                                onChange={handleMessageChange}
+                                                                className='w-full min-h-[200px] bg-white rounded-[10px] text-base focus-visible:ring-0 border'
+                                                                placeholder='Enter email message content'
+                                                            />
+                                                        </div>
+                                                        {bannerError && (
+                                                            <p className="text-red-500 text-sm mb-4">{bannerError}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </TabsContent>
                                     </Tabs>
+
+                                    {/* Hidden file input for banner upload */}
+                                    <Input
+                                        id="banner-upload"
+                                        type='file'
+                                        accept="image/*"
+                                        onChange={handleBannerUpload}
+                                        className='hidden'
+                                    />
                                 </div>
                             ) : (
                                 <div className='flex-1 flex flex-col'>
