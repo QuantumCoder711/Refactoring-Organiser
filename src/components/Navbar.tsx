@@ -203,7 +203,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
               </Link>
             </li>}
-            <li>
+            <li hidden={user?.role === "subuser"}>
               <Link to={"/add-event"}>
                 <Button className='btn-rounded !px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
               </Link>
@@ -291,7 +291,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
               </Link>
             </li>}
-            <li>
+            <li hidden={user?.role === "subuser"}>
               <Link to={"/add-event"}>
                 <Button className='btn-rounded !px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
               </Link>

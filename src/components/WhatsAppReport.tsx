@@ -68,7 +68,7 @@ const WhatsAppReport: React.FC = () => {
 
     const whatsappLabels = useMemo(() => {
         const statusCounts = tableData.reduce((acc, message) => {
-            const status = message.messageID.messageStatus.toLowerCase();
+            const status = message?.messageID?.messageStatus?.toLowerCase();
             acc[status] = (acc[status] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
@@ -111,9 +111,9 @@ const WhatsAppReport: React.FC = () => {
 
     const filteredAttendees = useMemo(() => {
         return tableData.filter(message =>
-            (message.firstName || '').toLowerCase().includes(filters.name.toLowerCase()) &&
-            (message.messageID.customerPhoneNumber || '').toLowerCase().includes(filters.phone.toLowerCase()) &&
-            (selectedStatus === "sent" || message.messageID.messageStatus.toLowerCase() === selectedStatus)
+            (message.firstName || '').toLowerCase().includes(filters?.name?.toLowerCase()) &&
+            (message.messageID?.customerPhoneNumber || '').toLowerCase().includes(filters?.phone?.toLowerCase()) &&
+            (selectedStatus === "sent" || message?.messageID?.messageStatus?.toLowerCase() === selectedStatus)
         );
     }, [tableData, filters.name, filters.phone, selectedStatus]);
 
@@ -211,9 +211,9 @@ const WhatsAppReport: React.FC = () => {
                                 <TableRow key={message._id}>
                                     <TableCell className="text-left min-w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
                                     <TableCell className="text-left min-w-10">{message.firstName || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{message.messageID.customerPhoneNumber || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{message.messageID.messageStatus || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{formatDateTimeReport(message.messageID.timestamp) || "-"}</TableCell>
+                                    <TableCell className="text-left min-w-10">{message?.messageID?.customerPhoneNumber || "-"}</TableCell>
+                                    <TableCell className="text-left min-w-10">{message?.messageID?.messageStatus || "-"}</TableCell>
+                                    <TableCell className="text-left min-w-10">{formatDateTimeReport(message?.messageID?.timestamp) || "-"}</TableCell>
                                 </TableRow>
                             ))
                         )}

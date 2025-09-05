@@ -39,7 +39,7 @@ export function PieChartComponent(props: { checkedInUsers: number; nonCheckedInU
     { status: "Checked In", visitors: props.checkedInUsers, fill: colors[0] },
     { status: "Non Checked In", visitors: props.nonCheckedInUsers, fill: colors[1] },
   ]
-  
+
   const totalVisitors = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
   }, [chartData])
@@ -79,16 +79,16 @@ export function PieChartComponent(props: { checkedInUsers: number; nonCheckedInU
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          className="fill-foreground text-2xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {props.checkedInUsers}/{totalVisitors.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Total Attendees
+                          CheckIn's
                         </tspan>
                       </text>
                     )

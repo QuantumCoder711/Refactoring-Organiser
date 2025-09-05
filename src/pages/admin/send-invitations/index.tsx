@@ -239,9 +239,11 @@ const SendInvitations: React.FC = () => {
                 'First Name': attendee.first_name || '',
                 'Last Name': attendee.last_name || '',
                 'Email': attendee.email_id || '',
+                'Alternate Email': attendee.alternate_email || '',
                 'Company': attendee.company_name || '',
                 'Job Title': attendee.job_title || '',
                 'Phone': attendee.phone_number || '',
+                'Alternate Phone Number': attendee.alternate_mobile_number || '',
                 'LinkedIn URL': attendee.linkedin_url || '',
                 'Status': attendee.status || '',
             }));
