@@ -1,4 +1,4 @@
-import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users, Youtube } from "lucide-react";
+import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
@@ -34,11 +34,11 @@ export const sidebarItems = [
         icon: UserCog,
         path: "/vendors",
     },
-    {
-        label: "Tutorials",
-        icon: Youtube,
-        path: "/tutorials",
-    },
+    // {
+    //     label: "Tutorials",
+    //     icon: Youtube,
+    //     path: "/tutorials",
+    // },
 ];
 
 export const navbarLinks = [

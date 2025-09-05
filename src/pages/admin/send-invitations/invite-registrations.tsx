@@ -140,7 +140,8 @@ const InviteRegistrations: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await inviteRegistrations(formData);
+            const newFormData = { user_id: user?.id, ...formData }
+            const response = await inviteRegistrations(newFormData);
 
             // Check if response exists and has a message property
             if (response.status == 200) {

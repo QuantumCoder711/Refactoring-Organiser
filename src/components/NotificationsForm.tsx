@@ -200,31 +200,32 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
 
     try {
       let response;
+      const newFormData = { user_id: user?.id, ...formData }
       switch (templateName) {
         case 'send-reminder': {
-          response = await sendReminder(formData);
+          response = await sendReminder(newFormData);
           break;
         }
         case 'send-same-day-reminder':
-          response = await sendSameDayReminder(formData);
+          response = await sendSameDayReminder(newFormData);
           break;
         case 'session-reminder':
-          response = await sessionReminder(formData);
+          response = await sessionReminder(newFormData);
           break;
         case 'visit-booth-reminder':
-          response = await visitBoothReminder(formData);
+          response = await visitBoothReminder(newFormData);
           break;
         case 'day-two-reminder':
-          response = await dayTwoReminder(formData);
+          response = await dayTwoReminder(newFormData);
           break;
         case 'day-two-same-day-reminder':
-          response = await dayTwoSameDayReminder(formData);
+          response = await dayTwoSameDayReminder(newFormData);
           break;
         case 'send-poll':
-          response = await sendPoll({ ...formData, link: pollLink } as SendPollType);
+          response = await sendPoll({ ...newFormData, link: pollLink } as SendPollType);
           break;
         case 'thank-you-message':
-          response = await thankYouMessage(formData);
+          response = await thankYouMessage(newFormData);
           break;
         case 'send-in-app-message':
           if (!event?.id) {
@@ -233,8 +234,8 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
           // For in-app messages, only send event_id, title, and message
           const inAppData = {
             event_id: event.id.toString(),
-            title: formData.subject,
-            message: formData.message
+            title: newFormData.subject,
+            message: newFormData.message
           };
           response = await sendInAppMessage(inAppData);
           break;
