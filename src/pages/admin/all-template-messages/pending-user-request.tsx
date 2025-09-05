@@ -72,28 +72,27 @@ const PendingUserRequest: React.FC = () => {
     const [pendingRequests, setPendingRequests] = useState<AttendeeType[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch pending requests when component mounts or event changes
-    useEffect(() => {
+    const fetchPendingRequests = async () => {
         if (event && token && user?.id) {
             setLoading(true);
             try {
-                axios.post(`${domain}/api/pending_event_requests/${event.uuid}`, { user_id: user.id }, {
+                const res = await axios.post(`${domain}/api/pending_event_requests/${event.uuid}`, { user_id: user.id }, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     }
-                }).then(res => {
-                    console.log(res.data);
-                    setPendingRequests(res.data.data);
-                    setLoading(false);
-                }).catch(error => {
-                    console.error('Error fetching pending requests:', error);
-                    setLoading(false);
                 });
+                setPendingRequests(res.data.data);
             } catch (error) {
-                console.error('Error in pending requests fetch:', error);
+                console.error('Error fetching pending requests:', error);
+            } finally {
                 setLoading(false);
             }
         }
+    };
+
+    // Fetch pending requests when component mounts or event changes
+    useEffect(() => {
+        fetchPendingRequests();
     }, [user, event, token]);
 
     // Filter states
@@ -158,6 +157,8 @@ const PendingUserRequest: React.FC = () => {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
                 });
+                // Re-fetch pending requests after deletion
+                fetchPendingRequests();
             } else {
                 toast(response.message, {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
