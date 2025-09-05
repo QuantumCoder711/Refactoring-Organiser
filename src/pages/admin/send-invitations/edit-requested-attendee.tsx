@@ -114,6 +114,7 @@ const CustomComboBox = React.memo(({
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [inputValue, setInputValue] = useState(value);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -128,7 +129,28 @@ const CustomComboBox = React.memo(({
         setInputValue(newValue);
         setSearchTerm(newValue);
         setIsOpen(true);
+        setSelectedIndex(-1); // Reset selected index
         onValueChange(newValue);
+    };
+
+    // Handle key down for navigation
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (isOpen) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedIndex((prevIndex) =>
+                    prevIndex < filteredOptions.length - 1 ? prevIndex + 1 : prevIndex
+                );
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
+                    handleOptionSelect(filteredOptions[selectedIndex]);
+                }
+            }
+        }
     };
 
     // Handle option selection
@@ -136,6 +158,7 @@ const CustomComboBox = React.memo(({
         setInputValue(option.name);
         setSearchTerm('');
         setIsOpen(false);
+        setSelectedIndex(-1); // Reset selected index
         onValueChange(option.name);
         inputRef.current?.blur();
     };
@@ -144,6 +167,7 @@ const CustomComboBox = React.memo(({
     const handleCreateNew = () => {
         setInputValue(searchTerm);
         setIsOpen(false);
+        setSelectedIndex(-1); // Reset selected index
         onValueChange(searchTerm);
         inputRef.current?.blur();
     };
@@ -154,6 +178,7 @@ const CustomComboBox = React.memo(({
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
                 setSearchTerm('');
+                setSelectedIndex(-1); // Reset selected index
             }
         };
 
@@ -165,6 +190,16 @@ const CustomComboBox = React.memo(({
     useEffect(() => {
         setInputValue(value);
     }, [value]);
+
+    // Scroll to selected option
+    useEffect(() => {
+        if (selectedIndex >= 0 && dropdownRef.current) {
+            const selectedOption = dropdownRef.current.querySelectorAll('.option')[selectedIndex];
+            if (selectedOption) {
+                selectedOption.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }, [selectedIndex]);
 
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
@@ -178,6 +213,7 @@ const CustomComboBox = React.memo(({
                         type="text"
                         value={inputValue}
                         onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
                         className="w-full capitalize bg-white !h-12 text-base pr-10"
@@ -194,10 +230,10 @@ const CustomComboBox = React.memo(({
                 {isOpen && (
                     <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
-                            filteredOptions.map((option) => (
+                            filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className="px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm"
+                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
