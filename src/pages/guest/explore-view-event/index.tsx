@@ -705,7 +705,8 @@ const ExploreViewEvent: React.FC = () => {
                         </div>
 
                         {/* Sponsors */}
-                        <div hidden={allSponsors?.length === 0} className='mt-6'>
+                        {/* Previous Condition: allSponsors?.length === 0 */}
+                        <div hidden={true} className='mt-6'>
                             <h3 className='font-semibold text-lg'>Sponsors</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>

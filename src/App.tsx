@@ -47,7 +47,7 @@ import AllAgendas from '@/pages/admin/all-events/all-agendas';
 import PendingUserRequest from '@/pages/admin/all-template-messages/pending-user-request';
 import AddAgenda from '@/pages/admin/all-events/add-agenda';
 import UpdateProfile from '@/pages/admin/profile/update-profile';
-import Tutorials from '@/pages/admin/tutorials';
+// import Tutorials from '@/pages/admin/tutorials';
 import Vendors from '@/pages/admin/vendors';
 import AudienceAcquisition from '@/pages/admin/vendors/audience-acquisition';
 import Gifting from '@/pages/admin/vendors/gifting';
@@ -169,7 +169,7 @@ const App: React.FC = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="organiser/change-password" element={<ChangePassword />} />
         <Route path="all-events" element={<AllEvents />} />
-        <Route path="add-event" element={<AddEvent />} />
+        {user?.role === "admin" && <Route path="add-event" element={<AddEvent />} />}
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
@@ -182,7 +182,7 @@ const App: React.FC = () => {
           <Route path="sub-users" element={<SubUsers />} />
         )}
 
-        <Route path='tutorials' element={<Tutorials />} />
+        {/* <Route path='tutorials' element={<Tutorials />} /> */}
 
         {/* {hasFeatureAccess('vendor') && (
         )} */}

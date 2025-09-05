@@ -802,13 +802,28 @@ const Attendees: React.FC = () => {
             </SelectContent>
           </Select>
 
-          <Button
-            className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
-            onClick={handleDeleteSelected}
-            disabled={selectedAttendees.size === 0}
-          >
-            Delete
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
+                disabled={selectedAttendees.size === 0}
+              >
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete these attendees and remove their data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteSelected} disabled={selectedAttendees.size === 0} className='cursor-pointer !bg-brand-secondary hover:!bg-brand-secondary/80 transition-all duration-300 text-white'>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <Table className='mt-4'>
