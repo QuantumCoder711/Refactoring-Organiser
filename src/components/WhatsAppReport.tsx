@@ -75,7 +75,7 @@ const WhatsAppReport: React.FC = () => {
 
         return [
             { title: 'Sent Messages', value: (statusCounts?.delivered || 0) + (statusCounts?.read || 0) + (statusCounts?.failed || 0) + (statusCounts?.sent || 0), status: "sent" },
-            { title: 'Delivered Messages', value: statusCounts.delivered || 0, status: "delivered" },
+            { title: 'Delivered Messages', value: (statusCounts.delivered || 0) + (statusCounts.read || 0), status: "delivered" },
             { title: 'Read Messages', value: statusCounts.read || 0, status: "read" },
             { title: 'Failed Messages', value: statusCounts.failed || 0, status: "failed" }
         ];

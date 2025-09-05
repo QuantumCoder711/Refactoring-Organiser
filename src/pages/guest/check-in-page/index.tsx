@@ -495,6 +495,13 @@ const CheckinPage: React.FC = () => {
             });
 
             if (response.data.status === 200) {
+                
+                // Updating the lastest event attendee
+                axios.post(`${appDomain}/api/organiser/v1/event-checkin/update-last-event-attendee`, {
+                    mobileNumber: payload.phone_number,
+                    eventUuid: payload.event_uuid
+                });
+
                 toast(response.data.message || "Checked-In Successfully", {
                     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleCheck className='size-5' />
