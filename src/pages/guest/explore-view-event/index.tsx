@@ -509,7 +509,7 @@ const ExploreViewEvent: React.FC = () => {
                     });
 
                     if (response.data.status === 200) {
-                        toast("Registration Successful", {
+                        toast("Request Recieved", {
                             className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                             icon: <CheckCircle className='size-5' />
                         });
