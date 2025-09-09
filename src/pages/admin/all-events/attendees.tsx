@@ -697,7 +697,7 @@ const Attendees: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+      <div className='bg-brand-background rounded-lg p-3 sm:p-5 mt-6 shadow-blur'>
 
         {/* Details Row */}
         <div className='flex gap-3.5'>
@@ -727,104 +727,138 @@ const Attendees: React.FC = () => {
         </div>
 
         {/* Filters Bar */}
-        <div className='flex w-full gap-2.5 mt-4'>
-          {/* Search By Name */}
-          <Input
-            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by name'
-            value={nameFilter}
-            onChange={(e) => setNameFilter(e.target.value)}
-          />
+        <div className="w-full mt-4 flex flex-col gap-3">
+          {/* Row 1: Search Inputs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            {/* Search By Name */}
+            <Input
+              className="input !p-2.5 !min-w-full !text-xs"
+              placeholder="Search by name"
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+            />
 
-          {/* Search By Company */}
-          <Input
-            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by company'
-            value={companyFilter}
-            onChange={(e) => setCompanyFilter(e.target.value)}
-          />
+            {/* Search By Company */}
+            <Input
+              className="input !p-2.5 !min-w-full !text-xs"
+              placeholder="Search by company"
+              value={companyFilter}
+              onChange={(e) => setCompanyFilter(e.target.value)}
+            />
 
-          {/* Search By Designation */}
-          <Input
-            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-            placeholder='Search by designation'
-            value={designationFilter}
-            onChange={(e) => setDesignationFilter(e.target.value)}
-          />
+            {/* Search By Designation */}
+            <Input
+              className="input !p-2.5 !min-w-full !text-xs"
+              placeholder="Search by designation"
+              value={designationFilter}
+              onChange={(e) => setDesignationFilter(e.target.value)}
+            />
+          </div>
 
-          {/* Filter By Check-In */}
-          <Select value={checkInFilter} onValueChange={setCheckInFilter}>
-            <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Checked-In">
-                {checkInFilter === 'all' ? 'Checked-In' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Checked-In'}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className='!text-sm !font-semibold'>
-              <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
-              <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
-              <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* Row 2: Selects + Delete */}
+          <div className="grid grid-cols-2 sm:flex gap-2.5">
+            {/* Filter By Check-In */}
+            <Select value={checkInFilter} onValueChange={setCheckInFilter}>
+              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+                <SelectValue placeholder="Checked-In">
+                  {checkInFilter === 'all'
+                    ? 'Checked-In'
+                    : checkInFilter === '1'
+                      ? 'Yes'
+                      : checkInFilter === '0'
+                        ? 'No'
+                        : 'Checked-In'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="!text-sm !font-semibold">
+                <SelectItem value="all" className="cursor-pointer">All</SelectItem>
+                <SelectItem value="1" className="cursor-pointer">Yes</SelectItem>
+                <SelectItem value="0" className="cursor-pointer">No</SelectItem>
+              </SelectContent>
+            </Select>
 
-          {/* Filter By Not Invited */}
-          <Select value={notInvitedFilter.toString()} onValueChange={(value) => setNotInvitedFilter(Number(value))}>
-            <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Not Invited">
-                {notInvitedFilter === 2 ? 'All' : notInvitedFilter === 1 ? 'Not Invited' : notInvitedFilter === 0 ? 'Invited' : 'All'}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className='!text-sm !font-semibold'>
-              <SelectItem value="2" className='cursor-pointer'>All</SelectItem>
-              <SelectItem value="1" className='cursor-pointer'>Not Invited</SelectItem>
-              <SelectItem value="0" className='cursor-pointer'>Invited</SelectItem>
-            </SelectContent>
-          </Select>
+            {/* Filter By Not Invited */}
+            <Select value={notInvitedFilter.toString()} onValueChange={(value) => setNotInvitedFilter(Number(value))}>
+              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+                <SelectValue placeholder="Not Invited">
+                  {notInvitedFilter === 2
+                    ? 'All'
+                    : notInvitedFilter === 1
+                      ? 'Not Invited'
+                      : notInvitedFilter === 0
+                        ? 'Invited'
+                        : 'All'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="!text-sm !font-semibold">
+                <SelectItem value="2" className="cursor-pointer">All</SelectItem>
+                <SelectItem value="1" className="cursor-pointer">Not Invited</SelectItem>
+                <SelectItem value="0" className="cursor-pointer">Invited</SelectItem>
+              </SelectContent>
+            </Select>
 
-          {/* Filter By Role */}
-          <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
-              <SelectValue placeholder="Role">
-                {roleFilter === 'all' ? 'Role' :
-                  roleFilter === 'delegate' ? 'Delegate' :
-                    roleFilter === 'speaker' ? 'Speaker' :
-                      roleFilter === 'sponsor' ? 'Sponsor' :
-                        roleFilter === 'panelist' ? 'Panelist' :
-                          roleFilter === 'moderator' ? 'Moderator' : 'Role'}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className='!text-sm !font-semibold'>
-              <SelectItem value="all" className='cursor-pointer'>All Roles</SelectItem>
-              <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
-              <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
-              <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
-              <SelectItem value="panelist" className='cursor-pointer'>Panelist</SelectItem>
-              <SelectItem value="moderator" className='cursor-pointer'>Moderator</SelectItem>
-            </SelectContent>
-          </Select>
+            {/* Filter By Role */}
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+                <SelectValue placeholder="Role">
+                  {roleFilter === 'all'
+                    ? 'Role'
+                    : roleFilter === 'delegate'
+                      ? 'Delegate'
+                      : roleFilter === 'speaker'
+                        ? 'Speaker'
+                        : roleFilter === 'sponsor'
+                          ? 'Sponsor'
+                          : roleFilter === 'panelist'
+                            ? 'Panelist'
+                            : roleFilter === 'moderator'
+                              ? 'Moderator'
+                              : 'Role'}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="!text-sm !font-semibold">
+                <SelectItem value="all" className="cursor-pointer">All Roles</SelectItem>
+                <SelectItem value="delegate" className="cursor-pointer">Delegate</SelectItem>
+                <SelectItem value="speaker" className="cursor-pointer">Speaker</SelectItem>
+                <SelectItem value="sponsor" className="cursor-pointer">Sponsor</SelectItem>
+                <SelectItem value="panelist" className="cursor-pointer">Panelist</SelectItem>
+                <SelectItem value="moderator" className="cursor-pointer">Moderator</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
-                disabled={selectedAttendees.size === 0}
-              >
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete these attendees and remove their data from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteSelected} disabled={selectedAttendees.size === 0} className='cursor-pointer !bg-brand-secondary hover:!bg-brand-secondary/80 transition-all duration-300 text-white'>Continue</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            {/* Delete Button */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  className="btn !rounded-[10px] sm:w-fit !p-3 !bg-brand-secondary text-white"
+                  disabled={selectedAttendees.size === 0}
+                >
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete these attendees and remove their data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteSelected}
+                    disabled={selectedAttendees.size === 0}
+                    className="cursor-pointer !bg-brand-secondary hover:!bg-brand-secondary/80 transition-all duration-300 text-white"
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
+
+
 
         <Table className='mt-4'>
           {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
