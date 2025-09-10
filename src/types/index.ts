@@ -39,6 +39,9 @@ export interface UserType {
         search_people: 0 | 1;
         vendor: 0 | 1;
         wallet: 0 | 1;
+        icp: 0 | 1;
+        personalised_email: 0 | 1;
+        personalised_whatsapp: 0 | 1;
     };
     sub_users: SubUserType[];
 }

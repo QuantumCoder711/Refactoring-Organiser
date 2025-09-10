@@ -85,7 +85,7 @@ const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
 
-  const hasFeatureAccess = (feature: 'search_people' | 'vendor' | 'wallet') => {
+  const hasFeatureAccess = (feature: 'search_people' | 'vendor' | 'wallet' | 'icp') => {
     return user?.feature_permission?.[feature] === 1;
   };
 
@@ -174,7 +174,7 @@ const App: React.FC = () => {
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
-        <Route path="icp" element={<ICP />} />
+        {hasFeatureAccess('icp') && (<Route path="icp" element={<ICP />} />)}
         {hasFeatureAccess('search_people') && (
           <Route path="search-people" element={<SearchPeople />} />
         )}

@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { appDomain } from '@/constants';
 import GoBack from '@/components/GoBack';
 
 import { Button } from '@/components/ui/button';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useDropzone } from 'react-dropzone';
 import { FileUp, FileText } from 'lucide-react';
 type EncodingMap = Record<string, string>;
@@ -59,8 +62,6 @@ function enhancedCustomSoundex(name: string): string {
 }
 
 import * as XLSX from 'xlsx';
-import Wave from '@/components/Wave';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface ListData {
     country: string;
@@ -94,6 +95,17 @@ const userId = "66b4c728ab20f1b3ad4497f8";
 const ICP: React.FC = () => {
     const [listData, setListData] = useState<ListData[]>([]);
     const [showList, setShowList] = useState<boolean>(false);
+    // Pagination state for ICP list
+    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const paginatedICP = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return listData.slice(start, start + itemsPerPage);
+    }, [listData, currentPage, itemsPerPage]);
+    const totalPages = useMemo(() => Math.ceil(listData.length / itemsPerPage) || 1, [listData.length, itemsPerPage]);
+    const handleItemsPerPageChange = (value: string) => { setItemsPerPage(Number(value)); setCurrentPage(1); };
+    const handlePageChange = (page: number) => setCurrentPage(page);
+
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -338,26 +350,138 @@ const ICP: React.FC = () => {
 
                 {/* ICP List */}
                 {showList && (
-                    <Table>
-                        <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
-                            <TableRow className='!text-base'>
-                                <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Priority</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {listData.map((item, index) => (
-                                <TableRow key={item._id}>
-                                    <TableCell className="text-left min-w-10 font-medium">{index + 1}</TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">{item.company}</TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">{item.designation}</TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">{item.priority}</TableCell>
+                    <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+                        <div className='flex w-full justify-between items-baseline mb-3'>
+                            <div className='flex items-center w-full gap-2.5'>
+                                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                                    <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                                        <SelectValue placeholder={`${itemsPerPage}/Page`} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[10, 25, 50, 100].map(v => (
+                                            <SelectItem key={v} value={v.toString()}>{v}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <span className='font-medium text-sm'>Total Companies: {listData.length}</span>
+                            </div>
+                        </div>
+                        
+                        <Table>
+                            <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                                <TableRow className='!text-base'>
+                                    <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
+                                    <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
+                                    <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
+                                    <TableHead className="text-left min-w-10 !px-2">Priority</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {paginatedICP.map((item, index) => (
+                                    <TableRow key={item._id}>
+                                        <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                                        <TableCell className="text-left min-w-10 capitalize">{item.company}</TableCell>
+                                        <TableCell className="text-left min-w-10 capitalize">{item.designation}</TableCell>
+                                        <TableCell className="text-left min-w-10 capitalize">{item.priority}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination */}
+                        <Pagination className='mt-[26px] flex justify-end'>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    />
+                                </PaginationItem>
+
+                                {/* Show first page */}
+                                {totalPages > 0 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={currentPage === 1}
+                                            onClick={() => handlePageChange(1)}
+                                            className="cursor-pointer"
+                                        >
+                                            1
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+
+                                {/* Show ellipsis if needed */}
+                                {currentPage > 3 && (
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                )}
+
+                                {/* Show current page and adjacent pages */}
+                                {totalPages > 1 && currentPage > 2 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage - 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+
+                                {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={true}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+
+                                {totalPages > 2 && currentPage < totalPages - 1 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+
+                                {/* Show ellipsis if needed */}
+                                {currentPage < totalPages - 2 && (
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                )}
+
+                                {/* Show last page */}
+                                {totalPages > 1 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={currentPage === totalPages}
+                                            onClick={() => handlePageChange(totalPages)}
+                                            className="cursor-pointer"
+                                        >
+                                            {totalPages}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
                 )}
             </div>
         </div>

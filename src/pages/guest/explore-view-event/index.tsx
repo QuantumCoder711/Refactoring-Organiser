@@ -915,7 +915,7 @@ const ExploreViewEvent: React.FC = () => {
                     </div>
 
                     {/* Right Div */}
-                    <div className='max-w-full mx-auto md:max-w-[300px]'>
+                    <div className='md:min-w-80 max-w-80 mx-auto'>
                         <img src={domain + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
 
                         <div hidden={currentEvent?.event_mode == 1} className='mt-10 hidden md:block md:mt-[5.8rem]'>
@@ -923,7 +923,7 @@ const ExploreViewEvent: React.FC = () => {
                             <hr className='border-t-2 border-white !my-[10px]' />
                             <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
                                 {currentEvent?.event_venue_address_2}</p>
-                            <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
+                            <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-80 md:h-80'>
                                 <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
                             </div>
                         </div>
