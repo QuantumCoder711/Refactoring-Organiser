@@ -1,4 +1,4 @@
-import { HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users } from "lucide-react";
+import { GitCompareArrows, HandHeart, LayoutDashboard, NotebookPen, Trophy, UserCog, Users } from "lucide-react";
 import PlaceholderImage from "/placeholder.png";
 
 export const UserAvatar: string = PlaceholderImage;
@@ -33,6 +33,11 @@ export const sidebarItems = [
         label: "Vendors",
         icon: UserCog,
         path: "/vendors",
+    },
+    {
+        label: "ICP",
+        icon: GitCompareArrows,
+        path: "/icp",
     },
     // {
     //     label: "Tutorials",

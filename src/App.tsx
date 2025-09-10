@@ -79,6 +79,7 @@ import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from '@/pages/guest/careers';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 import SubUsers from '@/pages/admin/profile/sub-users';
+import ICP from './pages/admin/icp';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -173,6 +174,7 @@ const App: React.FC = () => {
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
+        <Route path="icp" element={<ICP />} />
         {hasFeatureAccess('search_people') && (
           <Route path="search-people" element={<SearchPeople />} />
         )}
