@@ -6,8 +6,61 @@ import GoBack from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
 import { useDropzone } from 'react-dropzone';
 import { FileUp, FileText } from 'lucide-react';
-import enhancedCustomSoundex from './helpers';
+type EncodingMap = Record<string, string>;
+
+function customSoundex(name: string): string {
+    if (!name) return '';
+    name = name.toUpperCase();
+    const encodingMap: EncodingMap = {
+        B: '1', F: '1', P: '1', V: '1',
+        C: '2', G: '2', J: '2', K: '2', Q: '2', S: '2', X: '2', Z: '2',
+        D: '3', T: '3',
+        L: '4',
+        M: '5', N: '5',
+        R: '6'
+    };
+    const separators: string[] = ['A', 'E', 'I', 'O', 'U', 'H', 'W', 'Y'];
+    const getEncodedChar = (char: string): string => encodingMap[char] || '';
+    let encodedName: string = name[0];
+    let prevCode: string = getEncodedChar(name[0]);
+    for (let i = 1; i < name.length; i++) {
+        const char: string = name[i];
+        const code: string = getEncodedChar(char);
+        if (separators.includes(char)) {
+            prevCode = '';
+            continue;
+        }
+        if (code && code !== prevCode) {
+            encodedName += code;
+        }
+        prevCode = code;
+    }
+    encodedName = encodedName.substring(0, 1) + encodedName.substring(1).replace(/[^0-9]/g, '');
+    encodedName = encodedName.padEnd(4, '0').substring(0, 4);
+    return encodedName;
+}
+
+function hashName(name: string): number {
+    if (!name) return 0;
+    const words: string[] = name
+        .split(/\s+/)
+        .filter(word => !["AND", "THE", "OF", "INC", "LTD", "LLC", "CORP", "COMPANY", "PVT"].includes(word.toUpperCase()))
+        .map(word => word.toLowerCase())
+        .sort();
+    const hash = words.reduce((acc: number, word: string) => {
+        return acc + word.split('').reduce((charAcc: number, char: string) => charAcc + char.charCodeAt(0), 0);
+    }, 0);
+    return hash;
+}
+
+function enhancedCustomSoundex(name: string): string {
+    if (!name) return '';
+    return customSoundex(name) + hashName(name).toString();
+}
+
 import * as XLSX from 'xlsx';
+import Wave from '@/components/Wave';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface ListData {
     country: string;
@@ -40,15 +93,17 @@ const userId = "66b4c728ab20f1b3ad4497f8";
 
 const ICP: React.FC = () => {
     const [listData, setListData] = useState<ListData[]>([]);
+    const [showList, setShowList] = useState<boolean>(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [companyHighestScore, setCompanyHighestScore] = useState(0);
     const [matchedCompanyCount, setMatchedCompanyCount] = useState(0);
     const [companyList, setCompanyList] = useState<string[]>([]);
-    const [matchedCompanyAndDesignation, setMatchedCompanyAndDesignation] = useState<string[]>([]);
+    const [matchedDesignations, setMatchedDesignations] = useState<string[]>([]);
     const [companyWithDesignationScore, setCompanyWithDesignationScore] = useState(0);
-    const [uploadedICPData, setUploadedICPData] = useState<Array<{ priority: string; company: string; designation: string }>>([]);
+    const [showResults, setShowResults] = useState(false);
+
 
 
     useEffect(() => {
@@ -66,8 +121,7 @@ const ICP: React.FC = () => {
     }, []);
 
 
-    // Alias to use fetched list data in matching functions
-    const data = uploadedICPData;
+
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -112,13 +166,9 @@ const ICP: React.FC = () => {
                 priority: String(o.priority ?? o.Priority ?? o.PRIORITY ?? '').trim(),
             })).filter(x => x.company || x.designation || x.priority);
 
-            setUploadedICPData(mapped as Array<{ priority: string; company: string; designation: string }>);
 
-            // Defer compare to ensure state is updated
-            setTimeout(() => {
-                companyCompare();
-                companyWithDesignationMatch();
-            }, 0);
+            compareAll(listData, mapped);
+            setShowResults(true);
         } catch (e) {
             console.error('Failed to read Excel file:', e);
             setError('Failed to read Excel file.');
@@ -127,101 +177,77 @@ const ICP: React.FC = () => {
         }
     }
 
-    const companyCompare = () => {
-        // alert('running company compare');
-        const matchedData: string[] = [];
-        let matchCount = 0;
-        let companyScore = 0;
-        const p1Score = 5;
-        const p2Score = 3;
-        const p3Score = 1;
-        listData.forEach((uploadItem) => {
-            if (uploadItem.priority.toLowerCase() === "p1") {
-                companyScore = companyScore + p1Score;
-            } else if (uploadItem.priority.toLowerCase() === "p2") {
-                companyScore = companyScore + p2Score;
-            } else if (uploadItem.priority.toLowerCase() === "p3") {
-                companyScore = companyScore + p3Score;
-            }
-            data.forEach((item) => {
-                if (enhancedCustomSoundex(uploadItem.company) === enhancedCustomSoundex(item.company)) {
-                    // matchedData.push(uploadItem.company);
-                    let companyName = item.company.toLowerCase();
-                    matchedData.push(companyName);
-                    matchCount++;
-                }
-            })
-        })
-        setLoading(false);
-        // Remove duplicates
-        const uniqueMatchedData = [...new Set(matchedData)];
-        setCompanyHighestScore(companyScore)
-        setMatchedCompanyCount(uniqueMatchedData.length)
-        setCompanyList(uniqueMatchedData)
-    }
-
-    const companyWithDesignationMatch = () => {
-        // alert('running companyWithDesignationMatch')
-        const matched: string[] = [];
-        let matchCount = 0;
+    const compareAll = (
+        icpList: ListData[],
+        uploaded: Array<{ priority: string; company: string; designation: string }>
+    ) => {
+        const priorityWeight: Record<string, number> = { p1: 5, p2: 3, p3: 1 };
+        let maxCompanyScore = 0;
+        const matchedCompanies = new Set<string>();
         let securedScore = 0;
-        let priorityScore = 0;
-        listData.forEach((uploadItem) => {
-            if (uploadItem.priority.toLowerCase() === "p1") {
-                priorityScore = 5;
-            } else if (uploadItem.priority.toLowerCase() === "p2") {
-                priorityScore = 3;
-            } else if (uploadItem.priority.toLowerCase() === "p3") {
-                priorityScore = 1;
-            } else {
-                priorityScore = 0;
-            }
+        const matchedDesignationsAcc: string[] = [];
 
-            // console.log(data)
-            data.forEach((item) => {
-                if (enhancedCustomSoundex(uploadItem.company) === enhancedCustomSoundex(item.company)) {
-                    const uploadDesignation = uploadItem.designation.split(', ');
+        const getRoleScore = (w: string): number => {
+            const word = w.toLowerCase();
+            const cSuite = new Set([
+                'ceo', 'cgo', 'coo', 'cfo', 'cio', 'cto', 'cmo', 'chro', 'cpo', 'cro', 'cco', 'cdo', 'clo', 'cino', 'cso', 'cxo', 'cao', 'ciso',
+                'chief executive officer', 'chief growth officer', 'chief operating officer', 'chief financial officer', 'chief information officer', 'chief technology officer', 'chief marketing officer', 'chief human resources officer', 'chief product officer', 'chief revenue officer', 'chief customer officer', 'chief data officer', 'chief compliance officer', 'chief risk officer', 'chief legal officer', 'chief innovation officer', 'chief strategy officer', 'chief experience officer', 'chief digital officer', 'chief sustainability officer', 'chief analytics officer', 'chief communications officer', 'chief security officer', 'chief information security officer'
+            ]);
+            if (cSuite.has(word)) return 5;
+            if (word === 'vice president' || word === 'vp') return 4;
+            if (word === 'director' || word === 'general manager' || word === 'gm' || word === 'head') return 3;
+            if (word === 'manager') return 2;
+            return 1;
+        };
 
-                    for (let i = 0; i < uploadDesignation.length; i++) {
-                        const word = uploadDesignation[i].toLowerCase();
-                        const sentence = item.designation.toLowerCase();
-                        const matchedWord = sentence.indexOf(word);
+        for (const icp of icpList) {
+            const pScore = priorityWeight[icp.priority?.toLowerCase?.() as string] ?? 0;
+            maxCompanyScore += pScore;
 
+            for (const up of uploaded) {
+                if (enhancedCustomSoundex(icp.company) === enhancedCustomSoundex(up.company)) {
+                    matchedCompanies.add(up.company.toLowerCase());
 
-                        if (matchedWord > -1) {
+                    const sentence = String(up.designation || '').toLowerCase();
+                    const words = String(icp.designation || '')
+                        .toLowerCase()
+                        .split(',')
+                        .map(s => s.trim())
+                        .filter(Boolean);
 
-                            if (word === "ceo" || word === "cgo" || word === "coo" || word === "cfo" || word === "cio" || word === "cto" || word === "cmo" || word === "chro" || word === "cpo" || word === "cro" || word === "cco" || word === "cdo" || word === "cco" || word === "clo" || word === "cino" || word === "cso" || word === "cxo" || word === "cdo" || word === "cso" || word === "cao" || word === "cco" || word === "ciso" || word === "chief executive officer" || word === "chief growth officer" || word === "chief operating officer" || word === "chief financial officer" || word === "chief information officer" || word === "chief technology officer" || word === "chief marketing officer" || word === "chief human Resources officer" || word === "chief product officer" || word === "chief revenue officer" || word === "chief customer officer" || word === "chief data officer" || word === "chief compliance officer" || word === "chief risk officer" || word === "chief legal officer" || word === "chief innovation officer" || word === "chief strategy officer" || word === "chief experience officer" || word === "chief digital officer" || word === "chief sustainability officer" || word === "chief analytics officer" || word === "chief communications officer" || word === "chief security officer" || word === "chief information security officer") {
-                                const score = 5;
-                                securedScore = securedScore + priorityScore + score;
-                            } else if (word === "vice president" || word === "vp") {
-                                const score = 4;
-                                securedScore = securedScore + priorityScore + score;
-                            } else if (word === "director" || word === "general manager" || word === "gm" || word === "head") {
-                                const score = 3;
-                                securedScore = securedScore + priorityScore + score;
-                            } else if (word === "manager") {
-                                const score = 2;
-                                securedScore = securedScore + priorityScore + score;
-                            } else {
-                                const score = 1;
-                                securedScore = securedScore + priorityScore + score;
-                            }
-                            matched.push(`${item.company}---`);
-                            matched.push(`${item.designation}, `);
-                            matchCount++
+                    for (const w of words) {
+                        if (sentence.indexOf(w) > -1) {
+                            securedScore += pScore + getRoleScore(w);
+                            matchedDesignationsAcc.push(up.designation);
                         }
                     }
                 }
-            })
-        })
-        setLoading(false);
-        setMatchedCompanyAndDesignation(matched);
-        setCompanyWithDesignationScore(securedScore)
-    }
+            }
+        }
 
-    const matchedDesignations = matchedCompanyAndDesignation
-        .filter((_, idx) => idx % 2 === 1)
-        .map((s) => String(s).replace(/,\s*$/, ''));
+        setCompanyHighestScore(maxCompanyScore);
+        setMatchedCompanyCount(matchedCompanies.size);
+        setCompanyList(Array.from(matchedCompanies));
+        setCompanyWithDesignationScore(securedScore);
+
+        const uniqueDesignations = Array.from(new Set(
+            matchedDesignationsAcc.map(s => String(s).replace(/,\s*$/, ''))
+        ));
+
+
+        setMatchedDesignations(uniqueDesignations);
+    };
+
+    const resetToUpload = () => {
+        setShowResults(false);
+        setUploadedFile(null);
+        setError(null);
+        setCompanyHighestScore(0);
+        setMatchedCompanyCount(0);
+        setCompanyList([]);
+        setCompanyWithDesignationScore(0);
+        setMatchedDesignations([]);
+    };
 
     return (
         <div>
@@ -231,89 +257,57 @@ const ICP: React.FC = () => {
                     <h1 className='text-xl font-semibold'>Compare your ICP</h1>
                 </div>
 
-                <Button className='btn'>Upload New File</Button>
+                <div className='flex items-center gap-3'>
+                    <Button className='btn' onClick={resetToUpload}>Upload New File</Button>
+                    <Button className='btn' onClick={() => setShowList(prev => !prev)}>{showList ? "Hide List" : "Show List"}</Button>
+                </div>
             </div>
 
             <div className="mt-6">
                 <div className="w-[690px] p-7 rounded-[10px] mx-auto">
-                    <div
-                        {...getRootProps()}
-                        className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}
-
-                    >
-                        <input {...getInputProps()} />
-                        <div className="flex flex-col items-center justify-center gap-2 text-center">
-                            <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
-                            {isDragActive ? (
-                                <p className="text-brand-secondary font-medium">Drop the file here...</p>
-                            ) : (
-                                <>
-                                    <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
-                                    <p>Supported file: <span className="font-semibold">.xlsx, .xls</span></p>
-                                </>
-                            )}
-                            {uploadedFile && (
-                                <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                                    <FileText className="size-5 text-brand-secondary" />
-                                    <span className="text-sm font-medium truncate">{uploadedFile.name}</span>
-                                    <span className="text-xs text-gray-500">({(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                    {!showResults && (
+                        <>
+                            <div
+                                {...getRootProps()}
+                                className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}
+                            >
+                                <input {...getInputProps()} />
+                                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
+                                    {isDragActive ? (
+                                        <p className="text-brand-secondary font-medium">Drop the file here...</p>
+                                    ) : (
+                                        <>
+                                            <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
+                                            <p>Supported file: <span className="font-semibold">.xlsx, .xls</span></p>
+                                        </>
+                                    )}
+                                    {uploadedFile && (
+                                        <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
+                                            <FileText className="size-5 text-brand-secondary" />
+                                            <span className="text-sm font-medium truncate">{uploadedFile.name}</span>
+                                            <span className="text-xs text-gray-500">({(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                                        </div>
+                                    )}
+                                    {error && (
+                                        <p className="mt-2 text-sm text-red-600">{error}</p>
+                                    )}
                                 </div>
-                            )}
-                            {error && (
-                                <p className="mt-2 text-sm text-red-600">{error}</p>
-                            )}
-                        </div>
-                    </div>
+                            </div>
 
-                    <div className="mt-9 flex justify-center">
-
-                        {/* <div className="mt-10">
-                    <h2 className="text-lg font-semibold mb-3">Your ICP Data</h2>
-                    {listData && listData.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableCaption>Total: {listData.length}</TableCaption>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Company</TableHead>
-                                        <TableHead>Designation</TableHead>
-                                        <TableHead>Industry</TableHead>
-                                        <TableHead>Employees</TableHead>
-                                        <TableHead>Priority</TableHead>
-                                        <TableHead>Country</TableHead>
-                                        <TableHead>State</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {listData.map((row) => (
-                                        <TableRow key={row._id}>
-                                            <TableCell className="font-medium">{row.company}</TableCell>
-                                            <TableCell>{row.designation}</TableCell>
-                                            <TableCell>{row.industry}</TableCell>
-                                            <TableCell>{row.employeeSize}</TableCell>
-                                            <TableCell>{row.priority}</TableCell>
-                                            <TableCell>{row.country}</TableCell>
-                                            <TableCell>{row.state}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    ) : (
-                        <p className="text-sm text-muted-foreground">No data found.</p>
+                            <div className="mt-9 flex justify-center">
+                                <Button
+                                    onClick={handleCompare}
+                                    disabled={!uploadedFile || loading}
+                                    className="btn !bg-brand-secondary !text-white w-[200px] h-9"
+                                >
+                                    {loading ? 'Comparing...' : 'Compare'}
+                                </Button>
+                            </div>
+                        </>
                     )}
-                </div> */}
 
-                        <Button
-                            onClick={handleCompare}
-                            disabled={!uploadedFile || loading}
-                            className="btn !bg-brand-secondary !text-white w-[200px] h-9"
-                        >
-                            {loading ? 'Comparing...' : 'Compare'}
-                        </Button>
-                    </div>
-
-                    <div className="mt-8 space-y-3">
+                    <div hidden={!showResults} className="mt-8 space-y-3">
                         <h3 className="text-base font-semibold">Comparison Results</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="p-3 rounded-md border bg-white">
@@ -340,6 +334,31 @@ const ICP: React.FC = () => {
                     </div>
 
                 </div>
+
+
+                {/* ICP List */}
+                {showList && (
+                    <Table>
+                        <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                            <TableRow className='!text-base'>
+                                <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
+                                <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
+                                <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
+                                <TableHead className="text-left min-w-10 !px-2">Priority</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {listData.map((item, index) => (
+                                <TableRow key={item._id}>
+                                    <TableCell className="text-left min-w-10 font-medium">{index + 1}</TableCell>
+                                    <TableCell className="text-left min-w-10 capitalize">{item.company}</TableCell>
+                                    <TableCell className="text-left min-w-10 capitalize">{item.designation}</TableCell>
+                                    <TableCell className="text-left min-w-10 capitalize">{item.priority}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
             </div>
         </div>
     )
