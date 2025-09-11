@@ -8,7 +8,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useDropzone } from 'react-dropzone';
-import { FileUp, FileText } from 'lucide-react';
+import { FileUp, FileText, Download } from 'lucide-react';
 type EncodingMap = Record<string, string>;
 
 function customSoundex(name: string): string {
@@ -145,6 +145,20 @@ const ICP: React.FC = () => {
         maxFiles: 1
     });
 
+    const handleDownload = () => {
+        if (listData.length === 0) return;
+        
+        // Convert the data to worksheet
+        const ws = XLSX.utils.json_to_sheet(listData);
+        
+        // Create a new workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'ICP Data');
+        
+        // Generate Excel file and trigger download
+        XLSX.writeFile(wb, `icp_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
     const handleCompare = async () => {
         if (!uploadedFile) return;
         try {
@@ -265,13 +279,13 @@ const ICP: React.FC = () => {
         <div>
             <div className='flex items-center gap-3 justify-between'>
                 <div className='flex items-center gap-3'>
-                    <GoBack />
                     <h1 className='text-xl font-semibold'>Compare your ICP</h1>
                 </div>
 
                 <div className='flex items-center gap-3'>
                     <Button className='btn' onClick={resetToUpload}>Upload New File</Button>
                     <Button className='btn' onClick={() => setShowList(prev => !prev)}>{showList ? "Hide List" : "Show List"}</Button>
+                    <Button className='btn' onClick={handleDownload}>Download List</Button>
                 </div>
             </div>
 
