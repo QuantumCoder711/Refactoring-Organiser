@@ -1056,38 +1056,38 @@ const Attendees: React.FC = () => {
                         <DialogTitle className="text-2xl font-bold text-brand-primary">
                           Attendee Details
                         </DialogTitle>
-                        <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
+                        <div className="h-1 w-12 mx-auto sm:mx-0 bg-brand-primary rounded-full"></div>
                       </DialogHeader>
 
                       <div className="mt-8 space-y-6">
                         <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.first_name} {attendee.last_name}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.first_name} {attendee.last_name}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.job_title || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.job_title || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.email_id || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.email_id || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.company_name || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.company_name || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.phone_number || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.phone_number || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>
-                            <p className="text-base font-medium text-gray-800">{attendee.alternate_email || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.alternate_email || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</h3>
-                            <p className="text-base font-medium text-gray-800 capitalize">{attendee.status || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.status || '-'}</p>
                           </div>
                         </div>
                       </div>

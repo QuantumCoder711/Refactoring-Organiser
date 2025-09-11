@@ -543,25 +543,25 @@ const AddAttendee: React.FC = () => {
         <div className="">
             <div className='flex items-center gap-5 mb-5'>
                 <GoBack />
-                <h1 className='text-xl font-semibold'>{event?.title}</h1>
+                <h1 className='md:text-xl font-semibold'>{event?.title}</h1>
             </div>
-            <div className="w-[690px] bg-brand-light-gray p-7 rounded-[10px] mx-auto shadow-blur">
+            <div className="max-w-2xl bg-brand-light-gray p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
                     <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
                         <TabsTrigger
                             value="single"
-                            className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
                         >
-                            Add Attendee Details
+                            Add Attendee
                         </TabsTrigger>
                         <TabsTrigger
                             value="bulk"
-                            className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
                         >
                             Bulk Upload
                         </TabsTrigger></TabsList>
                     <TabsContent value="single" className="mt-5">
-                        <form onSubmit={handleSubmit} className="w-[620px] mx-auto text-center">
+                        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto text-center">
                             <div className="flex gap-3.5 w-full">
                                 <CustomInput
                                     label="First Name"
@@ -583,8 +583,8 @@ const AddAttendee: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="grid gap-3.5 grid-cols-2 mt-3.5 w-full">
-                                <div className="flex flex-col gap-3.5 w-full">
+                            <div className="grid gap-3.5 grid-cols-1 sm:grid-cols-2 items-center mt-3.5 w-full">
+                                <div className="flex flex-col gap-3.5 order-2 sm:order-1 w-full">
                                     {/* Profile Picture */}
                                     <div className="flex flex-col gap-2">
                                         <Label className="font-semibold" htmlFor="image">Profile Picture</Label>
@@ -631,10 +631,10 @@ const AddAttendee: React.FC = () => {
                                     />
                                 </div>
 
-                                <div className="w-full mx-auto flex flex-col gap-2">
+                                <div className="w-full mx-auto flex flex-col order-1 sm:order-2 gap-2">
                                     <Label className="font-semibold">Select Image</Label>
-                                    <div className="w-full h-full">
-                                        <AspectRatio className="aspect-video w-full h-full">
+                                    <div className="max-w-80 sm:max-w-full">
+                                        <AspectRatio className="max-w-80 h-full sm:aspect-video sm:max-w-full sm:max-h-full">
                                             <img src={createImage(formData.image)} alt="Attendee Image" className="rounded-md object-cover w-full h-full" />
                                         </AspectRatio>
                                     </div>
@@ -728,8 +728,8 @@ const AddAttendee: React.FC = () => {
                     </TabsContent>
 
                     <TabsContent value="bulk">
-                        <div className="mt-5 flex justify-between">
-                            <span className="font-semibold">Upload File</span>
+                        <div className="mt-5 flex justify-end">
+                            {/* <span className="font-semibold">Upload File</span> */}
                             <Button
                                 onClick={() => {
                                     // Create sample data with exact fields and sample data
@@ -784,10 +784,10 @@ const AddAttendee: React.FC = () => {
                                         icon: <CircleCheck className='size-5' />
                                     });
                                 }}
-                                className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm flex items-center gap-1"
+                                className="btn"
                             >
                                 <Download size={13} strokeWidth={1} />
-                                Download Sample Excel File
+                                Download Template
                             </Button>
                         </div>
 
