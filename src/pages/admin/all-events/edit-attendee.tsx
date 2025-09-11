@@ -505,12 +505,12 @@ const EditAttendee: React.FC = () => {
         <div className="">
             <div className="max-w-2xl bg-brand-light-gray p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
                 <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-2xl font-semibold">Edit Attendee Details</h1>
+                    <h1 className="text-lg font-semibold">Edit Attendee</h1>
                     <GoBack />
                 </div>
 
                 <form onSubmit={handleSubmit} className="max-w-2xl mx-auto text-center">
-                    <div className="flex gap-3.5 w-full">
+                    <div className="flex gap-3.5 flex-col sm:flex-row w-full">
                         <CustomInput
                             label="First Name"
                             id="first_name"

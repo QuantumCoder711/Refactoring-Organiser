@@ -541,9 +541,9 @@ const AddAttendee: React.FC = () => {
 
     return (
         <div className="">
-            <div className='flex items-center gap-5 mb-5'>
+            <div className='flex flex-col sm:flex-row sm:items-center gap-5 mb-5'>
                 <GoBack />
-                <h1 className='md:text-xl font-semibold'>{event?.title}</h1>
+                <h1 className='md:text-xl font-semibold sm:text-left text-center'>{event?.title}</h1>
             </div>
             <div className="max-w-2xl bg-brand-light-gray p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
@@ -562,7 +562,7 @@ const AddAttendee: React.FC = () => {
                         </TabsTrigger></TabsList>
                     <TabsContent value="single" className="mt-5">
                         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto text-center">
-                            <div className="flex gap-3.5 w-full">
+                            <div className="flex flex-col sm:flex-row gap-3.5 w-full">
                                 <CustomInput
                                     label="First Name"
                                     id="first_name"
@@ -794,21 +794,29 @@ const AddAttendee: React.FC = () => {
                         <div className="mt-1.5 w-full">
                             <div {...getRootProps()} className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
                                 <input {...getInputProps()} />
-                                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                                <div className="flex flex-col items-center justify-center gap-3 text-center sm:!text-sm">
                                     <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
                                     {isDragActive ? (
-                                        <p className="text-brand-secondary font-medium">Drop the file here...</p>
+                                        <p className="text-brand-secondary font-semibold">Drop the file here...</p>
                                     ) : (
                                         <>
-                                            <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
-                                            <p className="">Supported file: <span className="font-semibold">.csv, .xlsx, .xls (Max 10MB)</span></p>
+                                            <p className="text-lg font-semibold">
+                                                Click Here to Upload your File or Drag
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                Supported files: <span className="font-semibold">.csv, .xlsx, .xls (Max 10MB)</span>
+                                            </p>
                                         </>
                                     )}
                                     {bulkFile && (
                                         <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
                                             <FileText className="size-5 text-brand-secondary" />
-                                            <span className="text-sm font-medium truncate">{bulkFile.name}</span>
-                                            <span className="text-xs text-gray-500">({(bulkFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                                            <span className="truncate" style={{ maxWidth: '80%' }}>
+                                                {bulkFile.name}
+                                            </span>
+                                            <span className="text-xs text-gray-500 sm:text-xs">
+                                                ({ (bulkFile.size / (1024 * 1024)).toFixed(2)} MB)
+                                            </span>
                                         </div>
                                     )}
                                 </div>
@@ -818,9 +826,9 @@ const AddAttendee: React.FC = () => {
                                 <Button
                                     onClick={handleBulkUpload}
                                     disabled={!bulkFile}
-                                    className="btn !bg-brand-secondary !text-white w-[200px] h-9"
+                                    className="btn !bg-brand-secondary !text-white"
                                 >
-                                    Upload Excel Now
+                                    Upload Excel
                                 </Button>
                             </div>
                         </div>
