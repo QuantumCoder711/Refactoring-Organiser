@@ -23,7 +23,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Eye, Trash, Upload as UploadIcon } from 'lucide-react';
+import { Download, Eye, Trash, Upload as UploadIcon } from 'lucide-react';
 
 const ROWS_PER_PAGE: number = 10;
 
@@ -150,6 +150,13 @@ const ICP: React.FC = () => {
         try {
 
             const res = await uploadICPSheet(user.id as number, selectedFile, sheetName.trim());
+            if(res?.status === 401) {
+                toast(res.message || 'Invalid Header. Please check the sample file.', {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+                });
+
+                return;
+            }
             toast(res && 'message' in res ? res.message || 'Uploaded successfully' : 'Uploaded successfully', {
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
             });
@@ -174,7 +181,7 @@ const ICP: React.FC = () => {
         const a = normalize(s);
         if (!a) return "";
         const f = a[0];
-        const m: Record<string, string> = { b:"1",f:"1",p:"1",v:"1", c:"2",g:"2",j:"2",k:"2",q:"2",s:"2",x:"2",z:"2", d:"3",t:"3", l:"4", m:"5",n:"5", r:"6" };
+        const m: Record<string, string> = { b: "1", f: "1", p: "1", v: "1", c: "2", g: "2", j: "2", k: "2", q: "2", s: "2", x: "2", z: "2", d: "3", t: "3", l: "4", m: "5", n: "5", r: "6" };
         let r = f;
         let prev = m[f] || "";
         for (let i = 1; i < a.length && r.length < 4; i++) {
@@ -288,7 +295,7 @@ const ICP: React.FC = () => {
             }
 
             const totalMax = (icp.length * 5) + companyHighestScore;
-            const percent = (companyWithDesignationScore/((uploadedRows.length * 5) + companyHighestScore)) * 100;
+            const percent = (companyWithDesignationScore / ((uploadedRows.length * 5) + companyHighestScore)) * 100;
 
             setCompareResult({
                 percent,
@@ -303,6 +310,27 @@ const ICP: React.FC = () => {
         }
     };
 
+    //Download Button
+    const downloadSampleFile = () => {
+        const sampleData = [
+            {
+                company_name: 'Flipkart',
+                designation: 'CTO',
+                priority: 'P1'
+            },
+            {
+                company_name: 'Flipkart',
+                designation: 'COO',
+                priority: 'P2'
+            }
+        ];
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(sampleData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Sample ICP');
+        XLSX.writeFile(wb, 'sample_icp.xlsx');
+    };
+
     if (loading) return <Wave />;
 
     return (
@@ -314,6 +342,9 @@ const ICP: React.FC = () => {
                 </div>
 
                 <div className='flex items-center gap-3'>
+                    <Button className='btn' onClick={downloadSampleFile}>
+                        <Download className="mr-2 h-4 w-4" /> Get Template
+                    </Button>
                     <Button className='btn' onClick={() => setUploadOpen(true)}>
                         <UploadIcon className="mr-2 h-4 w-4" /> Upload New ICP
                     </Button>
@@ -545,7 +576,7 @@ const ICP: React.FC = () => {
             <Dialog open={!!openPreviewFor} onOpenChange={(o) => { if (!o) setOpenPreviewFor(null); }}>
                 <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)] overflow-y-auto'>
                     <DialogHeader>
-                        <DialogTitle className='capitalize'>{activeSheet?.sheet_name.split("").find((char:string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}</DialogTitle>
+                        <DialogTitle className='capitalize'>{activeSheet?.sheet_name.split("").find((char: string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}</DialogTitle>
                     </DialogHeader>
                     <div className='border rounded-md overflow-hidden'>
                         <Table>
