@@ -1,0 +1,107 @@
+import { domain, token } from "@/constants";
+import axios from "axios";
+import { create } from "zustand";
+
+interface SheetRow {
+    companyname: string;
+    designation: string[];
+    priority: string;
+}
+
+interface ICPSheet {
+    sheetRows: SheetRow[];
+    sheet_name: string;
+    uuid: string;
+}
+
+interface ICPStore {
+    loading: boolean;
+    icpSheets: ICPSheet[];
+    getICPSheets: (userId: number) => Promise<void>;
+    deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
+    uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
+}
+
+const useICPStore = create<ICPStore>((set, get) => ({
+    loading: false,
+    icpSheets: [],
+    getICPSheets: async (userId: number) => {
+        set({ loading: true });
+        try {
+            const response = await axios.get(`${domain}/api/get-icp-data/${userId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+            if (response.data.status === 200) {
+                set({ icpSheets: response.data.data });
+            } else {
+                console.error('Failed to fetch ICP sheets:', response.data.message);
+                throw new Error(response.data.message);
+            }
+        } finally {
+            set({ loading: false });
+        }
+    },
+    deleteICPSheet: async (uuid: string) => {
+        const { icpSheets } = get();
+        set({ icpSheets: icpSheets.filter((s) => s.uuid !== uuid) });
+        try {
+            const response = await axios.delete(`${domain}/api/delete-icp-data/${uuid}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+            if (response?.data?.status !== undefined) {
+                return { status: response.data.status, message: response.data.message };
+            }
+        } catch (error) {
+            set({ icpSheets });
+            throw error;
+        }
+    },
+    uploadICPSheet: async (userId: number, file: File, sheetName: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('user_id', String(userId));
+            formData.append('file', file);
+            formData.append('sheet_name', sheetName);
+
+            const response = await axios.post(`${domain}/api/store-icp-data`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // Refresh list after successful upload
+            if (response?.data?.status === 200 || response?.data?.status === 201) {
+                await get().getICPSheets(userId);
+            }
+
+            if (response?.data?.status !== undefined) {
+                return { status: response.data.status, message: response.data.message };
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+}));
+
+export default useICPStore;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

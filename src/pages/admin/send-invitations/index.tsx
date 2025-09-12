@@ -353,24 +353,24 @@ const SendInvitations: React.FC = () => {
 
     return (
         <div>
-            <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-5'>
+            <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0'>
+                <div className='flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto justify-start sm:justify-end'>
                     <GoBack />
                     <h1 className='text-xl font-semibold'>{event?.title}</h1>
                 </div>
 
-                <div className='flex items-center gap-5'>
+                <div className='flex flex-wrap items-center gap-3 sm:gap-5'>
                     {selectedAttendees.size > 0 ? (
                         <div className="flex gap-2">
                             <Button
                                 onClick={() => handleExportToExcel(filteredAttendees.filter(attendee => selectedAttendees.has(attendee.id)))}
-                                className='btn !rounded-[10px] !px-3 !bg-green-600 hover:!bg-green-700'
+                                className='btn !rounded-[10px] !px-3 !bg-green-600 hover:!bg-green-700 w-full sm:w-auto'
                             >
                                 Export Selected ({selectedAttendees.size})
                             </Button>
                             <Button
                                 onClick={() => handleExportToExcel()}
-                                className='btn !rounded-[10px] !px-3'
+                                className='btn !rounded-[10px] !px-3 w-full sm:w-auto'
                             >
                                 Export All
                             </Button>
@@ -378,7 +378,7 @@ const SendInvitations: React.FC = () => {
                     ) : (
                         <Button
                             onClick={() => handleExportToExcel()}
-                            className='btn !rounded-[10px] !px-3'
+                            className='btn !rounded-[10px] !px-3 w-full sm:w-auto'
                         >
                             Export Data
                         </Button>
@@ -386,27 +386,27 @@ const SendInvitations: React.FC = () => {
                 </div>
             </div>
 
-            <div className='flex items-center gap-5 mt-5 font-semibold'>
+            <div className='flex flex-wrap items-center gap-3 sm:gap-5 mt-5 font-semibold'>
                 <Link
                     to={`/send-invitations/add-requested-attendee/${slug}`}
-                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-fit text-nowrap text-sm grid place-content-center"
+                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-full sm:w-fit text-nowrap text-sm grid place-content-center"
                 >
                     Add Requested Attendee
                 </Link>
 
                 <Link
                     to={`/send-invitations/invite-registrations/${slug}`}
-                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-fit text-nowrap text-sm grid place-content-center"
+                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-full sm:w-fit text-nowrap text-sm grid place-content-center"
                 >
                     Invite Registrations
                 </Link>
             </div>
 
             {/* Search and Filter Section */}
-            <div className='flex w-full gap-2.5 mt-4'>
+            <div className='grid grid-cols-1 min-[480px]:grid-cols-2 sm:flex flex-wrap w-full gap-2.5 mt-4'>
                 {/* Search By Name */}
                 <Input
-                    className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
                     placeholder='Search by name'
                     value={nameFilter}
                     onChange={(e) => setNameFilter(e.target.value)}
@@ -414,7 +414,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Search By Company */}
                 <Input
-                    className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
                     placeholder='Search by company'
                     value={companyFilter}
                     onChange={(e) => setCompanyFilter(e.target.value)}
@@ -422,7 +422,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Search By Email */}
                 <Input
-                    className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
                     placeholder='Search by email'
                     value={emailFilter}
                     onChange={(e) => setEmailFilter(e.target.value)}
@@ -430,7 +430,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Filter By Status */}
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+                    <SelectTrigger className="input !w-full sm:!w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
                         <SelectValue placeholder="Status">
                             {statusFilter === 'all' ? 'All Statuses' :
                                 statusFilter === 'delegate' ? 'Delegate' :
@@ -452,7 +452,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Get Contact Button */}
                 <Button
-                    className='btn !rounded-[10px] !p-2.5 !bg-blue-600 text-white hover:!bg-blue-700'
+                    className='btn !rounded-[10px] !p-2.5 !bg-blue-600 text-white hover:!bg-blue-700 w-full sm:w-auto'
                     onClick={handleGetContacts}
                     disabled={isLoadingContacts || selectedAttendees.size === 0}
                 >
@@ -460,19 +460,19 @@ const SendInvitations: React.FC = () => {
                 </Button>
 
                 <Button
-                    className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
+                    className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white w-full sm:w-auto'
                     onClick={handleDeleteSelected}
                     disabled={selectedAttendees.size === 0}
                 >
-                    Delete
+                    Delete Selected
                 </Button>
             </div>
 
             {/* Table */}
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur overflow-x-auto'>
 
                 {/* Details Row */}
-                <div className='flex gap-3.5'>
+                <div className='flex flex-wrap gap-3.5 mb-2'>
                     {/* Select Box for pagination */}
                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
                         <SelectTrigger className="rounded-sm !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
@@ -556,7 +556,7 @@ const SendInvitations: React.FC = () => {
                                     {/* For Viewing the Event */}
                                     <Dialog>
                                         <DialogTrigger className='cursor-pointer'><Eye size={20} /></DialogTrigger>
-                                        <DialogContent className="max-w-md p-6">
+                                        <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                             <DialogHeader className="space-y-2">
                                                 <DialogTitle className="text-2xl font-bold text-brand-primary">
                                                     Attendee Details
@@ -607,7 +607,7 @@ const SendInvitations: React.FC = () => {
                                         <AlertDialogTrigger className='cursor-pointer'>
                                             <Trash size={20} className='fill-brand-secondary stroke-brand-secondary' />
                                         </AlertDialogTrigger>
-                                        <AlertDialogContent>
+                                        <AlertDialogContent className="w-[90vw] max-w-[425px] p-4 sm:p-6">
                                             <AlertDialogHeader>
                                                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                                 <AlertDialogDescription>
@@ -633,12 +633,12 @@ const SendInvitations: React.FC = () => {
                 </Table>
 
                 {/* Pagination */}
-                <div className="flex justify-between items-center mt-[26px]">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 mt-[26px]">
                     <div className="text-sm text-gray-500">
                         Showing {Math.min(totalItems, (currentPage - 1) * itemsPerPage + 1)} to {Math.min(totalItems, currentPage * itemsPerPage)} of {totalItems} entries
                     </div>
-                    <Pagination className='flex justify-end'>
-                        <PaginationContent>
+                    <Pagination className='flex justify-center sm:justify-end'>
+                        <PaginationContent className="flex flex-wrap">
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}

@@ -1,414 +1,582 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import axios from 'axios';
-import { appDomain } from '@/constants';
+import GoBack from '@/components/GoBack';
+import Wave from '@/components/Wave';
+import useAuthStore from '@/store/authStore';
+import useICPStore from '@/store/icpStore';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Button } from '@/components/ui/button';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { useDropzone } from 'react-dropzone';
-import { FileUp, FileText } from 'lucide-react';
-type EncodingMap = Record<string, string>;
-
-function customSoundex(name: string): string {
-    if (!name) return '';
-    name = name.toUpperCase();
-    const encodingMap: EncodingMap = {
-        B: '1', F: '1', P: '1', V: '1',
-        C: '2', G: '2', J: '2', K: '2', Q: '2', S: '2', X: '2', Z: '2',
-        D: '3', T: '3',
-        L: '4',
-        M: '5', N: '5',
-        R: '6'
-    };
-    const separators: string[] = ['A', 'E', 'I', 'O', 'U', 'H', 'W', 'Y'];
-    const getEncodedChar = (char: string): string => encodingMap[char] || '';
-    let encodedName: string = name[0];
-    let prevCode: string = getEncodedChar(name[0]);
-    for (let i = 1; i < name.length; i++) {
-        const char: string = name[i];
-        const code: string = getEncodedChar(char);
-        if (separators.includes(char)) {
-            prevCode = '';
-            continue;
-        }
-        if (code && code !== prevCode) {
-            encodedName += code;
-        }
-        prevCode = code;
-    }
-    encodedName = encodedName.substring(0, 1) + encodedName.substring(1).replace(/[^0-9]/g, '');
-    encodedName = encodedName.padEnd(4, '0').substring(0, 4);
-    return encodedName;
-}
-
-function hashName(name: string): number {
-    if (!name) return 0;
-    const words: string[] = name
-        .split(/\s+/)
-        .filter(word => !["AND", "THE", "OF", "INC", "LTD", "LLC", "CORP", "COMPANY", "PVT"].includes(word.toUpperCase()))
-        .map(word => word.toLowerCase())
-        .sort();
-    const hash = words.reduce((acc: number, word: string) => {
-        return acc + word.split('').reduce((charAcc: number, char: string) => charAcc + char.charCodeAt(0), 0);
-    }, 0);
-    return hash;
-}
-
-function enhancedCustomSoundex(name: string): string {
-    if (!name) return '';
-    return customSoundex(name) + hashName(name).toString();
-}
-
+import Dropzone from 'react-dropzone';
 import * as XLSX from 'xlsx';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Eye, Trash, Upload as UploadIcon } from 'lucide-react';
 
-interface ListData {
-    country: string;
-    state: string;
-    skill: string;
-    company: string;
-    industry: string;
-    designation: string;
-    employeeSize: string;
-    priority: string;
-    _id: string;
-}
+const ROWS_PER_PAGE: number = 10;
 
-const fetchICPList = async (userId: string, token: string) => {
-    try {
-        const response = await axios.post(`${appDomain}/api/marketing/user/getUploadedICPData`, { userId }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': token,
-            }
-        });
-        return response.data.result.data[0].list;
-    } catch (error) {
-        console.error('Error fetching ICP list:', error);
-        return [];
+const formatUploadedOn = (sheetName: string): { name: string; uploadedOn?: string } => {
+    if (!sheetName) return { name: '' };
+    const cleaned = sheetName.replace(/\.(xlsx?|csv)$/i, '').trim();
+    const idx = cleaned.lastIndexOf('_');
+    const nameRaw = idx > -1 ? cleaned.slice(0, idx) : cleaned;
+    const tsStr = idx > -1 ? cleaned.slice(idx + 1) : '';
+
+    const name = nameRaw.trim();
+
+    let uploadedOn: string | undefined;
+    if (tsStr && tsStr.length === 14) { // Format: YYYYMMDDHHmmss
+        const year = tsStr.slice(0, 4);
+        const month = tsStr.slice(4, 6);
+        const day = tsStr.slice(6, 8);
+        const d = new Date(`${year}-${month}-${day}`);
+        if (!isNaN(d.getTime())) {
+            uploadedOn = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
     }
-}
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjZiNGM3MjhhYjIwZjFiM2FkNDQ5N2Y4IiwiZW1haWwiOiJ2YWx1ZUBrbG91dC5jbHViIiwicm9sZSI6InByZW1pdW0iLCJpYXQiOjE3NTc0MDExMzksImV4cCI6MTc1ODAwNTkzOX0.SEX9EU53YtpetjJZuIQVlKcZ6YyH4IXPzx0AVyiZshI";
-const userId = "66b4c728ab20f1b3ad4497f8";
+
+    return { name, uploadedOn };
+};
 
 const ICP: React.FC = () => {
-    const [listData, setListData] = useState<ListData[]>([]);
-    const [showList, setShowList] = useState<boolean>(false);
-    // Pagination state for ICP list
-    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const paginatedICP = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage;
-        return listData.slice(start, start + itemsPerPage);
-    }, [listData, currentPage, itemsPerPage]);
-    const totalPages = useMemo(() => Math.ceil(listData.length / itemsPerPage) || 1, [listData.length, itemsPerPage]);
-    const handleItemsPerPageChange = (value: string) => { setItemsPerPage(Number(value)); setCurrentPage(1); };
-    const handlePageChange = (page: number) => setCurrentPage(page);
+    const { user } = useAuthStore(state => state);
+    const { icpSheets, loading, getICPSheets, deleteICPSheet, uploadICPSheet } = useICPStore(state => state);
 
-    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [companyHighestScore, setCompanyHighestScore] = useState(0);
-    const [matchedCompanyCount, setMatchedCompanyCount] = useState(0);
-    const [companyList, setCompanyList] = useState<string[]>([]);
-    const [matchedDesignations, setMatchedDesignations] = useState<string[]>([]);
-    const [companyWithDesignationScore, setCompanyWithDesignationScore] = useState(0);
-    const [showResults, setShowResults] = useState(false);
+    // Upload dialog state
+    const [uploadOpen, setUploadOpen] = useState(false);
+    const [sheetName, setSheetName] = useState("");
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [nameError, setNameError] = useState<string | null>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
 
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [uploading, setUploading] = useState(false);
 
+    // Compare dialog state
+    const [compareOpen, setCompareOpen] = useState(false);
+    const [compareFile, setCompareFile] = useState<File | null>(null);
+    const [compareTargetUUID, setCompareTargetUUID] = useState<string>("");
+    const [comparing, setComparing] = useState(false);
+    const [compareError, setCompareError] = useState<string | null>(null);
+    const [compareResult, setCompareResult] = useState<null | {
+        percent: number;
+        matchedCompanies: string[];
+        matchedDesignations: Array<{ company: string; designation: string; score: number }>;
+        totals: { companyWithDesignationScore: number; companyHighestScore: number; totalMax: number };
+    }>(null);
+
+    // Preview dialog state
+    const [openPreviewFor, setOpenPreviewFor] = useState<null | { uuid: string }>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        fetchICPList(userId, token).then(res => {
-            // setUploadedICPData(res);
-            setListData(res)
-        });
-    }, []);
+        if (user) getICPSheets(user.id as number);
+    }, [user, getICPSheets]);
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        const file = acceptedFiles[0];
-        if (!file) return;
-        setError(null);
-        setUploadedFile(file);
-    }, []);
+    const activeSheet = useMemo(() => icpSheets.find(s => s.uuid === openPreviewFor?.uuid) || null, [icpSheets, openPreviewFor]);
+    const totalPages = activeSheet ? Math.max(1, Math.ceil(activeSheet.sheetRows.length / ROWS_PER_PAGE)) : 1;
+    const paginatedRows = activeSheet ? activeSheet.sheetRows.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE) : [];
 
-
-
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        onDropRejected: () => setError('Only Excel files (.xlsx, .xls) are allowed.'),
-        accept: {
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-            'application/vnd.ms-excel': ['.xls']
-        },
-        maxFiles: 1
-    });
-
-    const handleDownload = () => {
-        if (listData.length === 0) return;
-        
-        // Convert the data to worksheet
-        const ws = XLSX.utils.json_to_sheet(listData);
-        
-        // Create a new workbook
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'ICP Data');
-        
-        // Generate Excel file and trigger download
-        XLSX.writeFile(wb, `icp_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+    const handlePreview = (uuid: string) => {
+        setOpenPreviewFor({ uuid });
+        setCurrentPage(1);
     };
 
-    const handleCompare = async () => {
-        if (!uploadedFile) return;
+    const handleDelete = async (uuid: string) => {
         try {
-            setLoading(true);
-            const arrayBuffer = await uploadedFile.arrayBuffer();
-            const bytes = new Uint8Array(arrayBuffer);
-            const workbook = XLSX.read(bytes, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const sheet = workbook.Sheets[sheetName];
-            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+            const res = await deleteICPSheet(uuid);
+            toast(res && 'message' in res ? res.message : 'ICP list deleted', {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+            });
+        } catch (err: any) {
+            toast(err?.message || 'Failed to delete ICP list');
+        }
+    };
 
-            if (!rows || rows.length === 0) {
-                setError('Uploaded file is empty.');
-                return;
+    // Upload dialog handlers
+    const handleBrowseClick = () => fileInputRef.current?.click();
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setFileError(null);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const file = e.dataTransfer?.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setFileError(null);
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!sheetName.trim()) {
+            setNameError('Name is required');
+            return;
+        } else {
+            setNameError(null);
+        }
+        if (!selectedFile) {
+            setFileError('Please select a file');
+            return;
+        } else {
+            setFileError(null);
+        }
+        if (!user?.id) return;
+
+        setUploading(true);
+        try {
+
+            const res = await uploadICPSheet(user.id as number, selectedFile, sheetName.trim());
+            toast(res && 'message' in res ? res.message || 'Uploaded successfully' : 'Uploaded successfully', {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+            });
+            setUploadOpen(false);
+            setSheetName("");
+            setSelectedFile(null);
+        } catch (err: any) {
+            toast(err?.message || 'Failed to upload ICP', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+            });
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+
+    // Comparison helpers
+    const normalize = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+
+    const soundex = (s: string) => {
+        const a = normalize(s);
+        if (!a) return "";
+        const f = a[0];
+        const m: Record<string, string> = { b:"1",f:"1",p:"1",v:"1", c:"2",g:"2",j:"2",k:"2",q:"2",s:"2",x:"2",z:"2", d:"3",t:"3", l:"4", m:"5",n:"5", r:"6" };
+        let r = f;
+        let prev = m[f] || "";
+        for (let i = 1; i < a.length && r.length < 4; i++) {
+            const ch = a[i];
+            const code = m[ch] || "";
+            if (code && code !== prev) r += code;
+            prev = code;
+        }
+        return (r + "000").slice(0, 4);
+    };
+
+    const hashName = (s: string) => {
+        let h = 5381;
+        for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
+        return (h >>> 0).toString(36);
+    };
+
+    const companyKey = (name: string) => {
+        const n = normalize(name);
+        return `${soundex(n)}-${hashName(n)}`;
+    };
+
+    const getPriorityWeight = (p: string) => {
+        const v = (p || "").toLowerCase();
+        if (v === "p1") return 5;
+        if (v === "p2") return 3;
+        if (v === "p3") return 1;
+        return 1;
+    };
+
+    const getRoleScore = (designationText: string, icpDesignations: string[] = []) => {
+        const text = (designationText || "").toLowerCase();
+        const has = (kw: string) => text.includes(kw.toLowerCase());
+        if (icpDesignations.length) {
+            const matched = icpDesignations.some(d => has(d));
+            if (!matched) return 1;
+        }
+        if (has("chief") || has("cxo") || has("c-suite") || has("ceo") || has("coo") || has("cfo") || has("cto") || has("cio")) return 5;
+        if (has("vp") || has("vice president")) return 4;
+        if (has("director") || has("gm") || has("general manager") || has("head")) return 3;
+        if (has("manager")) return 2;
+        return 1;
+    };
+
+    type UploadedRow = { company: string; designation: string; priority?: string };
+
+    const parseUploadedFile = async (file: File): Promise<UploadedRow[]> => {
+        const data = await file.arrayBuffer();
+        const wb = XLSX.read(data, { type: 'array' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const json: any[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
+        if (!json.length) return [];
+        const pick = (row: any, candidates: string[]) => {
+            for (const key of Object.keys(row)) {
+                const k = key.toLowerCase().trim();
+                if (candidates.includes(k)) return row[key];
             }
+            return "";
+        };
+        const companyKeys = ["company", "companyname", "company_name", "organization", "organisation", "org", "brand"];
+        const designationKeys = ["designation", "title", "job title", "jobtitle", "role", "position"];
+        const priorityKeys = ["priority", "p", "prio"];
+        const rows: UploadedRow[] = json.map(r => ({
+            company: String(pick(r, companyKeys)).trim(),
+            designation: String(pick(r, designationKeys)).trim(),
+            priority: String(pick(r, priorityKeys)).trim(),
+        })).filter(r => r.company);
+        return rows;
+    };
 
-            const headers = (rows[0] || []).map((h: any) => String(h ?? '').trim());
-            const dataRows = rows.slice(1);
+    const runComparison = async () => {
+        if (!compareTargetUUID) { setCompareError('Please select an ICP sheet'); return; }
+        if (!compareFile) { setCompareError('Please upload a file to compare'); return; }
+        setCompareError(null);
+        setComparing(true);
+        try {
+            const target = icpSheets.find(s => s.uuid === compareTargetUUID);
+            if (!target) { setCompareError('Selected ICP sheet not found'); setComparing(false); return; }
+            const uploadedRows = await parseUploadedFile(compareFile);
 
-            const objects = dataRows.map((row) => {
-                const obj: Record<string, any> = {};
-                headers.forEach((h, idx) => {
-                    obj[h || `Column_${idx + 1}`] = (row as any[])[idx];
-                });
-                return obj;
+            const icp = target.sheetRows.map(r => ({
+                company: r.companyname,
+                key: companyKey(r.companyname),
+                prioWeight: getPriorityWeight(r.priority),
+                icpDesignations: Array.isArray(r.designation) ? r.designation : String(r.designation || '').split(',').map(s => s.trim()).filter(Boolean)
+            }));
+            const icpKeyMap = new Map<string, typeof icp[number][]>();
+            icp.forEach(row => {
+                const arr = icpKeyMap.get(row.key) || [];
+                arr.push(row);
+                icpKeyMap.set(row.key, arr);
             });
 
-            const mapped = objects.map((o) => ({
-                company: String(o.company ?? o.Company ?? o.COMPANY ?? '').trim(),
-                designation: String(o.designation ?? o.Designation ?? o.DESIGNATION ?? '').trim(),
-                priority: String(o.priority ?? o.Priority ?? o.PRIORITY ?? '').trim(),
-            })).filter(x => x.company || x.designation || x.priority);
+            let companyWithDesignationScore = 0;
+            const companyHighestScore = icp.reduce((acc, r) => acc + r.prioWeight, 0);
+            const matchedCompaniesSet = new Set<string>();
+            const matchedDesignations: Array<{ company: string; designation: string; score: number }> = [];
 
-
-            compareAll(listData, mapped);
-            setShowResults(true);
-        } catch (e) {
-            console.error('Failed to read Excel file:', e);
-            setError('Failed to read Excel file.');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    const compareAll = (
-        icpList: ListData[],
-        uploaded: Array<{ priority: string; company: string; designation: string }>
-    ) => {
-        const priorityWeight: Record<string, number> = { p1: 5, p2: 3, p3: 1 };
-        let maxCompanyScore = 0;
-        const matchedCompanies = new Set<string>();
-        let securedScore = 0;
-        const matchedDesignationsAcc: string[] = [];
-
-        const getRoleScore = (w: string): number => {
-            const word = w.toLowerCase();
-            const cSuite = new Set([
-                'ceo', 'cgo', 'coo', 'cfo', 'cio', 'cto', 'cmo', 'chro', 'cpo', 'cro', 'cco', 'cdo', 'clo', 'cino', 'cso', 'cxo', 'cao', 'ciso',
-                'chief executive officer', 'chief growth officer', 'chief operating officer', 'chief financial officer', 'chief information officer', 'chief technology officer', 'chief marketing officer', 'chief human resources officer', 'chief product officer', 'chief revenue officer', 'chief customer officer', 'chief data officer', 'chief compliance officer', 'chief risk officer', 'chief legal officer', 'chief innovation officer', 'chief strategy officer', 'chief experience officer', 'chief digital officer', 'chief sustainability officer', 'chief analytics officer', 'chief communications officer', 'chief security officer', 'chief information security officer'
-            ]);
-            if (cSuite.has(word)) return 5;
-            if (word === 'vice president' || word === 'vp') return 4;
-            if (word === 'director' || word === 'general manager' || word === 'gm' || word === 'head') return 3;
-            if (word === 'manager') return 2;
-            return 1;
-        };
-
-        for (const icp of icpList) {
-            const pScore = priorityWeight[icp.priority?.toLowerCase?.() as string] ?? 0;
-            maxCompanyScore += pScore;
-
-            for (const up of uploaded) {
-                if (enhancedCustomSoundex(icp.company) === enhancedCustomSoundex(up.company)) {
-                    matchedCompanies.add(up.company.toLowerCase());
-
-                    const sentence = String(up.designation || '').toLowerCase();
-                    const words = String(icp.designation || '')
-                        .toLowerCase()
-                        .split(',')
-                        .map(s => s.trim())
-                        .filter(Boolean);
-
-                    for (const w of words) {
-                        if (sentence.indexOf(w) > -1) {
-                            securedScore += pScore + getRoleScore(w);
-                            matchedDesignationsAcc.push(up.designation);
-                        }
-                    }
+            for (const ur of uploadedRows) {
+                const key = companyKey(ur.company);
+                const matches = icpKeyMap.get(key);
+                if (!matches?.length) continue;
+                matchedCompaniesSet.add(ur.company);
+                for (const m of matches) {
+                    const roleScore = getRoleScore(ur.designation, m.icpDesignations);
+                    const secured = m.prioWeight + roleScore;
+                    companyWithDesignationScore += secured;
+                    matchedDesignations.push({ company: m.company, designation: ur.designation, score: secured });
                 }
             }
+
+            const totalMax = (icp.length * 5) + companyHighestScore;
+            const percent = (companyWithDesignationScore/((uploadedRows.length * 5) + companyHighestScore)) * 100;
+
+            setCompareResult({
+                percent,
+                matchedCompanies: Array.from(matchedCompaniesSet),
+                matchedDesignations,
+                totals: { companyWithDesignationScore, companyHighestScore, totalMax }
+            });
+        } catch (e: any) {
+            setCompareError(e?.message || 'Failed to compare');
+        } finally {
+            setComparing(false);
         }
-
-        setCompanyHighestScore(maxCompanyScore);
-        setMatchedCompanyCount(matchedCompanies.size);
-        setCompanyList(Array.from(matchedCompanies));
-        setCompanyWithDesignationScore(securedScore);
-
-        const uniqueDesignations = Array.from(new Set(
-            matchedDesignationsAcc.map(s => String(s).replace(/,\s*$/, ''))
-        ));
-
-
-        setMatchedDesignations(uniqueDesignations);
     };
 
-    const resetToUpload = () => {
-        setShowResults(false);
-        setUploadedFile(null);
-        setError(null);
-        setCompanyHighestScore(0);
-        setMatchedCompanyCount(0);
-        setCompanyList([]);
-        setCompanyWithDesignationScore(0);
-        setMatchedDesignations([]);
-    };
+    if (loading) return <Wave />;
 
     return (
         <div>
-            <div className='flex items-center gap-3 justify-between'>
+            <div className='flex items-center justify-between gap-3'>
                 <div className='flex items-center gap-3'>
-                    <h1 className='text-xl font-semibold'>Compare your ICP</h1>
+                    <GoBack />
+                    <h1 className='text-xl font-semibold'>ICP</h1>
                 </div>
 
                 <div className='flex items-center gap-3'>
-                    <Button className='btn' onClick={resetToUpload}>Upload New File</Button>
-                    <Button className='btn' onClick={() => setShowList(prev => !prev)}>{showList ? "Hide List" : "Show List"}</Button>
-                    <Button className='btn' onClick={handleDownload}>Download List</Button>
+                    <Button className='btn' onClick={() => setUploadOpen(true)}>
+                        <UploadIcon className="mr-2 h-4 w-4" /> Upload New ICP
+                    </Button>
+                    <Button variant="outline" onClick={() => { setCompareOpen(true); setCompareResult(null); setCompareError(null); setCompareFile(null); setCompareTargetUUID(""); }}>
+                        Compare
+                    </Button>
                 </div>
             </div>
 
-            <div className="mt-6">
-                <div className="w-[690px] p-7 rounded-[10px] mx-auto">
-                    {!showResults && (
-                        <>
+
+            {/* Upload ICP Dialog */}
+            <Dialog open={uploadOpen} onOpenChange={(open) => { setUploadOpen(open); if (!open) { setNameError(null); setFileError(null); } }}>
+                <DialogContent className="sm:max-w-lg">
+                    <DialogHeader>
+                        <DialogTitle>Upload ICP</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-5">
+                        <div>
+                            <Label htmlFor="sheetName">Name</Label>
+                            <Input
+                                id="sheetName"
+                                placeholder="Enter sheet name"
+                                value={sheetName}
+                                className='mt-2'
+                                onChange={(e) => { setSheetName(e.target.value); if (e.target.value.trim()) setNameError(null); }}
+                            />
+                            {nameError && <p className="text-destructive text-xs mt-1">{nameError}</p>}
+                        </div>
+                        <div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".xlsx,.xls,.csv"
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
                             <div
-                                {...getRootProps()}
-                                className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
+                                onClick={handleBrowseClick}
+                                className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/40"
                             >
-                                <input {...getInputProps()} />
-                                <div className="flex flex-col items-center justify-center gap-2 text-center">
-                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
-                                    {isDragActive ? (
-                                        <p className="text-brand-secondary font-medium">Drop the file here...</p>
-                                    ) : (
-                                        <>
-                                            <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
-                                            <p>Supported file: <span className="font-semibold">.xlsx, .xls</span></p>
-                                        </>
-                                    )}
-                                    {uploadedFile && (
-                                        <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                                            <FileText className="size-5 text-brand-secondary" />
-                                            <span className="text-sm font-medium truncate">{uploadedFile.name}</span>
-                                            <span className="text-xs text-gray-500">({(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
-                                        </div>
-                                    )}
-                                    {error && (
-                                        <p className="mt-2 text-sm text-red-600">{error}</p>
-                                    )}
-                                </div>
+                                {selectedFile ? (
+                                    <div className="text-sm">
+                                        <p className="font-medium">{selectedFile.name}</p>
+                                        <p className="text-muted-foreground">{(selectedFile.size / 1024).toFixed(0)} KB</p>
+                                        <p className="underline mt-2">Click to change</p>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                        <UploadIcon className="h-6 w-6" />
+                                        <p className="text-sm">Drag & drop your file here, or click to browse</p>
+                                        <p className="text-xs">Accepted: .xlsx, .xls, .csv</p>
+                                    </div>
+                                )}
                             </div>
-
-                            <div className="mt-9 flex justify-center">
-                                <Button
-                                    onClick={handleCompare}
-                                    disabled={!uploadedFile || loading}
-                                    className="btn !bg-brand-secondary !text-white w-[200px] h-9"
-                                >
-                                    {loading ? 'Comparing...' : 'Compare'}
-                                </Button>
-                            </div>
-                        </>
-                    )}
-
-                    <div hidden={!showResults} className="mt-8 space-y-3">
-                        <h3 className="text-base font-semibold">Comparison Results</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="p-3 rounded-md border bg-white">
-                                <div className="text-xs text-muted-foreground">Total companies</div>
-                                <div className="text-lg font-semibold">{listData.length}</div>
-                            </div>
-                            <div className="p-3 rounded-md border bg-white">
-                                <div className="text-xs text-muted-foreground">Companies matched</div>
-                                <div className="text-lg font-semibold">{matchedCompanyCount}</div>
-                            </div>
-                            <div className="p-3 rounded-md border bg-white md:col-span-2">
-                                <div className="text-xs text-muted-foreground">Score</div>
-                                <div className="text-lg font-semibold">{(companyWithDesignationScore / ((listData.length * 5) + companyHighestScore)) * 100} %</div>
-                            </div>
-                        </div>
-                        <div className="p-3 rounded-md border bg-white">
-                            <div className="text-xs text-muted-foreground mb-1">Matched Company Names</div>
-                            <div className="text-sm break-words capitalize">{companyList.length ? companyList.join(', ') : '-'}</div>
-                        </div>
-                        <div className="p-3 rounded-md border bg-white">
-                            <div className="text-xs text-muted-foreground mb-1">Designations</div>
-                            <div className="text-sm break-words capitalize">{matchedDesignations.length ? matchedDesignations.join(', ') : '-'}</div>
+                            {fileError && <p className="text-destructive text-xs mt-1">{fileError}</p>}
                         </div>
                     </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setUploadOpen(false)} disabled={uploading}>Cancel</Button>
+                        <Button onClick={handleUpload} disabled={uploading} className='btn'>{uploading ? 'Saving…' : 'Save'}</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
-                </div>
+            {/* Compare ICP Dialog */}
+            <Dialog open={compareOpen} onOpenChange={(o) => { setCompareOpen(o); if (!o) { setCompareFile(null); setCompareTargetUUID(""); setCompareResult(null); setCompareError(null); } }}>
+                <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden overflow-y-auto grid grid-rows-[auto,auto,1fr,auto]">
+                    <DialogHeader className="shrink-0">
+                        <DialogTitle>Compare ICP</DialogTitle>
+                    </DialogHeader>
 
-
-                {/* ICP List */}
-                {showList && (
-                    <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
-                        <div className='flex w-full justify-between items-baseline mb-3'>
-                            <div className='flex items-center w-full gap-2.5'>
-                                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                                    <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
-                                        <SelectValue placeholder={`${itemsPerPage}/Page`} />
+                    {/* Static form area (always visible) */}
+                    <div className="space-y-4 mt-5 shrink-0">
+                        <div>
+                            <Label>Select ICP sheet to compare against</Label>
+                            <div className="mt-2">
+                                <Select value={compareTargetUUID} onValueChange={(v) => setCompareTargetUUID(v)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select ICP sheet" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {[10, 25, 50, 100].map(v => (
-                                            <SelectItem key={v} value={v.toString()}>{v}</SelectItem>
+                                        {icpSheets.map(s => (
+                                            <SelectItem key={s.uuid} value={s.uuid}>{s.sheet_name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-
-                                <span className='font-medium text-sm'>Total Companies: {listData.length}</span>
                             </div>
                         </div>
-                        
+                        <div>
+                            <Label>Upload file to compare</Label>
+                            <div className="mt-2">
+                                <Dropzone accept={{ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] }} maxFiles={1} onDrop={(files) => setCompareFile(files?.[0] || null)}>
+                                    {({ getRootProps, getInputProps, isDragActive }) => (
+                                        <div {...getRootProps({ className: `border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/40 ${isDragActive ? 'bg-accent/60' : ''}` })}>
+                                            <input {...getInputProps()} />
+                                            {compareFile ? (
+                                                <div className="text-sm">
+                                                    <p className="font-medium">{compareFile.name}</p>
+                                                    <p className="text-muted-foreground">{(compareFile.size / 1024).toFixed(0)} KB</p>
+                                                    <p className="underline mt-2">Click to change</p>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                    <UploadIcon className="h-6 w-6" />
+                                                    <p className="text-sm">Drag & drop your file here, or click to browse</p>
+                                                    <p className="text-xs">Accepted: .xlsx, .xls</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </Dropzone>
+                            </div>
+                        </div>
+
+                        {compareError && <p className="text-destructive text-sm">{compareError}</p>}
+                    </div>
+
+                    {/* Results area (scrolls independently if long) */}
+                    {compareResult && (
+                        <div className="min-h-0 mt-4 overflow-auto">
+                            <div className="border rounded-md p-4 space-y-4">
+                                <div className="flex items-end gap-4">
+                                    <div className="text-3xl font-semibold">{compareResult.percent}%</div>
+                                    <div className="text-muted-foreground">match score</div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                    <div className="rounded-md bg-sky-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Companies matched</div>
+                                        <div className="font-medium">{compareResult.matchedCompanies.length}</div>
+                                    </div>
+                                    <div className="rounded-md bg-yellow-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Secured score</div>
+                                        <div className="font-medium">{compareResult.totals.companyWithDesignationScore}</div>
+                                    </div>
+                                    <div className="rounded-md bg-purple-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Percentage</div>
+                                        <div className="font-medium">{compareResult.percent}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium mb-2">Matched breakdown</div>
+                                    <div className="border rounded-md">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Company</TableHead>
+                                                    <TableHead>Designation</TableHead>
+                                                    <TableHead className="w-[120px]">Score</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {compareResult.matchedDesignations.map((m, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell className='font-medium'>{m.company}</TableCell>
+                                                        <TableCell className='text-muted-foreground'>{m.designation}</TableCell>
+                                                        <TableCell>{m.score}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                                {compareResult.matchedDesignations.length === 0 && (
+                                                    <TableRow>
+                                                        <TableCell colSpan={3} className='text-center text-muted-foreground'>No matches found</TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <DialogFooter className="shrink-0">
+                        <Button variant="outline" onClick={() => setCompareOpen(false)} className='cursor-pointer' disabled={comparing}>Close</Button>
+                        <Button onClick={runComparison} disabled={comparing || !compareFile || !compareTargetUUID} className='btn !h-full'>
+                            {comparing ? 'Comparing...' : 'Compare'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+
+            <div className='mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6'>
+                {icpSheets.map((sheet) => {
+                    const meta = formatUploadedOn(sheet.sheet_name || sheet.uuid);
+                    return (
+                        <Card key={sheet.uuid} className='transition-shadow hover:shadow-md'>
+                            <CardHeader className='flex flex-col'>
+                                <CardTitle className='text-base sm:text-lg capitalize break-words line-clamp-2'>{meta.name}</CardTitle>
+                                <CardDescription>{meta.uploadedOn ? `Uploaded on ${meta.uploadedOn}` : '—'}</CardDescription>
+                                <CardAction className='flex gap-2 mt-3'>
+                                    <Button variant="outline" size="sm" onClick={() => handlePreview(sheet.uuid)}>
+                                        <Eye className='size-4' /> Preview
+                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="sm">
+                                                <Trash className='size-4' /> Delete
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure you want to delete this ICP list?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the selected ICP list.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction className='cursor-pointer bg-destructive text-white' onClick={() => handleDelete(sheet.uuid)}>
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </CardAction>
+                            </CardHeader>
+                            <CardContent>
+                                <div className='text-sm text-muted-foreground'>
+                                    {sheet.sheetRows.length} entries
+                                </div>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
+            </div>
+
+            <Dialog open={!!openPreviewFor} onOpenChange={(o) => { if (!o) setOpenPreviewFor(null); }}>
+                <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)] overflow-y-auto'>
+                    <DialogHeader>
+                        <DialogTitle className='capitalize'>{activeSheet?.sheet_name.split("").find((char:string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}</DialogTitle>
+                    </DialogHeader>
+                    <div className='border rounded-md overflow-hidden'>
                         <Table>
-                            <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
-                                <TableRow className='!text-base'>
-                                    <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
-                                    <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
-                                    <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
-                                    <TableHead className="text-left min-w-10 !px-2">Priority</TableHead>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className='min-w-[220px]'>Company</TableHead>
+                                    <TableHead>Designation</TableHead>
+                                    <TableHead className='w-[120px]'>Priority</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {paginatedICP.map((item, index) => (
-                                    <TableRow key={item._id}>
-                                        <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                        <TableCell className="text-left min-w-10 capitalize">{item.company}</TableCell>
-                                        <TableCell className="text-left min-w-10 capitalize">{item.designation}</TableCell>
-                                        <TableCell className="text-left min-w-10 capitalize">{item.priority}</TableCell>
+                                {paginatedRows.map((row, idx) => (
+
+                                    <TableRow key={idx}>
+                                        <TableCell className='font-medium'>{row.companyname}</TableCell>
+                                        <TableCell className='text-muted-foreground'>{Array.isArray(row.designation) ? row.designation.join(', ') : String(row.designation || '')}</TableCell>
+                                        <TableCell>{row.priority}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
+                    </div>
 
-                        {/* Pagination */}
-                        <Pagination className='mt-[26px] flex justify-end'>
+                    {activeSheet && activeSheet.sheetRows.length > ROWS_PER_PAGE && (
+                        <Pagination className='mt-4'>
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }}
                                         className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        href="#"
                                     />
                                 </PaginationItem>
 
@@ -416,8 +584,9 @@ const ICP: React.FC = () => {
                                 {totalPages > 0 && (
                                     <PaginationItem>
                                         <PaginationLink
+                                            href="#"
                                             isActive={currentPage === 1}
-                                            onClick={() => handlePageChange(1)}
+                                            onClick={(e) => { e.preventDefault(); setCurrentPage(1); }}
                                             className="cursor-pointer"
                                         >
                                             1
@@ -432,39 +601,23 @@ const ICP: React.FC = () => {
                                     </PaginationItem>
                                 )}
 
-                                {/* Show current page and adjacent pages */}
-                                {totalPages > 1 && currentPage > 2 && (
-                                    <PaginationItem>
-                                        <PaginationLink
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            className="cursor-pointer"
-                                        >
-                                            {currentPage - 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                )}
+                                {/* Show current page and surrounding pages */}
+                                {Array.from({ length: 3 }, (_, i) => currentPage + i - 1)
+                                    .filter(pageNum => pageNum > 1 && pageNum < totalPages)
+                                    .map(pageNum => (
 
-                                {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
-                                    <PaginationItem>
-                                        <PaginationLink
-                                            isActive={true}
-                                            className="cursor-pointer"
-                                        >
-                                            {currentPage}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                )}
 
-                                {totalPages > 2 && currentPage < totalPages - 1 && (
-                                    <PaginationItem>
-                                        <PaginationLink
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            className="cursor-pointer"
-                                        >
-                                            {currentPage + 1}
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                )}
+                                        <PaginationItem key={pageNum}>
+                                            <PaginationLink
+                                                href="#"
+                                                isActive={currentPage === pageNum}
+                                                onClick={(e) => { e.preventDefault(); setCurrentPage(pageNum); }}
+                                                className="cursor-pointer"
+                                            >
+                                                {pageNum}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
 
                                 {/* Show ellipsis if needed */}
                                 {currentPage < totalPages - 2 && (
@@ -477,8 +630,9 @@ const ICP: React.FC = () => {
                                 {totalPages > 1 && (
                                     <PaginationItem>
                                         <PaginationLink
+                                            href="#"
                                             isActive={currentPage === totalPages}
-                                            onClick={() => handlePageChange(totalPages)}
+                                            onClick={(e) => { e.preventDefault(); setCurrentPage(totalPages); }}
                                             className="cursor-pointer"
                                         >
                                             {totalPages}
@@ -488,15 +642,16 @@ const ICP: React.FC = () => {
 
                                 <PaginationItem>
                                     <PaginationNext
-                                        onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                                        onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
                                         className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                        href="#"
                                     />
                                 </PaginationItem>
                             </PaginationContent>
                         </Pagination>
-                    </div>
-                )}
-            </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
