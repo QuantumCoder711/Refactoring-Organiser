@@ -623,13 +623,13 @@ const Attendees: React.FC = () => {
   return (
     <div>
 
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-5'>
+      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0'>
+        <div className='flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto'>
           <GoBack />
           <h1 className='text-xl font-semibold'>{event?.title}</h1>
         </div>
 
-        <div className='flex items-center gap-5'>
+        <div className='flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto justify-start sm:justify-end'>
           <Button
             className='btn !rounded-[10px] !px-3'
             onClick={handleExportToExcel}
@@ -646,7 +646,7 @@ const Attendees: React.FC = () => {
                 QR Code
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="w-[90vw] max-w-[425px] p-4 sm:p-6">
               <DialogHeader>
                 <DialogTitle className="text-center">Event Check-In QR Code</DialogTitle>
                 <DialogDescription className="text-center">
@@ -700,7 +700,7 @@ const Attendees: React.FC = () => {
       <div className='bg-brand-background rounded-lg p-3 sm:p-5 mt-6 shadow-blur'>
 
         {/* Details Row */}
-        <div className='flex gap-3.5'>
+        <div className='flex flex-wrap gap-2 sm:gap-3.5'>
 
           {/* Select Box for pagination */}
           <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
@@ -836,7 +836,7 @@ const Attendees: React.FC = () => {
                   Delete
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="w-[90vw] max-w-[425px] p-4 sm:p-6">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -860,7 +860,8 @@ const Attendees: React.FC = () => {
 
 
 
-        <Table className='mt-4'>
+        <div className='overflow-x-auto'>
+          <Table className='mt-4 min-w-[1000px]'>
           {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
           <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
             <TableRow className='!text-base'>
@@ -943,7 +944,7 @@ const Attendees: React.FC = () => {
 
                     <Dialog>
                       <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
-                      <DialogContent className="max-w-md max-h-96 overflow-y-auto p-6">
+                      <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                         {isLoading ? <Wave /> : <>
                           <DialogHeader className="space-y-4">
                             <div>
@@ -1139,10 +1140,11 @@ const Attendees: React.FC = () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
 
         {/* Pagination */}
-        <Pagination className='mt-[26px] flex justify-end'>
+        <Pagination className='mt-[26px] flex justify-center sm:justify-end'>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
