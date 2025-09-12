@@ -11,6 +11,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+
+import Dropzone from 'react-dropzone';
+import * as XLSX from 'xlsx';
 import {
     Table,
     TableBody,
@@ -59,6 +64,19 @@ const ICP: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [uploading, setUploading] = useState(false);
+
+    // Compare dialog state
+    const [compareOpen, setCompareOpen] = useState(false);
+    const [compareFile, setCompareFile] = useState<File | null>(null);
+    const [compareTargetUUID, setCompareTargetUUID] = useState<string>("");
+    const [comparing, setComparing] = useState(false);
+    const [compareError, setCompareError] = useState<string | null>(null);
+    const [compareResult, setCompareResult] = useState<null | {
+        percent: number;
+        matchedCompanies: string[];
+        matchedDesignations: Array<{ company: string; designation: string; score: number }>;
+        totals: { companyWithDesignationScore: number; companyHighestScore: number; totalMax: number };
+    }>(null);
 
     // Preview dialog state
     const [openPreviewFor, setOpenPreviewFor] = useState<null | { uuid: string }>(null);
@@ -131,6 +149,7 @@ const ICP: React.FC = () => {
 
         setUploading(true);
         try {
+
             const res = await uploadICPSheet(user.id as number, selectedFile, sheetName.trim());
             toast(res && 'message' in res ? res.message || 'Uploaded successfully' : 'Uploaded successfully', {
                 className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
@@ -148,6 +167,143 @@ const ICP: React.FC = () => {
         }
     };
 
+
+    // Comparison helpers
+    const normalize = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+
+    const soundex = (s: string) => {
+        const a = normalize(s);
+        if (!a) return "";
+        const f = a[0];
+        const m: Record<string, string> = { b:"1",f:"1",p:"1",v:"1", c:"2",g:"2",j:"2",k:"2",q:"2",s:"2",x:"2",z:"2", d:"3",t:"3", l:"4", m:"5",n:"5", r:"6" };
+        let r = f;
+        let prev = m[f] || "";
+        for (let i = 1; i < a.length && r.length < 4; i++) {
+            const ch = a[i];
+            const code = m[ch] || "";
+            if (code && code !== prev) r += code;
+            prev = code;
+        }
+        return (r + "000").slice(0, 4);
+    };
+
+    const hashName = (s: string) => {
+        let h = 5381;
+        for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
+        return (h >>> 0).toString(36);
+    };
+
+    const companyKey = (name: string) => {
+        const n = normalize(name);
+        return `${soundex(n)}-${hashName(n)}`;
+    };
+
+    const getPriorityWeight = (p: string) => {
+        const v = (p || "").toLowerCase();
+        if (v === "p1") return 5;
+        if (v === "p2") return 3;
+        if (v === "p3") return 1;
+        return 1;
+    };
+
+    const getRoleScore = (designationText: string, icpDesignations: string[] = []) => {
+        const text = (designationText || "").toLowerCase();
+        const has = (kw: string) => text.includes(kw.toLowerCase());
+        if (icpDesignations.length) {
+            const matched = icpDesignations.some(d => has(d));
+            if (!matched) return 1;
+        }
+        if (has("chief") || has("cxo") || has("c-suite") || has("ceo") || has("coo") || has("cfo") || has("cto") || has("cio")) return 5;
+        if (has("vp") || has("vice president")) return 4;
+        if (has("director") || has("gm") || has("general manager") || has("head")) return 3;
+        if (has("manager")) return 2;
+        return 1;
+    };
+
+    type UploadedRow = { company: string; designation: string; priority?: string };
+
+    const parseUploadedFile = async (file: File): Promise<UploadedRow[]> => {
+        const data = await file.arrayBuffer();
+        const wb = XLSX.read(data, { type: 'array' });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const json: any[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
+        if (!json.length) return [];
+        const pick = (row: any, candidates: string[]) => {
+            for (const key of Object.keys(row)) {
+                const k = key.toLowerCase().trim();
+                if (candidates.includes(k)) return row[key];
+            }
+            return "";
+        };
+        const companyKeys = ["company", "companyname", "company_name", "organization", "organisation", "org", "brand"];
+        const designationKeys = ["designation", "title", "job title", "jobtitle", "role", "position"];
+        const priorityKeys = ["priority", "p", "prio"];
+        const rows: UploadedRow[] = json.map(r => ({
+            company: String(pick(r, companyKeys)).trim(),
+            designation: String(pick(r, designationKeys)).trim(),
+            priority: String(pick(r, priorityKeys)).trim(),
+        })).filter(r => r.company);
+        return rows;
+    };
+
+    const runComparison = async () => {
+        if (!compareTargetUUID) { setCompareError('Please select an ICP sheet'); return; }
+        if (!compareFile) { setCompareError('Please upload a file to compare'); return; }
+        setCompareError(null);
+        setComparing(true);
+        try {
+            const target = icpSheets.find(s => s.uuid === compareTargetUUID);
+            if (!target) { setCompareError('Selected ICP sheet not found'); setComparing(false); return; }
+            const uploadedRows = await parseUploadedFile(compareFile);
+
+            const icp = target.sheetRows.map(r => ({
+                company: r.companyname,
+                key: companyKey(r.companyname),
+                prioWeight: getPriorityWeight(r.priority),
+                icpDesignations: Array.isArray(r.designation) ? r.designation : String(r.designation || '').split(',').map(s => s.trim()).filter(Boolean)
+            }));
+            const icpKeyMap = new Map<string, typeof icp[number][]>();
+            icp.forEach(row => {
+                const arr = icpKeyMap.get(row.key) || [];
+                arr.push(row);
+                icpKeyMap.set(row.key, arr);
+            });
+
+            let companyWithDesignationScore = 0;
+            const companyHighestScore = icp.reduce((acc, r) => acc + r.prioWeight, 0);
+            const matchedCompaniesSet = new Set<string>();
+            const matchedDesignations: Array<{ company: string; designation: string; score: number }> = [];
+
+            for (const ur of uploadedRows) {
+                const key = companyKey(ur.company);
+                const matches = icpKeyMap.get(key);
+                if (!matches?.length) continue;
+                matchedCompaniesSet.add(ur.company);
+                for (const m of matches) {
+                    const roleScore = getRoleScore(ur.designation, m.icpDesignations);
+                    const secured = m.prioWeight + roleScore;
+                    companyWithDesignationScore += secured;
+                    matchedDesignations.push({ company: m.company, designation: ur.designation, score: secured });
+                }
+            }
+
+            const totalMax = (icp.length * 5) + companyHighestScore;
+            const percent = (companyWithDesignationScore/((uploadedRows.length * 5) + companyHighestScore)) * 100;
+
+            setCompareResult({
+                percent,
+                matchedCompanies: Array.from(matchedCompaniesSet),
+                matchedDesignations,
+                totals: { companyWithDesignationScore, companyHighestScore, totalMax }
+            });
+        } catch (e: any) {
+            setCompareError(e?.message || 'Failed to compare');
+        } finally {
+            setComparing(false);
+        }
+    };
+
     if (loading) return <Wave />;
 
     return (
@@ -159,11 +315,11 @@ const ICP: React.FC = () => {
                 </div>
 
                 <div className='flex items-center gap-3'>
-                    <Button
-                        className='btn'
-                        onClick={() => setUploadOpen(true)}
-                    >
+                    <Button className='btn' onClick={() => setUploadOpen(true)}>
                         <UploadIcon className="mr-2 h-4 w-4" /> Upload New ICP
+                    </Button>
+                    <Button variant="outline" onClick={() => { setCompareOpen(true); setCompareResult(null); setCompareError(null); setCompareFile(null); setCompareTargetUUID(""); }}>
+                        Compare
                     </Button>
                 </div>
             </div>
@@ -225,6 +381,123 @@ const ICP: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
+            {/* Compare ICP Dialog */}
+            <Dialog open={compareOpen} onOpenChange={(o) => { setCompareOpen(o); if (!o) { setCompareFile(null); setCompareTargetUUID(""); setCompareResult(null); setCompareError(null); } }}>
+                <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden overflow-y-auto grid grid-rows-[auto,auto,1fr,auto]">
+                    <DialogHeader className="shrink-0">
+                        <DialogTitle>Compare ICP</DialogTitle>
+                    </DialogHeader>
+
+                    {/* Static form area (always visible) */}
+                    <div className="space-y-4 mt-5 shrink-0">
+                        <div>
+                            <Label>Select ICP sheet to compare against</Label>
+                            <div className="mt-2">
+                                <Select value={compareTargetUUID} onValueChange={(v) => setCompareTargetUUID(v)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select ICP sheet" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {icpSheets.map(s => (
+                                            <SelectItem key={s.uuid} value={s.uuid}>{s.sheet_name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div>
+                            <Label>Upload file to compare</Label>
+                            <div className="mt-2">
+                                <Dropzone accept={{ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'], 'application/vnd.ms-excel': ['.xls'] }} maxFiles={1} onDrop={(files) => setCompareFile(files?.[0] || null)}>
+                                    {({ getRootProps, getInputProps, isDragActive }) => (
+                                        <div {...getRootProps({ className: `border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/40 ${isDragActive ? 'bg-accent/60' : ''}` })}>
+                                            <input {...getInputProps()} />
+                                            {compareFile ? (
+                                                <div className="text-sm">
+                                                    <p className="font-medium">{compareFile.name}</p>
+                                                    <p className="text-muted-foreground">{(compareFile.size / 1024).toFixed(0)} KB</p>
+                                                    <p className="underline mt-2">Click to change</p>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                                    <UploadIcon className="h-6 w-6" />
+                                                    <p className="text-sm">Drag & drop your file here, or click to browse</p>
+                                                    <p className="text-xs">Accepted: .xlsx, .xls</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </Dropzone>
+                            </div>
+                        </div>
+
+                        {compareError && <p className="text-destructive text-sm">{compareError}</p>}
+                    </div>
+
+                    {/* Results area (scrolls independently if long) */}
+                    {compareResult && (
+                        <div className="min-h-0 mt-4 overflow-auto">
+                            <div className="border rounded-md p-4 space-y-4">
+                                <div className="flex items-end gap-4">
+                                    <div className="text-3xl font-semibold">{compareResult.percent}%</div>
+                                    <div className="text-muted-foreground">match score</div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                    <div className="rounded-md bg-sky-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Companies matched</div>
+                                        <div className="font-medium">{compareResult.matchedCompanies.length}</div>
+                                    </div>
+                                    <div className="rounded-md bg-yellow-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Secured score</div>
+                                        <div className="font-medium">{compareResult.totals.companyWithDesignationScore}</div>
+                                    </div>
+                                    <div className="rounded-md bg-purple-100 p-3">
+                                        <div className="text-xs text-muted-foreground">Percentage</div>
+                                        <div className="font-medium">{compareResult.percent}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-medium mb-2">Matched breakdown</div>
+                                    <div className="border rounded-md">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Company</TableHead>
+                                                    <TableHead>Designation</TableHead>
+                                                    <TableHead className="w-[120px]">Score</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {compareResult.matchedDesignations.map((m, i) => (
+                                                    <TableRow key={i}>
+                                                        <TableCell className='font-medium'>{m.company}</TableCell>
+                                                        <TableCell className='text-muted-foreground'>{m.designation}</TableCell>
+                                                        <TableCell>{m.score}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                                {compareResult.matchedDesignations.length === 0 && (
+                                                    <TableRow>
+                                                        <TableCell colSpan={3} className='text-center text-muted-foreground'>No matches found</TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <DialogFooter className="shrink-0">
+                        <Button variant="outline" onClick={() => setCompareOpen(false)} className='cursor-pointer' disabled={comparing}>Close</Button>
+                        <Button onClick={runComparison} disabled={comparing || !compareFile || !compareTargetUUID} className='btn !h-full'>
+                            {comparing ? 'Comparing...' : 'Compare'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+
             <div className='mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6'>
                 {icpSheets.map((sheet) => {
                     const meta = formatUploadedOn(sheet.sheet_name || sheet.uuid);
@@ -271,7 +544,7 @@ const ICP: React.FC = () => {
             </div>
 
             <Dialog open={!!openPreviewFor} onOpenChange={(o) => { if (!o) setOpenPreviewFor(null); }}>
-                <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)]'>
+                <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)] overflow-y-auto'>
                     <DialogHeader>
                         <DialogTitle className='capitalize'>{activeSheet?.sheet_name.split("").find((char:string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}</DialogTitle>
                     </DialogHeader>
@@ -286,6 +559,7 @@ const ICP: React.FC = () => {
                             </TableHeader>
                             <TableBody>
                                 {paginatedRows.map((row, idx) => (
+
                                     <TableRow key={idx}>
                                         <TableCell className='font-medium'>{row.companyname}</TableCell>
                                         <TableCell className='text-muted-foreground'>{Array.isArray(row.designation) ? row.designation.join(', ') : String(row.designation || '')}</TableCell>
@@ -332,6 +606,8 @@ const ICP: React.FC = () => {
                                 {Array.from({ length: 3 }, (_, i) => currentPage + i - 1)
                                     .filter(pageNum => pageNum > 1 && pageNum < totalPages)
                                     .map(pageNum => (
+
+
                                         <PaginationItem key={pageNum}>
                                             <PaginationLink
                                                 href="#"
