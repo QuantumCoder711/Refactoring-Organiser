@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { appDomain } from '@/constants';
-import GoBack from '@/components/GoBack';
 
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { useDropzone } from 'react-dropzone';
-import { FileUp, FileText, Download } from 'lucide-react';
+import { FileUp, FileText } from 'lucide-react';
 type EncodingMap = Record<string, string>;
 
 function customSoundex(name: string): string {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import GoBack from '@/components/GoBack';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -79,6 +79,10 @@ const SearchPeople: React.FC = () => {
 
     const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
 
+    // Secret button visibility state
+    const [showButton, setShowButton] = useState<boolean>(false);
+    const sequenceRef = useRef<string>("");
+
     // Filter states
     const [filters, setFilters] = useState({
         designation: "",
@@ -113,6 +117,100 @@ const SearchPeople: React.FC = () => {
             return designationMatch && companyMatch && cityMatch && companySizeMatch && industryMatch;
         });
     }, [people, filters]);
+
+    // Secret sequence detection for admin button
+    useEffect(() => {
+        const handleButtonDisplay = (event: KeyboardEvent) => {
+            const key = event.key.toLowerCase();
+
+            // Only track a–z letters to avoid keys like Shift, Enter, arrows, etc.
+            if (/^[a-z]$/.test(key)) {
+                sequenceRef.current += key;
+            }
+
+            // Keep a slightly longer rolling buffer
+            const MAX_LEN = 10;
+            if (sequenceRef.current.length > MAX_LEN) {
+                sequenceRef.current = sequenceRef.current.slice(-MAX_LEN);
+            }
+
+            // Check for reveal/hide sequences at the end of the buffer
+            if (sequenceRef.current.endsWith("reveal")) {
+                setShowButton(true);
+                sequenceRef.current = "";
+            } else if (sequenceRef.current.endsWith("hide")) {
+                setShowButton(false);
+                sequenceRef.current = "";
+            }
+        };
+
+        window.addEventListener("keydown", handleButtonDisplay);
+        return () => window.removeEventListener("keydown", handleButtonDisplay);
+    }, []);
+
+    // Exporting Data Function
+    const handleExport = () => {
+        if (selectedPeople.length === 0) {
+            toast("No people selected to export", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider"
+            });
+            return;
+        }
+
+        // Keep the order consistent with the current filtered list
+        const selectedRows = filteredPeople.filter(p => selectedPeople.includes(p._id));
+
+        // Prepare CSV headers (ignore commented-out columns like Email, Mobile Number)
+        const headers = [
+            "Name",
+            "Designation",
+            "Company",
+            "Industry",
+            "City",
+            "Company Size",
+            "LinkedIn"
+        ];
+
+        // CSV escape helper
+        const esc = (val: string) => {
+            const s = (val ?? "").toString();
+            if (s.includes('"')) {
+                return '"' + s.replace(/"/g, '""') + '"';
+            }
+            if (s.includes(',') || s.includes('\n') || s.includes('\r')) {
+                return '"' + s + '"';
+            }
+            return s;
+        };
+
+        const rows = selectedRows.map((person) => {
+            const name = [person.firstName || "", person.lastName || ""].filter(Boolean).join(" ") || "-";
+            return [
+                name,
+                person.designation || "-",
+                person.company || "-",
+                person.industry || "-",
+                person.city || "-",
+                person.employeeSize || "-",
+                person.linkedinUrl || "-",
+            ].map(esc).join(",");
+        });
+
+        const csv = [headers.join(","), ...rows].join("\r\n");
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }); // BOM for Excel compatibility
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `people_selected_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast(`${selectedRows.length} row(s) exported`, {
+            className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider"
+        });
+    }
 
     // Calculate paginated data
     const paginatedPeople = useMemo(() => {
@@ -241,17 +339,21 @@ const SearchPeople: React.FC = () => {
                     <GoBack />
                     <h1 className='text-xl font-semibold'>Add People</h1>
                 </div>
-                <Button onClick={() => {
-                    setDataLoaded(false);
-                    setPeople([]);
-                    setFilters({
-                        designation: "",
-                        company: "",
-                        city: "",
-                        companySize: "",
-                        industry: ""
-                    });
-                }} hidden={!dataLoaded} className='btn'>Reset</Button>
+                <div className='flex gap-3'>
+                    <Button onClick={() => {
+                        setDataLoaded(false);
+                        setPeople([]);
+                        setFilters({
+                            designation: "",
+                            company: "",
+                            city: "",
+                            companySize: "",
+                            industry: ""
+                        });
+                    }} hidden={!dataLoaded} className='btn'>Reset</Button>
+
+                    {showButton && <Button onClick={handleExport} hidden={!dataLoaded} className='btn'>Download</Button>}
+                </div>
             </div>
 
             {/* Initial Search UI - Show when no data is loaded */}
