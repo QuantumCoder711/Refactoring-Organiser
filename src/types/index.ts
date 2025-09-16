@@ -237,7 +237,7 @@ export interface MessageTemplateType {
     hour_interval: number;
     status: number;
     check_in: number;
-    template_banner?: File | null;
+    template_banner?: File | string | null;
 }
 
 export interface SendReminderType extends Omit<MessageTemplateType, 'check_in'> { }
