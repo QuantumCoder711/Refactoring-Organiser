@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -6,8 +6,6 @@ import { Label } from '@/components/ui/label';
 import { domain, roles, token } from '@/constants';
 import { formatDateTime, formatTemplateMessage, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
-import Quill from "quill";
-import "quill/dist/quill.snow.css";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -114,7 +112,6 @@ const InviteRegistrations: React.FC = () => {
     const event = getEventBySlug(slug);
     const [loading, setLoading] = useState(false);
     const [templateLoading, setTemplateLoading] = useState(false);
-    const quillRef = useRef<HTMLDivElement | null>(null);
     const { user } = useAuthStore(state => state);
 
     const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
@@ -157,7 +154,12 @@ const InviteRegistrations: React.FC = () => {
         if (first.toLowerCase().startsWith('subject:')) {
             const subject = first.replace(/^subject:\s*/i, '').trim();
             const message = lines.slice(1).join('\n').trim();
-            return { subject, message };
+
+            // Remove the first line
+            const trimmedLines = message.trim().split('\n');
+            trimmedLines.shift(); // removes the first line
+            const updatedMessage = trimmedLines.join('\n');
+            return { subject, message: updatedMessage };
         }
         return { subject: '', message: s };
     };
@@ -267,35 +269,6 @@ const InviteRegistrations: React.FC = () => {
         template_banner: null,
     });
 
-
-    // Initialize Quill editor
-    useEffect(() => {
-
-        if (quillRef.current && formData.send_method === "email") {
-            const quill = new Quill(quillRef.current, {
-                theme: "snow",
-                placeholder: "Type your message here...",
-            });
-
-            // Set initial content if message exists
-            if (formData.message) {
-                quill.clipboard.dangerouslyPasteHTML(formData.message);
-            }
-
-            quill.on('text-change', () => {
-                const content = quill.root.innerHTML;
-                setFormData(prev => ({
-                    ...prev,
-                    message: content
-                }));
-            });
-
-            return () => {
-                quill.off('text-change');
-            };
-        }
-    }, [quillRef, formData.send_method === "email"]);
-
     const whatsappMessage = `<p>Hello, this is a follow-up reminder for the email sent for <strong>${event?.title}</strong> happening on <strong>${event?.event_start_date}</strong> at <strong>${event?.event_venue_name}</strong>. <br /><br />
 
     Kindly review the same or check the link below for more details on the invitation. <br /><br />
@@ -320,7 +293,15 @@ const InviteRegistrations: React.FC = () => {
             user_id: user?.id as Number
         };
 
-        console.log("the template banner is: ", updatedFormData)
+        // // Remove the first line
+        // const lines = formData.message.trim().split('\n');
+        // lines.shift(); // removes the first line
+        // const updatedMessage = lines.join('\n');
+
+        // setFormData(prev => ({
+        //     ...prev,
+        //     message: updatedMessage
+        // }));
 
         // Validate banner image is required
         // if (!formData.template_banner) {
