@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import GoBack from '@/components/GoBack';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { domain, roles, token } from '@/constants';
 import { formatDateTime, formatTemplateMessage, getImageUrl } from '@/lib/utils';
 import useEventStore from '@/store/eventStore';
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -111,7 +113,8 @@ const InviteRegistrations: React.FC = () => {
     const { getEventBySlug } = useEventStore(state => state);
     const event = getEventBySlug(slug);
     const [loading, setLoading] = useState(false);
-
+    const [templateLoading, setTemplateLoading] = useState(false);
+    const quillRef = useRef<HTMLDivElement | null>(null);
     const { user } = useAuthStore(state => state);
 
     const [selectedRoles, setSelectedRoles] = useState<string[]>(roles);
@@ -120,81 +123,129 @@ const InviteRegistrations: React.FC = () => {
     const [bannerImage, setBannerImage] = useState<File | null>(null);
     const [uploadedBannerUrl, setUploadedBannerUrl] = useState<string | null>(null);
     const [bannerError, setBannerError] = useState<string>('');
+    const [subjectEdited, setSubjectEdited] = useState(false);
+    const [messageEdited, setMessageEdited] = useState(false);
+
 
     // Helper to scope stored banner id per event
     const getBannerIdKey = (eventId?: number) => eventId ? `emailBannerId_${eventId}` : 'emailBannerId';
 
-    // Email template definitions
-    const emailTemplates = {
+    // Email template definitions (stateful for caching/fetch)
+    const [emailTemplates, setEmailTemplates] = useState({
         template1: {
-            subject: `Exclusive Invitation: ${event?.title}- Join Industry Leaders!`,
-            message: `<p>
-                                    We are delighted to invite you to the ${event?.title}, an exclusive gathering of top thought
-                                    leaders and industry experts. This premier event is designed to foster meaningful
-                                    discussions, networking, and recognition of excellence in the industry.<br /><br />
-
-                                    📅 Date: ${event?.event_start_date}<br />
-                                    📍 Location: ${event?.event_venue_name}<br /><br />
-
-                                    Join us for an evening/day based on timing of the event of insights, connections, and
-                                    celebration.<br /><br />
-
-                                    We look forward to your participation!<br /><br />
-
-                                    Best regards,<br />
-                                    ${user?.first_name} ${user?.last_name}<br />
-                                    ${user?.company_name}
-                                </p>`
+            subject: "",
+            message: ""
         },
         template2: {
-            subject: `You're Invited: ${event?.title} - Premium Networking Event`,
-            message: `<p>
-                                    <strong>Dear Industry Leader,</strong><br /><br />
-
-                                    It is our pleasure to extend a personal invitation to you for <strong>${event?.title}</strong>,
-                                    a distinguished gathering that brings together visionary leaders and innovators from across industries.<br /><br />
-
-                                    <strong>Event Details:</strong><br />
-                                    🗓️ <strong>Date:</strong> ${event?.event_start_date}<br />
-                                    🏢 <strong>Venue:</strong> ${event?.event_venue_name}<br />
-                                    ⏰ <strong>Time:</strong> ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type}<br /><br />
-
-                                    This exclusive event offers unparalleled opportunities for strategic networking,
-                                    knowledge sharing, and collaborative discussions that drive industry advancement.<br /><br />
-
-                                    Your expertise and insights would be invaluable to our community of leaders.<br /><br />
-
-                                    Warm regards,<br />
-                                    <strong>${user?.first_name} ${user?.last_name}</strong><br />
-                                    ${user?.company_name}
-                                </p>`
+            subject: "",
+            message: ""
         },
         template3: {
-            subject: `Special Invitation: ${event?.title} - Connect, Learn, Lead`,
-            message: `<p>
-                                    Greetings!<br /><br />
-
-                                    We cordially invite you to join us at <strong>${event?.title}</strong>, where industry excellence meets innovation.<br /><br />
-
-                                    <div style="background-color: #f8f9fa; padding: 20px; border-left: 4px solid #007bff; margin: 20px 0;">
-                                        <strong>📋 Event Information</strong><br />
-                                        <strong>Event:</strong> ${event?.title}<br />
-                                        <strong>Date:</strong> ${event?.event_start_date}<br />
-                                        <strong>Location:</strong> ${event?.event_venue_name}<br />
-                                        <strong>Duration:</strong> ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type} - ${event?.end_time}:${event?.end_minute_time} ${event?.end_time_type}
-                                    </div>
-
-                                    This premier gathering is designed for forward-thinking professionals who are shaping the future of their industries.
-                                    Experience meaningful connections, gain valuable insights, and be part of conversations that matter.<br /><br />
-
-                                    We would be honored by your presence at this exceptional event.<br /><br />
-
-                                    Best wishes,<br />
-                                    ${user?.first_name} ${user?.last_name}<br />
-                                    <em>${user?.company_name}</em>
-                                </p>`
+            subject: "",
+            message: ""
         }
+    });
+
+
+    // Helpers for cached templates
+    const getTemplatesCacheKey = (eventId?: number) => eventId ? `emailTemplates_${eventId}` : 'emailTemplates';
+
+    const splitSubjectAndMessage = (s: string): { subject: string; message: string } => {
+        if (!s) return { subject: '', message: '' };
+        const lines = s.split('\n');
+        const first = (lines[0] || '').trim();
+        if (first.toLowerCase().startsWith('subject:')) {
+            const subject = first.replace(/^subject:\s*/i, '').trim();
+            const message = lines.slice(1).join('\n').trim();
+            return { subject, message };
+        }
+        return { subject: '', message: s };
     };
+
+    const parseApiTemplates = (apiTemplates: any[]): { template1: { subject: string; message: string }, template2: { subject: string; message: string }, template3: { subject: string; message: string } } => {
+        const base = { ...emailTemplates };
+        if (!Array.isArray(apiTemplates)) return base as any;
+        const mapped: any = { ...base };
+        apiTemplates.forEach((obj: any, idx: number) => {
+            const str = typeof obj === 'string' ? obj : (obj ? (Object.values(obj)[0] as string) : '');
+            if (!str) return;
+            const { subject, message } = splitSubjectAndMessage(str);
+            const key = idx === 0 ? 'template1' : idx === 1 ? 'template2' : 'template3';
+            if (mapped[key]) mapped[key] = { subject: subject || mapped[key].subject, message: message || mapped[key].message };
+        });
+        return mapped as any;
+    };
+
+    // Load templates from cache or API
+    useEffect(() => {
+        if (!event?.id) return;
+        const cacheKey = getTemplatesCacheKey(event.id);
+        try {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (parsed?.template1?.subject && parsed?.template2?.subject && parsed?.template3?.subject) {
+                        setEmailTemplates(parsed);
+                        return; // use cache only, no API call
+                    }
+                    // invalid shape -> clear
+                    localStorage.removeItem(cacheKey);
+                } catch {
+                    localStorage.removeItem(cacheKey);
+                }
+            }
+        } catch { }
+
+        // No valid cache -> fetch
+        const load = async () => {
+            try {
+                setTemplateLoading(true);
+                const company_name = (user?.company_name || user?.company || '').toString();
+                const event_name = (event?.title || '').toString();
+                const date_time = `${event?.event_start_date} ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type}`;
+                const event_mode = (event?.event_mode as 0 | 1 | undefined);
+                const location = event_mode === 0 ? event?.event_venue_name : undefined;
+                const webinar_link = event_mode === 1 ? (event as any)?.webinar_link : undefined;
+
+                const res = await generateEmailTemplate(company_name, event_name, date_time, location, event_mode as 0 | 1, webinar_link);
+                const apiTemplates = res?.email_templates;
+                if (Array.isArray(apiTemplates) && apiTemplates.length) {
+                    const structured = parseApiTemplates(apiTemplates);
+                    setEmailTemplates(structured);
+                    try { localStorage.setItem(cacheKey, JSON.stringify(structured)); } catch { }
+                } else {
+                    toast('Failed to load templates', {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <CircleX className='size-5' />
+                    });
+                }
+            } catch (err: any) {
+                toast(err?.response?.data?.message || err?.message || 'Failed to fetch templates', {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+                // Fallback: defaults already present in state
+            } finally {
+                setTemplateLoading(false);
+            }
+        };
+        load();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [event?.id]);
+
+    // Initialize/refresh subject and message when templates are available, but don't override user edits
+    useEffect(() => {
+        if (formData.send_method !== 'email') return;
+        const tpl = emailTemplates[selectedTemplate as keyof typeof emailTemplates];
+        if (!tpl) return;
+        setFormData(prev => ({
+            ...prev,
+            subject: subjectEdited ? prev.subject : tpl.subject,
+            message: messageEdited ? prev.message : stripHtmlTags(tpl.message)
+        }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [emailTemplates, selectedTemplate]);
 
     const [formData, setFormData] = useState<MessageTemplateType>({
         event_id: event?.uuid as string,
@@ -215,6 +266,35 @@ const InviteRegistrations: React.FC = () => {
         check_in: 2,
         template_banner: null,
     });
+
+
+    // Initialize Quill editor
+    useEffect(() => {
+
+        if (quillRef.current && formData.send_method === "email") {
+            const quill = new Quill(quillRef.current, {
+                theme: "snow",
+                placeholder: "Type your message here...",
+            });
+
+            // Set initial content if message exists
+            if (formData.message) {
+                quill.clipboard.dangerouslyPasteHTML(formData.message);
+            }
+
+            quill.on('text-change', () => {
+                const content = quill.root.innerHTML;
+                setFormData(prev => ({
+                    ...prev,
+                    message: content
+                }));
+            });
+
+            return () => {
+                quill.off('text-change');
+            };
+        }
+    }, [quillRef, formData.send_method === "email"]);
 
     const whatsappMessage = `<p>Hello, this is a follow-up reminder for the email sent for <strong>${event?.title}</strong> happening on <strong>${event?.event_start_date}</strong> at <strong>${event?.event_venue_name}</strong>. <br /><br />
 
@@ -287,6 +367,9 @@ const InviteRegistrations: React.FC = () => {
     const handleTemplateChange = (templateKey: string) => {
         setSelectedTemplate(templateKey);
         const template = emailTemplates[templateKey as keyof typeof emailTemplates];
+        // switching templates should adopt template content
+        setSubjectEdited(false);
+        setMessageEdited(false);
         setFormData(prev => ({
             ...prev,
             subject: template.subject,
@@ -309,15 +392,6 @@ const InviteRegistrations: React.FC = () => {
         setAllSelected(selectedRoles.length === roles.length);
     }, [selectedRoles]);
 
-    // Initialize message content with stripped HTML
-    useEffect(() => {
-        if (formData.message === '') {
-            setFormData(prev => ({
-                ...prev,
-                message: stripHtmlTags(emailTemplates.template1.message)
-            }));
-        }
-    }, []);
 
     // Fetch uploaded banner on mount using stored banner id
     useEffect(() => {
@@ -387,18 +461,19 @@ const InviteRegistrations: React.FC = () => {
             setFormData(prev => ({
                 ...prev,
                 send_method: value,
-                message: formData.message,
+                // message: formData.message,
             }));
         } else {
             setFormData(prev => ({
                 ...prev,
                 send_method: value,
-                message: whatsappMessage,
+                // message: whatsappMessage,
             }));
         }
     };
 
     const handleSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSubjectEdited(true);
         setFormData(prev => ({
             ...prev,
             subject: e.target.value
@@ -406,6 +481,7 @@ const InviteRegistrations: React.FC = () => {
     };
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessageEdited(true);
         setFormData(prev => ({
             ...prev,
             message: e.target.value
@@ -417,6 +493,46 @@ const InviteRegistrations: React.FC = () => {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         return tempDiv.textContent || tempDiv.innerText || '';
+    };
+
+    // Refresh templates: clears cache and re-fetches
+    const handleRefreshTemplates = async () => {
+        if (!event?.id) return;
+        const cacheKey = getTemplatesCacheKey(event.id);
+        try { localStorage.removeItem(cacheKey); } catch { }
+        try {
+            setTemplateLoading(true);
+            const company_name = (user?.company_name || user?.company || '').toString();
+            const event_name = (event?.title || '').toString();
+            const date_time = `${event?.event_start_date} ${event?.start_time}:${event?.start_minute_time} ${event?.start_time_type}`;
+            const event_mode = (event?.event_mode as 0 | 1 | undefined);
+            const location = event_mode === 0 ? event?.event_venue_name : undefined;
+            const webinar_link = event_mode === 1 ? (event as any)?.webinar_link : undefined;
+
+            const res = await generateEmailTemplate(company_name, event_name, date_time, location, event_mode as 0 | 1, webinar_link);
+            const apiTemplates = res?.email_templates;
+            if (Array.isArray(apiTemplates) && apiTemplates.length) {
+                const structured = parseApiTemplates(apiTemplates);
+                setEmailTemplates(structured);
+                try { localStorage.setItem(cacheKey, JSON.stringify(structured)); } catch { }
+                toast('Templates refreshed', {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+            } else {
+                toast('Failed to refresh templates', {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleX className='size-5' />
+                });
+            }
+        } catch (err: any) {
+            toast(err?.response?.data?.message || err?.message || 'Failed to refresh templates', {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+        } finally {
+            setTemplateLoading(false);
+        }
     };
 
     const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -488,7 +604,7 @@ const InviteRegistrations: React.FC = () => {
         fileInput?.click();
     };
 
-    if (loading) return <Wave />
+    if (loading || templateLoading) return <Wave />
 
     return (
         <div>
@@ -575,6 +691,9 @@ const InviteRegistrations: React.FC = () => {
 
                                     {/* Email Template Tabs */}
                                     <Tabs value={selectedTemplate} onValueChange={handleTemplateChange} className="flex-1 flex flex-col">
+                                        <div className='flex justify-end mt-4'>
+                                            <Button className='btn !px-3 !py-1' onClick={handleRefreshTemplates}>Refresh templates</Button>
+                                        </div>
                                         <TabsList className="bg-white p-0 w-fit mx-auto mt-4 mb-2 !max-h-9">
                                             <TabsTrigger
                                                 value="template1"
@@ -640,6 +759,9 @@ const InviteRegistrations: React.FC = () => {
                                                         </div>
                                                         <div className='mb-4'>
                                                             <Label className="font-semibold mb-2 block">Message Content</Label>
+                                                            {/* <div ref={quillRef} className='flex-1 flex flex-col'>
+                                                                <div className={`flex-1 border bg-white rounded-[10px] rounded-t-none`}></div>
+                                                            </div> */}
                                                             <Textarea
                                                                 value={formData.message}
                                                                 onChange={handleMessageChange}
