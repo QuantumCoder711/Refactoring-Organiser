@@ -80,6 +80,9 @@ import Careers from '@/pages/guest/careers';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 import SubUsers from '@/pages/admin/profile/sub-users';
 import ICP from './pages/admin/icp';
+import CreateICP from './pages/admin/icp/create-icp';
+import UploadICP from './pages/admin/icp/upload-icp';
+import SavedICP from './pages/admin/icp/saved-icp';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -174,7 +177,14 @@ const App: React.FC = () => {
         <Route path="all-attendees" element={<AllAttendees />} />
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
-        {hasFeatureAccess('icp') && (<Route path="icp" element={<ICP />} />)}
+        {hasFeatureAccess('icp') && (
+          <>
+            <Route path="icp" element={<ICP />} />
+            <Route path="icp/create" element={<CreateICP />} />
+            <Route path="icp/upload" element={<UploadICP />} />
+            <Route path="icp/saved" element={<SavedICP />} />
+          </>
+        )}
         {hasFeatureAccess('search_people') && (
           <Route path="search-people" element={<SearchPeople />} />
         )}
@@ -219,7 +229,7 @@ const App: React.FC = () => {
         <Route path="all-events">
           <Route path="view/:slug" element={<ViewEvent />} />
           <Route path="attendees/:slug" element={<Attendees />} />
-          {user?.role === 'admin' &&<Route path="update-event/:slug" element={<UpdateEvent />} />}
+          {user?.role === 'admin' && <Route path="update-event/:slug" element={<UpdateEvent />} />}
           <Route path="add-attendee/:slug" element={<AddAttendee />} />
           <Route path=":slug/edit-attendee/:uuid" element={<EditAttendee />} />
           <Route path="send-invitations/:slug" element={<SendInvitations />} />

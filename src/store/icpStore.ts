@@ -5,6 +5,9 @@ import { create } from "zustand";
 interface SheetRow {
     companyname: string;
     designation: string[];
+    country_name: string;
+    state_name: string;
+    employee_size: string;
     priority: string;
 }
 
@@ -14,17 +17,52 @@ interface ICPSheet {
     uuid: string;
 }
 
+interface CreateICPPayload {
+    sheet_name: string;
+    employee_size: string;
+    designation: string[];
+    company_name: string[];
+    state_name: string;
+    country_name: string;
+    priority: string[];
+}
+
 interface ICPStore {
     loading: boolean;
     icpSheets: ICPSheet[];
     getICPSheets: (userId: number) => Promise<void>;
     deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
+    createICP: (payload: CreateICPPayload) => Promise<{ success: boolean; message?: string }>;
 }
 
 const useICPStore = create<ICPStore>((set, get) => ({
     loading: false,
     icpSheets: [],
+    createICP: async (payload: CreateICPPayload) => {
+        try {
+            const response = await axios.post(`${domain}/api/store-icp`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                return {
+                    success: response.data.success,
+                    message: response.data.message
+                };
+            } else {
+                return {
+                    success: false,
+                    message: response.data.message || 'Failed to create ICP',
+                };
+            }
+        } catch (error) {
+            console.error('Failed to create ICP:', error);
+            throw error;
+        }
+    },
     getICPSheets: async (userId: number) => {
         set({ loading: true });
         try {
