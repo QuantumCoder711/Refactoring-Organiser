@@ -352,7 +352,7 @@ const SavedICP: React.FC = () => {
         setCompareError(null);
         setComparing(true);
         try {
-            const target = icpSheets.find(s => s.uuid === compareTargetUUID);
+            const target = icpSheets.find(s => s.sheet_name === compareTargetUUID);
             if (!target) { setCompareError('Selected ICP sheet not found'); setComparing(false); return; }
             const uploadedRows = await parseUploadedFile(compareFile);
 
@@ -437,7 +437,7 @@ const SavedICP: React.FC = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {icpSheets?.map(s => (
-                                            <SelectItem key={s.uuid} value={s.uuid}>{s.sheet_name}</SelectItem>
+                                            <SelectItem key={s.sheet_name} value={s.sheet_name}>{s.sheet_name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -671,7 +671,7 @@ const SavedICP: React.FC = () => {
             </div>
 
             <Dialog open={!!openPreviewFor} onOpenChange={(o) => { if (!o) setOpenPreviewFor(null); }}>
-                <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)] overflow-y-auto'>
+                <DialogContent className='sm:max-w-5xl max-h-[80vh] w-[calc(100%-2rem)] overflow-y-auto'>
                     <DialogHeader>
                         <DialogTitle className='capitalize flex justify-between items-center mt-5'>
                             {activeSheet?.sheet_name.split("").find((char: string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}
