@@ -36,7 +36,7 @@ interface ICPStore {
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
     createICP: (payload: CreateICPPayload) => Promise<{ success: boolean; message?: string }>;
     // Entry-level CRUD (console.log only for now)
-    addICPEntry: (sheetUuid: string, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
+    addICPEntry: (payload: CreateICPPayload, userId: number) => Promise<{ success: boolean; message: string }>;
     updateICPEntry: (sheetUuid: string, rowUuid: string, rowIndex: number, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
     deleteICPEntry: (sheetUuid: string, rowUuid: string) => Promise<{ success: boolean; message: string }>;
 }
@@ -131,29 +131,29 @@ const useICPStore = create<ICPStore>((set, get) => ({
             throw error;
         }
     },
-    addICPEntry: async (sheetUuid: string, entry: SheetRow, userId: number) => {
+    addICPEntry: async (payload: CreateICPPayload, userId: number) => {
         const data = {
             user_id: userId,
-            company_name: entry.companyname,
-            designation: entry.designation,
-            priority: entry.priority,
-            country_name: entry.country_name,
-            state_name: entry.state_name,
-            employee_size: entry.employee_size
+            company_name: payload.company_name,
+            designation: payload.designation,
+            priority: payload.priority,
+            country_name: payload.country_name,
+            state_name: payload.state_name,
+            employee_size: payload.employee_size
         };
 
-        await axios.post(`${domain}/api/add-icp-data/${sheetUuid}`, data, {
+        await axios.post(`${domain}/api/add-icp-data/${payload.sheet_name}`, data, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             }
         });
 
-        set((state) => ({
-            icpSheets: state.icpSheets.map((s) =>
-                s.uuid === sheetUuid ? { ...s, sheetRows: [entry, ...s.sheetRows] } : s
-            ),
-        }));
+        // set((state) => ({
+        //     icpSheets: state.icpSheets.map((s) =>
+        //         s.uuid === payload.sheet_name ? { ...s, sheetRows: [...s.sheetRows, data] } : s
+        //     ),
+        // }));
         return Promise.resolve({ success: true, message: 'Entry added' });
     },
     updateICPEntry: async (sheetUuid, rowUuid, rowIndex, entry, userId) => {

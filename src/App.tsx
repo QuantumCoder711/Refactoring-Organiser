@@ -83,6 +83,7 @@ import ICP from './pages/admin/icp';
 import CreateICP from './pages/admin/icp/create-icp';
 import UploadICP from './pages/admin/icp/upload-icp';
 import SavedICP from './pages/admin/icp/saved-icp';
+import AddEntry from './pages/admin/icp/add-entry';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -183,6 +184,7 @@ const App: React.FC = () => {
             <Route path="icp/create" element={<CreateICP />} />
             <Route path="icp/upload" element={<UploadICP />} />
             <Route path="icp/saved" element={<SavedICP />} />
+            <Route path="icp/add-entry/:sheetName" element={<AddEntry />} />
           </>
         )}
         {hasFeatureAccess('search_people') && (

@@ -119,6 +119,7 @@ const CustomComboBox = React.memo(({
 });
 
 import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const ROWS_PER_PAGE: number = 10;
 
@@ -147,7 +148,7 @@ const formatUploadedOn = (sheetName: string): { name: string; uploadedOn?: strin
 
 const SavedICP: React.FC = () => {
     const { user } = useAuthStore(state => state);
-    const { icpSheets, loading, getICPSheets, deleteICPSheet, addICPEntry, updateICPEntry, deleteICPEntry } = useICPStore(state => state);
+    const { icpSheets, loading, getICPSheets, deleteICPSheet, updateICPEntry, deleteICPEntry } = useICPStore(state => state);
 
     // Compare dialog state
     const [compareOpen, setCompareOpen] = useState(false);
@@ -191,16 +192,6 @@ const SavedICP: React.FC = () => {
         entryForm.priority
     );
 
-    const openAddEntry = () => {
-        setEntryMode('add');
-        setEditingIndex(null);
-        setEntryForm({ companyname: '', designation: [], country_name: '', state_name: '', employee_size: '', priority: 'P4', uuid:  ''});
-        setEntryCountryId(null);
-        setEntryOpen(true);
-        getCompanies();
-        getDesignations();
-    };
-
     const openEditEntry = (row: any, absIndex: number) => {
         setEntryMode('edit');
         setEditingIndex(absIndex);
@@ -223,7 +214,7 @@ const SavedICP: React.FC = () => {
         if (!activeSheet || !isEntryValid) return;
         try {
             if (entryMode === 'add') {
-                await addICPEntry(activeSheet.sheet_name, entryForm, user?.id as number);
+                // await addICPEntry(activeSheet.sheet_name, entryForm, user?.id as number);
                 toast.success('ICP entry added', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
             } else if (editingIndex !== null) {
                 const rowUuid = (activeSheet.sheetRows[editingIndex] as any)?.uuid;
@@ -250,7 +241,7 @@ const SavedICP: React.FC = () => {
         if (user) getICPSheets(user.id as number);
     }, [user, getICPSheets]);
 
-    const activeSheet = useMemo(() => icpSheets?.find(s => s.uuid === openPreviewFor?.uuid) || null, [icpSheets, openPreviewFor]);
+    const activeSheet = useMemo(() => icpSheets?.find(s => s.sheet_name === openPreviewFor?.uuid) || null, [icpSheets, openPreviewFor]);
     const totalPages = activeSheet ? Math.max(1, Math.ceil(activeSheet.sheetRows.length / ROWS_PER_PAGE)) : 1;
     const paginatedRows = activeSheet ? activeSheet.sheetRows.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE) : [];
 
@@ -639,7 +630,7 @@ const SavedICP: React.FC = () => {
                                 <CardTitle className='text-base sm:text-lg capitalize break-words line-clamp-2'>{meta.name}</CardTitle>
                                 <CardDescription>{meta.uploadedOn ? `Uploaded on ${meta.uploadedOn}` : '—'}</CardDescription>
                                 <CardAction className='flex gap-2 mt-3'>
-                                    <Button variant="outline" size="sm" onClick={() => handlePreview(sheet.uuid)}>
+                                    <Button variant="outline" size="sm" onClick={() => handlePreview(sheet.sheet_name)}>
                                         <Eye className='size-4' /> Preview
                                     </Button>
                                     <AlertDialog>
@@ -684,7 +675,7 @@ const SavedICP: React.FC = () => {
                     <DialogHeader>
                         <DialogTitle className='capitalize flex justify-between items-center mt-5'>
                             {activeSheet?.sheet_name.split("").find((char: string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}
-                            <div><Button variant="outline" size="sm" className='cursor-pointer' onClick={openAddEntry}>Add Entry</Button></div>
+                            <Link to={`/icp/add-entry/${activeSheet?.sheet_name}`}><Button variant="outline" size="sm" className='cursor-pointer'>Add Entry</Button></Link>
                         </DialogTitle>
                     </DialogHeader>
                     <div className='border rounded-md overflow-hidden'>
