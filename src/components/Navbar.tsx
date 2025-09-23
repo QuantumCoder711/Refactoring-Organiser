@@ -186,7 +186,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         </nav>
       </header>
       :
-      <header className='flex items-center bg-brand-background max-h-16'>
+      <header className='flex items-center bg-muted max-h-16'>
         <Link to="/" className='hidden md:block'>
           <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
             <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" className='h-14 object-contain object-center' />
@@ -200,12 +200,12 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
           <ul className='hidden md:flex gap-5 items-center'>
             {user?.feature_permission?.search_people === 1 && !pathname.includes("/search-people") && <li>
               <Link to={`/search-people`}>
-                <Button className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
+                <Button size="sm" className='btn-rounded !px-3 !h-8 !bg-brand-primary hover:!bg-brand-primary-dark size-8 lg:size-fit'><Search size={16} /> <span className='hidden lg:block'>Search People</span></Button>
               </Link>
             </li>}
             <li hidden={user?.role === "subuser"}>
               <Link to={"/add-event"}>
-                <Button className='btn-rounded !px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
+                <Button size="sm" variant='secondary' className='!px-3 !h-8 size-8 lg:size-fit'><Plus size={16} /> <span className='hidden lg:block'>Create New Event</span></Button>
               </Link>
             </li>
 
@@ -245,7 +245,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                     </div>
 
                     {/* Upgrade button */}
-                    <Button onClick={() => { navigate('/profile'); handleWalletLeave() }} className='btn-rounded px-6 mt-4 ml-auto'>
+                    <Button onClick={() => { navigate('/profile'); handleWalletLeave() }} className='mt-4 ml-auto'>
                       Upgrade
                     </Button>
                   </div>

@@ -223,11 +223,11 @@ const ViewEvent: React.FC = () => {
             <Helmet>
                 <title>{event?.title}</title>
             </Helmet>
-            <div className='w-full min-h-screen bg-brand-foreground text-black'>
+            <div className='w-full min-h-screen text-black'>
                 <div className='top-0 z-50 bg-brand-foreground'>
                     <GoBack />
                 </div>
-                <div className='max-w-2xl mt-5 mx-auto bg-brand-background rounded-lg md:px-4 md:py-8'>
+                <div className='max-w-2xl mt-5 mx-auto bg-muted rounded-lg md:px-4 md:py-8'>
                     <h1 className='text-2xl font-bold text-center p-5'>{event?.title}</h1>
                     <img src={getImageUrl(event?.image)} alt="Event Image" className='w-[300px] h-[300px] mx-auto rounded-lg' />
 
@@ -247,7 +247,7 @@ const ViewEvent: React.FC = () => {
                                 <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Button className='btn-rounded h-6'>View QR Code</Button>
+                                            <Button size="sm">View QR Code</Button>
                                         </DialogTrigger>
                                         <DialogContent>
                                             <DialogHeader>
@@ -270,7 +270,7 @@ const ViewEvent: React.FC = () => {
                                 {/* For breakout rooms */}
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button className='btn-rounded h-6'>Breakout QR Code</Button>
+                                        <Button size="sm">Breakout QR Code</Button>
                                     </DialogTrigger>
                                     <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
                                         <DialogHeader>

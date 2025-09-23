@@ -122,9 +122,9 @@ const EventCard: React.FC<EventCardProps> = ({
     if (loading) return <Wave />
 
     return (
-        <div className={`flex scale-95 sm:scale-100 bg-brand-background rounded-xl h-80 ${isLive ? 'w-xl' : 'max-w-80'}`}>
+        <div className={`flex scale-95 sm:scale-100 bg-accent rounded-xl h-80 ${isLive ? 'w-xl' : 'max-w-80'}`}>
             {/* Image Div */}
-            <div className='h-full flex flex-col relative justify-between min-w-80 overflow-hidden bg-brand-light-gray rounded-xl p-1.5'>
+            <div className='h-full flex flex-col relative justify-between min-w-80 overflow-hidden rounded-xl p-1.5'>
                 <div className='max-h-44 relative overflow-hidden'>
 
                     <div className='p-2 flex justify-between min-h-24 absolute bg-gradient-to-b rounded-xl from-black/0 via-black/40 to-black w-full bottom-0' />
@@ -133,13 +133,13 @@ const EventCard: React.FC<EventCardProps> = ({
                             {formatDate(date)}
                         </span>
                         <div className='flex gap-2 items-center'>
-                            {location && <Link to={`/create-badge/${slug}`} className='p-2 bg-brand-primary rounded-full text-white'>
+                            {location && <Link to={`/create-badge/${slug}`} className='p-2 bg-primary rounded-full text-white'>
                                 <Printer size={16} />
                             </Link>}
 
                             {user?.role === 'admin' && <AlertDialog>
                                 <AlertDialogTrigger
-                                    className='grid place-content-center text-white w-8 h-8 bg-brand-secondary hover:bg-brand-secondary cursor-pointer rounded-full z-50 top-2 right-2'
+                                    className='grid place-content-center text-white w-8 h-8 bg-secondary cursor-pointer rounded-full z-50 top-2 right-2'
                                 >
                                     <Trash size={16} />
                                 </AlertDialogTrigger>
@@ -152,7 +152,7 @@ const EventCard: React.FC<EventCardProps> = ({
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={handleDeleteEvent}>Delete</AlertDialogAction>
+                                        <AlertDialogAction className='cursor-pointer bg-secondary text-white' onClick={handleDeleteEvent}>Delete</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>}
@@ -221,7 +221,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     <div className={`grid gap-2 ${user?.role === "subuser" ? "grid-cols-2" : "grid-cols-3"}`}>
                         {buttonLinks.slice(0, 3).map((button, index) => (
                             button.path === "/all-events/update-event/" && user?.role === 'subuser' ? null : (
-                                <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-brand-primary text-center px-2 py-1 grid place-content-center text-sm'>
+                                <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-primary hover:shadow-sm text-center px-2 py-1 grid place-content-center text-sm'>
                                     {button.label}
                                 </Link>
                             )
@@ -229,7 +229,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </div>
                     <div className='grid grid-cols-2 gap-2'>
                         {buttonLinks.slice(3).map((button, index) => (
-                            <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-brand-primary text-center px-2 py-1 grid place-content-center text-sm'>
+                            <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white hover:shadow-sm text-primary text-center px-2 py-1 grid place-content-center text-sm'>
                                 {button.label}
                             </Link>
                         ))}
