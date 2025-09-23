@@ -9,6 +9,7 @@ interface SheetRow {
     state_name: string;
     employee_size: string;
     priority: string;
+    uuid: string;
 }
 
 interface ICPSheet {
@@ -34,6 +35,10 @@ interface ICPStore {
     deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
     createICP: (payload: CreateICPPayload) => Promise<{ success: boolean; message?: string }>;
+    // Entry-level CRUD (console.log only for now)
+    addICPEntry: (sheetUuid: string, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
+    updateICPEntry: (sheetUuid: string, rowUuid: string, rowIndex: number, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
+    deleteICPEntry: (sheetUuid: string, rowUuid: string) => Promise<{ success: boolean; message: string }>;
 }
 
 const useICPStore = create<ICPStore>((set, get) => ({
@@ -125,6 +130,76 @@ const useICPStore = create<ICPStore>((set, get) => ({
         } catch (error) {
             throw error;
         }
+    },
+    addICPEntry: async (sheetUuid: string, entry: SheetRow, userId: number) => {
+        const data = {
+            user_id: userId,
+            company_name: entry.companyname,
+            designation: entry.designation,
+            priority: entry.priority,
+            country_name: entry.country_name,
+            state_name: entry.state_name,
+            employee_size: entry.employee_size
+        };
+
+        await axios.post(`${domain}/api/add-icp-data/${sheetUuid}`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        set((state) => ({
+            icpSheets: state.icpSheets.map((s) =>
+                s.uuid === sheetUuid ? { ...s, sheetRows: [entry, ...s.sheetRows] } : s
+            ),
+        }));
+        return Promise.resolve({ success: true, message: 'Entry added' });
+    },
+    updateICPEntry: async (sheetUuid, rowUuid, rowIndex, entry, userId) => {
+        const data = {
+            company_name: entry.companyname,
+            designation: entry.designation,
+            country_name: entry.country_name,
+            state_name: entry.state_name,
+            employee_size: entry.employee_size,
+            priority: entry.priority,
+            _method: 'PUT',
+            user_id: userId
+        }
+        await axios.post(`${domain}/api/update-icp-data/${rowUuid}`, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        set((state) => ({
+            icpSheets: state.icpSheets.map((s) =>
+                s.uuid === sheetUuid
+                    ? {
+                        ...s,
+                        sheetRows: s.sheetRows.map((r, i) => (i === rowIndex ? entry : r)),
+                    }
+                    : s
+            ),
+        }));
+        return Promise.resolve({ success: true, message: 'Entry updated' });
+    },
+    deleteICPEntry: async (sheetUuid, rowUuid) => {
+        axios.delete(`${domain}/api/delete-icp/${rowUuid}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        set((state) => ({
+            icpSheets: state.icpSheets.map((s) =>
+                s.uuid === sheetUuid
+                    ? { ...s, sheetRows: s.sheetRows.filter((r) => r.uuid !== rowUuid) }
+                    : s
+            ),
+        }));
+        return Promise.resolve({ success: true, message: 'Entry deleted' });
     }
 }));
 

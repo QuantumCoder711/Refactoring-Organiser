@@ -11,18 +11,114 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import useExtrasStore from '@/store/extrasStore';
+import { CountrySelect, StateSelect } from 'react-country-state-city';
+import 'react-country-state-city/dist/react-country-state-city.css';
 
 import Dropzone from 'react-dropzone';
 import * as XLSX from 'xlsx';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
+// Custom Combo Box (copied from CreateICP with minor condensation to fit)
+const CustomComboBox = React.memo(({
+    label,
+    value,
+    onValueChange,
+    placeholder,
+    options,
+    required = false,
+    isMulti = false,
+    onSearch,
+}: {
+    label: string;
+    value: string | string[];
+    onValueChange: (value: string | string[]) => void;
+    placeholder: string;
+    options: { id: number; name: string }[];
+    required?: boolean;
+    isMulti?: boolean;
+    onSearch?: (term: string) => void;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
+    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+    const selectedValues = Array.isArray(value) ? value : [];
+    const filteredOptions = options
+        .filter(o => o.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter(o => !isMulti || !selectedValues.some(v => v.toLowerCase() === o.name.toLowerCase()));
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const term = e.target.value;
+        if (!isMulti) { setInputValue(term); onValueChange(term); }
+        setSearchTerm(term); setIsOpen(true); setSelectedIndex(-1); onSearch?.(term);
+    };
+    const addValue = (name: string) => {
+        if (!isMulti) { setInputValue(name); onValueChange(name); }
+        else {
+            const exists = selectedValues.some(v => v.toLowerCase() === name.toLowerCase());
+            if (!exists) onValueChange([...selectedValues, name]);
+        }
+        setSearchTerm(''); setIsOpen(false); setSelectedIndex(-1); inputRef.current?.blur();
+    };
+    const removeValue = (name: string) => { if (isMulti) onValueChange(selectedValues.filter(v => v.toLowerCase() !== name.toLowerCase())); };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (isOpen) {
+            if (e.key === 'ArrowDown') { e.preventDefault(); setSelectedIndex(p => (p < filteredOptions.length - 1 ? p + 1 : p)); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setSelectedIndex(p => (p > 0 ? p - 1 : p)); }
+            else if (e.key === 'Enter') { e.preventDefault(); if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) addValue(filteredOptions[selectedIndex].name); else if (searchTerm) addValue(searchTerm); }
+        } else if (e.key === 'Enter' && searchTerm) { addValue(searchTerm); }
+    };
+
+    useEffect(() => { const h = (e: MouseEvent) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) { setIsOpen(false); setSearchTerm(''); setSelectedIndex(-1); } }; document.addEventListener('mousedown', h); return () => document.removeEventListener('mousedown', h); }, []);
+    useEffect(() => { if (!isMulti && typeof value === 'string') setInputValue(value); }, [value, isMulti]);
+    useEffect(() => { if (selectedIndex >= 0 && dropdownRef.current) { const el = dropdownRef.current.querySelectorAll('.option')[selectedIndex] as HTMLElement; el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } }, [selectedIndex]);
+
+    return (
+        <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
+            <Label className="font-semibold">{label} {required && <span className="text-brand-secondary">*</span>}</Label>
+            <div className="relative">
+                <div className="relative">
+                    <Input ref={inputRef} type="text" value={isMulti ? searchTerm : inputValue} onChange={handleInputChange} onKeyDown={handleKeyDown} onFocus={() => setIsOpen(true)} placeholder={placeholder} className="w-full capitalize bg-white !h-12 text-base pr-10" />
+                    <ChevronDown className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`} onClick={() => { setIsOpen(!isOpen); inputRef.current?.focus(); }} />
+                </div>
+                {isMulti && selectedValues.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {selectedValues.map((val) => (
+                            <Badge key={val} variant="secondary" className="flex items-center gap-1 px-2 py-1 rounded-full">
+                                <span className="capitalize">{val}</span>
+                                <button type="button" onClick={() => removeValue(val)} className="hover:text-red-600"><X className="size-3 cursor-pointer" /></button>
+                            </Badge>
+                        ))}
+                    </div>
+                )}
+                {isOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((o, idx) => (
+                                <div key={o.id} className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === idx ? 'bg-gray-100' : ''} option`} onClick={() => addValue(o.name)}>
+                                    <span className="capitalize">{o.name}</span>
+                                    {!isMulti && typeof value === 'string' && value === o.name && (<Check className="size-4 text-brand-secondary" />)}
+                                </div>
+                            ))
+                        ) : searchTerm ? (
+                            <div className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm font-medium" onClick={() => addValue(searchTerm)}>{searchTerm}</div>
+                        ) : (
+                            <div className="px-3 py-2 text-gray-500 text-sm">No options found</div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
+import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown } from 'lucide-react';
 
 const ROWS_PER_PAGE: number = 10;
 
@@ -51,7 +147,7 @@ const formatUploadedOn = (sheetName: string): { name: string; uploadedOn?: strin
 
 const SavedICP: React.FC = () => {
     const { user } = useAuthStore(state => state);
-    const { icpSheets, loading, getICPSheets, deleteICPSheet } = useICPStore(state => state);
+    const { icpSheets, loading, getICPSheets, deleteICPSheet, addICPEntry, updateICPEntry, deleteICPEntry } = useICPStore(state => state);
 
     // Compare dialog state
     const [compareOpen, setCompareOpen] = useState(false);
@@ -69,6 +165,86 @@ const SavedICP: React.FC = () => {
     // Preview dialog state
     const [openPreviewFor, setOpenPreviewFor] = useState<null | { uuid: string }>(null);
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Entry add/edit dialog state
+    const { designations, companies, getCompanies, getDesignations } = useExtrasStore(state => state);
+    const [entryOpen, setEntryOpen] = useState(false);
+    const [entryMode, setEntryMode] = useState<'add' | 'edit'>('add');
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [entryCountryId, setEntryCountryId] = useState<string | number | null>(null);
+    const employeeOptions = ['0-10', '10-50', '50-100', '100-500', '500-1000', '1000-5000', '5000-10000', 'more than 10,000'];
+    const [entryForm, setEntryForm] = useState({
+        companyname: '',
+        designation: [] as string[],
+        country_name: '',
+        state_name: '',
+        employee_size: '',
+        priority: 'P4' as 'P1' | 'P2' | 'P3' | 'P4',
+        uuid: ''
+    });
+    const isEntryValid = Boolean(
+        entryForm.companyname.trim() &&
+        entryForm.designation.length > 0 &&
+        entryForm.country_name.trim() &&
+        entryForm.state_name.trim() &&
+        entryForm.employee_size &&
+        entryForm.priority
+    );
+
+    const openAddEntry = () => {
+        setEntryMode('add');
+        setEditingIndex(null);
+        setEntryForm({ companyname: '', designation: [], country_name: '', state_name: '', employee_size: '', priority: 'P4', uuid:  ''});
+        setEntryCountryId(null);
+        setEntryOpen(true);
+        getCompanies();
+        getDesignations();
+    };
+
+    const openEditEntry = (row: any, absIndex: number) => {
+        setEntryMode('edit');
+        setEditingIndex(absIndex);
+        setEntryForm({
+            companyname: row.companyname || '',
+            designation: Array.isArray(row.designation) ? row.designation : String(row.designation || '').split(',').map((s: string) => s.trim()).filter(Boolean),
+            country_name: row.country_name || '',
+            state_name: row.state_name || '',
+            employee_size: row.employee_size || '',
+            priority: String(row.priority || 'P4').toUpperCase() as 'P1' | 'P2' | 'P3' | 'P4',
+            uuid: row.uuid || '',
+        });
+        setEntryCountryId(null);
+        setEntryOpen(true);
+        getCompanies(row.companyname);
+        getDesignations();
+    };
+
+    const handleSaveEntry = async () => {
+        if (!activeSheet || !isEntryValid) return;
+        try {
+            if (entryMode === 'add') {
+                await addICPEntry(activeSheet.sheet_name, entryForm, user?.id as number);
+                toast.success('ICP entry added', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
+            } else if (editingIndex !== null) {
+                const rowUuid = (activeSheet.sheetRows[editingIndex] as any)?.uuid;
+                await updateICPEntry(activeSheet.uuid, rowUuid, editingIndex, entryForm, user?.id as number);
+                toast.success('ICP entry updated', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
+            }
+            setEntryOpen(false);
+        } catch (e: any) {
+            toast.error(e?.message || 'Operation failed', { className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <XIcon className='size-5' /> });
+        }
+    };
+
+    const handleDeleteEntry = async (absIndex: number) => {
+        if (!activeSheet) return;
+        try {
+            await deleteICPEntry(activeSheet.uuid, (activeSheet.sheetRows[absIndex] as any)?.uuid);
+            toast.success('ICP entry deleted', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
+        } catch (e: any) {
+            toast.error(e?.message || 'Failed to delete entry', { className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <XIcon className='size-5' /> });
+        }
+    };
 
     useEffect(() => {
         if (user) getICPSheets(user.id as number);
@@ -368,6 +544,91 @@ const SavedICP: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
+            {/* Add/Edit ICP Entry Dialog */}
+            <Dialog open={entryOpen} onOpenChange={(o) => setEntryOpen(o)}>
+                <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{entryMode === 'add' ? 'Add New ICP Entry' : 'Edit ICP Entry'}</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div className="flex flex-col gap-2">
+                            <CustomComboBox
+                                label="Company Name"
+                                value={entryForm.companyname}
+                                onValueChange={(val) => setEntryForm(prev => ({ ...prev, companyname: String(val || '') }))}
+                                placeholder="Type or select company"
+                                options={companies.map((c, idx) => ({ id: idx + 1, name: c.company }))}
+                                onSearch={(term) => getCompanies(term)}
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <CustomComboBox
+                                label="Job Title"
+                                isMulti
+                                value={entryForm.designation}
+                                onValueChange={(val) => setEntryForm(prev => ({ ...prev, designation: Array.isArray(val) ? val : (val ? [String(val)] : []) }))}
+                                placeholder="Type or select job title"
+                                options={designations.map((d, idx) => ({ id: idx + 1, name: d.designation }))}
+                                onSearch={(term) => getDesignations(term)}
+                                required
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label className="font-semibold">Country <span className="text-brand-secondary">*</span></Label>
+                            <CountrySelect
+                                placeHolder="Select Country"
+                                onChange={(val: any) => { setEntryCountryId(val?.id ?? null); setEntryForm(prev => ({ ...prev, country_name: val?.name || '', state_name: '' })); }}
+                                inputClassName="!h-12 !text-base !bg-white"
+                                containerClassName="!w-full"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label className="font-semibold">State <span className="text-brand-secondary">*</span></Label>
+                            <StateSelect
+                                countryid={entryCountryId as any}
+                                placeHolder={entryCountryId ? 'Select State' : 'Select country first'}
+                                onChange={(val: any) => setEntryForm(prev => ({ ...prev, state_name: val?.name || '' }))}
+                                inputClassName="!h-12 !text-base !bg-white"
+                                containerClassName="!w-full"
+                                disabled={!entryCountryId}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label className="font-semibold">Employee Size <span className="text-brand-secondary">*</span></Label>
+                            <Select value={entryForm.employee_size} onValueChange={(v) => setEntryForm(prev => ({ ...prev, employee_size: v }))}>
+                                <SelectTrigger className="input !h-12 text-base cursor-pointer min-w-full">
+                                    <SelectValue placeholder="Select employee size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {employeeOptions.map(opt => (
+                                        <SelectItem key={opt} value={opt} className="cursor-pointer">{opt}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label className="font-semibold">Priority <span className="text-brand-secondary">*</span></Label>
+                            <Select value={entryForm.priority} onValueChange={(v) => setEntryForm(prev => ({ ...prev, priority: v as 'P1' | 'P2' | 'P3' | 'P4' }))}>
+                                <SelectTrigger className="input !h-12 text-base cursor-pointer min-w-full">
+                                    <SelectValue placeholder="Select priority" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {['P1', 'P2', 'P3', 'P4'].map(p => (
+                                        <SelectItem key={p} value={p} className="cursor-pointer">{p}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" className="cursor-pointer" onClick={() => setEntryOpen(false)}>Cancel</Button>
+                        <Button onClick={handleSaveEntry} disabled={!isEntryValid} className="btn !h-full">{entryMode === 'add' ? 'Add Entry' : 'Save Changes'}</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+
 
             <div className='mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6'>
                 {icpSheets ? icpSheets?.map((sheet) => {
@@ -421,7 +682,10 @@ const SavedICP: React.FC = () => {
             <Dialog open={!!openPreviewFor} onOpenChange={(o) => { if (!o) setOpenPreviewFor(null); }}>
                 <DialogContent className='sm:max-w-5xl w-[calc(100%-2rem)] overflow-y-auto'>
                     <DialogHeader>
-                        <DialogTitle className='capitalize'>{activeSheet?.sheet_name.split("").find((char: string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}</DialogTitle>
+                        <DialogTitle className='capitalize flex justify-between items-center mt-5'>
+                            {activeSheet?.sheet_name.split("").find((char: string) => char === '_') ? activeSheet?.sheet_name.split("_")[0] : activeSheet?.sheet_name}
+                            <div><Button variant="outline" size="sm" className='cursor-pointer' onClick={openAddEntry}>Add Entry</Button></div>
+                        </DialogTitle>
                     </DialogHeader>
                     <div className='border rounded-md overflow-hidden'>
                         <Table>
@@ -433,17 +697,40 @@ const SavedICP: React.FC = () => {
                                     <TableHead className='w-[120px]'>State</TableHead>
                                     <TableHead className='w-[120px]'>Employee Size</TableHead>
                                     <TableHead className='w-[120px]'>Priority</TableHead>
+                                    <TableHead className='w-[120px]'>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {paginatedRows?.map((row, idx) => (
                                     <TableRow key={idx} className='capitalize'>
                                         <TableCell className='font-medium'>{row.companyname}</TableCell>
-                                        <TableCell className='text-muted-foreground'>{Array.isArray(row.designation) ? row.designation.join(', ') : String(row.designation || '')}</TableCell>
+                                        <TableCell className='text-muted-foreground'>{row.designation.map(d => d).join(", ")}</TableCell>
                                         <TableCell>{row.country_name}</TableCell>
                                         <TableCell>{row.state_name}</TableCell>
                                         <TableCell>{row.employee_size}</TableCell>
                                         <TableCell>{row.priority}</TableCell>
+                                        <TableCell className="space-x-2">
+                                            <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => openEditEntry(row, ((currentPage - 1) * ROWS_PER_PAGE) + idx)}>Edit</Button>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive" size="sm" className="cursor-pointer">Delete</Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot be undone. This will permanently delete the selected ICP entry.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction className="cursor-pointer bg-destructive text-white" onClick={() => handleDeleteEntry(((currentPage - 1) * ROWS_PER_PAGE) + idx)}>
+                                                            Delete
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
