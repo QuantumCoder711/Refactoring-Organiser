@@ -1,8 +1,36 @@
+/**
+ * ICP Creation Page with Advanced Company Fetching
+ *
+ * This component implements a comprehensive solution for fetching companies based on:
+ * - Multiple industries (multi-select)
+ * - Multiple employee size ranges (multi-select)
+ * - Automatic pagination handling
+ * - Duplicate removal across combinations
+ * - Real-time progress tracking
+ *
+ * Key Features:
+ * 1. fetchAllCompaniesForCombination: Handles pagination for single industry/size combination
+ * 2. fetchAllCompaniesByCombinations: Processes all combinations and removes duplicates
+ * 3. Real-time results display with editable priorities
+ * 4. Batch ICP creation from fetched results
+ *
+ * API Response Format Expected:
+ * {
+ *   "status": true,
+ *   "data": {
+ *     "companies": [...],
+ *     "totalCompanies": number
+ *   }
+ * }
+ */
+
 import React, { useRef, useState } from 'react';
 import useExtrasStore from '@/store/extrasStore';
 import useICPStore from '@/store/icpStore';
 import { useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import axios from 'axios';
+import { appDomain } from '@/constants';
 
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +43,24 @@ import 'react-country-state-city/dist/react-country-state-city.css';
 import { toast } from 'sonner';
 import useAuthStore from '@/store/authStore';
 import GoBack from '@/components/GoBack';
+
+interface Company {
+  company_name: string;
+  designation: string;
+  priority: string;
+  employee_size: string;
+  industry: string;
+}
+
+interface MasterData {
+  user_id: number;
+  sheet_name: string;
+  employee_size: string;
+  company: Company[];
+  state_name: string;
+  country_name: string;
+}
+
 
 // Custom Combo Box Component (enhanced to support multi-select, keeps existing styles)
 const CustomComboBox = React.memo(({
@@ -42,7 +88,6 @@ const CustomComboBox = React.memo(({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const selectedValues = Array.isArray(value) ? value : [];
 
   const filteredOptions = options
@@ -205,11 +250,12 @@ const CreateICP: React.FC = () => {
 
   const [formData, setFormData] = useState({
     sheet_name: '',
-    employee_size: '',
+    employee_size: [] as string[], // Changed to array for multiple selections
     designation: [] as string[],
     company_name: [] as string[],
     state_name: '',
-    country_name: '',
+    country_name: 'India',
+    industry_name: [] as string[], // Changed to array for multiple selections
   });
   const [countryId, setCountryId] = useState<string | number | null>(null);
   const employeeOptions = [
@@ -222,20 +268,12 @@ const CreateICP: React.FC = () => {
     '5000-10000',
     'more than 10,000',
   ];
-  const [rowPriorities, setRowPriorities] = useState<Record<string, 'P1' | 'P2' | 'P3' | 'P4'>>({});
-  useEffect(() => {
-    setRowPriorities(prev => {
-      const next: Record<string, 'P1' | 'P2' | 'P3' | 'P4'> = {};
-      formData.company_name.forEach(name => {
-        next[name] = prev[name] ?? 'P4';
-      });
-      return next;
-    });
-  }, [formData.company_name]);
+
+  const [masterData, setMasterData] = useState<MasterData[]>([]);
 
   useEffect(() => {
-    getCompanies();
-    getDesignations();
+    getCompanies('');
+    getDesignations('');
   }, []);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -245,38 +283,190 @@ const CreateICP: React.FC = () => {
     console.log(name, value);
   };
 
-  const handleCreateSheet = async () => {
+  /**
+   * Fetches all companies with pagination for a specific industry and employee size combination
+   * @param industry - The industry to filter by
+   * @param employeeSize - The employee size range to filter by
+   * @returns Promise<any[]> - Array of all companies for the given combination
+   */
+  const fetchAllCompaniesForCombination = async (industry: string, employeeSize: string) => {
+    const companies: any[] = [];
+    let page = 1;
+    let hasMoreData = true;
+
+    try {
+      while (hasMoreData) {
+        const response = await axios.get(
+          `${appDomain}/api/mapping/v1/company-master/all-company?page=${page}&search=&industry=${encodeURIComponent(industry)}&employeeSize=${encodeURIComponent(employeeSize)}&logo=undefined`
+        );
+
+        const responseData = response.data;
+
+        if (responseData.status && responseData.data && responseData.data.companies) {
+          const pageCompanies = responseData.data.companies;
+          companies.push(...pageCompanies);
+
+          // Check if we have more data to fetch
+          const totalCompanies = responseData.data.totalCompanies || 0;
+          const currentCompaniesCount = companies.length;
+
+          if (currentCompaniesCount >= totalCompanies || pageCompanies.length === 0) {
+            hasMoreData = false;
+          } else {
+            page++;
+          }
+        } else {
+          hasMoreData = false;
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching companies for industry: ${industry}, employeeSize: ${employeeSize}`, error);
+      throw error;
+    }
+
+    return companies;
+  };
+
+  /**
+   * Fetches companies for all combinations of industries and employee sizes
+   * Handles pagination automatically and removes duplicates
+   * @param industries - Array of industry names to search
+   * @param employeeSizes - Array of employee size ranges to search
+   * @returns Promise<any[]> - Array of unique companies from all combinations
+   *
+   * Example usage:
+   * const industries = ['IT', 'Healthcare', 'Finance'];
+   * const employeeSizes = ['10-50', '50-100', '100-500'];
+   * const companies = await fetchAllCompaniesByCombinations(industries, employeeSizes);
+   */
+  const fetchAllCompaniesByCombinations = async (industries: string[], employeeSizes: string[]) => {
+    const masterData: any[] = [];
+    const seenCompanies = new Set<string>(); // To avoid duplicates
+    let totalCombinations = industries.length * employeeSizes.length;
+    let processedCombinations = 0;
+
+    try {
+      for (const industry of industries) {
+        for (const employeeSize of employeeSizes) {
+          console.log(`Fetching companies for Industry: ${industry}, Employee Size: ${employeeSize}`);
+
+          try {
+            const companies = await fetchAllCompaniesForCombination(industry, employeeSize);
+
+            // Filter out duplicates based on company ID or name
+            const uniqueCompanies = companies.filter(company => {
+              const companyKey = company._id || company.company;
+              if (seenCompanies.has(companyKey)) {
+                return false;
+              }
+              seenCompanies.add(companyKey);
+              return true;
+            });
+
+            masterData.push(...uniqueCompanies);
+            processedCombinations++;
+
+            console.log(`Processed ${processedCombinations}/${totalCombinations} combinations. Found ${uniqueCompanies.length} new companies.`);
+          } catch (error) {
+            console.error(`Failed to fetch companies for ${industry} - ${employeeSize}:`, error);
+            processedCombinations++;
+            // Continue with next combination even if one fails
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error in fetchAllCompaniesByCombinations:', error);
+      throw error;
+    }
+
+    return masterData;
+  };
+
+  const handleSearchICP = async () => {
+    setMasterData([]);
     // Validation: all fields mandatory
     const isValid = Boolean(
       formData.sheet_name.trim() &&
-      formData.employee_size &&
+      formData.employee_size.length > 0 &&
       formData.designation.length > 0 &&
       formData.company_name.length > 0 &&
       formData.country_name.trim() &&
-      formData.state_name.trim()
+      formData.state_name.trim() &&
+      formData.industry_name.length > 0
     );
 
     if (!isValid) {
       console.warn('Please fill all required fields before proceeding.');
+      toast.error('Please fill all required fields before proceeding.', {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <XIcon className='size-5' />
+      });
       return;
     }
 
-    const payload = {
-      sheet_name: formData.sheet_name.trim(),
-      employee_size: formData.employee_size.trim(),
-      designation: formData.designation.map(d => d.trim()).filter(Boolean),
-      company_name: formData.company_name.map(c => c.trim()).filter(Boolean),
-      state_name: formData.state_name.trim(),
-      country_name: formData.country_name.trim(),
-      priority: formData.company_name.map(company => rowPriorities[company] ?? 'P4'),
-      user_id: id
-    };
-
     try {
+      // Show loading toast
+      toast.info('Fetching companies data...', {
+        className: "!bg-blue-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+      });
+
+      // Use the arrays from form data for multiple industries and employee sizes
+      const industries = formData.industry_name.map(i => i.trim()).filter(Boolean);
+      const employeeSizes = formData.employee_size.map(e => e.trim()).filter(Boolean);
+
+      const allCompanies = await fetchAllCompaniesByCombinations(industries, employeeSizes);
+
+      console.log(`Total unique companies fetched: ${allCompanies.length}`);
+      console.log(`Fetched companies: ${allCompanies}`);
+
+      // Update master data state
+      setMasterData(prevData => {
+        const newMasterData = [...prevData];
+
+        // Create a new entry for this search
+        const newEntry: MasterData = {
+          user_id: id as number,
+          sheet_name: formData.sheet_name.trim(),
+          employee_size: formData.employee_size.join(', '), // Join array for display
+          company: allCompanies.map(company => ({
+            company_name: company.company || '',
+            designation: formData.designation.join(', '),
+            priority: 'P4', // Default priority
+            employee_size: company.companySize || formData.employee_size.join(', '),
+            industry: company.industry || formData.industry_name.join(', ')
+          })),
+          state_name: formData.state_name.trim(),
+          country_name: formData.country_name.trim()
+        };
+
+        newMasterData.push(newEntry);
+        return newMasterData;
+      });
+
+      console.log("The all companies data is:", allCompanies);
+
+      toast.success(`Successfully fetched ${allCompanies.length} companies!`, {
+        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleCheck className='size-5' />
+      });
+
+      // Optionally, you can now proceed with creating the ICP
+      // Uncomment the following code if you want to automatically create ICP after fetching
+      /*
+      const payload = {
+        sheet_name: formData.sheet_name.trim(),
+        employee_size: formData.employee_size.join(', '),
+        designation: formData.designation.map(d => d.trim()).filter(Boolean),
+        company_name: allCompanies.map(c => c.company).filter(Boolean),
+        state_name: formData.state_name.trim(),
+        country_name: formData.country_name.trim(),
+        priority: allCompanies.map(() => 'P4'), // Default priority for all
+        user_id: id
+      };
+
       const { success, message } = await useICPStore.getState().createICP(payload);
-      console.log(success, message);
       if (success) {
-        toast.success(message || "ICP added successfully", {
+        toast.success(message || "ICP created successfully", {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <CircleCheck className='size-5' />
         });
@@ -286,20 +476,25 @@ const CreateICP: React.FC = () => {
           icon: <XIcon className='size-5' />
         });
       }
+      */
+
     } catch (error) {
-      toast.error("Failed to create ICP", {
-        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+      console.error('Error in handleSearchICP:', error);
+      toast.error("Failed to fetch companies data", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <XIcon className='size-5' />
       });
     }
   };
 
   const isFormComplete = Boolean(
     formData.sheet_name.trim() &&
-    formData.employee_size &&
+    formData.employee_size.length > 0 &&
     formData.designation.length > 0 &&
     formData.company_name.length > 0 &&
     formData.country_name.trim() &&
-    formData.state_name.trim()
+    formData.state_name.trim() &&
+    formData.industry_name.length > 0
   );
 
   return (
@@ -322,21 +517,39 @@ const CreateICP: React.FC = () => {
               className="!h-12 text-base"
             />
           </div>
+          
+          {/* Industry Name (multi-select) */}
+          <CustomComboBox
+            label="Industry Name"
+            isMulti
+            value={formData.industry_name}
+            onValueChange={(val) => setFormData(prev => ({ ...prev, industry_name: Array.isArray(val) ? val : (val ? [val] : []) }))}
+            placeholder="Type or select industry"
+            options={[
+              { id: 1, name: 'IT' },
+              { id: 2, name: 'Healthcare' },
+              { id: 3, name: 'Finance' },
+              { id: 4, name: 'Manufacturing' },
+              { id: 5, name: 'Education' },
+              { id: 6, name: 'Retail' },
+              { id: 7, name: 'Consulting' },
+              { id: 8, name: 'Real Estate' },
+              { id: 9, name: 'Automotive' },
+              { id: 10, name: 'Energy' }
+            ]}
+            required
+          />
 
-          {/* Employee Size (single select) */}
-          <div className="flex flex-col gap-2 w-full">
-            <Label className="font-semibold">Employee Size <span className="text-brand-secondary">*</span></Label>
-            <Select value={formData.employee_size} onValueChange={(v) => setFormData(prev => ({ ...prev, employee_size: v }))}>
-              <SelectTrigger className="input !h-12 text-base cursor-pointer min-w-full">
-                <SelectValue placeholder="Select employee size" />
-              </SelectTrigger>
-              <SelectContent>
-                {employeeOptions.map(opt => (
-                  <SelectItem key={opt} value={opt} className="cursor-pointer">{opt}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Employee Size (multi-select) */}
+          <CustomComboBox
+            label="Employee Size"
+            isMulti
+            value={formData.employee_size}
+            onValueChange={(val) => setFormData(prev => ({ ...prev, employee_size: Array.isArray(val) ? val : (val ? [val] : []) }))}
+            placeholder="Select employee size ranges"
+            options={employeeOptions.map((opt, index) => ({ id: index + 1, name: opt }))}
+            required
+          />
 
           {/* Designations (CustomComboBox multi) */}
           <CustomComboBox
@@ -389,7 +602,7 @@ const CreateICP: React.FC = () => {
             />
           </div>
         </div>
-
+        {/* 
         {isFormComplete && (
           <div className="pt-2">
             <div className="overflow-x-auto rounded-md border bg-white">
@@ -433,12 +646,143 @@ const CreateICP: React.FC = () => {
               </table>
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="pt-4 flex justify-end">
-          <Button onClick={handleCreateSheet} disabled={!isFormComplete} className="px-6 btn">Create ICP</Button>
+          <Button onClick={handleSearchICP} disabled={!isFormComplete} className="px-6 btn">Search</Button>
         </div>
       </Card>
+
+      {/* Results Table */}
+      {masterData.length > 0 && (
+        <Card className="p-6 mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Fetched Companies</h2>
+            <div className="text-sm text-gray-600">
+              Total: {masterData.reduce((total, entry) => total + entry.company.length, 0)} companies
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {masterData.map((entry, entryIndex) => (
+              <div key={entryIndex} className="border rounded-lg p-4">
+                <div className="mb-3">
+                  <h3 className="font-medium text-base">{entry.sheet_name}</h3>
+                  <p className="text-sm text-gray-600">
+                    {entry.country_name}, {entry.state_name} | Employee Size: {entry.employee_size}
+                  </p>
+                </div>
+
+                <div className="overflow-x-auto rounded-md border bg-white">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gray-50 text-gray-700">
+                      <tr>
+                        <th className="text-left px-4 py-3 font-semibold">Company Name</th>
+                        <th className="text-left px-4 py-3 font-semibold">Industry</th>
+                        <th className="text-left px-4 py-3 font-semibold">Employee Size</th>
+                        <th className="text-left px-4 py-3 font-semibold">Designations</th>
+                        <th className="text-left px-4 py-3 font-semibold">Priority</th>
+                        <th className="text-left px-4 py-3 font-semibold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {entry.company.map((company, companyIndex) => (
+                        <tr key={companyIndex} className="border-t hover:bg-gray-50">
+                          <td className="px-4 py-3 capitalize font-medium">{company.company_name}</td>
+                          <td className="px-4 py-3 capitalize">{company.industry}</td>
+                          <td className="px-4 py-3">{company.employee_size}</td>
+                          <td className="px-4 py-3 capitalize">{company.designation}</td>
+                          <td className="px-4 py-3">
+                            <Select
+                              value={company.priority}
+                              onValueChange={(v) => {
+                                setMasterData(prevData => {
+                                  const newData = [...prevData];
+                                  newData[entryIndex].company[companyIndex].priority = v as 'P1' | 'P2' | 'P3' | 'P4';
+                                  return newData;
+                                });
+                              }}
+                            >
+                              <SelectTrigger className="input !h-9 text-sm w-20">
+                                <SelectValue placeholder="P4" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {['P1', 'P2', 'P3', 'P4'].map(p => (
+                                  <SelectItem key={p} value={p} className="cursor-pointer">{p}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </td>
+                          <td className="px-4 py-3">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => {
+                                setMasterData(prevData => {
+                                  const newData = [...prevData];
+                                  newData[entryIndex].company.splice(companyIndex, 1);
+                                  return newData;
+                                });
+                              }}
+                              className="h-8 px-3 text-xs"
+                            >
+                              <X className="size-3" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {entry.company.length > 0 && (
+                  <div className="mt-4 flex justify-end">
+                    <Button
+                      onClick={async () => {
+                        try {
+                          const payload = {
+                            sheet_name: entry.sheet_name,
+                            employee_size: entry.employee_size,
+                            designation: entry.company.map(c => c.designation).filter(Boolean),
+                            company_name: entry.company.map(c => c.company_name).filter(Boolean),
+                            state_name: entry.state_name,
+                            country_name: entry.country_name,
+                            priority: entry.company.map(c => c.priority),
+                            user_id: entry.user_id
+                          };
+
+                          const { success, message } = await useICPStore.getState().createICP(payload);
+                          if (success) {
+                            toast.success(message || "ICP created successfully", {
+                              className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                              icon: <CircleCheck className='size-5' />
+                            });
+                            // Remove this entry from masterData after successful creation
+                            setMasterData(prevData => prevData.filter((_, index) => index !== entryIndex));
+                          } else {
+                            toast.error(message || "Error creating ICP", {
+                              className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                              icon: <XIcon className='size-5' />
+                            });
+                          }
+                        } catch (error) {
+                          toast.error("Failed to create ICP", {
+                            className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                            icon: <XIcon className='size-5' />
+                          });
+                        }
+                      }}
+                      className="px-6 btn"
+                    >
+                      Create ICP ({entry.company.length} companies)
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 
