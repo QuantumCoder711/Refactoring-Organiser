@@ -44,21 +44,27 @@ import { toast } from 'sonner';
 import useAuthStore from '@/store/authStore';
 import GoBack from '@/components/GoBack';
 
+/**
+ * Company interface - represents individual company data
+ * Each company object contains all necessary information for ICP creation
+ */
 interface Company {
-  company_name: string;
-  designation: string;
-  priority: string;
-  employee_size: string;
-  industry: string;
+  company_name: string;           // Name of the company
+  designation: string[];          // Job titles/designations as array
+  industry: string;               // Industry category
+  priority: 'P1' | 'P2' | 'P3' | 'P4';  // Priority level for the company
+  employee_size: string;          // Employee size range
 }
 
+/**
+ * MasterData interface - represents a complete ICP dataset
+ * Contains user info, search criteria, and array of companies
+ */
 interface MasterData {
-  user_id: number;
-  sheet_name: string;
-  employee_size: string;
-  company: Company[];
-  state_name: string;
-  country_name: string;
+  sheet_name: string;             // Name for the ICP sheet
+  state_name: string;             // State/region filter
+  country_name: string;           // Country filter
+  company: Company[];             // Array of Company objects - MAIN DATA
 }
 
 
@@ -246,6 +252,7 @@ const CustomComboBox = React.memo(({
 
 const CreateICP: React.FC = () => {
   const id = useAuthStore(state => state?.user?.id);
+  const token = useAuthStore(state => state?.token);
   const { designations, companies, getCompanies, getDesignations } = useExtrasStore(state => state);
 
   const [formData, setFormData] = useState({
@@ -270,6 +277,33 @@ const CreateICP: React.FC = () => {
   ];
 
   const [masterData, setMasterData] = useState<MasterData[]>([]);
+
+  /**
+   * Validates that a Company object matches the Company interface
+   */
+  const validateCompanyStructure = (company: any): company is Company => {
+    return (
+      typeof company.company_name === 'string' &&
+      Array.isArray(company.designation) &&
+      company.designation.every((d: any) => typeof d === 'string') &&
+      typeof company.industry === 'string' &&
+      ['P1', 'P2', 'P3', 'P4'].includes(company.priority) &&
+      typeof company.employee_size === 'string'
+    );
+  };
+
+  /**
+   * Validates that a MasterData object matches the MasterData interface
+   */
+  const validateMasterDataStructure = (data: any): data is MasterData => {
+    return (
+      typeof data.sheet_name === 'string' &&
+      typeof data.state_name === 'string' &&
+      typeof data.country_name === 'string' &&
+      Array.isArray(data.company) &&
+      data.company.every(validateCompanyStructure)
+    );
+  };
 
   useEffect(() => {
     getCompanies('');
@@ -389,7 +423,6 @@ const CreateICP: React.FC = () => {
       formData.sheet_name.trim() &&
       formData.employee_size.length > 0 &&
       formData.designation.length > 0 &&
-      formData.company_name.length > 0 &&
       formData.country_name.trim() &&
       formData.state_name.trim() &&
       formData.industry_name.length > 0
@@ -423,23 +456,61 @@ const CreateICP: React.FC = () => {
       setMasterData(prevData => {
         const newMasterData = [...prevData];
 
-        // Create a new entry for this search
+        // Create a new entry for this search - properly structured according to MasterData interface
+        // Example structure:
+        // {
+        //   user_id: 123,
+        //   sheet_name: "Tech Companies Q1",
+        //   state_name: "California",
+        //   country_name: "United States",
+        //   company: [
+        //     {
+        //       company_name: "TechCorp",
+        //       designation: ["Software Engineer", "Product Manager"],
+        //       industry: "IT",
+        //       priority: "P4",
+        //       employee_size: "50-100"
+        //     },
+        //     // ... more companies
+        //   ]
+        // }
         const newEntry: MasterData = {
-          user_id: id as number,
           sheet_name: formData.sheet_name.trim(),
-          employee_size: formData.employee_size.join(', '), // Join array for display
-          company: allCompanies.map(company => ({
-            company_name: company.company || '',
-            designation: formData.designation.join(', '),
-            priority: 'P4', // Default priority
-            employee_size: company.companySize || formData.employee_size.join(', '),
-            industry: company.industry || formData.industry_name.join(', ')
-          })),
           state_name: formData.state_name.trim(),
-          country_name: formData.country_name.trim()
+          country_name: formData.country_name.trim(),
+          company: allCompanies.map((company): Company => ({
+            company_name: company.company || '',
+            designation: formData.designation, // Keep as array
+            industry: company.industry || formData.industry_name.join(', '),
+            priority: 'P4' as const, // Default priority with proper typing
+            employee_size: company.companySize || formData.employee_size.join(', ')
+          }))
         };
 
-        newMasterData.push(newEntry);
+        // Validate the data structure before adding
+        if (validateMasterDataStructure(newEntry)) {
+          newMasterData.push(newEntry);
+
+          // Log the properly structured data for verification
+          console.log('✅ Created valid MasterData entry:', newEntry);
+          console.log('✅ Company array structure:', newEntry.company);
+          console.log('✅ Each company object structure:', newEntry.company[0]);
+          console.log('✅ Final data structure matches requirement:', {
+            sheet_name: newEntry.sheet_name,
+            state_name: newEntry.state_name,
+            country_name: newEntry.country_name,
+            company: newEntry.company.map(c => ({
+              company_name: c.company_name,
+              designation: c.designation, // Array format
+              industry: c.industry,
+              priority: c.priority,
+              employee_size: c.employee_size
+            }))
+          });
+        } else {
+          throw new Error('Created data does not match MasterData interface');
+        }
+
         return newMasterData;
       });
 
@@ -463,8 +534,8 @@ const CreateICP: React.FC = () => {
         priority: allCompanies.map(() => 'P4'), // Default priority for all
         user_id: id
       };
-
-      const { success, message } = await useICPStore.getState().createICP(payload);
+      
+      const { success, message } = await useICPStore.getState().createICP(masterData);
       if (success) {
         toast.success(message || "ICP created successfully", {
           className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
@@ -491,7 +562,6 @@ const CreateICP: React.FC = () => {
     formData.sheet_name.trim() &&
     formData.employee_size.length > 0 &&
     formData.designation.length > 0 &&
-    formData.company_name.length > 0 &&
     formData.country_name.trim() &&
     formData.state_name.trim() &&
     formData.industry_name.length > 0
@@ -669,7 +739,7 @@ const CreateICP: React.FC = () => {
                 <div className="mb-3">
                   <h3 className="font-medium text-base">{entry.sheet_name}</h3>
                   <p className="text-sm text-gray-600">
-                    {entry.country_name}, {entry.state_name} | Employee Size: {entry.employee_size}
+                    {entry.country_name}, {entry.state_name} | Companies: {entry.company.length}
                   </p>
                 </div>
 
@@ -691,7 +761,7 @@ const CreateICP: React.FC = () => {
                           <td className="px-4 py-3 capitalize font-medium">{company.company_name}</td>
                           <td className="px-4 py-3 capitalize">{company.industry}</td>
                           <td className="px-4 py-3">{company.employee_size}</td>
-                          <td className="px-4 py-3 capitalize">{company.designation}</td>
+                          <td className="px-4 py-3 capitalize">{company.designation.join(', ')}</td>
                           <td className="px-4 py-3">
                             <Select
                               value={company.priority}
@@ -720,7 +790,11 @@ const CreateICP: React.FC = () => {
                               onClick={() => {
                                 setMasterData(prevData => {
                                   const newData = [...prevData];
-                                  newData[entryIndex].company.splice(companyIndex, 1);
+                                  // Use filter instead of splice to avoid index issues
+                                  newData[entryIndex] = {
+                                    ...newData[entryIndex],
+                                    company: newData[entryIndex].company.filter((_, index) => index !== companyIndex)
+                                  };
                                   return newData;
                                 });
                               }}
@@ -740,18 +814,12 @@ const CreateICP: React.FC = () => {
                     <Button
                       onClick={async () => {
                         try {
-                          const payload = {
-                            sheet_name: entry.sheet_name,
-                            employee_size: entry.employee_size,
-                            designation: entry.company.map(c => c.designation).filter(Boolean),
-                            company_name: entry.company.map(c => c.company_name).filter(Boolean),
-                            state_name: entry.state_name,
-                            country_name: entry.country_name,
-                            priority: entry.company.map(c => c.priority),
-                            user_id: entry.user_id
+                          console.log("Creating ICP with data:", masterData[0]);
+                          const object = {
+                            ...masterData[0],
+                            user_id: id
                           };
-
-                          const { success, message } = await useICPStore.getState().createICP(payload);
+                          const { success, message } = await useICPStore.getState().createICP(object, token as string);
                           if (success) {
                             toast.success(message || "ICP created successfully", {
                               className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",

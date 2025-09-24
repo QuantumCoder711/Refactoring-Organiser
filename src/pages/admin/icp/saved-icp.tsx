@@ -148,7 +148,7 @@ const formatUploadedOn = (sheetName: string): { name: string; uploadedOn?: strin
 
 const SavedICP: React.FC = () => {
     const { user } = useAuthStore(state => state);
-    const { icpSheets, loading, getICPSheets, deleteICPSheet, updateICPEntry, deleteICPEntry } = useICPStore(state => state);
+    const { icpSheets, loading, getICPSheets, deleteICPSheet, deleteICPEntry } = useICPStore(state => state);
 
     // Compare dialog state
     const [compareOpen, setCompareOpen] = useState(false);
@@ -217,8 +217,8 @@ const SavedICP: React.FC = () => {
                 // await addICPEntry(activeSheet.sheet_name, entryForm, user?.id as number);
                 toast.success('ICP entry added', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
             } else if (editingIndex !== null) {
-                const rowUuid = (activeSheet.sheetRows[editingIndex] as any)?.uuid;
-                await updateICPEntry(activeSheet.uuid, rowUuid, editingIndex, entryForm, user?.id as number);
+                // const rowUuid = (activeSheet.sheetRows[editingIndex] as any)?.uuid;
+                // await updateICPEntry(activeSheet.uuid, rowUuid, editingIndex, entryForm, user?.id as number);
                 toast.success('ICP entry updated', { className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2", icon: <CircleCheck className='size-5' /> });
             }
             setEntryOpen(false);
@@ -688,6 +688,7 @@ const SavedICP: React.FC = () => {
                                     <TableHead className='w-[120px]'>State</TableHead>
                                     <TableHead className='w-[120px]'>Employee Size</TableHead>
                                     <TableHead className='w-[120px]'>Priority</TableHead>
+                                    <TableHead className='w-[120px]'>Industry</TableHead>
                                     <TableHead className='w-[120px]'>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -700,6 +701,7 @@ const SavedICP: React.FC = () => {
                                         <TableCell>{row.state_name}</TableCell>
                                         <TableCell>{row.employee_size}</TableCell>
                                         <TableCell>{row.priority}</TableCell>
+                                        <TableCell>{row.industry || '—'}</TableCell>
                                         <TableCell className="space-x-2">
                                             <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => openEditEntry(row, ((currentPage - 1) * ROWS_PER_PAGE) + idx)}>Edit</Button>
                                             <AlertDialog>
