@@ -92,7 +92,7 @@ const MultiSelectDropdown = React.memo(({
   };
 
   const filteredOptions = options.filter(option =>
-    option.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    option.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     !value.includes(option.name)
   );
 

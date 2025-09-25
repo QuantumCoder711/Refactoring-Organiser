@@ -13,6 +13,7 @@ export const getAllCompanies = async (search?: string, industry?: string, employ
 export const getAllDesignations = async (search?: string) => {
     try {
         const response = await axios.get(`${appDomain}/api/mapping/v1/designation-master/all-designation?page=1&search=${search}`);
+        console.log(response.data.data.designations);
         return response.data.data.designations;
     } catch (error) {
         throw error;
