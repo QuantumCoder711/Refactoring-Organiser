@@ -36,6 +36,16 @@ export interface FetchOptions {
   maxRetries?: number;
   retryDelay?: number;
 }
+const temp = "https://app.klout.club";
+export const handleSuggestedIndustries = async (search: string) => {
+  const response = await axios.post(`${temp}/api/mapping/v1/company-master/search-industry?search=${search}`);
+  if (response.data.status) {
+    const industries: string[] = response.data.data;
+    return industries;
+  } else {
+    return [];
+  }
+}
 
 /**
  * Fetches all companies for a specific industry and employee size with pagination
@@ -58,7 +68,7 @@ export const fetchAllCompaniesForCombination = async (
       );
 
       const responseData = response.data;
-      
+
       if (responseData.status && responseData.data && responseData.data.companies) {
         const pageCompanies = responseData.data.companies;
         companies.push(...pageCompanies);
@@ -66,13 +76,13 @@ export const fetchAllCompaniesForCombination = async (
         // Check if we have more data to fetch
         const totalCompanies = responseData.data.totalCompanies || 0;
         const currentCompaniesCount = companies.length;
-        
+
         if (currentCompaniesCount >= totalCompanies || pageCompanies.length === 0) {
           hasMoreData = false;
         } else {
           page++;
         }
-        
+
         // Reset retry count on successful request
         retryCount = 0;
       } else {
@@ -80,18 +90,18 @@ export const fetchAllCompaniesForCombination = async (
       }
     } catch (error) {
       retryCount++;
-      
+
       if (retryCount >= maxRetries) {
         const errorMessage = `Failed to fetch companies for industry: ${industry}, employeeSize: ${employeeSize} after ${maxRetries} retries`;
         const fetchError = new Error(errorMessage);
-        
+
         if (options.onError) {
           options.onError(fetchError, `${industry} - ${employeeSize}`);
         }
-        
+
         throw fetchError;
       }
-      
+
       // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, retryDelay * retryCount));
     }
@@ -116,7 +126,7 @@ export const fetchAllCompaniesByCombinations = async (
   for (const industry of industries) {
     for (const employeeSize of employeeSizes) {
       const currentCombination = `${industry} - ${employeeSize}`;
-      
+
       // Report progress
       if (options.onProgress) {
         options.onProgress({
@@ -127,10 +137,10 @@ export const fetchAllCompaniesByCombinations = async (
           uniqueCompanies: seenCompanies.size
         });
       }
-      
+
       try {
         const companies = await fetchAllCompaniesForCombination(industry, employeeSize, options);
-        
+
         // Filter out duplicates based on company ID or name
         const uniqueCompanies = companies.filter(company => {
           const companyKey = company._id || company.company;
@@ -143,16 +153,16 @@ export const fetchAllCompaniesByCombinations = async (
 
         masterData.push(...uniqueCompanies);
         processedCombinations++;
-        
+
         console.log(`Processed ${processedCombinations}/${totalCombinations} combinations. Found ${uniqueCompanies.length} new companies.`);
       } catch (error) {
         console.error(`Failed to fetch companies for ${currentCombination}:`, error);
         processedCombinations++;
-        
+
         if (options.onError) {
           options.onError(error as Error, currentCombination);
         }
-        
+
         // Continue with next combination even if one fails
       }
     }

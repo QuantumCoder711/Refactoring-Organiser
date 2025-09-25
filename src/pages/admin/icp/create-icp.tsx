@@ -43,6 +43,7 @@ import 'react-country-state-city/dist/react-country-state-city.css';
 import { toast } from 'sonner';
 import useAuthStore from '@/store/authStore';
 import GoBack from '@/components/GoBack';
+import { handleSuggestedIndustries } from '@/utils/companyFetcher';
 
 /**
  * Company interface - represents individual company data
@@ -278,6 +279,50 @@ const CreateICP: React.FC = () => {
 
   const [masterData, setMasterData] = useState<MasterData[]>([]);
 
+  // Dynamic Industry Suggestions
+  const defaultIndustryOptions: { id: number; name: string }[] = [
+    { id: 1, name: 'IT' },
+    { id: 2, name: 'Healthcare' },
+    { id: 3, name: 'Finance' },
+    { id: 4, name: 'Manufacturing' },
+    { id: 5, name: 'Education' },
+    { id: 6, name: 'Retail' },
+    { id: 7, name: 'Consulting' },
+    { id: 8, name: 'Real Estate' },
+    { id: 9, name: 'Automotive' },
+    { id: 10, name: 'Energy' }
+  ];
+  const [industryOptions, setIndustryOptions] = useState<{ id: number; name: string }[]>(defaultIndustryOptions);
+  const industrySearchDebounceRef = useRef<number | undefined>(undefined);
+
+  const handleIndustrySearch = (term: string) => {
+    if (industrySearchDebounceRef.current) {
+      window.clearTimeout(industrySearchDebounceRef.current);
+    }
+    industrySearchDebounceRef.current = window.setTimeout(async () => {
+      const q = term.trim();
+      if (!q) {
+        setIndustryOptions(defaultIndustryOptions);
+        return;
+      }
+      try {
+        const suggestions = await handleSuggestedIndustries(q);
+        const unique = Array.from(new Set(suggestions.filter(Boolean)));
+        setIndustryOptions(unique.map((name, idx) => ({ id: idx + 1, name })));
+      } catch (err) {
+        console.error('Failed to fetch industry suggestions:', err);
+      }
+    }, 300);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (industrySearchDebounceRef.current) {
+        window.clearTimeout(industrySearchDebounceRef.current);
+      }
+    };
+  }, []);
+
   /**
    * Validates that a Company object matches the Company interface
    */
@@ -423,7 +468,6 @@ const CreateICP: React.FC = () => {
       formData.sheet_name.trim() &&
       formData.employee_size.length > 0 &&
       formData.designation.length > 0 &&
-      formData.country_name.trim() &&
       formData.state_name.trim() &&
       formData.industry_name.length > 0
     );
@@ -514,8 +558,6 @@ const CreateICP: React.FC = () => {
         return newMasterData;
       });
 
-      console.log("The all companies data is:", allCompanies);
-
       toast.success(`Successfully fetched ${allCompanies.length} companies!`, {
         className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
         icon: <CircleCheck className='size-5' />
@@ -595,18 +637,8 @@ const CreateICP: React.FC = () => {
             value={formData.industry_name}
             onValueChange={(val) => setFormData(prev => ({ ...prev, industry_name: Array.isArray(val) ? val : (val ? [val] : []) }))}
             placeholder="Type or select industry"
-            options={[
-              { id: 1, name: 'IT' },
-              { id: 2, name: 'Healthcare' },
-              { id: 3, name: 'Finance' },
-              { id: 4, name: 'Manufacturing' },
-              { id: 5, name: 'Education' },
-              { id: 6, name: 'Retail' },
-              { id: 7, name: 'Consulting' },
-              { id: 8, name: 'Real Estate' },
-              { id: 9, name: 'Automotive' },
-              { id: 10, name: 'Energy' }
-            ]}
+            options={industryOptions}
+            onSearch={handleIndustrySearch}
             required
           />
 
@@ -634,7 +666,7 @@ const CreateICP: React.FC = () => {
           />
 
           {/* Company Names (CustomComboBox multi) */}
-          <CustomComboBox
+          {false && <CustomComboBox
             label="Company Name"
             isMulti
             value={formData.company_name}
@@ -643,7 +675,7 @@ const CreateICP: React.FC = () => {
             options={companies.map((c, index) => ({ id: index + 1, name: c.company }))}
             onSearch={(term) => getCompanies(term)}
             required
-          />
+          />}
 
           {/* Country */}
           <div className="flex flex-col gap-2">
