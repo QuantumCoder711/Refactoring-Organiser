@@ -19,6 +19,21 @@ export const getAllDesignations = async (search?: string) => {
     }
 }
 
+// Getting all industries
+export const getAllIndustries = async (search?: string) => {
+    try {
+        const app = "https://app.klout.club";
+        const response = await axios.post(`${app}/api/mapping/v1/company-master/search-industry?search=${search}`);
+        if(response.data.status) {
+            return response.data.data;
+        } else {
+            return [];
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
 // Adding Non-Existing Company In Database
 export const addCompany = async (company: string) => {
     axios.post(`${appDomain}/api/mapping/v1/company-master/add-unmapped-or-new-company`, { company: company.toLowerCase() }, {

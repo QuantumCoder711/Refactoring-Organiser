@@ -35,7 +35,7 @@ interface ICPStore {
     getICPSheets: (userId: number) => Promise<void>;
     deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
-    createICP: (payload: any, token: string) => Promise<{ success: boolean; message?: string }>;
+    createICP: (payload: any) => Promise<{ success: boolean; message?: string }>;
     // Entry-level CRUD (console.log only for now)
     addICPEntry: (payload: CreateICPPayload, userId: number) => Promise<{ success: boolean; message: string }>;
     updateICPEntry: (sheetUuid: string, rowUuid: string, rowIndex: number, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
@@ -45,7 +45,7 @@ interface ICPStore {
 const useICPStore = create<ICPStore>((set, get) => ({
     loading: false,
     icpSheets: [],
-    createICP: async (payload: any, token: string) => {
+    createICP: async (payload: any) => {
         try {
             const response = await axios.post(`${domain}/api/store-icp`, payload, {
                 headers: {
