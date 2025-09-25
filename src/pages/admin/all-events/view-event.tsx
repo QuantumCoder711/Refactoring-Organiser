@@ -241,7 +241,7 @@ const ViewEvent: React.FC = () => {
                         )}
                     </div>
 
-                    <div className='flex flex-col gap-3 justify-center items-center'>
+                    <div className='flex flex-col gap-3 mt-2 justify-center items-center'>
                         {isLive && (
                             <React.Fragment>
                                 <div className='grid grid-cols-2 gap-[18px] w-[300px] mx-auto mt-3'>
@@ -300,7 +300,7 @@ const ViewEvent: React.FC = () => {
                             <div hidden={event?.event_mode == 1} className='col-span-2 gap-3 flex justify-center'>
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button className='btn-rounded h-6'>View QR Code</Button>
+                                        <Button size="sm">View QR Code</Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
@@ -322,7 +322,7 @@ const ViewEvent: React.FC = () => {
                                 {/* For breakout rooms */}
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button className='btn-rounded h-6'>Breakout QR Code</Button>
+                                        <Button size="sm">Breakout QR Code</Button>
                                     </DialogTrigger>
                                     <DialogContent className='!max-w-3xl !min-w-fit !w-full'>
                                         <DialogHeader>

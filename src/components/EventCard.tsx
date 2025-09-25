@@ -129,7 +129,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     <div className='p-2 flex justify-between min-h-24 absolute bg-gradient-to-b rounded-xl from-black/0 via-black/40 to-black w-full bottom-0' />
                     <div className='absolute flex items-center justify-between w-full bottom-2 px-2'>
-                        <span className='rounded-full px-2.5 py-1.5  w-fit border text-white text-xs grid place-content-center'>
+                        <span className='rounded-full px-2.5 py-1.5 w-fit border border-white text-white text-xs grid place-content-center'>
                             {formatDate(date)}
                         </span>
                         <div className='flex gap-2 items-center'>
@@ -161,12 +161,12 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     {/* Live Tag */}
                     <div hidden={!isLive} className='max-w-fit h-14 absolute overflow-hidden'>
-                        <svg width="100%" height="100%" viewBox="0 0 94 46" fill="none" className='-mt-[1px] fill-brand-light-gray' xmlns="http://www.w3.org/2000/svg">
+                        <svg width="100%" height="100%" viewBox="0 0 94 46" fill="none" className='-mt-[1px] fill-accent' xmlns="http://www.w3.org/2000/svg">
                             <path d="M0 14V46C0 37 7.5 32 14 32C28.8333 32.1667 59.5 32 65 32C71 32 81 28 81 14C81 3.2 90.3106 0.166667 94.9658 0L0 0L0 14Z" />
                         </svg>
 
-                        <span className='absolute top-0 left-0 px-5 z-20 py-1 font-semibold rounded-full bg-white text-red-600 flex items-center gap-2'>
-                            <span className='inline-block size-3 rounded-full bg-red-600' />
+                        <span className='absolute top-0 left-0 px-5 z-20 py-1 font-semibold rounded-full bg-white dark:bg-muted flex items-center gap-2'>
+                            <span className='inline-block size-3 rounded-full bg-destructive animate-pulse duration-1000' />
                             Live
                         </span>
                     </div>
@@ -174,10 +174,10 @@ const EventCard: React.FC<EventCardProps> = ({
                     {/* Upcoming Tag */}
                     <div hidden={!isUpcoming || isLive} className='max-w-fit absolute overflow-hidden'>
                         <svg width="127" height="56" viewBox="0 0 127 56" className='-ml-[1px] -mt-[1px]' fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.00192035 14.0015C-0.0051926 21.5009 0.00974393 54.0001 0.00974393 54.0001L0.00974945 55.9744C0.0170754 47.4855 7.32604 42.0023 14.613 42.0023C20.1505 41.9987 81.8316 41.9987 94.7029 41.9987H95.8025C103.92 41.9987 112.443 36.3214 112.465 24.0029C112.467 22.9993 112.468 17.5067 112.465 14.0033C112.458 3.26056 122.308 -0.00311438 127 0.00048524C119.185 -0.000766513 20.8516 0.000431773 14.613 0.00375349C6.79837 0.000431773 -0.0053073 5.99843 0.00192035 14.0015Z" fill="#D9D9D9" />
+                            <path d="M0.00192035 14.0015C-0.0051926 21.5009 0.00974393 54.0001 0.00974393 54.0001L0.00974945 55.9744C0.0170754 47.4855 7.32604 42.0023 14.613 42.0023C20.1505 41.9987 81.8316 41.9987 94.7029 41.9987H95.8025C103.92 41.9987 112.443 36.3214 112.465 24.0029C112.467 22.9993 112.468 17.5067 112.465 14.0033C112.458 3.26056 122.308 -0.00311438 127 0.00048524C119.185 -0.000766513 20.8516 0.000431773 14.613 0.00375349C6.79837 0.000431773 -0.0053073 5.99843 0.00192035 14.0015Z" fill="#D9D9D9" className='dark:fill-accent' />
                         </svg>
 
-                        <span className='absolute mt-0.5 top-0 left-0 px-3 z-20 py-1 font-semibold rounded-full bg-white flex items-center gap-2'>
+                        <span className='absolute mt-0.5 top-0 left-0 px-3 z-20 py-1 font-semibold rounded-full bg-white dark:bg-muted flex items-center gap-2'>
                             Upcoming
                         </span>
                     </div>
@@ -186,10 +186,10 @@ const EventCard: React.FC<EventCardProps> = ({
                     {/* Completed Tag */}
                     <div hidden={!isPast} className='max-w-fit absolute overflow-hidden'>
                         <svg width="135" height="56" viewBox="0 0 135 56" className='-ml-[1px] -mt-[1px]' fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.00194563 14.0028C-0.00526096 21.5019 0.00987221 54.0001 0.00987221 54.0001L0.00987779 55.9744C0.0173002 47.4858 7.42248 42.0027 14.8053 42.0027C20.5986 41.999 93.3722 41.9972 103.392 41.9972C111.617 41.9972 120.212 36.3165 120.234 23.9984C120.236 22.9949 120.237 17.5024 120.234 13.9991C120.227 3.2567 130.247 -0.00331736 135 0.000282142C127.083 -0.000969572 21.1261 0.0021558 14.8053 0.00547741C6.88786 0.0021558 -0.00537717 5.99997 0.00194563 14.0028Z" fill="#D9D9D9" />
+                            <path d="M0.00194563 14.0028C-0.00526096 21.5019 0.00987221 54.0001 0.00987221 54.0001L0.00987779 55.9744C0.0173002 47.4858 7.42248 42.0027 14.8053 42.0027C20.5986 41.999 93.3722 41.9972 103.392 41.9972C111.617 41.9972 120.212 36.3165 120.234 23.9984C120.236 22.9949 120.237 17.5024 120.234 13.9991C120.227 3.2567 130.247 -0.00331736 135 0.000282142C127.083 -0.000969572 21.1261 0.0021558 14.8053 0.00547741C6.88786 0.0021558 -0.00537717 5.99997 0.00194563 14.0028Z" fill="#D9D9D9" className='dark:fill-accent' />
                         </svg>
 
-                        <span className='absolute mt-0.5 top-0 left-0 px-3 z-20 py-1 font-semibold rounded-full bg-white flex items-center gap-2'>
+                        <span className='absolute mt-0.5 top-0 left-0 px-3 z-20 py-1 font-semibold rounded-full bg-white dark:bg-muted flex items-center gap-2'>
                             Completed
                         </span>
                     </div>
@@ -203,25 +203,25 @@ const EventCard: React.FC<EventCardProps> = ({
                     {!isLive ? <>
                         {location ?
                             <>
-                                <MapPin className='min-w-4 min-h-4 size-4' />
+                                <MapPin className='min-w-4 min-h-4 size-4 text-muted-foreground' />
                                 <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>{location}</span>
                             </> :
                             <>
-                                <Globe className='min-w-4 min-h-4 size-4' />
+                                <Globe className='min-w-4 min-h-4 size-4 text-muted-foreground' />
                                 <span className='text-sm overflow-hidden text-ellipsis text-nowrap'>Online</span>
                             </>
                         }
-                    </> : <div className='text-brand-primary font-medium text-sm'>
+                    </> : <div className='text-primary font-medium text-sm'>
                         Live CheckIn Count - {checkInCount || total_checked_in}
                     </div>}
                 </div>
-                <Separator className='bg-white !h-[1px] mt-1' />
+                <Separator className='bg-muted !h-[1px] mt-1' />
                 {/* Buttons */}
                 <div className='grid grid-row-2 gap-2 mt-1'>
                     <div className={`grid gap-2 ${user?.role === "subuser" ? "grid-cols-2" : "grid-cols-3"}`}>
                         {buttonLinks.slice(0, 3).map((button, index) => (
                             button.path === "/all-events/update-event/" && user?.role === 'subuser' ? null : (
-                                <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white text-primary hover:shadow-sm text-center px-2 py-1 grid place-content-center text-sm'>
+                                <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-muted text-primary dark:text-foreground hover:shadow-sm text-center px-2 py-1 grid place-content-center text-sm'>
                                     {button.label}
                                 </Link>
                             )
@@ -229,7 +229,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </div>
                     <div className='grid grid-cols-2 gap-2'>
                         {buttonLinks.slice(3).map((button, index) => (
-                            <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-white hover:shadow-sm text-primary text-center px-2 py-1 grid place-content-center text-sm'>
+                            <Link key={index} to={`${button.path}${slug}`} className='w-full tracking-normal rounded-full bg-muted text-primary dark:text-foreground hover:shadow-sm text-center px-2 py-1 grid place-content-center text-sm'>
                                 {button.label}
                             </Link>
                         ))}
@@ -242,24 +242,24 @@ const EventCard: React.FC<EventCardProps> = ({
                 {/* Live Counts */}
                 <div className='flex flex-col gap-2'>
                     <div className='flex gap-2'>
-                        <div className='w-full border-2 border-brand-primary/80 h-14 rounded-2xl p-2 px-2.5 bg-brand-light-gray'>
+                        <div className='w-full border-2 dark:bg-muted border-primary h-14 rounded-2xl p-2 px-2.5 bg-muted'>
                             <h6 className='font-semibold text-sm'>Registrations</h6>
                             <p className='text-xs mt-1'>{total_checked_in}/{total_attendees}</p>
                         </div>
 
-                        <div className='w-full border-2 border-brand-primary/80 h-14 rounded-2xl p-2 px-2.5 bg-brand-light-gray'>
+                        <div className='w-full border-2 dark:bg-muted border-primary h-14 rounded-2xl p-2 px-2.5 bg-muted'>
                             <h6 className='font-semibold text-sm'>Sponsors</h6>
                             <p className='text-xs mt-1'>{total_checkedin_sponsor}/{total_sponsor}</p>
                         </div>
                     </div>
 
                     <div className='flex gap-2'>
-                        <div className='w-full border-2 border-brand-primary/80 h-14 rounded-2xl p-2 px-2.5 bg-brand-light-gray'>
+                        <div className='w-full border-2 dark:bg-muted border-primary h-14 rounded-2xl p-2 px-2.5 bg-muted'>
                             <h6 className='font-semibold text-sm'>Speakers</h6>
                             <p className='text-xs mt-1'>{total_checkedin_speaker}/{total_speaker}</p>
                         </div>
 
-                        <div className='w-full border-2 border-brand-primary/80 h-14 rounded-2xl p-2 px-2.5 bg-brand-light-gray'>
+                        <div className='w-full border-2 dark:bg-muted border-primary h-14 rounded-2xl p-2 px-2.5 bg-muted'>
                             <h6 className='font-semibold text-sm'>Attendees</h6>
                             <p className='text-xs mt-1'>{total_checked_in}/{total_attendees}</p>
                         </div>
@@ -267,16 +267,16 @@ const EventCard: React.FC<EventCardProps> = ({
                 </div>
 
                 {/* Pending Delegates */}
-                <div className='w-full rounded-full text-xs bg-brand-light-gray p-3 flex justify-between items-center'>
+                <div className='w-full rounded-full text-xs bg-muted p-3 flex justify-between items-center'>
                     <h6 className='font-semibold'>Pending Delegates</h6>
                     <span>{total_pending_delegate}</span>
                 </div>
 
-                <Separator className='h-0.5 bg-brand-light-gray' />
+                <Separator className='h-0.5 bg-muted' />
 
                 <div className='grid grid-cols-2 gap-2'>
                     {reportLinks.map((link, index) => (
-                        <Link aria-disabled={(link.label === "Send Invitations" && isPast) ? true : false} key={index} to={`${link.path}${slug}`} className={`w-full tracking-normal rounded-full bg-white text-brand-primary disabled:cursor-not-allowed disabled:text-brand-dark-gray text-center p-2 grid place-content-center text-sm ${index === reportLinks.length - 1 ? 'col-span-2' : ''}`}>
+                        <Link aria-disabled={(link.label === "Send Invitations" && isPast) ? true : false} key={index} to={`${link.path}${slug}`} className={`w-full tracking-normal rounded-full bg-muted text-primary dark:text-foreground disabled:cursor-not-allowed disabled:text-brand-dark-gray text-center p-2 grid place-content-center text-sm ${index === reportLinks.length - 1 ? 'col-span-2' : ''}`}>
                             {link.label}
                         </Link>
                     ))}

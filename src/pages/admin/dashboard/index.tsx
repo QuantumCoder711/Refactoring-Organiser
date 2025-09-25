@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
           ].map((card, index) => (
             <div
               key={index}
-              className='min-w-40 rounded-lg h-9 px-4 shadow-blur flex justify-between items-center'
+              className='min-w-40 dark:bg-accent rounded-lg h-9 px-4 shadow-blur flex justify-between items-center'
             >
               <span>{card.title}</span>
               <span>{card.value}</span>

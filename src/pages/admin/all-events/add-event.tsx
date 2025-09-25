@@ -492,11 +492,11 @@ const AddEvent: React.FC = () => {
                 <div className='top-0 left-0'>
                     <GoBack />
                 </div>
-                <div className='max-w-[700px] mx-auto rounded-[10px] p-5 lg:p-8 bg-brand-background mt-5'>
+                <div className='max-w-[700px] mx-auto rounded-[10px] p-5 lg:p-8 bg-muted mt-5'>
                     {/* Event Name */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='title'>
-                            Event Name <span className="text-brand-secondary">*</span>
+                            Event Name <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="title"
@@ -504,7 +504,7 @@ const AddEvent: React.FC = () => {
                             type="text"
                             value={formData.title}
                             onChange={handleInputChange}
-                            className='input !h-12 min-w-full text-base'
+                            className='bg-background h-12 min-w-full'
                         />
                     </div>
 
@@ -514,17 +514,17 @@ const AddEvent: React.FC = () => {
                             {/* Event Type */}
                             <div className="flex flex-col gap-2 w-full">
                                 <Label className="font-semibold" htmlFor='paid_event'>
-                                    Event Type <span className="text-brand-secondary">*</span>
+                                    Event Type <span className="text-secondary">*</span>
                                 </Label>
-                                <div className='input !h-12 min-w-full flex items-center text-base pl-4 !py-1.5'>
-                                    <div className='flex gap-4 items-center text-brand-dark-gray'>
+                                <div className='input !h-12 min-w-full flex items-center text-base bg-background rounded-md pl-4 !py-1.5'>
+                                    <div className='flex gap-4 items-center text-muted-foreground'>
                                         <Label htmlFor="paid_event" className='cursor-pointer'>Free</Label>
 
                                         <Switch
                                             id="paid_event"
                                             checked={formData.paid_event === 1}
                                             onCheckedChange={(checked) => handleSwitchChange(checked, 'paid_event')}
-                                            className="data-[state=checked]:bg-brand-primary"
+                                            
                                         />
 
                                         <Label htmlFor="paid_event" className='cursor-pointer'>Paid</Label>
@@ -539,7 +539,7 @@ const AddEvent: React.FC = () => {
                                                 value={formData.event_fee}
                                                 placeholder='Event Fee'
                                                 onChange={handleInputChange}
-                                                className='input !h-11 focus-visible:!ring-0 focus-visible:!ring-offset-0 w-full text-base'
+                                                className='h-12 border-l-0 rounded-l-none'
                                             />
                                         </div>
                                     </div>}
@@ -549,7 +549,7 @@ const AddEvent: React.FC = () => {
                             {/* Banner Image - Disabled when templates are showing */}
                             <div className="flex flex-col gap-2">
                                 <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
-                                <div className={`input relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
+                                <div className={`bg-background rounded-md relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
                                     <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                     <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                         {formData.image
@@ -650,7 +650,7 @@ const AddEvent: React.FC = () => {
                     {/* Description Box */}
                     <div className='flex flex-col gap-2 mt-5'>
                         <Label className="font-semibold" htmlFor='description'>
-                            Description <span className="text-brand-secondary">*</span>
+                            Description <span className="text-secondary">*</span>
                         </Label>
                         <Textarea
                             id="description"
@@ -666,7 +666,7 @@ const AddEvent: React.FC = () => {
                         {/* Start Time */}
                         <div className='flex flex-col gap-2 w-full'>
                             <Label className='font-semibold'>
-                                Start Time <span className="text-brand-secondary">*</span>
+                                Start Time <span className="text-secondary">*</span>
                             </Label>
 
                             <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
@@ -710,7 +710,7 @@ const AddEvent: React.FC = () => {
                         {/* End Time */}
                         <div className='flex flex-col gap-2 w-full'>
                             <Label className='font-semibold'>
-                                End Time <span className="text-brand-secondary">*</span>
+                                End Time <span className="text-secondary">*</span>
                             </Label>
 
                             <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
@@ -782,7 +782,7 @@ const AddEvent: React.FC = () => {
                     {/* Location */}
                     <div hidden={formData.event_mode === 1} className='flex flex-col gap-2 mt-5'>
                         <Label className='font-semibold' htmlFor='google_map_link'>
-                            Location <span className="text-brand-secondary">*</span>
+                            Location <span className="text-secondary">*</span>
                         </Label>
                         <div className='relative'>
                             {isLoaded ? (
@@ -797,7 +797,7 @@ const AddEvent: React.FC = () => {
                                         value={formData.google_map_link}
                                         onChange={handleInputChange}
                                         placeholder='Enter Location'
-                                        className='input !h-12 min-w-full text-base'
+                                        className='bg-background h-12 min-w-full'
                                     />
                                 </Autocomplete>
                             ) : (
@@ -808,7 +808,7 @@ const AddEvent: React.FC = () => {
                                     value={formData.google_map_link}
                                     onChange={handleInputChange}
                                     placeholder='Enter Location'
-                                    className='input !h-12 min-w-full text-base'
+                                    className='bg-background h-12 min-w-full'
                                 />
                             )}
 
@@ -823,7 +823,7 @@ const AddEvent: React.FC = () => {
                     {/* Webinar Link */}
                     <div hidden={formData.event_mode === 0} className='flex flex-col gap-2 mt-5'>
                         <Label className='font-semibold' htmlFor='webinar_link'>
-                            Webinar Link <span className="text-brand-secondary">*</span>
+                            Webinar Link <span className="text-secondary">*</span>
                         </Label>
                         <div className='relative'>
                             <Input
@@ -833,7 +833,7 @@ const AddEvent: React.FC = () => {
                                 value={formData.webinar_link}
                                 onChange={handleInputChange}
                                 placeholder='Enter Webinar Link'
-                                className='input !h-12 min-w-full text-base'
+                                className='bg-background h-12 min-w-full'
                             />
 
                         </div>
@@ -851,7 +851,7 @@ const AddEvent: React.FC = () => {
                                 type="number"
                                 value={formData.printer_count !== null ? formData.printer_count.toString() : ''}
                                 onChange={handleInputChange}
-                                className='input !h-12 min-w-full text-base'
+                                className='bg-background h-12 min-w-full'
                             />
                         </div>
 
@@ -866,7 +866,7 @@ const AddEvent: React.FC = () => {
                                 type="number"
                                 value={formData.break_out !== null ? formData.break_out : 0}
                                 onChange={handleInputChange}
-                                className='input !h-12 min-w-full text-base'
+                                className='bg-background h-12 min-w-full'
                             />
                         </div>
 
@@ -883,7 +883,7 @@ const AddEvent: React.FC = () => {
                                         id="view_agenda_by"
                                         checked={formData.view_agenda_by === 1}
                                         onCheckedChange={(checked) => handleSwitchChange(checked, 'view_agenda_by')}
-                                        className="data-[state=checked]:bg-brand-primary"
+                                        
                                     />
 
                                     <Label htmlFor="view_agenda_by" className='cursor-pointer'>Checked In</Label>

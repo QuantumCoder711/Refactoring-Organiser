@@ -17,8 +17,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import useAuthStore from '@/store/authStore';
+import useThemeStore from '@/store/themeStore';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '@/lib/utils';
 
@@ -31,7 +35,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { AlignRight, LogOut, Plus, Search, X } from 'lucide-react';
+import { AlignRight, LogOut, Plus, Search, X, Sun, Moon, Monitor, Check } from 'lucide-react';
 
 interface ProgressRingProps {
   percentage: number;
@@ -85,6 +89,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
   const { pathname } = location;
   const [heading, setHeading] = React.useState<string>('');
   const [open, setOpen] = useState<boolean>(false);
+
+  // Theme state
+  const { theme, setTheme } = useThemeStore();
 
   // Wallet popup state
   const [showWallet, setShowWallet] = React.useState<boolean>(false);
@@ -274,6 +281,41 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                   {user?.role === "admin" && <Link to="/organiser/change-password">
                     <DropdownMenuItem className='cursor-pointer'>Change Password</DropdownMenuItem>
                   </Link>}
+
+                  {/* Theme Selection Submenu */}
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className='cursor-pointer'>
+                      <Sun size={16} className="mr-2" />
+                      Appearance
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={() => setTheme('light')}
+                      >
+                        <Sun size={16} className="mr-2" />
+                        Light
+                        {theme === 'light' && <Check size={16} className="ml-auto" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={() => setTheme('dark')}
+                      >
+                        <Moon size={16} className="mr-2" />
+                        Dark
+                        {theme === 'dark' && <Check size={16} className="ml-auto" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={() => setTheme('system')}
+                      >
+                        <Monitor size={16} className="mr-2" />
+                        System
+                        {theme === 'system' && <Check size={16} className="ml-auto" />}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
                   {/* <DropdownMenuItem className='cursor-pointer'>Billing</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Team</DropdownMenuItem>
                   <DropdownMenuItem className='cursor-pointer'>Subscription</DropdownMenuItem> */}
@@ -282,7 +324,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
-          </ul>
+            </ul>
 
           {/* Mobile Rendering */}
           <ul className='md:hidden flex gap-3 items-center'>

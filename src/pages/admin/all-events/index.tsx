@@ -53,13 +53,13 @@ const AllEvents: React.FC = () => {
       <div className='flex justify-between items-center'>
         <div className='flex gap-5'>
           <Button
-            className={`btn !text-black !bg-brand-background hover:bg-brand-dark-gray rounded-[10px] ${activeTab === 'upcoming' ? '!bg-brand-dark-gray !text-white' : ''}`}
+            className={`transition-all duration-300 ${activeTab !== 'upcoming' ? 'bg-accent text-accent-foreground hover:text-background' : 'bg-primary'}`}
             onClick={() => {
               setActiveTab('upcoming');
               setCurrentPage(1);
             }}>Upcoming Events</Button>
           <Button
-            className={`btn !text-black !bg-brand-background hover:bg-brand-dark-gray rounded-[10px] ${activeTab === 'past' ? '!bg-brand-dark-gray !text-white' : ''}`}
+            className={`transition-all duration-300 ${activeTab !== 'past' ? 'bg-accent text-accent-foreground hover:text-background' : 'bg-primary'}`}
             onClick={() => {
               setActiveTab('past');
               setCurrentPage(1);
@@ -166,7 +166,7 @@ const AllEvents: React.FC = () => {
         <Input
           type="text"
           placeholder="Search for events..."
-          className="input !min-w-80 !text-base !bg-brand-background/80"
+          className="!min-w-80"
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -176,7 +176,7 @@ const AllEvents: React.FC = () => {
         {searchTerm && (
           <X
             onClick={() => setSearchTerm('')}
-            className="w-4 h-4 absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" />
+            className="w-4 h-4 absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-destructive" />
         )}
       </div>
 
