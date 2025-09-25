@@ -22,8 +22,7 @@ export const getAllDesignations = async (search?: string) => {
 // Getting all industries
 export const getAllIndustries = async (search?: string) => {
     try {
-        const app = "https://app.klout.club";
-        const response = await axios.post(`${app}/api/mapping/v1/company-master/search-industry?search=${search}`);
+        const response = await axios.post(`${appDomain}/api/mapping/v1/company-master/search-industry?search=${search}`);
         if(response.data.status) {
             return response.data.data;
         } else {
