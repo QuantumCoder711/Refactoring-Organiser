@@ -437,7 +437,7 @@ const SavedICP: React.FC = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {icpSheets?.map(s => (
-                                            <SelectItem key={s.sheet_name} value={s.sheet_name}>{s.sheet_name}</SelectItem>
+                                            <SelectItem key={s.sheet_name} value={s.sheet_name} className='capitalize'>{s.sheet_name.split("_")[0].split("-").join(" ")}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -627,7 +627,7 @@ const SavedICP: React.FC = () => {
                     return (
                         <Card key={sheet.uuid} className='transition-shadow hover:shadow-md'>
                             <CardHeader className='flex flex-col'>
-                                <CardTitle className='text-base sm:text-lg capitalize break-words line-clamp-2'>{meta.name}</CardTitle>
+                                <CardTitle className='text-base sm:text-lg capitalize break-words line-clamp-2'>{meta.name.split("_")[0].split("-").join(" ")}</CardTitle>
                                 <CardDescription>{meta.uploadedOn ? `Uploaded on ${meta.uploadedOn}` : '—'}</CardDescription>
                                 <CardAction className='flex gap-2 mt-3'>
                                     <Button variant="outline" size="sm" onClick={() => handlePreview(sheet.sheet_name)}>
