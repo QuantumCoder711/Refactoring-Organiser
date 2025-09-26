@@ -241,10 +241,6 @@ const SavedICP: React.FC = () => {
     };
 
     useEffect(() => {
-        console.log("ICP Sheets are: ", icpSheets);
-    }, [icpSheets])
-
-    useEffect(() => {
         if (user) getICPSheets(user.id as number);
     }, [user, getICPSheets]);
 
@@ -398,12 +394,11 @@ const SavedICP: React.FC = () => {
                 }
                 setComparedData(dataToSave);
             }
-            console.log('The api response is: ', response.data);
 
-            toast(`Successfully extracted ${extractedData.length} records from the file`, {
-                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                icon: <CircleCheck className='size-5' />
-            });
+            // toast(`Successfully extracted ${extractedData.length} records from the file`, {
+            //     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+            //     icon: <CircleCheck className='size-5' />
+            // });
 
         } catch (error) {
             console.error('Error reading file:', error);
@@ -438,6 +433,7 @@ const SavedICP: React.FC = () => {
                     setCompareOpen(false);
                     setCompareFile(null);
                     setSelectedICPSheet('');
+                    setComparedData(null);
                 }
             }}>
                 <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden overflow-y-auto grid grid-rows-[auto,auto,1fr,auto]">
@@ -445,8 +441,10 @@ const SavedICP: React.FC = () => {
                         <DialogTitle>Compare ICP</DialogTitle>
                     </DialogHeader>
 
+                    {comparedData && <Button className='btn !h-10 max-w-fit flex justify-self-end' onClick={() => { setCompareFile(null); setComparedData(null); }}>Upload New</Button>}
+
                     {/* Static form area (always visible) */}
-                    <div className="space-y-4 mt-5 shrink-0">
+                    <div hidden={comparedData ? true : false} className="space-y-4 mt-5 shrink-0">
                         <div>
                             <Label>Select ICP sheet to compare against</Label>
                             <div className="mt-2">
@@ -490,8 +488,7 @@ const SavedICP: React.FC = () => {
                     </div>
 
                     {/* Results area (scrolls independently if long) */}
-
-                    <div className="min-h-0 mt-4 overflow-auto">
+                    <div hidden={!comparedData} className="min-h-0 mt-4 overflow-auto">
                         <div className="border rounded-md p-4 space-y-4">
                             <div className="flex items-end gap-4">
                                 <div className="text-3xl font-semibold">{comparedData?.score}</div>
@@ -518,14 +515,14 @@ const SavedICP: React.FC = () => {
                                         <TableHeader>
                                             <TableRow className='bg-muted hover:bg-muted'>
                                                 <TableHead>Company</TableHead>
-                                                <TableHead>Designation</TableHead>
+                                                <TableHead className='text-center'>Designation</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {comparedData?.data?.map((m, i) => (
                                                 <TableRow key={i} className='capitalize'>
                                                     <TableCell className='font-medium'>{m.company}</TableCell>
-                                                    <TableCell className='text-muted-foreground'>{m.designation}</TableCell>
+                                                    <TableCell className='text-muted-foreground text-center'>{m.designation ? m.designation : "-"}</TableCell>
                                                 </TableRow>
                                             ))}
                                             {comparedData?.data?.length === 0 && (
@@ -546,12 +543,12 @@ const SavedICP: React.FC = () => {
                             setCompareFile(null);
                             setSelectedICPSheet('');
                         }} className='cursor-pointer'>Close</Button>
-                        <Button
+                        {!comparedData &&<Button
                             disabled={!compareFile || !selectedICPSheet}
                             onClick={handleCompareFiles}
                             className='bg-brand-primary hover:bg-brand-primary-dark duration-300 transition-colors'>
                             {comparing ? <span className='flex items-center gap-x-2'>Comparing <Loader2 className="animate-spin" /></span> : 'Compare'}
-                        </Button>
+                        </Button>}
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
