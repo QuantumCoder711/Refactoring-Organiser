@@ -13,7 +13,7 @@ interface SheetRow {
     uuid: string;
 }
 
-interface ICPSheet {
+export interface ICPSheet {
     sheetRows: SheetRow[];
     sheet_name: string;
     uuid: string;

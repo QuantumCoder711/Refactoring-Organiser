@@ -1,7 +1,7 @@
 import GoBack from '@/components/GoBack';
 import Wave from '@/components/Wave';
 import useAuthStore from '@/store/authStore';
-import useICPStore from '@/store/icpStore';
+import useICPStore, { ICPSheet } from '@/store/icpStore';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,8 +18,15 @@ import { CountrySelect, StateSelect } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 
 import Dropzone from 'react-dropzone';
-import * as XLSX from 'xlsx';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import * as XLSX from 'xlsx';
+
+interface ComparedData {
+    score: number,
+    totalScore: number,
+    data: { company: string, designation: string }[],
+    percent: string
+}
 
 // Custom Combo Box (copied from CreateICP with minor condensation to fit)
 const CustomComboBox = React.memo(({
@@ -118,8 +125,10 @@ const CustomComboBox = React.memo(({
     );
 });
 
-import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown } from 'lucide-react';
+import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { appDomain } from '@/constants';
 
 const ROWS_PER_PAGE: number = 10;
 
@@ -153,20 +162,14 @@ const SavedICP: React.FC = () => {
     // Compare dialog state
     const [compareOpen, setCompareOpen] = useState(false);
     const [compareFile, setCompareFile] = useState<File | null>(null);
-    const [compareTargetUUID, setCompareTargetUUID] = useState<string>("");
-    const [comparing, setComparing] = useState(false);
-    const [compareError, setCompareError] = useState<string | null>(null);
-    const [compareResult, setCompareResult] = useState<null | {
-        percent: number;
-        matchedCompanies: string[];
-        matchedDesignations: Array<{ company: string; designation: string; score: number }>;
-        totals: { companyWithDesignationScore: number; companyHighestScore: number; totalMax: number };
-    }>(null);
-
+    const [selectedICPSheet, setSelectedICPSheet] = useState<string>('');
+    const [comparing, setComparing] = useState<boolean>(false);
     // Preview dialog state
     const [openPreviewFor, setOpenPreviewFor] = useState<null | { uuid: string }>(null);
     const [currentPage, setCurrentPage] = useState(1);
 
+    // Compared Data State
+    const [comparedData, setComparedData] = useState<ComparedData | null>(null);
     // Entry add/edit dialog state
     const { designations, companies, getCompanies, getDesignations } = useExtrasStore(state => state);
     const [entryOpen, setEntryOpen] = useState(false);
@@ -238,6 +241,10 @@ const SavedICP: React.FC = () => {
     };
 
     useEffect(() => {
+        console.log("ICP Sheets are: ", icpSheets);
+    }, [icpSheets])
+
+    useEffect(() => {
         if (user) getICPSheets(user.id as number);
     }, [user, getICPSheets]);
 
@@ -267,141 +274,147 @@ const SavedICP: React.FC = () => {
         }
     };
 
-    // Comparison helpers
-    const normalize = (s: string) => (s || "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
-
-    const soundex = (s: string) => {
-        const a = normalize(s);
-        if (!a) return "";
-        const f = a[0];
-        const m: Record<string, string> = { b: "1", f: "1", p: "1", v: "1", c: "2", g: "2", j: "2", k: "2", q: "2", s: "2", x: "2", z: "2", d: "3", t: "3", l: "4", m: "5", n: "5", r: "6" };
-        let r = f;
-        let prev = m[f] || "";
-        for (let i = 1; i < a.length && r.length < 4; i++) {
-            const ch = a[i];
-            const code = m[ch] || "";
-            if (code && code !== prev) r += code;
-            prev = code;
-        }
-        return (r + "000").slice(0, 4);
-    };
-
-    const hashName = (s: string) => {
-        let h = 5381;
-        for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
-        return (h >>> 0).toString(36);
-    };
-
-    const companyKey = (name: string) => {
-        const n = normalize(name);
-        return `${soundex(n)}-${hashName(n)}`;
-    };
-
-    const getPriorityWeight = (p: string) => {
-        const v = (p || "").toLowerCase();
-        if (v === "p1") return 5;
-        if (v === "p2") return 3;
-        if (v === "p3") return 1;
-        return 1;
-    };
-
-    const getRoleScore = (designationText: string, icpDesignations: string[] = []) => {
-        const text = (designationText || "").toLowerCase();
-        const has = (kw: string) => text.includes(kw.toLowerCase());
-        if (icpDesignations.length) {
-            const matched = icpDesignations.some(d => has(d));
-            if (!matched) return 1;
-        }
-        if (has("chief") || has("cxo") || has("c-suite") || has("ceo") || has("coo") || has("cfo") || has("cto") || has("cio")) return 5;
-        if (has("vp") || has("vice president")) return 4;
-        if (has("director") || has("gm") || has("general manager") || has("head")) return 3;
-        if (has("manager")) return 2;
-        return 1;
-    };
-
-    type UploadedRow = { company: string; designation: string; priority?: string };
-
-    const parseUploadedFile = async (file: File): Promise<UploadedRow[]> => {
-        const data = await file.arrayBuffer();
-        const wb = XLSX.read(data, { type: 'array' });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const json: any[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
-        if (!json.length) return [];
-        const pick = (row: any, candidates: string[]) => {
-            for (const key of Object.keys(row)) {
-                const k = key.toLowerCase().trim();
-                if (candidates.includes(k)) return row[key];
-            }
-            return "";
-        };
-        const companyKeys = ["company", "companyname", "company_name", "organization", "organisation", "org", "brand"];
-        const designationKeys = ["designation", "title", "job title", "jobtitle", "role", "position"];
-        const priorityKeys = ["priority", "p", "prio"];
-        const rows: UploadedRow[] = json.map(r => ({
-            company: String(pick(r, companyKeys)).trim(),
-            designation: String(pick(r, designationKeys)).trim(),
-            priority: String(pick(r, priorityKeys)).trim(),
-        })).filter(r => r.company);
-        return rows;
-    };
-
-    const runComparison = async () => {
-        if (!compareTargetUUID) { setCompareError('Please select an ICP sheet'); return; }
-        if (!compareFile) { setCompareError('Please upload a file to compare'); return; }
-        setCompareError(null);
+    const handleCompareFiles = async () => {
         setComparing(true);
-        try {
-            const target = icpSheets.find(s => s.sheet_name === compareTargetUUID);
-            if (!target) { setCompareError('Selected ICP sheet not found'); setComparing(false); return; }
-            const uploadedRows = await parseUploadedFile(compareFile);
-
-            const icp = target.sheetRows.map(r => ({
-                company: r.companyname,
-                key: companyKey(r.companyname),
-                prioWeight: getPriorityWeight(r.priority),
-                icpDesignations: Array.isArray(r.designation) ? r.designation : String(r.designation || '').split(',').map(s => s.trim()).filter(Boolean)
-            }));
-            const icpKeyMap = new Map<string, typeof icp[number][]>();
-            icp.forEach(row => {
-                const arr = icpKeyMap.get(row.key) || [];
-                arr.push(row);
-                icpKeyMap.set(row.key, arr);
+        if (!compareFile || !selectedICPSheet) {
+            toast("Please select a file and an ICP sheet to compare", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <XIcon className='size-5' />
             });
+            return;
+        }
 
-            let companyWithDesignationScore = 0;
-            const companyHighestScore = icp.reduce((acc, r) => acc + r.prioWeight, 0);
-            const matchedCompaniesSet = new Set<string>();
-            const matchedDesignations: Array<{ company: string; designation: string; score: number }> = [];
+        // Getting the entries of the already saved icp sheet
+        const savedSheet = icpSheets.filter(s => s.sheet_name === selectedICPSheet)[0].sheetRows;
+        if (!savedSheet) {
+            toast("Saved ICP sheet not found", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <XIcon className='size-5' />
+            });
+            return;
+        }
 
-            for (const ur of uploadedRows) {
-                const key = companyKey(ur.company);
-                const matches = icpKeyMap.get(key);
-                if (!matches?.length) continue;
-                matchedCompaniesSet.add(ur.company);
-                for (const m of matches) {
-                    const roleScore = getRoleScore(ur.designation, m.icpDesignations);
-                    const secured = m.prioWeight + roleScore;
-                    companyWithDesignationScore += secured;
-                    matchedDesignations.push({ company: m.company, designation: ur.designation, score: secured });
-                }
+        const savedSheetData = savedSheet.map((sheet) => {
+            return {
+                company_name: sheet.companyname.trim(),
+                designations: sheet.designation.map(d => d.trim()),
+                priority: sheet.priority.trim(),
+            }
+        });
+
+        // console.log("The savedSheetData is: ", savedSheetData);
+
+        // Generating the data of the excel file being uploded by the user.
+        try {
+            // Read the uploaded Excel file
+            const arrayBuffer = await compareFile.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+            // Get the first sheet
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            // Convert to JSON
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            if (jsonData.length === 0) {
+                toast("The uploaded file appears to be empty", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <XIcon className='size-5' />
+                });
+                return;
             }
 
-            const totalMax = (icp.length * 5) + companyHighestScore;
-            const percent = (companyWithDesignationScore / ((uploadedRows.length * 5) + companyHighestScore)) * 100;
+            // Get headers (first row)
+            const headers = jsonData[0] as string[];
 
-            setCompareResult({
-                percent,
-                matchedCompanies: Array.from(matchedCompaniesSet),
-                matchedDesignations,
-                totals: { companyWithDesignationScore, companyHighestScore, totalMax }
+            // Find company_name and designation column indices
+            const companyIndex = headers.findIndex(header =>
+                header && header.toLowerCase().includes('company')
+            );
+            const designationIndex = headers.findIndex(header =>
+                header && (header.toLowerCase().includes('designation') || header.toLowerCase().includes('job') || header.toLowerCase().includes('title'))
+            );
+
+            if (companyIndex === -1) {
+                toast("Could not find company_name column in the uploaded file", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <XIcon className='size-5' />
+                });
+                return;
+            }
+
+            if (designationIndex === -1) {
+                toast("Could not find designation column in the uploaded file", {
+                    className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <XIcon className='size-5' />
+                });
+                return;
+            }
+
+            // Extract data rows (skip header)
+            const dataRows = jsonData.slice(1) as any[][];
+
+            // Process the data into the required format
+            const extractedData = dataRows
+                .filter(row => row[companyIndex] && row[designationIndex]) // Filter out empty rows
+                .map(row => {
+                    const companyName = String(row[companyIndex] || '').trim();
+                    const designationValue = String(row[designationIndex] || '').trim();
+
+                    // Split designations by comma and clean them up
+                    const designations = designationValue
+                        .split(',')
+                        .map(d => d.trim())
+                        .filter(d => d.length > 0);
+
+                    return {
+                        company_name: companyName,
+                        designations: designations
+                    };
+                })
+                .filter(item => item.company_name && item.designations.length > 0); // Final filter
+
+            // Api Hit and sending extractedData and savedSheetData
+            const response = await axios.post(`${appDomain}/api/mapping/v1/icp/compare-icp`, {
+                uploadedSheetData: savedSheetData,
+                compareSheetData: extractedData
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
-        } catch (e: any) {
-            setCompareError(e?.message || 'Failed to compare');
+
+            if (response.data.status) {
+                toast.success(response.data.message || "Files compared successfully", {
+                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                    icon: <CircleCheck className='size-5' />
+                });
+                const dataToSave = {
+                    data: response.data.data,
+                    score: response.data.score,
+                    totalScore: response.data.totalScore,
+                    percent: response.data.percent
+                }
+                setComparedData(dataToSave);
+            }
+            console.log('The api response is: ', response.data);
+
+            toast(`Successfully extracted ${extractedData.length} records from the file`, {
+                className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleCheck className='size-5' />
+            });
+
+        } catch (error) {
+            console.error('Error reading file:', error);
+            toast("Error reading the uploaded file. Please check the file format.", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <XIcon className='size-5' />
+            });
         } finally {
             setComparing(false);
         }
-    };
+    }
 
     if (loading) return <Wave />;
 
@@ -413,14 +426,20 @@ const SavedICP: React.FC = () => {
                     <h1 className='text-xl font-semibold'>ICP</h1>
                 </div>
                 <div className='flex items-center gap-3'>
-                    <Button variant="outline" onClick={() => { setCompareOpen(true); setCompareResult(null); setCompareError(null); setCompareFile(null); setCompareTargetUUID(""); }}>
+                    <Button variant="outline" onClick={() => setCompareOpen(true)}>
                         Compare
                     </Button>
                 </div>
             </div>
 
             {/* Compare ICP Dialog */}
-            <Dialog open={compareOpen} onOpenChange={(o) => { setCompareOpen(o); if (!o) { setCompareFile(null); setCompareTargetUUID(""); setCompareResult(null); setCompareError(null); } }}>
+            <Dialog open={compareOpen} onOpenChange={(open) => {
+                if (!open) {
+                    setCompareOpen(false);
+                    setCompareFile(null);
+                    setSelectedICPSheet('');
+                }
+            }}>
                 <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden overflow-y-auto grid grid-rows-[auto,auto,1fr,auto]">
                     <DialogHeader className="shrink-0">
                         <DialogTitle>Compare ICP</DialogTitle>
@@ -431,13 +450,13 @@ const SavedICP: React.FC = () => {
                         <div>
                             <Label>Select ICP sheet to compare against</Label>
                             <div className="mt-2">
-                                <Select value={compareTargetUUID} onValueChange={(v) => setCompareTargetUUID(v)}>
-                                    <SelectTrigger>
+                                <Select value={selectedICPSheet} onValueChange={setSelectedICPSheet}>
+                                    <SelectTrigger className='cursor-pointer'>
                                         <SelectValue placeholder="Select ICP sheet" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {icpSheets?.map(s => (
-                                            <SelectItem key={s.sheet_name} value={s.sheet_name} className='capitalize'>{s.sheet_name.split("_")[0].split("-").join(" ")}</SelectItem>
+                                            <SelectItem key={s.sheet_name} value={s.sheet_name} className='capitalize cursor-pointer'>{s.sheet_name.split("_")[0].split("-").join(" ")}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -468,68 +487,70 @@ const SavedICP: React.FC = () => {
                                 </Dropzone>
                             </div>
                         </div>
-
-                        {compareError && <p className="text-destructive text-sm">{compareError}</p>}
                     </div>
 
                     {/* Results area (scrolls independently if long) */}
-                    {compareResult && (
-                        <div className="min-h-0 mt-4 overflow-auto">
-                            <div className="border rounded-md p-4 space-y-4">
-                                <div className="flex items-end gap-4">
-                                    <div className="text-3xl font-semibold">{compareResult.percent}%</div>
-                                    <div className="text-muted-foreground">match score</div>
+
+                    <div className="min-h-0 mt-4 overflow-auto">
+                        <div className="border rounded-md p-4 space-y-4">
+                            <div className="flex items-end gap-4">
+                                <div className="text-3xl font-semibold">{comparedData?.score}</div>
+                                <div className="text-muted-foreground">match score</div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                <div className="rounded-md bg-sky-100 p-3">
+                                    <div className="text-xs text-muted-foreground">Companies matched</div>
+                                    <div className="font-medium">{comparedData?.data.length}</div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                                    <div className="rounded-md bg-sky-100 p-3">
-                                        <div className="text-xs text-muted-foreground">Companies matched</div>
-                                        <div className="font-medium">{compareResult.matchedCompanies.length}</div>
-                                    </div>
-                                    <div className="rounded-md bg-yellow-100 p-3">
-                                        <div className="text-xs text-muted-foreground">Secured score</div>
-                                        <div className="font-medium">{compareResult.totals.companyWithDesignationScore}</div>
-                                    </div>
-                                    <div className="rounded-md bg-purple-100 p-3">
-                                        <div className="text-xs text-muted-foreground">Percentage</div>
-                                        <div className="font-medium">{compareResult.percent}</div>
-                                    </div>
+                                <div className="rounded-md bg-yellow-100 p-3">
+                                    <div className="text-xs text-muted-foreground">Secured score</div>
+                                    <div className="font-medium">{comparedData?.score}</div>
                                 </div>
-                                <div>
-                                    <div className="text-sm font-medium mb-2">Matched breakdown</div>
-                                    <div className="border rounded-md">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>Company</TableHead>
-                                                    <TableHead>Designation</TableHead>
-                                                    <TableHead className="w-[120px]">Score</TableHead>
+                                <div className="rounded-md bg-purple-100 p-3">
+                                    <div className="text-xs text-muted-foreground">Percentage</div>
+                                    <div className="font-medium">{comparedData?.percent}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-sm font-medium mb-2">Matched breakdown</div>
+                                <div className="border rounded-md">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow className='bg-muted hover:bg-muted'>
+                                                <TableHead>Company</TableHead>
+                                                <TableHead>Designation</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {comparedData?.data?.map((m, i) => (
+                                                <TableRow key={i} className='capitalize'>
+                                                    <TableCell className='font-medium'>{m.company}</TableCell>
+                                                    <TableCell className='text-muted-foreground'>{m.designation}</TableCell>
                                                 </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {compareResult.matchedDesignations.map((m, i) => (
-                                                    <TableRow key={i}>
-                                                        <TableCell className='font-medium'>{m.company}</TableCell>
-                                                        <TableCell className='text-muted-foreground'>{m.designation}</TableCell>
-                                                        <TableCell>{m.score}</TableCell>
-                                                    </TableRow>
-                                                ))}
-                                                {compareResult.matchedDesignations.length === 0 && (
-                                                    <TableRow>
-                                                        <TableCell colSpan={3} className='text-center text-muted-foreground'>No matches found</TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
+                                            ))}
+                                            {comparedData?.data?.length === 0 && (
+                                                <TableRow>
+                                                    <TableCell colSpan={3} className='text-center text-muted-foreground'>No matches found</TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             </div>
                         </div>
-                    )}
+                    </div>
 
                     <DialogFooter className="shrink-0">
-                        <Button variant="outline" onClick={() => setCompareOpen(false)} className='cursor-pointer' disabled={comparing}>Close</Button>
-                        <Button onClick={runComparison} disabled={comparing || !compareFile || !compareTargetUUID} className='btn !h-full'>
-                            {comparing ? 'Comparing...' : 'Compare'}
+                        <Button variant="outline" onClick={() => {
+                            setCompareOpen(false);
+                            setCompareFile(null);
+                            setSelectedICPSheet('');
+                        }} className='cursor-pointer'>Close</Button>
+                        <Button
+                            disabled={!compareFile || !selectedICPSheet}
+                            onClick={handleCompareFiles}
+                            className='bg-brand-primary hover:bg-brand-primary-dark duration-300 transition-colors'>
+                            {comparing ? <span className='flex items-center gap-x-2'>Comparing <Loader2 className="animate-spin" /></span> : 'Compare'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -620,9 +641,8 @@ const SavedICP: React.FC = () => {
             </Dialog>
 
 
-
             <div className='mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6'>
-                {icpSheets ? icpSheets?.map((sheet) => {
+                {icpSheets ? icpSheets?.map((sheet: ICPSheet) => {
                     const meta = formatUploadedOn(sheet.sheet_name || sheet.uuid);
                     return (
                         <Card key={sheet.uuid} className='transition-shadow hover:shadow-md'>
