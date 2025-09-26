@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, ChevronDown, Loader2, CircleCheck, XIcon } from 'lucide-react';
+import { X, ChevronDown, Loader2, CircleCheck, XIcon, Check } from 'lucide-react';
 import { CountrySelect, StateSelect } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 import useExtrasStore from '@/store/extrasStore';
@@ -83,6 +83,8 @@ const MultiSelectDropdown = React.memo(({
   const handleOptionSelect = (optionName: string) => {
     if (!value.includes(optionName)) {
       onValueChange([...value, optionName]);
+    } else {
+      onValueChange(value.filter(item => item !== optionName));
     }
     setSearchTerm('');
   };
@@ -127,10 +129,11 @@ const MultiSelectDropdown = React.memo(({
               filteredOptions.map((option) => (
                 <div
                   key={option.id}
-                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer capitalize"
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer capitalize flex justify-between items-center"
                   onClick={() => handleOptionSelect(option.name)}
                 >
                   {option.name}
+                  {value.includes(option.name) && <Check className="h-4 w-4 ml-2 text-green-500" />}
                 </div>
               ))
             ) : (
@@ -250,7 +253,10 @@ const CreateICP: React.FC = () => {
       );
 
       if (!response.data.status || !response.data.data || response.data.data.length === 0) {
-        toast.error('No companies found for the selected criteria');
+        toast('No companies found for the selected criteria', {
+          className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+          icon: <XIcon className='size-5' />
+        });
         setLoading(false);
         return;
       }
@@ -271,15 +277,10 @@ const CreateICP: React.FC = () => {
         })),
       };
 
-      // Log the final ICPData structure
-      console.log('Generated ICP Data:', icpData);
-
-      toast.success(`ICP data generated successfully with ${icpData.company.length} companies!`);
-
-      // // Ask user if they want to save the ICP data
-      // const shouldSave = window.confirm(
-      //   `ICP data generated successfully with ${icpData.company.length} companies!\n\nWould you like to save this ICP to your account?`
-      // );
+      toast(`ICP data generated successfully with ${icpData.company.length} companies!`, {
+        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <CircleCheck className='size-5' />
+      });
 
       const data = {
         ...icpData,
@@ -390,7 +391,7 @@ const CreateICP: React.FC = () => {
               />
 
               {/* Priority */}
-              <div className="flex flex-col gap-2">
+              <div hidden className="flex flex-col gap-2">
                 <Label className="font-semibold w-full">
                   Priority <span className="text-red-500">*</span>
                 </Label>
@@ -414,32 +415,34 @@ const CreateICP: React.FC = () => {
                 <Label className="font-semibold">
                   Country <span className="text-red-500">*</span>
                 </Label>
-                <CountrySelect
-                  placeHolder="Select Country"
-                  onChange={(val: any) => {
-                    setCountryId(val?.id ?? null);
-                    setFormData(prev => ({
-                      ...prev,
-                      country_name: val?.name || '',
-                      state_name: ''
-                    }));
-                  }}
-                  inputClassName="!h-12 !text-base !bg-white"
-                  containerClassName="!w-full"
-                />
+                <div className="relative">
+                  <CountrySelect
+                    placeHolder="Select Country"
+                    onChange={(val: any) => {
+                      setCountryId(val?.id ?? null);
+                      setFormData(prev => ({
+                        ...prev,
+                        country_name: val?.name || '',
+                        state_name: ''
+                      }));
+                    }}
+                    className="!w-full !h-12 !text-base !bg-white !capitalize"
+                  />
+                </div>
               </div>
 
               {/* State */}
               <div className="flex flex-col gap-2">
                 <Label className="font-semibold">State</Label>
-                <StateSelect
-                  countryid={countryId as any}
-                  placeHolder={countryId ? 'Select State' : 'Select country first'}
-                  onChange={(val: any) => setFormData(prev => ({ ...prev, state_name: val?.name || '' }))}
-                  inputClassName="!h-12 !text-base !bg-white"
-                  containerClassName="!w-full"
-                  disabled={!countryId}
-                />
+                <div className="relative">
+                  <StateSelect
+                    countryid={countryId as any}
+                    placeHolder={countryId ? 'Select State' : 'Select country first'}
+                    onChange={(val: any) => setFormData(prev => ({ ...prev, state_name: val?.name || '' }))}
+                    className="!w-full !h-12 !text-base !bg-white !capitalize"
+                    disabled={!countryId}
+                  />
+                </div>
               </div>
             </div>
 
@@ -453,10 +456,10 @@ const CreateICP: React.FC = () => {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating ICP Data...
+                    Saving ICP Data...
                   </>
                 ) : (
-                  'Generate ICP Data'
+                  'Save ICP'
                 )}
               </Button>
             </div>

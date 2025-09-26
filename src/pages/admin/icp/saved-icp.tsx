@@ -688,7 +688,7 @@ const SavedICP: React.FC = () => {
                                     <TableHead className='w-[120px]'>State</TableHead>
                                     <TableHead className='w-[120px]'>Employee Size</TableHead>
                                     <TableHead className='w-[120px]'>Priority</TableHead>
-                                    <TableHead className='w-[120px]'>Industry</TableHead>
+                                    {activeSheet?.sheetRows[0].industry && <TableHead className='w-[120px]'>Industry</TableHead>}
                                     <TableHead className='w-[120px]'>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -701,7 +701,7 @@ const SavedICP: React.FC = () => {
                                         <TableCell>{row.state_name}</TableCell>
                                         <TableCell>{row.employee_size}</TableCell>
                                         <TableCell>{row.priority}</TableCell>
-                                        <TableCell>{row.industry || '—'}</TableCell>
+                                        {row.industry && <TableCell>{row.industry}</TableCell>}
                                         <TableCell className="space-x-2">
                                             <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => openEditEntry(row, ((currentPage - 1) * ROWS_PER_PAGE) + idx)}>Edit</Button>
                                             <AlertDialog>
