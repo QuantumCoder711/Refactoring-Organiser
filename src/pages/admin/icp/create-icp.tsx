@@ -149,7 +149,7 @@ const MultiSelectDropdown = React.memo(({
         <div className="flex flex-wrap gap-2 mb-2">
           {value.map((item) => (
             <Badge key={item} variant="secondary" className="group flex items-center gap-1">
-              <span className="capitalize">{item}</span>
+              <span className="capitalize">{item==="10000-1000000000" ? "More than 10,000" : item}</span>
               <button
                 onClick={() => handleRemoveTag(item)}
                 className="focus:outline-none"
