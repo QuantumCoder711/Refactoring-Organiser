@@ -53,7 +53,7 @@ const MultiSelectDropdown = React.memo(({
   value: string[];
   onValueChange: (value: string[]) => void;
   placeholder: string;
-  options: { id: number; name: string }[];
+  options: { id: number; name: string; value?: string }[];
   required?: boolean;
   onSearch?: (term: string) => void;
   loading?: boolean;
@@ -80,11 +80,12 @@ const MultiSelectDropdown = React.memo(({
     }
   };
 
-  const handleOptionSelect = (optionName: string) => {
-    if (!value.includes(optionName)) {
-      onValueChange([...value, optionName]);
+  const handleOptionSelect = (option: { name: string; value?: string }) => {
+    const valueToUse = option.value || option.name;
+    if (!value.includes(valueToUse)) {
+      onValueChange([...value, valueToUse]);
     } else {
-      onValueChange(value.filter(item => item !== optionName));
+      onValueChange(value.filter(item => item !== valueToUse));
     }
     setSearchTerm('');
   };
@@ -130,10 +131,10 @@ const MultiSelectDropdown = React.memo(({
                 <div
                   key={option.id}
                   className="px-3 py-2 hover:bg-gray-100 cursor-pointer capitalize flex justify-between items-center"
-                  onClick={() => handleOptionSelect(option.name)}
+                  onClick={() => handleOptionSelect(option)}
                 >
                   {option.name}
-                  {value.includes(option.name) && <Check className="h-4 w-4 ml-2 text-green-500" />}
+                  {value.includes(option.value || option.name) && <Check className="h-4 w-4 ml-2 text-green-500" />}
                 </div>
               ))
             ) : (
@@ -186,8 +187,14 @@ const CreateICP: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const employeeOptions = [
-    '0-10', '10-50', '50-100', '100-500',
-    '500-1000', '1000-5000', '5000-10000', '10000-100000'
+    { display: '0-10', value: '0-10' },
+    { display: '10-50', value: '10-50' },
+    { display: '50-100', value: '50-100' },
+    { display: '100-500', value: '100-500' },
+    { display: '500-1000', value: '500-1000' },
+    { display: '1000-5000', value: '1000-5000' },
+    { display: '5000-10000', value: '5000-10000' },
+    { display: 'More than 10, 000', value: '10000-1000000000' }
   ];
 
   useEffect(() => {
@@ -375,7 +382,7 @@ const CreateICP: React.FC = () => {
                 value={formFields.employeeSizes}
                 onValueChange={(val) => handleFieldChange('employeeSizes', val)}
                 placeholder="Select employee sizes"
-                options={employeeOptions.map((size, idx) => ({ id: idx + 1, name: size }))}
+                options={employeeOptions.map((size, idx) => ({ id: idx + 1, name: size.display, value: size.value }))}
                 required
               />
 
