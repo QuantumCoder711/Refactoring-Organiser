@@ -7,7 +7,7 @@ import { Eye, SquarePen, UserCheck, Trash, CircleX, CircleCheck, StarsIcon, X, D
 
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
-import { dateDifference, formatBreakOutTime, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
+import { cn, dateDifference, formatBreakOutTime, formatDateTimeReport, getImageUrl, isEventLive } from '@/lib/utils';
 
 import {
   Table,
@@ -631,7 +631,7 @@ const Attendees: React.FC = () => {
 
         <div className='flex flex-wrap items-center gap-3 sm:gap-5 w-full sm:w-auto justify-start sm:justify-end'>
           <Button
-            className='btn !rounded-[10px] !px-3'
+            className='!rounded-[10px] !px-3'
             onClick={handleExportToExcel}
           >
             {selectedAttendees.size > 0 ? `Export Selected (${selectedAttendees.size})` : 'Export Data'}
@@ -689,22 +689,24 @@ const Attendees: React.FC = () => {
           <Link
             key={index}
             to={link?.url as string}
-            className={`btn ${link?.name !== 'Add Attendee' ? '!bg-brand-background !text-black font-semibold' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
+            // className={`btn ${link?.name !== 'Add Attendee' ? '' : ''} !rounded-[10px] !px-3 !h-[30px] w-fit text-nowrap text-sm grid place-content-center`}
           >
-            {link?.name}
+            <Button variant={link.name !== 'Add Attendee' ? 'outline' : 'default'} className={cn(link.name !== 'Add Attendee' && 'dark:bg-muted')  }>
+              {link?.name}
+            </Button>
           </Link>
         ))}
       </div>
 
       {/* Table */}
-      <div className='bg-brand-background rounded-lg p-3 sm:p-5 mt-6 shadow-blur'>
+      <div className='bg-muted rounded-lg p-3 sm:p-5 mt-6 shadow-blur'>
 
         {/* Details Row */}
-        <div className='flex flex-wrap gap-2 sm:gap-3.5'>
+        <div className='flex flex-wrap items-center gap-2 sm:gap-3.5'>
 
           {/* Select Box for pagination */}
           <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-            <SelectTrigger className="rounded-sm !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+            <SelectTrigger className="rounded-sm !w-fit !h-8 border flex items-center justify-center text-sm">
               <SelectValue placeholder={`${itemsPerPage}/Page`} />
             </SelectTrigger>
             <SelectContent>
@@ -732,7 +734,7 @@ const Attendees: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
             {/* Search By Name */}
             <Input
-              className="input !p-2.5 !min-w-full !text-xs"
+              className="!min-w-full !text-xs"
               placeholder="Search by name"
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
@@ -740,7 +742,7 @@ const Attendees: React.FC = () => {
 
             {/* Search By Company */}
             <Input
-              className="input !p-2.5 !min-w-full !text-xs"
+              className="!min-w-full !text-xs"
               placeholder="Search by company"
               value={companyFilter}
               onChange={(e) => setCompanyFilter(e.target.value)}
@@ -748,7 +750,7 @@ const Attendees: React.FC = () => {
 
             {/* Search By Designation */}
             <Input
-              className="input !p-2.5 !min-w-full !text-xs"
+              className="!min-w-full !text-xs"
               placeholder="Search by designation"
               value={designationFilter}
               onChange={(e) => setDesignationFilter(e.target.value)}
@@ -759,7 +761,7 @@ const Attendees: React.FC = () => {
           <div className="grid grid-cols-2 sm:flex gap-2.5">
             {/* Filter By Check-In */}
             <Select value={checkInFilter} onValueChange={setCheckInFilter}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
                 <SelectValue placeholder="Checked-In">
                   {checkInFilter === 'all'
                     ? 'Checked-In'
@@ -770,7 +772,7 @@ const Attendees: React.FC = () => {
                         : 'Checked-In'}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="!text-sm !font-semibold">
+              <SelectContent className="!text-sm">
                 <SelectItem value="all" className="cursor-pointer">All</SelectItem>
                 <SelectItem value="1" className="cursor-pointer">Yes</SelectItem>
                 <SelectItem value="0" className="cursor-pointer">No</SelectItem>
@@ -779,7 +781,7 @@ const Attendees: React.FC = () => {
 
             {/* Filter By Not Invited */}
             <Select value={notInvitedFilter.toString()} onValueChange={(value) => setNotInvitedFilter(Number(value))}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
                 <SelectValue placeholder="Not Invited">
                   {notInvitedFilter === 2
                     ? 'All'
@@ -790,7 +792,7 @@ const Attendees: React.FC = () => {
                         : 'All'}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="!text-sm !font-semibold">
+              <SelectContent className="!text-sm">
                 <SelectItem value="2" className="cursor-pointer">All</SelectItem>
                 <SelectItem value="1" className="cursor-pointer">Not Invited</SelectItem>
                 <SelectItem value="0" className="cursor-pointer">Invited</SelectItem>
@@ -799,7 +801,7 @@ const Attendees: React.FC = () => {
 
             {/* Filter By Role */}
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm !font-semibold cursor-pointer !text-black">
+              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer text-foreground">
                 <SelectValue placeholder="Role">
                   {roleFilter === 'all'
                     ? 'Role'
@@ -816,7 +818,7 @@ const Attendees: React.FC = () => {
                               : 'Role'}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent className="!text-sm !font-semibold">
+              <SelectContent className="!text-sm">
                 <SelectItem value="all" className="cursor-pointer">All Roles</SelectItem>
                 <SelectItem value="delegate" className="cursor-pointer">Delegate</SelectItem>
                 <SelectItem value="speaker" className="cursor-pointer">Speaker</SelectItem>
@@ -830,7 +832,9 @@ const Attendees: React.FC = () => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
-                  className="btn !rounded-[10px] sm:w-fit !p-3 !bg-brand-secondary text-white"
+                  size="sm"
+                  variant={"destructive"}
+                  className="btn sm:w-fit text-white"
                   disabled={selectedAttendees.size === 0}
                 >
                   Delete
@@ -861,285 +865,283 @@ const Attendees: React.FC = () => {
 
 
         <div className='overflow-x-auto'>
-          <Table className='mt-4 min-w-[1000px]'>
-          {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-          <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
-            <TableRow className='!text-base'>
-              <TableHead className="text-left min-w-10 !px-2">
-                <Checkbox
-                  className='bg-white border-brand-dark-gray cursor-pointer'
-                  checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">A. Email</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
-              {renderCheckInColumns()}
-              <TableHead className="text-left min-w-10 !px-2">Breakout Checkin</TableHead>
-              <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-              <TableRow
-                key={attendee.id}
-                className={`${attendee.not_invited === 1 ? 'bg-brand-secondary/10 hover:bg-brand-secondary/20' : 'hover:bg-brand-background'}`}
-              >
-                <TableCell className="text-left min-w-10">
+          <Table className='mt-4 min-w-[1000px] rounded-md'>
+            {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+            <TableHeader className='bg-accent !rounded-[10px]'>
+              <TableRow className='!text-base'>
+                <TableHead className="text-left min-w-10 !px-2">
                   <Checkbox
-                    className='bg-white border-brand-dark-gray cursor-pointer'
-                    checked={selectedAttendees.has(attendee.id)}
-                    onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
+                    checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
+                    onCheckedChange={handleSelectAll}
                   />
-                </TableCell>
-                <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                <TableCell className="text-left min-w-10 capitalize">
-                  {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10 !capitalize">
-                  {attendee.job_title || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10 !capitalize">
-                  {attendee.company_name || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10">
-                  {attendee.email_id || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10">
-                  {attendee.alternate_email || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10">
-                  {attendee.phone_number || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10">
-                  {attendee.alternate_mobile_number || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10 !capitalize">
-                  {attendee.status || "-"}
-                </TableCell>
-                <TableCell className="text-left min-w-10">
-                  {attendee.award_winner !== null && attendee.award_winner !== undefined
-                    ? (attendee.award_winner === 1 ? "Yes" : "No")
-                    : "-"}
-                </TableCell>
-                {renderCheckInData(attendee)}
-                <TableCell className="text-left min-w-10">
-                  {!attendee.break_out_room_and_time ? '-' :
-                    attendee.break_out_room_and_time.map((item, index) => (
-                      <div key={index}>{formatBreakOutTime(item)}</div>
-                    ))
-                  }
-                </TableCell>
-                <TableCell className="min-w-10 flex items-center justify-end gap-1.5">
+                </TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">A. Email</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
+                {renderCheckInColumns()}
+                <TableHead className="text-left min-w-10 !px-2">Breakout Checkin</TableHead>
+                <TableHead className="text-left min-w-10 !px-2">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
+                <TableRow
+                  key={attendee.id}
+                  className={`${attendee.not_invited === 1 ? 'bg-secondary/10 hover:bg-secondary/20' : 'hover:bg-background/50'}`}
+                >
+                  <TableCell className="text-left min-w-10">
+                    <Checkbox
+                      checked={selectedAttendees.has(attendee.id)}
+                      onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
+                    />
+                  </TableCell>
+                  <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                  <TableCell className="text-left min-w-10 capitalize">
+                    {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10 !capitalize">
+                    {attendee.job_title || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10 !capitalize">
+                    {attendee.company_name || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10">
+                    {attendee.email_id || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10">
+                    {attendee.alternate_email || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10">
+                    {attendee.phone_number || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10">
+                    {attendee.alternate_mobile_number || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10 !capitalize">
+                    {attendee.status || "-"}
+                  </TableCell>
+                  <TableCell className="text-left min-w-10">
+                    {attendee.award_winner !== null && attendee.award_winner !== undefined
+                      ? (attendee.award_winner === 1 ? "Yes" : "No")
+                      : "-"}
+                  </TableCell>
+                  {renderCheckInData(attendee)}
+                  <TableCell className="text-left min-w-10">
+                    {!attendee.break_out_room_and_time ? '-' :
+                      attendee.break_out_room_and_time.map((item, index) => (
+                        <div key={index}>{formatBreakOutTime(item)}</div>
+                      ))
+                    }
+                  </TableCell>
+                  <TableCell className="min-w-10 flex items-center justify-end gap-1.5">
 
-                  {attendee.status === "sponsor" &&
+                    {attendee.status === "sponsor" &&
 
-                    <Dialog>
-                      <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
-                      <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
-                        {isLoading ? <Wave /> : <>
-                          <DialogHeader className="space-y-4">
-                            <div>
-                              <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
-                                {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
-                              </DialogTitle>
-                              <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
-                            </div>
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <Input
-                                type="text"
-                                placeholder="Search attendees..."
-                                className="pl-10 w-full"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                              />
-                            </div>
-                          </DialogHeader>
-
-                          <DialogDescription className='flex items-center overflow-x-scroll gap-2'>
-                            {selectedSponsorsAttendees.map((item) => (
-                              <div key={item.attendee_id} className="flex items-center gap-2 mt-5 max-w-md">
-                                <div className="p-2 px-4 flex gap-2 items-center justify-center rounded-full min-w-fit !text-nowrap bg-brand-primary">
-                                  <p className="text-white capitalize text-xs tracking-wider">
-                                    {filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.first_name + " " +
-                                      filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.last_name}
-                                  </p>
-                                  <X className="size-4 text-white cursor-pointer" onClick={() => handleSponsorAttendeeDelete(item.uuid)} />
-                                </div>
+                      <Dialog>
+                        <DialogTrigger onClick={() => handleGetSponsorsAttendee(event?.id as number, attendee.id)} className='cursor-pointer'><StarsIcon className='size-4 text-purple-600' /></DialogTrigger>
+                        <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
+                          {isLoading ? <Wave /> : <>
+                            <DialogHeader className="space-y-4">
+                              <div>
+                                <DialogTitle className="text-2xl font-bold capitalize text-brand-primary">
+                                  {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                                </DialogTitle>
+                                <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
                               </div>
-                            ))}
-                          </DialogDescription>
+                              <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
+                                <Input
+                                  type="text"
+                                  placeholder="Search attendees..."
+                                  className="pl-10 w-full"
+                                  value={searchQuery}
+                                  onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                              </div>
+                            </DialogHeader>
 
-                          <Table className="mt-4">
-                            <TableHeader className="bg-brand-light">
-                              <TableRow className="text-left">
-                                <TableHead>Sr. No.</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Company</TableHead>
-                                <TableHead className='text-right max-w-fit flex items-center justify-center'>
-                                  <Checkbox
-                                    id='select-all'
-                                    name='select-all'
-                                    checked={selectedSponsorsAttendees.length === filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").length}
-                                    className="mx-auto cursor-pointer border border-brand-dark-gray"
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        setSelectedSponsorsAttendees(
-                                          filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: attendee?.uuid as string, attendee_id: attendee.id }))
-                                        )
-                                      } else {
-                                        setSelectedSponsorsAttendees([])
-                                      }
-                                    }}
-                                  />
-                                </TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {filteredAttendees
-                                .filter((attendee: AttendeeType) => attendee.status !== "sponsor")
-                                .filter((attendee: AttendeeType) => {
-                                  if (!searchQuery) return true;
-                                  const search = searchQuery.toLowerCase();
-                                  return (
-                                    (attendee.first_name?.toLowerCase().includes(search) ||
-                                      attendee.last_name?.toLowerCase().includes(search) ||
-                                      attendee.company_name?.toLowerCase().includes(search) ||
-                                      attendee.email_id?.toLowerCase().includes(search))
-                                  );
-                                })
-                                .map((attendee: AttendeeType) => (
-                                  <TableRow key={attendee.id} className="hover:bg-brand-lightest">
-                                    <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
-                                    <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
-                                    <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
-                                    <TableCell className="text-center max-w-fit flex items-center justify-center">
-                                      <Checkbox
-                                        id={String(attendee.id)}
-                                        name="sponsor"
-                                        checked={selectedSponsorsAttendees.find((item) => item.attendee_id === attendee.id) ? true : false}
-                                        className="mx-auto cursor-pointer border border-brand-dark-gray"
-                                        onCheckedChange={(checked) => {
-                                          if (checked) {
-                                            setSelectedSponsorsAttendees((prev) => [...prev, { uuid: event?.uuid as string, attendee_id: attendee.id }])
-                                          } else {
-                                            setSelectedSponsorsAttendees((prev) => [...prev].filter((item) => item.attendee_id !== attendee.id))
-                                          }
-                                        }}
-                                      />
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                            </TableBody>
-                          </Table>
-                          <DialogFooter>
-                            <Button className='cursor-pointer btn' onClick={() => handleBulkSponsorAttendeeAdd(attendee.id)}>Save</Button>
-                          </DialogFooter>
-                        </>}
-                      </DialogContent>
-                    </Dialog>
-                  }
+                            <DialogDescription className='flex items-center overflow-x-scroll gap-2'>
+                              {selectedSponsorsAttendees.map((item) => (
+                                <div key={item.attendee_id} className="flex items-center gap-2 mt-5 max-w-md">
+                                  <div className="p-2 px-4 flex gap-2 items-center justify-center rounded-full min-w-fit !text-nowrap bg-brand-primary">
+                                    <p className="text-white capitalize text-xs tracking-wider">
+                                      {filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.first_name + " " +
+                                        filteredAttendees.find((attendee: AttendeeType) => attendee.id === item.attendee_id)?.last_name}
+                                    </p>
+                                    <X className="size-4 text-white cursor-pointer" onClick={() => handleSponsorAttendeeDelete(item.uuid)} />
+                                  </div>
+                                </div>
+                              ))}
+                            </DialogDescription>
 
-                  {/* For Viewing the Event */}
-                  <Dialog>
-                    <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} className='size-4' /></DialogTrigger>
-                    <DialogContent className="max-w-md p-6">
-                      <DialogHeader className="space-y-2">
-                        <DialogTitle className="text-2xl font-bold text-brand-primary">
-                          Attendee Details
-                        </DialogTitle>
-                        <div className="h-1 w-12 mx-auto sm:mx-0 bg-brand-primary rounded-full"></div>
-                      </DialogHeader>
+                            <Table className="mt-4">
+                              <TableHeader className="bg-brand-light">
+                                <TableRow className="text-left">
+                                  <TableHead>Sr. No.</TableHead>
+                                  <TableHead>Name</TableHead>
+                                  <TableHead>Company</TableHead>
+                                  <TableHead className='text-right max-w-fit flex items-center justify-center'>
+                                    <Checkbox
+                                      id='select-all'
+                                      name='select-all'
+                                      checked={selectedSponsorsAttendees.length === filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").length}
+                                      className="mx-auto cursor-pointer border border-brand-dark-gray"
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setSelectedSponsorsAttendees(
+                                            filteredAttendees.filter((attendee: AttendeeType) => attendee.status !== "sponsor").map((attendee: AttendeeType) => ({ uuid: attendee?.uuid as string, attendee_id: attendee.id }))
+                                          )
+                                        } else {
+                                          setSelectedSponsorsAttendees([])
+                                        }
+                                      }}
+                                    />
+                                  </TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {filteredAttendees
+                                  .filter((attendee: AttendeeType) => attendee.status !== "sponsor")
+                                  .filter((attendee: AttendeeType) => {
+                                    if (!searchQuery) return true;
+                                    const search = searchQuery.toLowerCase();
+                                    return (
+                                      (attendee.first_name?.toLowerCase().includes(search) ||
+                                        attendee.last_name?.toLowerCase().includes(search) ||
+                                        attendee.company_name?.toLowerCase().includes(search) ||
+                                        attendee.email_id?.toLowerCase().includes(search))
+                                    );
+                                  })
+                                  .map((attendee: AttendeeType) => (
+                                    <TableRow key={attendee.id} className="hover:bg-brand-lightest">
+                                      <TableCell>{filteredAttendees.indexOf(attendee) + 1}</TableCell>
+                                      <TableCell className='capitalize'>{attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}</TableCell>
+                                      <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
+                                      <TableCell className="text-center max-w-fit flex items-center justify-center">
+                                        <Checkbox
+                                          id={String(attendee.id)}
+                                          name="sponsor"
+                                          checked={selectedSponsorsAttendees.find((item) => item.attendee_id === attendee.id) ? true : false}
+                                          className="mx-auto cursor-pointer border border-brand-dark-gray"
+                                          onCheckedChange={(checked) => {
+                                            if (checked) {
+                                              setSelectedSponsorsAttendees((prev) => [...prev, { uuid: event?.uuid as string, attendee_id: attendee.id }])
+                                            } else {
+                                              setSelectedSponsorsAttendees((prev) => [...prev].filter((item) => item.attendee_id !== attendee.id))
+                                            }
+                                          }}
+                                        />
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                              </TableBody>
+                            </Table>
+                            <DialogFooter>
+                              <Button className='cursor-pointer btn' onClick={() => handleBulkSponsorAttendeeAdd(attendee.id)}>Save</Button>
+                            </DialogFooter>
+                          </>}
+                        </DialogContent>
+                      </Dialog>
+                    }
 
-                      <div className="mt-8 space-y-6">
-                        <div className="grid grid-cols-2 gap-6">
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.first_name} {attendee.last_name}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.job_title || '-'}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.email_id || '-'}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.company_name || '-'}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.phone_number || '-'}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.alternate_email || '-'}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800 capitalize">{attendee.status || '-'}</p>
+                    {/* For Viewing the Event */}
+                    <Dialog>
+                      <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} className='size-4 text-green-500' /></DialogTrigger>
+                      <DialogContent className="max-w-md p-6">
+                        <DialogHeader className="space-y-2">
+                          <DialogTitle className="text-2xl font-bold text-brand-primary">
+                            Attendee Details
+                          </DialogTitle>
+                          <div className="h-1 w-12 mx-auto sm:mx-0 bg-primary rounded-full"></div>
+                        </DialogHeader>
+
+                        <div className="mt-8 space-y-6">
+                          <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Name</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground capitalize">{attendee.first_name} {attendee.last_name}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Job Title</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground capitalize">{attendee.job_title || '-'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Email</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground">{attendee.email_id || '-'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Company</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground capitalize">{attendee.company_name || '-'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Phone</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground">{attendee.phone_number || '-'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Alternate Email</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground">{attendee.alternate_email || '-'}</p>
+                            </div>
+                            <div className="space-y-1">
+                              <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Status</h3>
+                              <p className="text-sm sm:text-base font-medium text-foreground capitalize">{attendee.status || '-'}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                      </DialogContent>
+                    </Dialog>
 
-                  {/* Edit Event */}
-                  <Link to={`/all-events/${slug}/edit-attendee/${attendee.uuid}`} className=''><SquarePen width={9.78} height={9.5} className='size-4' /></Link>
+                    {/* Edit Event */}
+                    <Link to={`/all-events/${slug}/edit-attendee/${attendee.uuid}`} className=''><SquarePen className='size-4 text-yellow-500' /></Link>
 
-                  {/* Custom Check-In User */}
-                  {isEventLive(event) && <AlertDialog>
-                    <AlertDialogTrigger className='cursor-pointer'>
-                      <UserCheck width={10} height={11} className='fill-brand-primary stroke-brand-primary size-4' />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure want to mark this user as checked in ?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>}
+                    {/* Custom Check-In User */}
+                    {isEventLive(event) && <AlertDialog>
+                      <AlertDialogTrigger className='cursor-pointer'>
+                        <UserCheck width={10} height={11} className='fill-primary stroke-primary size-4' />
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure want to mark this user as checked in ?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>}
 
-                  {/* Delete Attendee */}
-                  <AlertDialog>
-                    <AlertDialogTrigger className='cursor-pointer'>
-                      <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary size-4' />
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure want to delete {attendee.first_name} {attendee.last_name} ?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                        <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => handleDeleteAttendee(attendee.id)}>Continue</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                    {/* Delete Attendee */}
+                    <AlertDialog>
+                      <AlertDialogTrigger className='cursor-pointer'>
+                        <Trash width={9} height={11} className='text-destructive size-4' />
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure want to delete {attendee.first_name} {attendee.last_name} ?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
+                          <AlertDialogAction className='cursor-pointer hover:bg-destructive/80 duration-300 transition-all bg-destructive text-white' onClick={() => handleDeleteAttendee(attendee.id)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
 
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
         </div>
 

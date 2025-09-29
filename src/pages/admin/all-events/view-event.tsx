@@ -224,7 +224,7 @@ const ViewEvent: React.FC = () => {
                 <title>{event?.title}</title>
             </Helmet>
             <div className='w-full min-h-screen text-foreground'>
-                <div className='top-0 z-50 bg-brand-foreground'>
+                <div className='top-0 z-50'>
                     <GoBack />
                 </div>
                 <div className='max-w-2xl mt-5 mx-auto bg-muted rounded-lg md:px-4 md:py-8'>
@@ -235,8 +235,8 @@ const ViewEvent: React.FC = () => {
                     <div className='text-xs flex gap-2.5 mt-5 justify-center'>
                         {event && (
                             <>
-                                <span className='border border-muted-foreground px-3 py-1 rounded-md'>{formatEventDateTime(event).dateRange}</span>
-                                <span className='border border-muted-foreground px-3 py-1 rounded-md'>{formatEventDateTime(event).timeRange}</span>
+                                <span className='border border-accent px-3 py-1 rounded-md'>{formatEventDateTime(event).dateRange}</span>
+                                <span className='border border-accent px-3 py-1 rounded-md'>{formatEventDateTime(event).timeRange}</span>
                             </>
                         )}
                     </div>
@@ -265,7 +265,7 @@ const ViewEvent: React.FC = () => {
                                             </DialogHeader>
                                         </DialogContent>
                                     </Dialog>
-                                    <Badge className='rounded-full h-6 bg-brand-dark-gray text-white w-full text-sm'>Currently Running</Badge>
+                                    <Badge className='rounded-full h-6 bg-secondary/50 text-foreground w-full text-sm'>Currently Running</Badge>
                                 </div>
                                 {/* For breakout rooms */}
                                 <Dialog>
@@ -359,25 +359,25 @@ const ViewEvent: React.FC = () => {
                     </div>
 
                     {/* Description */}
-                    <div className='border-t mt-3 p-5 border-muted-foreground'>
+                    <div className='border-t mt-3 p-5 border-accent'>
                         <h3 className='font-semibold'>Description</h3>
                         <p className='text-sm mt-2 text-brand-dark-gray'>{event?.description}</p>
                     </div>
 
                     {/* Event OTP & Agenda By */}
-                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-muted-foreground flex justify-between'>
+                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-accent flex justify-between'>
                         <div className='w-1/2'>
                             <h3 className='font-semibold'>Event OTP</h3>
                             <p className='text-sm text-brand-dark-gray'>{event?.event_otp}</p>
                         </div>
-                        <div className='w-1/2 border-l border-muted-foreground pl-5'>
+                        <div className='w-1/2 border-l border-accent pl-5'>
                             <h3 className='font-semibold'>View Agenda By</h3>
                             <p className='text-sm text-brand-dark-gray'>{event?.view_agenda_by == 0 ? "All" : "Checked In"}</p>
                         </div>
                     </div>
 
                     {/* Event Location */}
-                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-muted-foreground'>
+                    <div hidden={event?.event_mode == 1} className='p-5 border-t border-accent'>
                         <h3 className='font-semibold'>Location</h3>
                         <p className='text-sm font-semibold -mt-1 text-brand-dark-gray'>{event?.event_venue_name}</p>
                         <p className='text-sm text-brand-dark-gray'>{event?.event_venue_address_1}</p>
@@ -398,7 +398,7 @@ const ViewEvent: React.FC = () => {
                     {/* Content Container */}
                     <div className='mt-4'>
                         {/* Agenda Details */}
-                        <div className='p-5 border-t border-muted-foreground'>
+                        <div className='p-5 border-t border-accent'>
                             <h3 className='font-semibold'>Agenda</h3>
                             <div>
                                 {agendaData.length > 0 ? agendaData.map((agenda) => (
@@ -426,7 +426,7 @@ const ViewEvent: React.FC = () => {
                         </div>
 
                         {/* Event Speakers */}
-                        <div className='p-5 border-t border-muted-foreground'>
+                        <div className='p-5 border-t border-accent'>
                             <h3 className='font-semibold'>Speakers</h3>
                             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 place-items-center gap-4 space-y-8'>
                                 {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
@@ -442,7 +442,7 @@ const ViewEvent: React.FC = () => {
 
                         {/* Jury */}
                         {allJury.length > 0 && (
-                            <div className='p-5 border-t border-muted-foreground'>
+                            <div className='p-5 border-t border-accent'>
                                 <h3 className='font-semibold'>Jury</h3>
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-8'>
                                     {allJury.map((jury, index) => (

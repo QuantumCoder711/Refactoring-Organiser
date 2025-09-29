@@ -39,13 +39,13 @@ const CustomInput = React.memo(({ label, id, name, type, value, onChange, requir
 }) => (
     <div className="flex flex-col gap-2 w-full">
         <Label className="font-semibold" htmlFor={id}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Input
             id={id}
             name={name}
             type={type}
-            className='input !h-12 min-w-full text-base'
+            className='!h-12 min-w-full text-base'
             value={value}
             onChange={onChange}
         />
@@ -70,7 +70,7 @@ const CustomSelectSimple = React.memo(({
 }) => (
     <div className="flex flex-col gap-2">
         <Label className="font-semibold" htmlFor={label.toLowerCase().replace(/\s+/g, '_')}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Select
             value={value}
@@ -203,7 +203,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -215,7 +215,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                        className="w-full capitalize !h-12 text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -227,17 +227,17 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 min-w-4 min-h-4 text-secondary" />
                                     )}
                                 </div>
                             ))
@@ -545,18 +545,18 @@ const AddAttendee: React.FC = () => {
                 <GoBack />
                 <h1 className='md:text-xl font-semibold sm:text-left text-center'>{event?.title}</h1>
             </div>
-            <div className="max-w-2xl bg-brand-light-gray p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
+            <div className="max-w-2xl bg-muted p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
-                    <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
+                    <TabsList className="p-0 min-w-fit bg-background mx-auto !max-h-10">
                         <TabsTrigger
                             value="single"
-                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
                         >
                             Add Attendee
                         </TabsTrigger>
                         <TabsTrigger
                             value="bulk"
-                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="max-h-9 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
                         >
                             Bulk Upload
                         </TabsTrigger></TabsList>
@@ -588,7 +588,7 @@ const AddAttendee: React.FC = () => {
                                     {/* Profile Picture */}
                                     <div className="flex flex-col gap-2">
                                         <Label className="font-semibold" htmlFor="image">Profile Picture</Label>
-                                        <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                                        <div className="input relative overflow-hidden bg-background/50 rounded-md !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                             <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                             <p className="w-full text-nowrap overflow-hidden text-ellipsis">{formData.image ? formData.image.name : 'No file Chosen'}</p>
                                             <Input
@@ -792,29 +792,29 @@ const AddAttendee: React.FC = () => {
                         </div>
 
                         <div className="mt-1.5 w-full">
-                            <div {...getRootProps()} className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
+                            <div {...getRootProps()} className={`border group duration-300 hover:border-primary border-primary-foreground/20 shadow-blur rounded-lg bg-background/50 p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
                                 <input {...getInputProps()} />
                                 <div className="flex flex-col items-center justify-center gap-3 text-center sm:!text-sm">
-                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
+                                    <FileUp width={24} className="group-hover:stroke-primary duration-300" />
                                     {isDragActive ? (
-                                        <p className="text-brand-secondary font-semibold">Drop the file here...</p>
+                                        <p className="text-secondary font-semibold">Drop the file here...</p>
                                     ) : (
                                         <>
                                             <p className="text-lg font-semibold">
                                                 Click Here to Upload your File or Drag
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-foreground">
                                                 Supported files: <span className="font-semibold">.csv, .xlsx, .xls (Max 10MB)</span>
                                             </p>
                                         </>
                                     )}
                                     {bulkFile && (
-                                        <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                                            <FileText className="size-5 text-brand-secondary" />
+                                        <div className="mt-4 flex items-center gap-2 p-2 bg-accent rounded-md w-full">
+                                            <FileText className="size-5 text-secondary" />
                                             <span className="truncate" style={{ maxWidth: '80%' }}>
                                                 {bulkFile.name}
                                             </span>
-                                            <span className="text-xs text-gray-500 sm:text-xs">
+                                            <span className="text-xs text-muted-foreground sm:text-xs">
                                                 ({ (bulkFile.size / (1024 * 1024)).toFixed(2)} MB)
                                             </span>
                                         </div>

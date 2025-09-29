@@ -1069,7 +1069,7 @@ const UpdateEvent: React.FC = () => {
                                     id="view_agenda_by"
                                     checked={formData.view_agenda_by === 1}
                                     onCheckedChange={(checked) => handleSwitchChange(checked, 'view_agenda_by')}
-                                    className="data-[state=checked]:bg-brand-primary"
+                                    className="data-[state=checked]:bg-primary"
                                 />
 
                                 <Label htmlFor="view_agenda_by" className='cursor-pointer'>Checked In</Label>

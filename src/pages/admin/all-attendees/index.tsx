@@ -192,14 +192,14 @@ const AllAttendees: React.FC = () => {
             </div>
 
             {/* Table */}
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
 
                 {/* Details Row */}
                 <div className='flex gap-3.5'>
 
                     {/* Select Box for pagination */}
                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="rounded-sm !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                        <SelectTrigger className="rounded-sm !w-fit !h-8 border flex items-center justify-center text-sm">
                             <SelectValue placeholder={`${itemsPerPage}/Page`} />
                         </SelectTrigger>
                         <SelectContent>
@@ -210,9 +210,9 @@ const AllAttendees: React.FC = () => {
                         </SelectContent>
                     </Select>
 
-                    <span className='font-semibold text-sm'>Total Attendees: {allEventsAttendees.length}</span>
+                    <span className='text-sm'>Total Attendees: {allEventsAttendees.length}</span>
                     {isFilterActive && (
-                        <span className='font-semibold text-sm'>Search Result: {filteredAttendees.length}</span>
+                        <span className='text-sm'>Search Result: {filteredAttendees.length}</span>
                     )}
                 </div>
 
@@ -220,7 +220,7 @@ const AllAttendees: React.FC = () => {
                 <div className='flex w-full gap-2.5 mt-4'>
                     {/* Search By Name */}
                     <Input
-                        className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                        className='!text-sm'
                         placeholder='Search by name'
                         value={nameFilter}
                         onChange={(e) => setNameFilter(e.target.value)}
@@ -228,7 +228,7 @@ const AllAttendees: React.FC = () => {
 
                     {/* Search By Company */}
                     <Input
-                        className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                        className='!text-sm'
                         placeholder='Search by company'
                         value={companyFilter}
                         onChange={(e) => setCompanyFilter(e.target.value)}
@@ -236,7 +236,7 @@ const AllAttendees: React.FC = () => {
 
                     {/* Search By Designation */}
                     <Input
-                        className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                        className='!text-sm'
                         placeholder='Search by designation'
                         value={designationFilter}
                         onChange={(e) => setDesignationFilter(e.target.value)}
@@ -244,12 +244,12 @@ const AllAttendees: React.FC = () => {
 
                     {/* Filter By Check-In */}
                     <Select value={checkInFilter} onValueChange={setCheckInFilter}>
-                        <SelectTrigger className="input !w-[122px] !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+                        <SelectTrigger className="cursor-pointer">
                             <SelectValue placeholder="Checked-In">
                                 {checkInFilter === 'all' ? 'Checked-In' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Checked-In'}
                             </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className='!text-sm !font-semibold'>
+                        <SelectContent className='!text-sm'>
                             <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
                             <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
                             <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
@@ -258,7 +258,7 @@ const AllAttendees: React.FC = () => {
 
                     {/* Filter By Role */}
                     <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="input !w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+                        <SelectTrigger className="cursor-pointer">
                             <SelectValue placeholder="Role">
                                 {roleFilter === 'all' ? 'Role' :
                                     roleFilter === 'delegate' ? 'Delegate' :
@@ -268,7 +268,7 @@ const AllAttendees: React.FC = () => {
                                                     roleFilter === 'moderator' ? 'Moderator' : 'Role'}
                             </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className='!text-sm !font-semibold'>
+                        <SelectContent className=''>
                             <SelectItem value="all" className='cursor-pointer'>All Roles</SelectItem>
                             <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
                             <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
@@ -280,7 +280,7 @@ const AllAttendees: React.FC = () => {
                 </div>
 
                 <Table className='mt-4'>
-                    <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                    <TableHeader className='bg-accent !rounded-[10px]'>
                         <TableRow className='!text-base'>
                             <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
@@ -297,7 +297,7 @@ const AllAttendees: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-                            <TableRow key={attendee.id}>
+                            <TableRow key={attendee.id} className="hover:bg-background/50">
                                 <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                                 <TableCell className="text-left min-w-10 !capitalize">
                                     {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}

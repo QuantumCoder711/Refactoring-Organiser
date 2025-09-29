@@ -18,17 +18,17 @@ const AllTemplateMessages: React.FC = () => {
           <div
             key={index}
             onClick={() => navigate(`${template.path}/${slug}`)}
-            className="bg-brand-background p-4 rounded-[10px] h-52 cursor-pointer group flex flex-col justify-between"
+            className="bg-muted p-4 rounded-[10px] h-52 cursor-pointer group flex flex-col justify-between"
           >
             <div className='flex flex-col gap-2'>
               <img src={template.icon as string} alt={template.title} className="size-10" />
-              <h2 className="text-lg font-medium group-hover:text-brand-primary duration-300">{template.title}</h2>
+              <h2 className="text-lg font-medium group-hover:text-primary duration-300">{template.title}</h2>
             </div>
 
             <div className='w-full flex justify-between items-end'>
               <p className='text-sm w-3/4'>{template.paragraph}</p>
-              <div className='bg-white grid w-8 h-8 p-1.5 place-content-center rounded-full'>
-                <ArrowRight className='h-full w-full group-hover:text-brand-primary duration-300' />
+              <div className='bg-background grid w-8 h-8 p-1.5 place-content-center rounded-full'>
+                <ArrowRight className='h-full w-full group-hover:text-primary duration-300' />
               </div>
             </div>
           </div>
