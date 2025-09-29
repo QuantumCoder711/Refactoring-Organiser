@@ -504,7 +504,7 @@ const AddEvent: React.FC = () => {
                             type="text"
                             value={formData.title}
                             onChange={handleInputChange}
-                            className='bg-background h-12 min-w-full'
+                            className='h-12 min-w-full'
                         />
                     </div>
 
@@ -516,7 +516,7 @@ const AddEvent: React.FC = () => {
                                 <Label className="font-semibold" htmlFor='paid_event'>
                                     Event Type <span className="text-secondary">*</span>
                                 </Label>
-                                <div className='input !h-12 min-w-full flex items-center text-base bg-background rounded-md pl-4 !py-1.5'>
+                                <div className='input !h-12 min-w-full flex items-center text-base !bg-background/50 rounded-md pl-4 !py-1.5'>
                                     <div className='flex gap-4 items-center text-muted-foreground'>
                                         <Label htmlFor="paid_event" className='cursor-pointer'>Free</Label>
 
@@ -548,9 +548,9 @@ const AddEvent: React.FC = () => {
 
                             {/* Banner Image - Disabled when templates are showing */}
                             <div className="flex flex-col gap-2">
-                                <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
-                                <div className={`bg-background rounded-md relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
-                                    <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
+                                <Label className="font-semibold" htmlFor="image">Banner <span className='text-secondary'>*</span></Label>
+                                <div className={`!bg-background/50 rounded-md relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
+                                    <span className="w-full bg-muted px-2 h-9 rounded-md text-base font-normal flex items-center">Choose File</span>
                                     <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                         {formData.image
                                             ? formData.image instanceof File
@@ -576,13 +576,13 @@ const AddEvent: React.FC = () => {
                             <p className='font-semibold text-center -my-4'>Or</p>
 
                             {/* Toggle Template Button */}
-                            <button
+                            <Button
                                 onClick={toggleTemplates}
                                 type="button"
                                 className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'
                             >
                                 {showTemplates ? 'Hide Templates' : 'Create Event Banner'}
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Image Preview */}
@@ -657,7 +657,7 @@ const AddEvent: React.FC = () => {
                             name='description'
                             value={formData.description}
                             onChange={handleInputChange}
-                            className='input min-w-full !h-32 text-base'
+                            className='min-w-full !h-32 text-base'
                         />
                     </div>
 
@@ -669,9 +669,9 @@ const AddEvent: React.FC = () => {
                                 Start Time <span className="text-secondary">*</span>
                             </Label>
 
-                            <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
+                            <div className='w-full rounded-[10px] relative flex h-12 !bg-background/50 p-1'>
                                 {/* For Date */}
-                                <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
+                                <div className='h-full w-full relative rounded-l-md border-r'>
                                     <Input
                                         type='date'
                                         name='event_start_date'
@@ -685,7 +685,7 @@ const AddEvent: React.FC = () => {
                                 </div>
 
                                 {/* For Time */}
-                                <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
+                                <div className='h-full w-28 relative rounded-r-md'>
                                     <Input
                                         type='time'
                                         name='start_time'
@@ -713,9 +713,9 @@ const AddEvent: React.FC = () => {
                                 End Time <span className="text-secondary">*</span>
                             </Label>
 
-                            <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
+                            <div className='w-full rounded-[10px] relative flex h-12 !bg-background/50 p-1'>
                                 {/* For Date */}
-                                <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
+                                <div className='h-full w-full relative rounded-l-md border-r'>
                                     <Input
                                         type='date'
                                         name='event_date'
@@ -729,7 +729,7 @@ const AddEvent: React.FC = () => {
                                 </div>
 
                                 {/* For Time */}
-                                <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
+                                <div className='h-full w-28 relative rounded-r-md'>
                                     <Input
                                         type='time'
                                         name='end_time'
@@ -767,10 +767,10 @@ const AddEvent: React.FC = () => {
                                 }));
                             }}
                         >
-                            <SelectTrigger className="w-full input !h-12 !min-w-full cursor-pointer">
+                            <SelectTrigger className="w-full !h-12 !min-w-full cursor-pointer">
                                 <SelectValue placeholder="Select Event Mode" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className='!bg-background/50'>
                                 <SelectGroup>
                                     <SelectItem value="0" className='cursor-pointer'>In Person</SelectItem>
                                     <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
@@ -797,7 +797,7 @@ const AddEvent: React.FC = () => {
                                         value={formData.google_map_link}
                                         onChange={handleInputChange}
                                         placeholder='Enter Location'
-                                        className='bg-background h-12 min-w-full'
+                                        className='h-12 min-w-full'
                                     />
                                 </Autocomplete>
                             ) : (
@@ -808,7 +808,7 @@ const AddEvent: React.FC = () => {
                                     value={formData.google_map_link}
                                     onChange={handleInputChange}
                                     placeholder='Enter Location'
-                                    className='bg-background h-12 min-w-full'
+                                    className='h-12 min-w-full'
                                 />
                             )}
 
@@ -875,8 +875,8 @@ const AddEvent: React.FC = () => {
                             <Label className="font-semibold" htmlFor='view_agenda_by'>
                                 View Agenda By
                             </Label>
-                            <div className='input !h-12 min-w-full flex items-center text-base px-4'>
-                                <div className='flex gap-4 items-center text-brand-dark-gray'>
+                            <div className='!bg-background/50 rounded-md !h-12 min-w-full flex items-center text-base px-4'>
+                                <div className='flex gap-4 items-center'>
                                     <Label htmlFor="view_agenda_by" className='cursor-pointer'>All</Label>
 
                                     <Switch
