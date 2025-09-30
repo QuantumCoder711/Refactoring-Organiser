@@ -405,7 +405,7 @@ const UpdateICP: React.FC = () => {
             }));
 
             const icpData = {
-                sheet_name: formData.sheet_name.trim(),
+                sheet_name: sheet?.sheet_name,
                 country_name: formData.country_name,
                 state_name: formData.state_name || '',
                 company: companiesWithUpdatedDesignations,
@@ -453,7 +453,7 @@ const UpdateICP: React.FC = () => {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {/* Sheet Name */}
-                        <div className="flex flex-col gap-2">
+                        {/* <div className="flex flex-col gap-2">
                             <Label className="font-semibold">
                                 Sheet Name <span className="text-red-500">*</span>
                             </Label>
@@ -463,7 +463,7 @@ const UpdateICP: React.FC = () => {
                                 placeholder="Enter sheet name"
                                 className="h-12"
                             />
-                        </div>
+                        </div> */}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Job Title */}
