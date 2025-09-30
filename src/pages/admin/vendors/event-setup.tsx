@@ -77,7 +77,7 @@ const EventSetupPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-10 flex gap-5">
+      <div className="mt-10 grid grid-cols-3 gap-5">
         {/* Company Card */}
         {filteredVendors?.map((company, index) => (
           <VendorCompanyCard key={index} company={company} />

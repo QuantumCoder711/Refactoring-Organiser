@@ -18,7 +18,7 @@ import { getImageUrl } from '@/lib/utils';
 import DocumentRenderer from '@/components/DocumentRenderer';
 import Wave from '@/components/Wave';
 
-// Custom Combo Box Component for company names with filtering and creation
+
 const CustomComboBox = React.memo(({
     label,
     value,
@@ -145,7 +145,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex flex-col gap-2" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -157,7 +157,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="input capitalize !h-12 min-w-full text-base pr-10"
+                        className="capitalize !h-12 min-w-full text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -169,29 +169,29 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 capitalize cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 capitalize cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span>{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 text-secondary" />
                                     )}
                                 </div>
                             ))
                         ) : searchTerm ? (
                             <div
-                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                className="px-3 py-2 cursor-pointer hover:bg-accent text-secondary text-sm font-medium"
                                 onClick={handleCreateNew}
                             >
                                 Create "{searchTerm}"
                             </div>
                         ) : (
-                            <div className="px-3 py-2 text-gray-500 text-sm">
+                            <div className="px-3 py-2 text-foreground/50 text-sm">
                                 No companies found
                             </div>
                         )}
@@ -261,10 +261,10 @@ const UpdateSponsor: React.FC = () => {
             if (res.data.success) {
                 const obj = { ...res.data.sponsor, attendees: res.data.attendees }
                 setFormData(obj);
-                toast(res.data.message || "Event sponsor attendees retrieved successfully", {
-                    className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-                    icon: <CircleCheck className='size-5' />
-                });
+                // toast(res.data.message || "Event sponsor attendees retrieved successfully", {
+                //     className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                //     icon: <CircleCheck className='size-5' />
+                // });
                 setFilePaths(res.data.sponsor.upload_deck);
             } else {
                 toast(res.data.message || "Error while fetching sponsor details", {
@@ -354,47 +354,37 @@ const UpdateSponsor: React.FC = () => {
                 <h1 className='text-xl font-semibold'>{event?.title}</h1>
             </div>
 
-            <div className='mt-5 max-w-2xl flex flex-col gap-5 mx-auto bg-brand-background p-5 rounded-xl'>
+            <div className='mt-5 max-w-2xl flex flex-col gap-5 mx-auto bg-muted p-5 rounded-xl'>
 
                 {/* Company Logo */}
                 <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-4">
-
-                        <div className='size-28 rounded-full bg-brand-primary/10 flex items-center justify-center overflow-hidden'>
+                    <div className="flex items-center w-full gap-4">
+                        <div className='size-28 min-w-28 min-h-28 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden'>
                             {/* Logo preview will be shown here */}
-                            {formData.company_logo ? (
-                                <div>
-                                    <img
-                                        src={formData.company_logo as any instanceof File ? URL.createObjectURL(formData.company_logo) : getImageUrl(formData.company_logo)}
-                                        alt="Logo Preview"
-                                        className="object-cover w-full h-full"
-                                    />
-                                </div>
-                            ) : (
-                                <span className="text-brand-primary text-sm font-medium">Logo</span>
-                            )}
+                            {formData.company_logo ? <div>
+                                <img src={formData.company_logo as any instanceof File ? URL.createObjectURL(formData.company_logo) : getImageUrl(formData.company_logo)} alt="Logo Preview" className="object-cover w-full h-full" />
+                            </div> : <span className="text-primary text-sm font-medium">Logo</span>}
                         </div>
-
-                        <div className="flex-1 gap-2 flex flex-col">
-                            <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-brand-secondary'>*</span></Label>
-                            <div className='flex gap-4'>
-                                <div className="input relative overflow-hidden !h-9 max-w-fit text-base cursor-pointer flex items-center justify-between p-2 gap-4">
-                                    <span className="w-full bg-brand-background px-2 rounded-md text-base font-normal flex items-center">Choose File</span>
-                                    <p className="w-full text-nowrap overflow-hidden text-ellipsis">
-                                        No file Chosen
-                                    </p>
+                        <div className="gap-2 flex flex-col flex-1 overflow-hidden">
+                            <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-secondary'>*</span></Label>
+                            <div className='flex flex-1 overflow-hidden gap-4'>
+                                <div className="bg-background/50 rounded-md relative overflow-hidden !h-10 text-base cursor-pointer flex flex-1 items-center justify-between p-2 gap-4">
+                                    <span className="max-w-fit text-nowrap px-2 rounded-md text-base font-normal flex items-center">Choose File</span>
+                                    {/* <p className="text-foreground/80 text-left text-nowrap overflow-hidden text-ellipsis">
+                                                        {selectedImage ? selectedImage.name : 'No file Chosen'}
+                                                    </p> */}
                                     <Input
                                         id="company_logo"
                                         name="company_logo"
                                         type='file'
                                         accept="image/*"
                                         onChange={(e) => handleFormChange(e)}
-                                        className='absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
+                                        className='absolute left-0 top-0 opacity-0 !h-12 w-full overflow-hidden text-base cursor-pointer'
                                     />
                                 </div>
-                                <Button className='bg-white  hover:bg-white h-9 text-black cursor-pointer' onClick={() => setFormData((prev) => ({ ...prev, company_logo: null }))}>Remove</Button>
+                                <Button onClick={() => { setFormData((prev) => ({ ...prev, company_logo: null })) }}>Remove</Button>
                             </div>
-                            <p className="text-xs text-gray-500">Recommended size: 512x512px (1:1 ratio)</p>
+                            <p className="text-xs text-foreground/50">Recommended size: 512x512px (1:1 ratio)</p>
                         </div>
                     </div>
                 </div>
@@ -421,7 +411,7 @@ const UpdateSponsor: React.FC = () => {
                 {/* About Company */}
                 <div className='flex flex-col gap-2'>
                     <Label className="font-semibold" htmlFor='about_company'>
-                        About Company <span className='text-brand-secondary'>*</span>
+                        About Company <span className='text-secondary'>*</span>
                     </Label>
                     <Textarea
                         id='about_company'
@@ -430,7 +420,6 @@ const UpdateSponsor: React.FC = () => {
                         onChange={(e) => handleFormChange(e)}
                         className='input min-w-full !h-60 text-base'
                     />
-
                 </div>
 
                 {/* Video Link */}
@@ -442,9 +431,9 @@ const UpdateSponsor: React.FC = () => {
                         id='video_link'
                         name='video_link'
                         type='url'
-                        value={formData?.video_link}
+                        value={formData.video_link}
                         onChange={(e) => handleFormChange(e)}
-                        className='input min-w-full text-base'
+                        className='min-w-full !h-12 text-base'
                     />
                 </div>
 
@@ -467,23 +456,23 @@ const UpdateSponsor: React.FC = () => {
                     </div>
 
                     <div className="w-full">
-                        <div {...getRootProps()} className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
+                        <div {...getRootProps()} className={`border group duration-300 hover:border-primary border-brand-light-gray shadow-blur rounded-lg bg-background/50 p-6 cursor-pointer transition-colors ${isDragActive && 'border-secondary bg-secondary/10'}`}>
                             <input {...getInputProps()} />
                             <div className="flex flex-col items-center justify-center gap-2 text-center">
-                                <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
+                                <FileUp width={24} className="group-hover:stroke-primary duration-300" />
                                 {isDragActive ? (
-                                    <p className="text-brand-secondary font-medium">Drop the file here...</p>
+                                    <p className="text-secondary font-medium">Drop the file here...</p>
                                 ) : (
                                     <>
-                                        <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
+                                        <p className="text-lg"><span className="text-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
                                         <p className="">Supported file: <span className="font-semibold">.pdf, .pptx, .ppt (Max 1GB)</span></p>
                                     </>
                                 )}
                                 {bulkFile && (
-                                    <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                                        <FileText className="size-5 text-brand-secondary" />
+                                    <div className="mt-4 flex items-center gap-2 p-2 bg-accent rounded-md w-full">
+                                        <FileText className="size-5 text-secondary" />
                                         <span className="text-sm font-medium truncate">{bulkFile.name}</span>
-                                        <span className="text-xs text-gray-500 ml-auto">{(bulkFile.size / 1024 / 1024).toFixed(2)} MB</span>
+                                        <span className="text-xs text-muted-foreground ml-auto">{(bulkFile.size / 1024 / 1024).toFixed(2)} MB</span>
                                     </div>
                                 )}
                             </div>

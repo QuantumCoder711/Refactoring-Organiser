@@ -36,36 +36,36 @@ const EventSponsors: React.FC = () => {
                     events.filter((event: EventType) => event.title.toLowerCase().includes(searchTerm.toLowerCase())).sort((a: any, b: any) => {
                         return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
                     }).map((event: EventType) => (
-                        <div key={event.id} className='w-80 p-2 bg-brand-light-gray rounded-3xl'>
+                        <div key={event.id} className='w-80 p-2 bg-accent rounded-3xl'>
                             <div className='relative h-48'>
                                 <img src={getImageUrl(event.image)} alt={event.title} className='rounded-2xl h-full w-full object-cover' />
                                 {/* Overlay */}
                                 <div className='absolute h-1/2 bottom-0 w-full bg-gradient-to-b from-black/0 rounded-xl via-black/40 to-black'>
-                                    <div className='border border-white rounded-full px-4 absolute bottom-2 left-2 text-white py-1 max-w-fit text-xs'>
+                                    <div className='rounded-full px-4 absolute bottom-2 left-2 py-1 max-w-fit text-xs text-background dark:text-foreground border backdrop-blur-xs dark:border-foreground'>
                                         {formatDateTime(event.event_start_date)}
                                     </div>
                                 </div>
                             </div>
-                            <div className='py-1 '>
+                            <div className='py-1 space-y-1'>
                                 <h3 className='text-sm uppercase font-medium text-nowrap text-ellipsis overflow-hidden'>
                                     {event.title}
                                 </h3>
-                                <div hidden={event.event_mode == 1} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
-                                    <MapPin width={8} height={12} className='!size-5 fill-black stroke-brand-light-gray' />
-                                    <span className='overflow-hidden text-ellipsis'>
+                                <div hidden={event.event_mode == 1} className='text-xs text-nowrap opacity-60 dark:opacity-50 overflow-hidden text-ellipsis flex gap-1 items-center'>
+                                    <MapPin width={8} height={12} className='!size-5 fill-accent stroke-foreground' />
+                                    <span className='overflow-hidden text-ellipsis text-foreground'>
                                         {event.event_venue_name}
                                     </span>
                                 </div>
                                 <div hidden={event.event_mode == 0} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
-                                    <Globe width={8} height={12} className='!size-5 fill-black stroke-brand-light-gray' />
-                                    <span className='overflow-hidden text-ellipsis'>
+                                    <Globe width={8} height={12} className='!size-5 fill-accent stroke-foreground' />
+                                    <span className='overflow-hidden text-ellipsis text-foreground'>
                                         Online
                                     </span>
                                 </div>
-                                <Separator />
+                                <Separator className='bg-muted !h-[1px] mt-1' />
                                 <div className='flex justify-center mt-2 gap-2 text-sm'>
-                                    <Link to={`/event-sponsors/${event.slug}`} className='bg-white rounded-full px-5 py-1 w-full grid place-content-center text-brand-primary'>View Sponsors</Link>
-                                    <Link to={`/event-sponsors/add-sponsor/${event.slug}`} className='bg-white rounded-full px-5 py-1 w-full grid place-content-center text-brand-primary'>Add Sponsors</Link>
+                                    <Link to={`/event-sponsors/${event.slug}`} className='bg-muted rounded-full px-5 py-1 w-full grid place-content-center text-primary'>View Sponsors</Link>
+                                    <Link to={`/event-sponsors/add-sponsor/${event.slug}`} className='bg-muted rounded-full px-5 py-1 w-full grid place-content-center text-primary'>Add Sponsors</Link>
                                 </div>
                             </div>
                         </div>

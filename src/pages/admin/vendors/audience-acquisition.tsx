@@ -60,7 +60,7 @@ const AudienceAcquisitionPage: React.FC = () => {
         <div className="mt-10 !mx-auto max-w-fit">
           <Label className='mb-3'>Select City</Label>
           <Select onValueChange={(value) => setSelectedCity(value)} defaultValue="all">
-            <SelectTrigger className="input min-w-96 text-base cursor-pointer">
+            <SelectTrigger className="min-w-96 text-base cursor-pointer">
               <SelectValue placeholder="Select City"/>
             </SelectTrigger>
             <SelectContent>
@@ -78,7 +78,7 @@ const AudienceAcquisitionPage: React.FC = () => {
         
       </div>
 
-      <div className="mt-10 flex gap-5">
+      <div className="mt-10 grid grid-cols-3 gap-5">
         {/* Company Card */}
         {filteredVendors?.map((company, index) => (
           <VendorCompanyCard key={index} company={company} />

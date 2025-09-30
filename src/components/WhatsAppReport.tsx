@@ -153,8 +153,8 @@ const WhatsAppReport: React.FC = () => {
                 {whatsappLabels.map((card, index) => (
                     <div
                         key={index}
-                        onClick={() => { setSelectedStatus(card.status as "sent" | "delivered" | "read" | "failed"); setCurrentPage(1); }}
-                        className={`min-w-40 w-full cursor-pointer duration-300 hover:bg-brand-background bg-brand-background rounded-lg h-9 px-4 shadow-blur flex justify-between items-center ${selectedStatus === card.status ? '!font-semibold' : ''}`}
+                        onClick={() => {setSelectedStatus(card.status as "sent" | "delivered" | "read" | "failed"); setCurrentPage(1);}}
+                        className={`min-w-40 w-full cursor-pointer duration-300 hover:bg-accent bg-muted rounded-lg h-10 px-4 flex justify-between items-center text-foreground ${selectedStatus === card.status ? 'bg-primary hover:bg-primary text-white' : ''}`}
                     >
                         <span>{card.title}</span>
                         <span>{card.value}</span>
@@ -162,11 +162,11 @@ const WhatsAppReport: React.FC = () => {
                 ))}
             </div>
 
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
                 <div className='flex w-full justify-between items-baseline'>
                     <div className='flex w-full gap-2.5'>
                         <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] cursor-pointer border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                            <SelectTrigger className="!w-fit cursor-pointer h-10 border border-accent flex items-center justify-center text-sm">
                                 <SelectValue placeholder={`${itemsPerPage}/Page`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -177,13 +177,13 @@ const WhatsAppReport: React.FC = () => {
                         </Select>
 
                         <Input
-                            className='input !min-w-fit !max-w-fit !max-h-[30px] !p-2.5 !text-xs'
+                            className='!min-w-fit !max-w-60 h-10 !text-xs'
                             placeholder='Search by name'
                             value={filters.name}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, name: e.target.value }))}
                         />
                         <Input
-                            className='input !min-w-fit !max-w-fit !max-h-[30px] !p-2.5 !text-xs'
+                            className='!min-w-fit !max-w-60 h-10 !text-xs'
                             placeholder='Search by phone'
                             value={filters.phone}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, phone: e.target.value }))}
@@ -192,7 +192,7 @@ const WhatsAppReport: React.FC = () => {
                 </div>
 
                 <Table className='mt-7'>
-                    <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                    <TableHeader className='bg-accent !rounded-[10px]'>
                         <TableRow className='!rounded-[10px]'>
                             <TableHead className="text-left min-w-10 !px-2 !font-semibold">S.No</TableHead>
                             <TableHead className="text-left min-w-10 !px-2 !font-semibold">Name</TableHead>
@@ -208,7 +208,7 @@ const WhatsAppReport: React.FC = () => {
                             </TableRow>
                         ) : (
                             filteredAttendees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((message: WhatsAppMessage, index: number) => (
-                                <TableRow key={message._id}>
+                                <TableRow key={message._id} className='capitalize'>
                                     <TableCell className="text-left min-w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
                                     <TableCell className="text-left min-w-10">{message.firstName || "-"}</TableCell>
                                     <TableCell className="text-left min-w-10">{message?.messageID?.customerPhoneNumber || "-"}</TableCell>

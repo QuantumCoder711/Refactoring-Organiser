@@ -41,7 +41,7 @@ const AllReports: React.FC = () => {
                             date={event.event_date}
                             image={getImageUrl(event.image)}
                             imageAlt={event.title}
-                            location={event.event_venue_address_1}
+                            location={event.city}
                             slug={event.slug}
                             title={event.title}
                         />

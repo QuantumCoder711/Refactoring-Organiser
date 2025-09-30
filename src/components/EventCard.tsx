@@ -129,7 +129,7 @@ const EventCard: React.FC<EventCardProps> = ({
 
                     <div className='p-2 flex justify-between min-h-24 absolute bg-gradient-to-b rounded-xl from-black/0 via-black/40 to-black w-full bottom-0' />
                     <div className='absolute flex items-center justify-between w-full bottom-2 px-2'>
-                        <span className='rounded-full px-2.5 py-1.5 w-fit border border-white text-white text-xs grid place-content-center'>
+                        <span className='rounded-full px-2.5 py-1.5 w-fit text-background dark:text-foreground border backdrop-blur-xs dark:border-foreground text-xs grid place-content-center'>
                             {formatDate(date)}
                         </span>
                         <div className='flex gap-2 items-center'>

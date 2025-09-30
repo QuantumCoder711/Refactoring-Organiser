@@ -55,23 +55,23 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
     }
 
     return (
-        <div className='w-52 h-52 bg-brand-background flex justify-between flex-col rounded-lg p-4 shadow'>
-            <div className='h-24 w-full grid place-content-center overflow-clip bg-white rounded-2xl'>
+        <div className='w-52 h-52 bg-muted flex justify-between flex-col rounded-lg p-4 shadow'>
+            <div className='h-24 w-full grid place-content-center overflow-clip bg-background/50 rounded-2xl'>
                 <img className='w-full h-full object-contain' src={getImageUrl(image)} alt={title} />
             </div>
             <h3 className='font-bold text-center capitalize'>{title}</h3>
             <div className='flex justify-between gap-2'>
                 <Link to={`/event-sponsors/${slug}/sponsor-details/${id}`} className='w-full'>
-                    <Button className='btn !rounded-full !w-full font-bold'>View</Button>
+                    <Button className='rounded-full w-full'>View</Button>
                 </Link>
 
-                <Link to={`/event-sponsors/${slug}/update-sponsor/${id}`} className='p-2 bg-brand-primary hover:bg-brand-primary-dark duration-300 rounded-full text-white'>
+                <Link to={`/event-sponsors/${slug}/update-sponsor/${id}`} className='p-2 w-9 h-9 min-w-9 min-h-9 bg-primary hover:bg-primary/80 duration-300 grid place-content-center rounded-full text-white'>
                     <Edit size={16} />
                 </Link>
 
                 <AlertDialog>
                     <AlertDialogTrigger
-                        className='grid place-content-center text-white w-8 h-8 min-w-8 min-h-8 bg-brand-secondary hover:bg-brand-secondary/80 duration-300 cursor-pointer rounded-full z-50 top-2 right-2'
+                        className='grid place-content-center text-white w-9 h-9 min-w-9 min-h-9 bg-secondary duration-300 cursor-pointer rounded-full z-50 top-2 right-2'
                     >
                         <Trash size={16} />
                     </AlertDialogTrigger>
@@ -84,7 +84,7 @@ const Card: React.FC<{ image: string | null, title: string, id: number }> = ({ i
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                            <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => handleDeleteSponsor(id)}>Delete</AlertDialogAction>
+                            <AlertDialogAction className='cursor-pointer bg-destructive hover:bg-destructive/80 duration-300 transition-all text-white' onClick={() => handleDeleteSponsor(id)}>Delete</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
