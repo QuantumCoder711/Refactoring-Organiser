@@ -125,7 +125,7 @@ const CustomComboBox = React.memo(({
     );
 });
 
-import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown, Loader2 } from 'lucide-react';
+import { CircleCheck, Eye, Trash, Upload as UploadIcon, XIcon, X, Check, ChevronDown, Loader2, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { appDomain } from '@/constants';
@@ -543,7 +543,7 @@ const SavedICP: React.FC = () => {
                             setCompareFile(null);
                             setSelectedICPSheet('');
                         }} className='cursor-pointer'>Close</Button>
-                        {!comparedData &&<Button
+                        {!comparedData && <Button
                             disabled={!compareFile || !selectedICPSheet}
                             onClick={handleCompareFiles}
                             className='bg-brand-primary hover:bg-brand-primary-dark duration-300 transition-colors'>
@@ -642,7 +642,7 @@ const SavedICP: React.FC = () => {
                 {icpSheets ? icpSheets?.map((sheet: ICPSheet) => {
                     const meta = formatUploadedOn(sheet.sheet_name || sheet.uuid);
                     return (
-                        <Card key={sheet.uuid} className='transition-shadow hover:shadow-md'>
+                        <Card key={sheet.uuid} className='relative transition-shadow hover:shadow-md'>
                             <CardHeader className='flex flex-col'>
                                 <CardTitle className='text-base sm:text-lg capitalize break-words line-clamp-2'>{meta.name.split("_")[0].split("-").join(" ")}</CardTitle>
                                 <CardDescription>{meta.uploadedOn ? `Uploaded on ${meta.uploadedOn}` : '—'}</CardDescription>
@@ -673,6 +673,11 @@ const SavedICP: React.FC = () => {
                                     </AlertDialog>
                                 </CardAction>
                             </CardHeader>
+                            <div className='block absolute right-2 top-2'>
+                                <Link to={`/icp/update-sheet/${sheet.sheet_name}`} className='p-2 bg-brand-primary hover:bg-brand-primary-dark duration-300 rounded-full text-white block'>
+                                    <Edit size={16} />
+                                </Link>
+                            </div>
                             <CardContent>
                                 <div className='text-sm text-muted-foreground'>
                                     {sheet.sheetRows.length} entries

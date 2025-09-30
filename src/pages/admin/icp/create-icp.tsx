@@ -284,10 +284,10 @@ const CreateICP: React.FC = () => {
         })),
       };
 
-      toast(`ICP data generated successfully with ${icpData.company.length} companies!`, {
-        className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-        icon: <CircleCheck className='size-5' />
-      });
+      // toast(`ICP data generated successfully with ${icpData.company.length} companies!`, {
+      //   className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+      //   icon: <CircleCheck className='size-5' />
+      // });
 
       const data = {
         ...icpData,

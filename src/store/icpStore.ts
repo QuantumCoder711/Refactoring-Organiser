@@ -36,6 +36,8 @@ interface ICPStore {
     deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
     createICP: (payload: any) => Promise<{ success: boolean; message?: string }>;
+    updateRow: (sheetName: string, payload: any) => Promise<{ success: boolean; message?: string }>;
+    updateICP: (payload: any) => Promise<{ success: boolean; message?: string }>;
     // Entry-level CRUD (console.log only for now)
     addICPEntry: (payload: CreateICPPayload, userId: number) => Promise<{ success: boolean; message: string }>;
     updateICPEntry: (sheetUuid: string, rowUuid: string, rowIndex: number, entry: SheetRow, userId: number) => Promise<{ success: boolean; message: string }>;
@@ -201,6 +203,54 @@ const useICPStore = create<ICPStore>((set, get) => ({
             ),
         }));
         return Promise.resolve({ success: true, message: 'Entry deleted' });
+    },
+    updateRow: async (sheetName: string, payload: any) => {
+        try {
+            const response = await axios.post(`${domain}/api/update-icp/${sheetName}`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                return {
+                    success: response.data.success,
+                    message: response.data.message
+                };
+            } else {
+                return {
+                    success: false,
+                    message: response.data.message || 'Failed to update ICP',
+                };
+            }
+        } catch (error) {
+            console.error('Failed to update ICP:', error);
+            throw error;
+        }
+    },
+    updateICP: async (payload: any) => {
+        try {
+            const response = await axios.post(`${domain}/api/update-sheet`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.data.success) {
+                return {
+                    success: response.data.success,
+                    message: response.data.message
+                };
+            } else {
+                return {
+                    success: false,
+                    message: response.data.message || 'Failed to update ICP',
+                };
+            }
+        } catch (error) {
+            console.error('Failed to update ICP:', error);
+            throw error;
+        }
     }
 }));
 
