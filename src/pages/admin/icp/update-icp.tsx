@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, ChevronDown, Loader2, CircleCheck, XIcon, Check, Trash } from 'lucide-react';
+import { X, ChevronDown, Loader2, CircleCheck, XIcon, Check } from 'lucide-react';
 import { CountrySelect, StateSelect, GetCountries } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 import useExtrasStore from '@/store/extrasStore';
