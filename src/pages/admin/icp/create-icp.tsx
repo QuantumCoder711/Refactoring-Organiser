@@ -271,7 +271,7 @@ const CreateICP: React.FC = () => {
       const companies = response.data.data;
 
       // Generate ICP Data
-      const icpData: ICPData = {
+      const icpData = {
         sheet_name: formData.sheet_name.trim(),
         country_name: formData.country_name,
         state_name: formData.state_name || '',
@@ -282,6 +282,13 @@ const CreateICP: React.FC = () => {
           employee_size: company.companySize,
           industry: company.industry,
         })),
+        preferences: {
+          employee_size: formFields.employeeSizes,
+          industry: formFields.industries,
+          designation: formFields.designations,
+          country: formData.country_name,
+          state: formData.state_name || ''
+        }
       };
 
       // toast(`ICP data generated successfully with ${icpData.company.length} companies!`, {

@@ -1,3 +1,5 @@
+// update-icp.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +11,7 @@ import { X, ChevronDown, Loader2, CircleCheck, XIcon, Check } from 'lucide-react
 import { CountrySelect, StateSelect, GetCountries } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
 import useExtrasStore from '@/store/extrasStore';
-import useICPStore from '@/store/icpStore';
+import useICPStore, { PreferencesPayload } from '@/store/icpStore';
 import useAuthStore from '@/store/authStore';
 import { appDomain } from '@/constants';
 import axios from 'axios';
@@ -168,7 +170,7 @@ const MultiSelectDropdown = React.memo(({
 
 const UpdateICP: React.FC = () => {
     const { designations, industries, getDesignations, getIndustries } = useExtrasStore();
-    const { icpSheets, updateICP, loading: storeLoading, getICPSheets } = useICPStore();
+    const { icpMetaData, updateICP, loading: storeLoading, getICPSheets, getICPExcelSheets } = useICPStore();
     const { user } = useAuthStore();
     const { sheetName } = useParams<{ sheetName: string }>();
     const navigate = useNavigate();
@@ -177,9 +179,11 @@ const UpdateICP: React.FC = () => {
         if (user) getICPSheets(user.id as number);
     }, [user, getICPSheets]);
 
-    const sheet = icpSheets?.find(s => s.sheet_name === sheetName);
+    // Find the sheet metadata from icpMetaData
+    const sheetMeta = icpMetaData?.find((meta: PreferencesPayload) => meta.sheet_name === sheetName);
+
     const [formData, setFormData] = useState<ICPData>({
-        sheet_name: '',
+        sheet_name: sheetName || '',
         country_name: '',
         state_name: '',
         company: [],
@@ -208,68 +212,109 @@ const UpdateICP: React.FC = () => {
         { display: 'More than 10, 000', value: '10000-1000000000' }
     ];
 
-    // Pre-fill form with existing sheet data
+    // Pre-fill form with existing preferences data
     useEffect(() => {
-        if (sheet && sheet.sheetRows.length > 0 && !isInitialized) {
-            // Extract unique employee sizes from sheet data and filter to only include valid options
-            const validEmployeeSizeValues = new Set(employeeOptions.map(opt => opt.value));
-            const uniqueEmployeeSizes = Array.from(
-                new Set(
-                    sheet.sheetRows
-                        .map(row => row.employee_size)
-                        .filter(size => size && validEmployeeSizeValues.has(size))
-                )
-            );
+        const initializeForm = async () => {
+            if (sheetMeta && !isInitialized) {
+                try {
+                    // Get the full sheet data including rows
+                    const sheetData = await getICPExcelSheets(sheetName as string);
+                    const activeSheet = sheetData[0];
 
-            // Extract unique industries from sheet data
-            const uniqueIndustries = Array.from(new Set(sheet.sheetRows.map(row => row.industry).filter(Boolean)));
+                    if (activeSheet && activeSheet.sheetRows.length > 0) {
+                        // Use preferences if available, otherwise extract from sheet rows
+                        let preferencesData = sheetMeta.preferences?.[0];
 
-            // Extract unique designations from sheet data
-            const uniqueDesignations = Array.from(new Set(sheet.sheetRows.flatMap(row => row.designation).filter(Boolean)));
+                        if (preferencesData) {
+                            // Use preferences data
+                            setFormData({
+                                sheet_name: sheetName || '',
+                                country_name: preferencesData.country_name || '',
+                                state_name: preferencesData.state_name || '',
+                                company: [],
+                            });
 
-            // Get country and state from first row (assuming all rows have same country/state)
-            const firstRow = sheet.sheetRows[0];
+                            setFormFields({
+                                designations: preferencesData.designation || [],
+                                employeeSizes: preferencesData.employee_size || [],
+                                industries: preferencesData.industry || [],
+                                priority: 'P4',
+                            });
+                        } else {
+                            // Fallback: Extract from sheet rows (original logic)
+                            const firstRow = activeSheet.sheetRows[0];
 
-            setFormData({
-                sheet_name: sheet.sheet_name,
-                country_name: firstRow.country_name || '',
-                state_name: firstRow.state_name || '',
-                company: [],
-            });
+                            // Extract unique values from sheet rows
+                            const validEmployeeSizeValues = new Set(employeeOptions.map(opt => opt.value));
+                            const uniqueEmployeeSizes = Array.from(
+                                new Set(
+                                    activeSheet.sheetRows
+                                        .map((row: any) => row.employee_size)
+                                        .filter((size: string) => size && validEmployeeSizeValues.has(size))
+                                )
+                            );
 
-            setFormFields({
-                designations: uniqueDesignations,
-                employeeSizes: uniqueEmployeeSizes,
-                industries: uniqueIndustries,
-                priority: 'P4',
-            });
+                            const uniqueIndustries = Array.from(
+                                new Set(activeSheet.sheetRows.map((row: any) => row.industry).filter(Boolean))
+                            );
 
-            // Pre-populate results table with existing company data
-            const existingCompanies: Company[] = sheet.sheetRows.map(row => ({
-                company_name: row.companyname,
-                designation: row.designation,
-                priority: row.priority as "P1" | "P2" | "P3" | "P4",
-                employee_size: row.employee_size,
-                industry: row.industry,
-            }));
+                            const uniqueDesignations = Array.from(
+                                new Set(activeSheet.sheetRows.flatMap((row: any) => row.designation).filter(Boolean))
+                            );
 
-            setResultCompanies(existingCompanies);
+                            setFormData({
+                                sheet_name: sheetName || '',
+                                country_name: firstRow.country_name || '',
+                                state_name: firstRow.state_name || '',
+                                company: [],
+                            });
 
-            // Find and set country ID for pre-filling country/state selects
-            if (firstRow.country_name) {
-                GetCountries().then((countries: any[]) => {
-                    const matchedCountry = countries.find(
-                        (c: any) => c.name.toLowerCase() === firstRow.country_name.toLowerCase()
-                    );
-                    if (matchedCountry) {
-                        setCountryId(matchedCountry.id);
+                            setFormFields({
+                                designations: uniqueDesignations,
+                                employeeSizes: uniqueEmployeeSizes,
+                                industries: uniqueIndustries,
+                                priority: 'P4',
+                            });
+                        }
+
+                        // Pre-populate results table with existing company data
+                        const existingCompanies: Company[] = activeSheet.sheetRows.map((row: any) => ({
+                            company_name: row.companyname,
+                            designation: row.designation,
+                            priority: row.priority as "P1" | "P2" | "P3" | "P4",
+                            employee_size: row.employee_size,
+                            industry: row.industry,
+                        }));
+
+                        setResultCompanies(existingCompanies);
+
+                        // Find and set country ID for pre-filling country/state selects
+                        const countryName = preferencesData?.country_name || activeSheet.sheetRows[0]?.country_name;
+                        if (countryName) {
+                            GetCountries().then((countries: any[]) => {
+                                const matchedCountry = countries.find(
+                                    (c: any) => c.name.toLowerCase() === countryName.toLowerCase()
+                                );
+                                if (matchedCountry) {
+                                    setCountryId(matchedCountry.id);
+                                }
+                            });
+                        }
+
+                        setIsInitialized(true);
                     }
-                });
+                } catch (error) {
+                    console.error('Error initializing form:', error);
+                    toast("Failed to load ICP data", {
+                        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                        icon: <XIcon className='size-5' />
+                    });
+                }
             }
+        };
 
-            setIsInitialized(true);
-        }
-    }, [sheet, isInitialized]);
+        initializeForm();
+    }, [sheetMeta, sheetName, isInitialized, getICPExcelSheets]);
 
     useEffect(() => {
         getDesignations('');
@@ -344,7 +389,7 @@ const UpdateICP: React.FC = () => {
                     } else if (field === 'designations') {
                         // Remove any company that contains any removed designation
                         updated = prev.filter(c => c.designation.every(d => !removed.includes(d)))
-                                      .map(c => ({ ...c, designation: value }));
+                            .map(c => ({ ...c, designation: value }));
                     }
                     return updated;
                 });
@@ -405,11 +450,18 @@ const UpdateICP: React.FC = () => {
             }));
 
             const icpData = {
-                sheet_name: sheet?.sheet_name,
+                sheet_name: sheetName,
                 country_name: formData.country_name,
                 state_name: formData.state_name || '',
                 company: companiesWithUpdatedDesignations,
                 user_id: user?.id as number,
+                preferences: {
+                    employee_size: formFields.employeeSizes,
+                    industry: formFields.industries,
+                    designation: formFields.designations,
+                    country_name: formData.country_name,
+                    state_name: formData.state_name || ''
+                }
             };
 
             const result = await updateICP(icpData);
@@ -436,7 +488,7 @@ const UpdateICP: React.FC = () => {
         }
     };
 
-    if (storeLoading || !sheet) {
+    if (storeLoading || !sheetMeta) {
         return <Wave />;
     }
 
@@ -452,19 +504,6 @@ const UpdateICP: React.FC = () => {
                         <CardTitle>Update ICP</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        {/* Sheet Name */}
-                        {/* <div className="flex flex-col gap-2">
-                            <Label className="font-semibold">
-                                Sheet Name <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                value={formData.sheet_name}
-                                onChange={(e) => setFormData(prev => ({ ...prev, sheet_name: e.target.value }))}
-                                placeholder="Enter sheet name"
-                                className="h-12"
-                            />
-                        </div> */}
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Job Title */}
                             <MultiSelectDropdown
@@ -525,6 +564,7 @@ const UpdateICP: React.FC = () => {
                                 </Label>
                                 <div className="relative">
                                     <CountrySelect
+                                        value={formData.country_name}
                                         placeHolder="Select Country"
                                         onChange={(val: any) => {
                                             setCountryId(val?.id ?? null);

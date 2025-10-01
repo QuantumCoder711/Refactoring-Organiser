@@ -19,6 +19,20 @@ export interface ICPSheet {
     uuid: string;
 }
 
+export interface Preferences {
+    uuid: string;
+    designation: string[];
+    industry: string[];
+    country_name: string;
+    state_name: string;
+    employee_size: string[];
+}
+
+export interface PreferencesPayload {
+    sheet_name: string;
+    preferences?: Preferences[];
+}
+
 interface CreateICPPayload {
     sheet_name: string;
     employee_size: string;
@@ -32,7 +46,9 @@ interface CreateICPPayload {
 interface ICPStore {
     loading: boolean;
     icpSheets: ICPSheet[];
+    icpMetaData: PreferencesPayload[];
     getICPSheets: (userId: number) => Promise<void>;
+    getICPExcelSheets: (sheet_name: string) => Promise<ICPSheet[]>;
     deleteICPSheet: (uuid: string) => Promise<{ status: number; message: string } | void>;
     uploadICPSheet: (userId: number, file: File, sheetName: string) => Promise<{ status: number; message?: string } | void>;
     createICP: (payload: any) => Promise<{ success: boolean; message?: string }>;
@@ -47,6 +63,7 @@ interface ICPStore {
 const useICPStore = create<ICPStore>((set, get) => ({
     loading: false,
     icpSheets: [],
+    icpMetaData: [],
     createICP: async (payload: any) => {
         try {
             const response = await axios.post(`${domain}/api/store-icp`, payload, {
@@ -74,14 +91,34 @@ const useICPStore = create<ICPStore>((set, get) => ({
     getICPSheets: async (userId: number) => {
         set({ loading: true });
         try {
-            const response = await axios.get(`${domain}/api/get-icp-data/${userId}`, {
+            const response = await axios.get(`${domain}/api/get-sheet-preferences/${userId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 }
             });
             if (response.data.status === 200) {
-                set({ icpSheets: response.data.data });
+                set({ icpMetaData: response.data.data });
+            } else {
+                console.error('Failed to fetch ICP sheets:', response.data.message);
+                throw new Error(response.data.message);
+            }
+        } finally {
+            set({ loading: false });
+        }
+    },
+    getICPExcelSheets: async (sheet_name: string) => {
+        set({ loading: true });
+        try {
+            const response = await axios.get(`${domain}/api/get-icp-data/${sheet_name}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+            if (response.data.status === 200) {
+                return response.data.data;
+                // set({ icpMetaData: response.data.data });
             } else {
                 console.error('Failed to fetch ICP sheets:', response.data.message);
                 throw new Error(response.data.message);
