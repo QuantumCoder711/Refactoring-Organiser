@@ -332,25 +332,25 @@ const AiPhotos: React.FC = () => {
         <GoBack />
       </div>
 
-      <div className='max-w-3xl bg-brand-background mx-auto rounded-[10px] p-7'>
+      <div className='max-w-3xl bg-muted mx-auto rounded-[10px] p-7'>
         <Tabs 
           defaultValue="upload" 
           className="mx-auto"
           onValueChange={handleTabChange}
           value={activeTab}
         >
-          <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
+          <TabsList className="p-0 min-w-fit bg-background mx-auto !max-h-10">
             <TabsTrigger
               value="upload"
-              className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+              className="max-h-10 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
             >
               Upload Files
             </TabsTrigger>
             <TabsTrigger
               value="photos"
-              className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+              className="max-h-10 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
             >
-              Photos
+              View Photos
             </TabsTrigger>
           </TabsList>
           
@@ -363,38 +363,38 @@ const AiPhotos: React.FC = () => {
               </div>
             ) : (
               <>
-                <h3 className='font-semibold'>Event Zip Files<span className='text-brand-secondary'>*</span></h3>
+                <h3 className='font-semibold'>Event Zip Files<span className='text-secondary'>*</span></h3>
                 <div 
                   {...getRootProps()} 
-                  className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${
-                    isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'
+                  className={`border group duration-300 hover:border-primary border-accent shadow-blur rounded-lg bg-background/50 p-6 cursor-pointer transition-colors ${
+                    isDragActive ? 'border-secondary bg-secondary/10' : 'border-accent'
                   }`}
                 >
                   <input {...getInputProps()} />
                   <div className="flex flex-col items-center justify-center gap-2 text-center">
                     <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
                     {isDragActive ? (
-                      <p className="text-brand-secondary font-medium">Drop the file here...</p>
+                      <p className="text-secondary font-medium">Drop the file here...</p>
                     ) : (
                       <>
-                        <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
+                        <p className="text-lg"><span className="text-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
                         <p className="">Supported file: <span className="font-semibold">.zip (Max 6GB)</span></p>
                       </>
                     )}
                     {file && (
-                      <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                        <FileText className="size-5 text-brand-secondary" />
+                      <div className="mt-4 flex items-center gap-2 p-2 bg-accent rounded-md w-full">
+                        <FileText className="size-5 text-secondary" />
                         <span className="text-sm font-medium truncate">{file.name}</span>
-                        <span className="text-xs text-gray-500">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                        <span className="text-xs text-muted-foreground">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {uploadProgress > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
+                  <div className="w-full bg-muted rounded-full h-2 mt-4">
                     <div 
-                      className="bg-brand-secondary h-2 rounded-full" 
+                      className="bg-secondary h-2 rounded-full" 
                       style={{ width: `${uploadProgress}%` }}
                     ></div>
                     <p className="text-xs text-gray-600 mt-1 text-right">{uploadProgress}% uploaded</p>
@@ -403,7 +403,7 @@ const AiPhotos: React.FC = () => {
 
                 <div className='w-full flex justify-center mt-9'>
                   <Button
-                    className='w-36 bg-brand-secondary text-white cursor-pointer hover:bg-brand-secondary'
+                    className='w-40'
                     onClick={handleUpload}
                     disabled={loading || !file}
                   >

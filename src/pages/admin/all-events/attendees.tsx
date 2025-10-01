@@ -1114,7 +1114,7 @@ const Attendees: React.FC = () => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                          <AlertDialogAction className='cursor-pointer bg-brand-primary hover:bg-brand-primary text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
+                          <AlertDialogAction className='cursor-pointer bg-primary hover:bg-primary/80 duration-300 transition-all text-white' onClick={() => handleCustomCheckIn(attendee.uuid)}>Continue</AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>}

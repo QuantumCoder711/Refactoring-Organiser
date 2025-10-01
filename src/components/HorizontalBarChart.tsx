@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { cn } from "@/lib/utils";
 
 // Define the type for chart data items
 interface ChartDataItem {
@@ -39,10 +40,9 @@ export function HorizontalBarChartComponent({ chartData, title = "Total Attendee
                 {item.label}
               </p>
               <div
-                className={`h-6 rounded-sm grid font-sans min-w-fit font-semibold place-content-center bg-brand-primary text-center text-white p-1`}
+                className={cn(`h-6 rounded-sm grid font-sans min-w-fit font-semibold place-content-center bg-brand-primary text-center text-white p-1`, bgColor)}
                 style={{
                   width: `${(item.count / maxCount) * 100}%`,
-                  backgroundColor: bgColor
                 }}
               >
                 {item.count}

@@ -53,7 +53,7 @@ export function BarChartComponent(props: { hoursArray: { hour: string, totalChec
                             cursor={false}
                             content={<ChartTooltipContent hideLabel />}
                         />
-                        <Bar dataKey="attendees" fill="var(--color-attendees)" radius={8}>
+                        <Bar dataKey="attendees" className="fill-primary" radius={8}>
                             <LabelList
                                 position="top"
                                 offset={12}

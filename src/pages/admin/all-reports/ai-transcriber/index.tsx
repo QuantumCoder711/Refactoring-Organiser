@@ -128,26 +128,26 @@ const AiTranscriber: React.FC = () => {
       <div className='absolute top-0 left-0'>
         <GoBack />
       </div>
-     
-      <div className='max-w-3xl bg-brand-background mx-auto rounded-[10px] p-7'>
+
+      <div className='max-w-3xl bg-muted mx-auto rounded-[10px] p-7'>
         <Tabs defaultValue="upload" className="mx-auto" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
+          <TabsList className="p-0 min-w-fit bg-background mx-auto !max-h-10">
             <TabsTrigger
               value="upload"
-              className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+              className="max-h-10 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
             >
               Upload Files
             </TabsTrigger>
             <TabsTrigger
               value="summary"
-              className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+              className="max-h-10 px-3 md:px-4 h-full font-medium !py-0 cursor-pointer"
             >
               Summary
             </TabsTrigger></TabsList>
           <TabsContent value="upload" className="mt-5 flex gap-5 flex-col">
 
             {!processing ? <><div className='flex flex-col gap-2'>
-              <Label className='font-semibold'>Video URL<span className='text-brand-secondary'>*</span></Label>
+              <Label className='font-semibold'>Video URL<span className='text-secondary'>*</span></Label>
               <Input
                 type="text"
                 value={form.youtubeUrl}
@@ -156,9 +156,9 @@ const AiTranscriber: React.FC = () => {
               />
             </div>
 
-              <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
-                <span className="w-fit text-nowrap justify-center font-semibold bg-brand-background px-2 h-[34px] rounded-md text-base flex items-center">Choose File</span>
-                <p className="w-full text-nowrap overflow-hidden text-ellipsis font-semibold text-brand-dark-gray">{form.file ? form.file?.name : 'No file Chosen'}</p>
+              <div className="input relative overflow-hidden shadow-sm bg-background/50 rounded-md !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                <span className="min-w-fit bg-muted px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
+                <p className="w-full text-nowrap overflow-hidden text-ellipsis">{form.file ? form.file?.name : 'No file Chosen'}</p>
                 <Input
                   id="image"
                   name="image"
@@ -170,8 +170,8 @@ const AiTranscriber: React.FC = () => {
               </div>
 
               <div className='w-full flex justify-center mt-9'>
-                <Button className='w-36 bg-brand-secondary text-white cursor-pointer hover:bg-brand-secondary' onClick={handleUpload}>Upload</Button>
-              </div></> : <div className="p-5 bg-yellow-50 border border-yellow-300 rounded-lg text-center">
+                <Button className='' onClick={handleUpload}>Upload</Button>
+              </div></> : <div className="p-5 bg-muted backdrop-blur-3xl border border-yellow-300 rounded-lg text-center">
               <h3 className="text-xl font-medium text-yellow-800 mb-2">Processing Summary</h3>
               <p className="text-yellow-800">Your summary is currently being processed. This may take some time.</p>
               <p className="text-yellow-700 mt-2 text-sm">You can check the "Summary" tab to see when your processed summary is available.</p>
@@ -181,9 +181,8 @@ const AiTranscriber: React.FC = () => {
           <TabsContent value="summary">
             <div className='flex flex-col gap-4'>
               <div className='flex justify-end'>
-                <Button 
+                <Button
                   onClick={handleDownload}
-                  className='bg-brand-secondary cursor-pointer text-white hover:bg-brand-secondary'
                 >
                   Download Summary
                 </Button>

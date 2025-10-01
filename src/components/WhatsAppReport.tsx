@@ -193,7 +193,7 @@ const WhatsAppReport: React.FC = () => {
 
                 <Table className='mt-7'>
                     <TableHeader className='bg-accent !rounded-[10px]'>
-                        <TableRow className='!rounded-[10px]'>
+                        <TableRow>
                             <TableHead className="text-left min-w-10 !px-2 !font-semibold">S.No</TableHead>
                             <TableHead className="text-left min-w-10 !px-2 !font-semibold">Name</TableHead>
                             <TableHead className="text-left min-w-10 !px-2 !font-semibold">Phone No.</TableHead>
@@ -208,7 +208,7 @@ const WhatsAppReport: React.FC = () => {
                             </TableRow>
                         ) : (
                             filteredAttendees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((message: WhatsAppMessage, index: number) => (
-                                <TableRow key={message._id} className='capitalize'>
+                                <TableRow key={message._id} className='capitalize hover:bg-background/50'>
                                     <TableCell className="text-left min-w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
                                     <TableCell className="text-left min-w-10">{message.firstName || "-"}</TableCell>
                                     <TableCell className="text-left min-w-10">{message?.messageID?.customerPhoneNumber || "-"}</TableCell>

@@ -143,7 +143,7 @@ const Charts: React.FC = () => {
     setLoading(true);
     if (chartRef.current) {
       const element = chartRef.current;
-      element.style.backgroundColor = 'white !important';
+      element.style.backgroundColor = 'var(--muted) !important';
 
       // Use a scale factor to capture high-quality images without too large a file
       html2canvas(element, { scale: 2 }).then((canvas) => {
@@ -197,11 +197,11 @@ const Charts: React.FC = () => {
     <div className='flex flex-col h-full gap-4 p-4'>
       <div className='flex justify-between items-center'>
         <GoBack />
-        <Button onClick={handleExport} className='bg-brand-primary hover:bg-brand-primary/90 cursor-pointer'>Export Charts</Button>
+        <Button onClick={handleExport}>Export Charts</Button>
       </div>
       <div
         ref={chartRef}
-        className='max-w-3xl mx-auto rounded-[10px] bg-brand-background p-6 shadow-lg space-y-8 print:shadow-none print:p-2'
+        className='max-w-3xl mx-auto rounded-[10px] bg-muted p-6 shadow-lg space-y-8 print:shadow-none h-full print:p-2'
         style={{ minWidth: '800px' }}
       >
         <div className='flex justify-center w-full'>
@@ -210,22 +210,22 @@ const Charts: React.FC = () => {
           </div>
         </div>
 
-        <Separator className='bg-gray-300 my-8' />
+        <Separator className='bg-accent my-8' />
 
         <div className='w-full'>
           <BarChartComponent hoursArray={hoursArray} />
         </div>
 
-        <Separator className='bg-gray-300 my-8' />
+        <Separator className='bg-accent my-8' />
 
         <div className='w-full'>
-          <HorizontalBarChartComponent chartData={companyCounts} title="Total Attendees by Company" />
+          <HorizontalBarChartComponent chartData={companyCounts} bgColor='bg-chart-4' title="Total Attendees by Company" />
         </div>
 
-        <Separator className='bg-gray-300 my-8' />
+        <Separator className='bg-accent my-8' />
 
         <div className='w-full'>
-          <HorizontalBarChartComponent chartData={designationCounts} bgColor="#6C7A89" title="Total Attendees by Designation" />
+          <HorizontalBarChartComponent chartData={designationCounts} bgColor='bg-chart-2' title="Total Attendees by Designation" />
         </div>
       </div>
     </div>
