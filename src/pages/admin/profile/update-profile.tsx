@@ -89,7 +89,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex flex-col gap-2 w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -122,13 +122,13 @@ const CustomComboBox = React.memo(({
                                 >
                                     <span>{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 text-secondary" />
                                     )}
                                 </div>
                             ))
                         ) : searchTerm ? (
                             <div
-                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-secondary text-sm font-medium"
                                 onClick={handleCreateNew}
                             >
                                 Create "{searchTerm}"
@@ -268,13 +268,13 @@ const UpdateProfile: React.FC = () => {
                 <GoBack />
             </div>
 
-            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background flex flex-col gap-5'>
+            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-muted flex flex-col gap-5'>
                 {/* Name */}
                 <div className='flex gap-5 justify-between'>
                     {/* First Name */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='first_name'>
-                            First Name <span className="text-brand-secondary">*</span>
+                            First Name <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="first_name"
@@ -288,7 +288,7 @@ const UpdateProfile: React.FC = () => {
                     {/* Last Name */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='last_name'>
-                            Last Name <span className="text-brand-secondary">*</span>
+                            Last Name <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="last_name"
@@ -304,7 +304,7 @@ const UpdateProfile: React.FC = () => {
                 {/* Email */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='email'>
-                        Email <span className="text-brand-secondary">*</span>
+                        Email <span className="text-secondary">*</span>
                     </Label>
                     <Input
                         id="email"
@@ -319,7 +319,7 @@ const UpdateProfile: React.FC = () => {
                 {/* Mobile Number */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='mobile_number'>
-                        Phone No. <span className="text-brand-secondary">*</span>
+                        Phone No. <span className="text-secondary">*</span>
                     </Label>
                     <Input
                         id="mobile_number"
@@ -360,7 +360,7 @@ const UpdateProfile: React.FC = () => {
                     {/* Address */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='address'>
-                            Address <span className="text-brand-secondary">*</span>
+                            Address <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="address"
@@ -375,7 +375,7 @@ const UpdateProfile: React.FC = () => {
                     {/* Pincode */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='pincode'>
-                            Pincode <span className="text-brand-secondary">*</span>
+                            Pincode <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="pincode"
@@ -393,7 +393,7 @@ const UpdateProfile: React.FC = () => {
                     {/* Company Image */}
                     <div className='flex gap-5 flex-col w-full'>
                         <div className="flex flex-col gap-2">
-                            <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-brand-secondary'>*</span></Label>
+                            <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-secondary'>*</span></Label>
                             <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
@@ -422,7 +422,7 @@ const UpdateProfile: React.FC = () => {
                     {/* Profile Picture */}
                     <div className='flex gap-5 flex-col w-full'>
                         <div className="flex flex-col gap-2">
-                            <Label className="font-semibold" htmlFor="image">Profile Picture <span className='text-brand-secondary'>*</span></Label>
+                            <Label className="font-semibold" htmlFor="image">Profile Picture <span className='text-secondary'>*</span></Label>
                             <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
                                 <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">

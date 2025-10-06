@@ -96,7 +96,7 @@ const ChangePassword: React.FC = () => {
             <div className='max-w-lg w-full rounded-[10px]'>
                 <h1 className='text-2xl font-semibold text-center mb-6'>Change Password</h1>
                 
-                <div className='space-y-5 p-8 shadow-blur-lg rounded-2xl'>
+                <div className='space-y-5 p-8 shadow-blur-lg bg-muted rounded-2xl'>
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold'>Current Password</Label>
                         <div className='relative'>
@@ -157,7 +157,7 @@ const ChangePassword: React.FC = () => {
                         </div>
                     </div>
 
-                    <Button onClick={handleSubmit} className='btn mx-auto w-full'>
+                    <Button onClick={handleSubmit} className='btn mx-auto h-12 w-full'>
                         Change Password
                     </Button>
                 </div>

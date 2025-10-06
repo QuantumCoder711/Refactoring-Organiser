@@ -122,11 +122,11 @@ const SubUser = (subUser: SubUserType) => {
     }
 
     return (
-        <Card key={subUser.id} className="relative overflow-hidden transition-all hover:shadow-xl transform hover:-translate-y-1 duration-200 bg-gradient-to-br from-white to-gray-50">
+        <Card key={subUser.id} className="relative overflow-hidden transition-all hover:shadow-xl transform hover:-translate-y-1 duration-200 bg-gradient-to-br from-muted to-accent">
             <div className="absolute right-4 top-4 z-10 flex gap-2">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <button className="p-1.5 rounded-full cursor-pointer bg-white/80 hover:bg-brand-primary/10 text-brand-primary transition-colors">
+                        <button className="p-1.5 rounded-full cursor-pointer bg-accent hover:bg-brand-primary/10 text-brand-primary transition-colors">
                             <Shield className="w-4 h-4" />
                         </button>
                     </DialogTrigger>
@@ -191,13 +191,13 @@ const SubUser = (subUser: SubUserType) => {
 
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <button className="p-1.5 rounded-full cursor-pointer bg-white/80 hover:bg-red-100 text-red-600 transition-colors">
+                        <button className="p-1.5 rounded-full cursor-pointer bg-accent text-destructive transition-colors">
                             <Trash className="w-4 h-4" />
                         </button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-xl text-red-600">Delete Confirmation</AlertDialogTitle>
+                            <AlertDialogTitle className="text-xl text-destructive">Delete Confirmation</AlertDialogTitle>
                             <AlertDialogDescription className="text-gray-600">
                                 Are you sure you want to delete this subuser? This action cannot be undone.
                             </AlertDialogDescription>
@@ -206,7 +206,7 @@ const SubUser = (subUser: SubUserType) => {
                             <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={handleDelete}
-                                className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                                className="bg-destructive hover:bg-destructive/80 duration-300 transition-all cursor-pointer"
                             >
                                 Delete User
                             </AlertDialogAction>
@@ -216,27 +216,27 @@ const SubUser = (subUser: SubUserType) => {
             </div>
             <div className="p-6 space-y-4">
                 <div className="flex items-center space-x-4">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-primary/20 to-brand-primary/10 grid place-items-center ring-2 ring-brand-primary/20 shadow-inner">
-                        <span className="text-xl capitalize font-bold text-brand-primary drop-shadow-sm">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 grid place-items-center ring-2 ring-primary/20 shadow-inner">
+                        <span className="text-xl capitalize font-bold text-primary drop-shadow-sm">
                             {subUser.name.split(' ').map((name) => name[0]).join('')}
                         </span>
                     </div>
                     <div>
-                        <CardTitle className="text-lg font-semibold capitalize text-gray-800 hover:text-brand-primary transition-colors">
+                        <CardTitle className="text-lg font-semibold capitalize text-foreground hover:text-primary transition-colors">
                             {subUser.name}
                         </CardTitle>
-                        <p className="text-sm text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <p className="text-sm text-foreground/50 transition-colors flex items-center gap-1">
+                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
                             {subUser.email}
                         </p>
                     </div>
                 </div>
-                <div className="pt-4 border-t border-gray-100">
+                <div className="pt-4 border-t border-accent">
                     <div className="flex justify-between items-center">
                         <p className="text-sm font-medium">
-                            Role: <span className="text-brand-primary capitalize bg-brand-primary/10 px-2 py-1 rounded-full">{subUser.role}</span>
+                            Role: <span className="text-primary capitalize bg-primary/10 px-2 py-1 rounded-full">{subUser.role}</span>
                         </p>
-                        <p className="text-xs text-gray-400 italic">
+                        <p className="text-xs text-muted-foreground italic">
                             Added on {new Date(subUser.created_at).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'short',
@@ -257,7 +257,7 @@ const SubUsers: React.FC = () => {
     return (
         <div className='h-full w-full'>
             <Tabs defaultValue="view-user" className="w-full h-full">
-                <TabsList className='bg-brand-light mx-auto'>
+                <TabsList className='bg-muted h-10 mx-auto'>
                     <TabsTrigger value="view-user" className='cursor-pointer'>View Users</TabsTrigger>
                     <TabsTrigger value="add-user" className='cursor-pointer'>Add Users</TabsTrigger>
                 </TabsList>

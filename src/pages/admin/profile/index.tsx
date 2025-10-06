@@ -169,7 +169,7 @@ const Profile: React.FC = () => {
                 <GoBack />
             </div>
 
-            <div className='w-lg rounded-[10px] bg-brand-background h-full mx-auto px-[72px] pt-9 pb-[30px]'>
+            <div className='w-lg rounded-[10px] bg-muted h-full mx-auto px-[72px] pt-9 pb-[30px]'>
                 <div className='flex justify-between'>
                     <div>
                         <h3 className='font-bold'>Profile Picture</h3>
@@ -214,7 +214,7 @@ const Profile: React.FC = () => {
 
                                 {/* Slider section */}
                                 <div className="space-y-4">
-                                    <p className="text-gray-600 font-medium">Select Credits Amount:</p>
+                                    <p className="text-foreground font-medium">Select Credits Amount:</p>
 
                                     <div className="px-2">
                                         <Slider
@@ -223,9 +223,9 @@ const Profile: React.FC = () => {
                                             min={10}
                                             max={1000}
                                             step={10}
-                                            className="w-full"
+                                            className="w-full bg-muted"
                                         />
-                                        <div className="flex justify-between text-sm text-gray-500 mt-2">
+                                        <div className="flex justify-between text-sm text-muted-foreground mt-2">
                                             <span>₹80 (10 credits)</span>
                                             <span>₹8000 (1000 credits)</span>
                                         </div>
@@ -235,7 +235,7 @@ const Profile: React.FC = () => {
                                 {/* Credits input with increment/decrement */}
                                 <div className="flex items-center gap-2">
                                     <label className="font-medium">Credits:</label>
-                                    <div className="flex items-center border rounded-md">
+                                    <div className="flex items-center border rounded-md overflow-hidden">
                                         <Input
                                             type="number"
                                             value={credits}
@@ -247,14 +247,14 @@ const Profile: React.FC = () => {
                                         <div className="flex flex-col border-l">
                                             <button
                                                 onClick={incrementCredits}
-                                                className="px-2 py-1 hover:bg-gray-100 border-b"
+                                                className="px-2 py-1 hover:bg-accent border-b"
                                                 type="button"
                                             >
                                                 <ChevronUp className="h-3 w-3" />
                                             </button>
                                             <button
                                                 onClick={decrementCredits}
-                                                className="px-2 py-1 hover:bg-gray-100"
+                                                className="px-2 py-1 hover:bg-accent"
                                                 type="button"
                                             >
                                                 <ChevronDown className="h-3 w-3" />
@@ -264,25 +264,23 @@ const Profile: React.FC = () => {
                                 </div>
 
                                 {/* Total price */}
-                                <div className="bg-gray-100 p-4 rounded-md">
+                                <div className="bg-muted p-4 rounded-md">
                                     <div className="flex justify-between items-center">
                                         <span className="font-semibold text-lg">Total Price:</span>
-                                        <span className="font-bold text-xl text-blue-600">₹{totalPrice.toLocaleString()}/-</span>
+                                        <span className="font-bold text-xl text-primary">₹{totalPrice.toLocaleString()}/-</span>
                                     </div>
                                 </div>
 
                                 {/* Action buttons */}
-                                <div className="flex gap-4 pt-4">
+                                <div className="grid grid-cols-2 gap-4 pt-4">
                                     <Button
                                         onClick={handleCancel}
                                         variant="outline"
-                                        className="flex-1 cursor-pointer bg-gray-400 hover:bg-gray-500 text-white border-gray-400 hover:border-gray-500"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         onClick={handleUpgrade}
-                                        className="flex-1 cursor-pointer bg-blue-600 hover:bg-blue-700"
                                     >
                                         Upgrade
                                     </Button>

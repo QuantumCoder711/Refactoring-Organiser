@@ -83,7 +83,7 @@ const AddSubuser: React.FC = () => {
 
     return (
         <div className='w-full h-full'>
-            <div className='max-w-lg w-full mt-10 mx-auto rounded-[10px]'>
+            <div className='max-w-lg w-full bg-muted mt-10 mx-auto rounded-[10px]'>
                 <div className='space-y-5 p-8 shadow-blur-lg rounded-2xl'>
                     <div className='flex flex-col gap-2'>
                         <Label className='font-semibold' htmlFor='name'>Name</Label>
@@ -93,7 +93,7 @@ const AddSubuser: React.FC = () => {
                                 onChange={handleInputChange}
                                 name="name"
                                 placeholder='Full Name'
-                                className='input !h-10 !min-w-full relative !px-4 flex items-center justify-end'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
                         </div>
                     </div>
@@ -106,7 +106,7 @@ const AddSubuser: React.FC = () => {
                                 onChange={handleInputChange}
                                 name="email"
                                 placeholder='Email'
-                                className='input !h-10 !min-w-full relative !px-4 flex items-center justify-end'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
                         </div>
                     </div>
@@ -120,7 +120,7 @@ const AddSubuser: React.FC = () => {
                                 name="password"
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder='Enter current password'
-                                className='input !h-10 !min-w-full relative !px-4 flex items-center justify-end'
+                                className='input !h-12 !min-w-full relative !px-4 flex items-center justify-end'
                             />
                             <div className='absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer'>
                                 {showPassword ?
@@ -131,7 +131,7 @@ const AddSubuser: React.FC = () => {
                         </div>
                     </div>
 
-                    <Button onClick={handleSubmit} className='btn mx-auto w-full'>
+                    <Button onClick={handleSubmit} className='btn h-12 mx-auto w-full'>
                         Add User
                     </Button>
                 </div>

@@ -193,13 +193,13 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         </nav>
       </header>
       :
-      <header className='flex items-center bg-muted max-h-16'>
+      <header className='flex items-center max-h-16 bg-muted'>
         <Link to="/" className='hidden md:block'>
-          <div className='border-r border-b border-white min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3'>
+          <div className='min-w-52 lg:min-w-56 max-h-16 grid place-content-center !p-3 border-b border-r border-accent'>
             <img src={user?.company_logo ? getImageUrl(user?.company_logo) : Logo} alt="logo" className='h-14 object-contain object-center' />
           </div>
         </Link>
-        <nav className='w-full h-full flex justify-between items-center p-3 md:px-5 lg:px-10'>
+        <nav className='w-full h-full flex justify-between bg-muted backdrop-blur-xl items-center p-3 md:px-5 lg:px-10'>
           <h2 className='hidden md:block xl:text-xl font-semibold'>{heading}</h2>
           <img src={Logo} width={72} height={40} className='w-28 md:hidden' />
 
@@ -229,11 +229,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
               {/* Wallet popover */}
               <div
-                className={`${showWallet ? 'flex' : 'hidden'} absolute top-10 left-1/2 -translate-x-1/2 z-50`}
+                className={`${showWallet ? 'flex' : 'hidden'} absolute bg-background/50 !backdrop-blur-2xl top-10 left-1/2 -translate-x-1/2 z-50`}
                 onMouseEnter={handleWalletEnter}
                 onMouseLeave={handleWalletLeave}
               >
-                <div className='flex items-center gap-8 rounded-xl border border-gray-200 bg-white shadow-lg px-6 py-5'>
+                <div className='flex items-center gap-8 rounded-xl border bg-background/50 !backdrop-blur-xl px-6 py-5'>
                   {/* Circular progress */}
                   <div className='flex flex-col items-center'>
                     <ProgressRing percentage={walletRemainingPercent} size={72} />

@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MessageTemplateType, SendPollType } from '@/types';
 import { toast } from 'sonner';
-import { CircleX, CircleCheck, ChevronRight } from 'lucide-react';
+import { CircleX, CircleCheck, ChevronRight, Send } from 'lucide-react';
 import { dayTwoReminder, dayTwoSameDayReminder, sendInAppMessage, sendPoll, sendReminder, sendSameDayReminder, sessionReminder, thankYouMessage, visitBoothReminder } from '@/api/messageTemplates';
 import Wave from './Wave';
 import useAuthStore from '@/store/authStore';
@@ -363,11 +363,12 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                   <RadioGroupItem
                     value="app"
                     id="app"
-                    className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                   />
                   <Label htmlFor="app" className='cursor-pointer flex items-center gap-2'>
                     App
-                    <img src={Logo} alt="App Logo" className="w-5 h-5" />
+                    <div className='h-6'>
+                      <img src={Logo} alt="App Logo" className="object-contain w-full h-full" />
+                    </div>
                   </Label>
                 </div>
               </RadioGroup>
@@ -386,17 +387,17 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                 >
                   {!isThankYouTemplate && (
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="everyone" id="everyone" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                      <RadioGroupItem value="everyone" id="everyone" />
                       <Label htmlFor="everyone" className='cursor-pointer'>All</Label>
                     </div>
                   )}
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="checkedIn" id="checkedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                    <RadioGroupItem value="checkedIn" id="checkedIn" />
                     <Label htmlFor="checkedIn" className='cursor-pointer'>Checked In</Label>
                   </div>
                   {!isThankYouTemplate && (
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary' />
+                      <RadioGroupItem value="nonCheckedIn" id="nonCheckedIn" />
                       <Label htmlFor="nonCheckedIn" className='cursor-pointer'>Non-Checked In</Label>
                     </div>
                   )}
@@ -412,11 +413,11 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                     type='text'
                     value={formData.subject}
                     onChange={handleSubjectChange}
-                    className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
+                    className='w-full rounded-[10px] text-base focus-visible:ring-0 border focus:border-b-none !rounded-b-none !h-12 font-semibold'
                     placeholder='Subject *'
                   />
                   <div className='flex-1 flex flex-col'>
-                    <div ref={quillRef} className={`flex-1 border bg-white rounded-[10px] rounded-t-none`}></div>
+                    <div ref={quillRef} className={`flex-1 border bg-background/50 rounded-[10px] rounded-t-none`}></div>
                   </div>
                 </>
               ) : (
@@ -427,7 +428,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                         type='text'
                         value={pollLink}
                         onChange={(e) => setPollLink(e.target.value)}
-                        className='w-full bg-white rounded-[10px] text-base focus-visible:ring-0 border !h-12 font-semibold'
+                        className='w-full bg-background/50 rounded-[10px] text-base focus-visible:ring-0 border !h-12 font-semibold'
                         placeholder='Poll Link *'
                       />
                     </div>
@@ -440,20 +441,22 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                     )}
                     {!isInAppTemplate && "Your Message"}
                   </h3>
-                  <div className='p-5 bg-white rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
+                  <div className='p-5 bg-background/50 rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(formData.message, event, user) }} />
                 </div>
               )}
             </div>
 
             {/* Send Button */}
-            <Button className='btn !mt-5 w-fit' onClick={handleSubmit}>Send</Button>
+            <div className='flex justify-end'>
+              <Button className='mt-5 w-20' onClick={handleSubmit}>Send <Send className='size-4'/></Button>
+            </div>
           </div>
         </div>
 
-        <div className='w-[300px] flex flex-col gap-4 min-h-full bg-brand-background rounded-[10px] p-3'>
+        <div className='w-[300px] flex flex-col gap-4 min-h-full bg-muted rounded-[10px] p-3'>
           <img src={getImageUrl(event?.image)} alt={event?.title} className='rounded-[10px]' />
           <h3 className='font-semibold text-nowrap text-ellipsis overflow-hidden text-xl'>{event?.title}</h3>
-          <Separator className='bg-white w-full' />
+          <Separator className='bg-accent w-full' />
           <div className='flex flex-col flex-1 gap-4'>
             <div className='flex flex-col gap-2'>
               <h3 className='font-semibold'>Date</h3>
