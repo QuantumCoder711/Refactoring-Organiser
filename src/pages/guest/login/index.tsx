@@ -17,15 +17,15 @@ const Login: React.FC = () => {
       </Helmet>
 
       <div className='h-full w-full grid place-content-center'>
-        <Tabs defaultValue="organiser" className="w-[400px] mx-auto">
+        <Tabs defaultValue="organiser" className="mx-auto">
           <TabsList className='mx-auto'>
             <TabsTrigger value="organiser" className='cursor-pointer'>Organiser</TabsTrigger>
             <TabsTrigger value="sub-user" className='cursor-pointer'>Sub User</TabsTrigger>
           </TabsList>
-          <TabsContent value="organiser">
+          <TabsContent value="organiser" className='bg-muted rounded-md'>
             <OrganiserLogin />
           </TabsContent>
-          <TabsContent value="sub-user"><SubUserLogin /></TabsContent>
+          <TabsContent value="sub-user" className='bg-muted rounded-md'><SubUserLogin /></TabsContent>
         </Tabs>
 
       </div>

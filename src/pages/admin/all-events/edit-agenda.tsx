@@ -20,6 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import GoBack from '@/components/GoBack';
 
 interface FormData {
     title: string;
@@ -286,45 +287,43 @@ const EditAgenda: React.FC = () => {
         <div className='w-full h-full'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-5'>
-                    <Link to={`/all-agendas/${slug}`}>
-                        <Button className='btn !bg-brand-background !text-black'><ChevronLeft />Back</Button>
-                    </Link>
+                    <GoBack />
                     <h1 className='text-xl font-semibold'>{event?.title}</h1>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className='max-w-3xl flex flex-col gap-5 mt-8 p-8 mx-auto bg-brand-background rounded-[10px] w-full h-full'>
+            <form onSubmit={handleSubmit} className='max-w-3xl flex flex-col gap-5 mt-8 p-8 mx-auto bg-muted rounded-[10px] w-full h-full'>
                 {/* Agenda Name */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='title'>
-                        Agenda Name <span className="text-brand-secondary">*</span>
+                        Agenda Name <span className="text-secondary">*</span>
                     </Label>
                     <Input
                         id="title"
                         name='title'
                         type="text"
-                        className={`input !h-12 min-w-full text-base ${errors.title ? 'border-red-500' : ''}`}
+                        className={`input !h-12 min-w-full text-base ${errors.title ? 'border-destructive' : ''}`}
                         value={formData.title}
                         onChange={handleInputChange}
                         required
                     />
-                    {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+                    {errors.title && <p className="text-destructive text-sm">{errors.title}</p>}
                 </div>
 
                 {/* Description */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='description'>
-                        Description <span className="text-brand-secondary">*</span>
+                        Description <span className="text-secondary">*</span>
                     </Label>
                     <Textarea
                         id="description"
                         name='description'
-                        className={`input min-h-[100px] min-w-full text-base ${errors.description ? 'border-red-500' : ''}`}
+                        className={`input min-h-[100px] min-w-full text-base ${errors.description ? 'border-destructive' : ''}`}
                         value={formData.description}
                         onChange={handleInputChange}
                         required
                     />
-                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+                    {errors.description && <p className="text-destructive text-sm">{errors.description}</p>}
                 </div>
 
                 {/* Tag Speakers & Speakers List */}
@@ -334,24 +333,26 @@ const EditAgenda: React.FC = () => {
                         <Label className="font-semibold">
                             Tagged Speakers
                         </Label>
-                        <div className={`bg-white min-h-12 p-2 rounded-md flex flex-wrap gap-2 ${errors.tag_speakers ? 'border border-red-500' : ''}`}>
+                        <div className={`bg-background/50 min-h-12 p-2 border rounded-md flex flex-wrap gap-2 ${errors.tag_speakers ? 'border border-destructive' : ''}`}>
                             {formData.tag_speakers.map((speakerId) => {
                                 const speaker = speakers.find(s => s.id.toString() === speakerId);
                                 return (
-                                    <span key={speakerId} className="bg-brand-primary/20 capitalize px-2 py-1 rounded flex items-center">
+                                    <span key={speakerId} className="bg-primary/20 capitalize px-2 py-1 rounded flex items-center">
                                         {speaker?.first_name || speaker?.last_name}
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={() => handleRemoveSpeaker(speakerId)}
-                                            className="ml-2 text-gray-500 hover:text-gray-700"
+                                            size="icon"
+                                            className='!p-1 !rounded text-destructive hover:text-destructive hover:bg-transparent max-h-fit max-w-fit ml-2'
+                                            variant="ghost"
                                         >
-                                            <X size={16} className='cursor-pointer'/>
-                                        </button>
+                                            <X size={16} />
+                                        </Button>
                                     </span>
                                 );
                             })}
                         </div>
-                        {errors.tag_speakers && <p className="text-red-500 text-sm">{errors.tag_speakers}</p>}
+                        {errors.tag_speakers && <p className="text-destructive text-sm">{errors.tag_speakers}</p>}
                     </div>
 
                     {/* Speakers List */}
@@ -381,10 +382,10 @@ const EditAgenda: React.FC = () => {
                     {/* Event Date */}
                     <div className='flex flex-col gap-2 w-full'>
                         <Label className='font-semibold' htmlFor='event_date'>
-                            Event Date <span className="text-brand-secondary">*</span>
+                            Event Date <span className="text-secondary">*</span>
                         </Label>
-                        <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                            <div className={`bg-brand-light h-full w-full relative rounded-md border-white ${errors.event_date ? 'border border-red-500' : ''}`}>
+                        <div className='w-full border rounded-[10px] relative flex h-12 bg-background/50 p-1'>
+                            <div className={`h-full w-full relative rounded-md ${errors.event_date ? 'border border-destructive' : ''}`}>
                                 <Input
                                     type='date'
                                     name='event_date'
@@ -396,24 +397,24 @@ const EditAgenda: React.FC = () => {
                                 <p className='h-full px-3 flex items-center'>{formData.event_date ? beautifyDate(new Date(formData.event_date)) : 'Select Date'}</p>
                             </div>
                         </div>
-                        {errors.event_date && <p className="text-red-500 text-sm">{errors.event_date}</p>}
+                        {errors.event_date && <p className="text-destructive text-sm">{errors.event_date}</p>}
                     </div>
 
                     {/* Priority */}
                     <div className='flex flex-col gap-2 w-full'>
                         <Label className='font-semibold' htmlFor='position'>
-                            Priority <span className="text-brand-secondary">*</span>
+                            Priority <span className="text-secondary">*</span>
                         </Label>
                         <Input
                             id="position"
                             name='position'
                             type="number"
-                            className={`input !h-12 min-w-full text-base ${errors.position ? 'border-red-500' : ''}`}
+                            className={`!h-12 min-w-full text-base ${errors.position ? 'border-destructive' : ''}`}
                             value={formData.position}
                             onChange={handleInputChange}
                             required
                         />
-                        {errors.position && <p className="text-red-500 text-sm">{errors.position}</p>}
+                        {errors.position && <p className="text-destructive text-sm">{errors.position}</p>}
                     </div>
                 </div>
 
@@ -421,10 +422,10 @@ const EditAgenda: React.FC = () => {
                     {/* Start Time */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='start_time'>
-                            Start Time <span className="text-brand-secondary">*</span>
+                            Start Time <span className="text-secondary">*</span>
                         </Label>
-                        <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                            <div className={`bg-brand-light h-full w-full relative rounded-md ${errors.start_time ? 'border border-red-500' : ''}`}>
+                        <div className='w-full border rounded-[10px] relative flex h-12 bg-background/50 p-1'>
+                            <div className={`h-full w-full relative rounded-md ${errors.start_time ? 'border border-destructive' : ''}`}>
                                 <Input
                                     type='time'
                                     name='start_time'
@@ -441,16 +442,16 @@ const EditAgenda: React.FC = () => {
                                 </p>
                             </div>
                         </div>
-                        {errors.start_time && <p className="text-red-500 text-sm">{errors.start_time}</p>}
+                        {errors.start_time && <p className="text-destructive text-sm">{errors.start_time}</p>}
                     </div>
 
                     {/* End Time */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='end_time'>
-                            End Time <span className="text-brand-secondary">*</span>
+                            End Time <span className="text-secondary">*</span>
                         </Label>
-                        <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                            <div className={`bg-brand-light h-full w-full relative rounded-md ${errors.end_time ? 'border border-red-500' : ''}`}>
+                        <div className='w-full border rounded-[10px] relative flex h-12 bg-background/50 p-1'>
+                            <div className={`h-full w-full relative rounded-md ${errors.end_time ? 'border border-destructive' : ''}`}>
                                 <Input
                                     type='time'
                                     name='end_time'
@@ -467,7 +468,7 @@ const EditAgenda: React.FC = () => {
                                 </p>
                             </div>
                         </div>
-                        {errors.end_time && <p className="text-red-500 text-sm">{errors.end_time}</p>}
+                        {errors.end_time && <p className="text-destructive text-sm">{errors.end_time}</p>}
                     </div>
                 </div>
 

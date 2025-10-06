@@ -72,13 +72,12 @@ const OrganiserLogin: React.FC = () => {
 
             <form onSubmit={handleLogin} className='mt-8 flex flex-col gap-5 text-sm'>
                 <div className='w-full max-w-64 mx-auto flex flex-col gap-2'>
-                    <Label htmlFor="email">Email <span className="text-brand-secondary">*</span></Label>
+                    <Label htmlFor="email">Email <span className="text-secondary">*</span></Label>
                     <Input
                         id="email"
                         name="email"
                         type='email'
                         placeholder='Enter your email'
-                        className='input'
                         value={formData.email}
                         onChange={handleInputChange}
                         required
@@ -86,14 +85,13 @@ const OrganiserLogin: React.FC = () => {
                 </div>
 
                 <div className='w-full max-w-64 mx-auto flex flex-col gap-2'>
-                    <Label htmlFor="password">Password <span className="text-brand-secondary">*</span></Label>
+                    <Label htmlFor="password">Password <span className="text-secondary">*</span></Label>
                     <div className='relative'>
                         <Input
                             id="password"
                             name="password"
                             type={showPassword ? 'text' : 'password'}
                             placeholder='Enter your password'
-                            className='input'
                             value={formData.password}
                             onChange={handleInputChange}
                             required
@@ -103,7 +101,7 @@ const OrganiserLogin: React.FC = () => {
                 </div>
             </form>
             <div className='max-w-64 w-full text-left px-3'>
-                <Link to='/organiser/forgot-password' className='text-brand-primary text-xs'>Forgot Password?</Link>
+                <Link to='/organiser/forgot-password' className='text-primary text-xs'>Forgot Password?</Link>
             </div>
 
             <Button
@@ -115,7 +113,7 @@ const OrganiserLogin: React.FC = () => {
             </Button>
 
             <p className='text-center mt-5 text-xs'>
-                Don't have an account? <Link to='/organiser/signup' className='text-brand-primary'>Signup Here</Link>
+                Don't have an account? <Link to='/organiser/signup' className='text-primary'>Signup Here</Link>
             </p>
         </div>
     )

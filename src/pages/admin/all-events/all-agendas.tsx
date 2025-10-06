@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Plus, FileInput, Eye, SquarePen, Trash, CircleCheck, CircleX } from 'lucide-react';
+import { Plus, FileInput, Eye, SquarePen, Trash, CircleCheck, CircleX, Badge } from 'lucide-react';
 import useEventStore from '@/store/eventStore';
 import Wave from '@/components/Wave';
 
@@ -86,24 +86,24 @@ const AllAgendas: React.FC = () => {
                     if (data) {
                         // Update local state with the fetched data
                         setAgendas(data);
-                        
+
                         // Also update the store's state to keep it in sync
                         useAgendaStore.setState(state => {
                             const existingIndex = state.allEventAgendas.findIndex(ea => ea.event_id === event.id);
                             const updatedAgendas = [...state.allEventAgendas];
-                            
+
                             if (existingIndex >= 0) {
-                                updatedAgendas[existingIndex] = { 
-                                    event_id: event.id, 
-                                    agendas: data 
+                                updatedAgendas[existingIndex] = {
+                                    event_id: event.id,
+                                    agendas: data
                                 };
                             } else {
-                                updatedAgendas.push({ 
-                                    event_id: event.id, 
-                                    agendas: data 
+                                updatedAgendas.push({
+                                    event_id: event.id,
+                                    agendas: data
                                 });
                             }
-                            
+
                             return { allEventAgendas: updatedAgendas };
                         });
                     }
@@ -116,7 +116,7 @@ const AllAgendas: React.FC = () => {
         };
 
         fetchAgendas();
-        
+
         // Cleanup function to reset loading state if component unmounts
         return () => {
             useAgendaStore.setState({ loading: false });
@@ -207,12 +207,12 @@ const AllAgendas: React.FC = () => {
 
                 <div className='flex items-center gap-5'>
                     <Link to={`/add-agenda/${slug}`}>
-                        <Button className='btn !rounded-[10px] !px-3'><Plus size={20} />Add Agenda</Button>
+                        <Button><Plus size={20} />Add Agenda</Button>
                     </Link>
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button className='btn !rounded-[10px] !px-3'><FileInput size={20} />Import Agenda</Button>
+                            <Button><FileInput size={20} />Import Agenda</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -223,7 +223,7 @@ const AllAgendas: React.FC = () => {
                             </DialogHeader>
                             <ul className='flex flex-col max-h-80 overflow-y-scroll'>
                                 {events.filter(e => e.id !== event?.id).map(event => (
-                                    <li key={event.id} onClick={() => setSelectedEventId(event.id)} className='rounded-md hover:bg-brand-light-gray relative'>
+                                    <li key={event.id} onClick={() => setSelectedEventId(event.id)} className='rounded-md hover:bg-muted relative'>
                                         <Label className='cursor-pointer leading-relaxed !p-4 !min-w-full flex gap-3 items-center'>
                                             <input
                                                 type="radio"
@@ -237,7 +237,6 @@ const AllAgendas: React.FC = () => {
                             </ul>
                             <Button
                                 onClick={() => handleImportAgenda()}
-                                className='btn !rounded-[10px] !px-3'
                             >
                                 Import Agendas
                             </Button>
@@ -247,14 +246,14 @@ const AllAgendas: React.FC = () => {
             </div>
 
             {/* Table */}
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
 
                 {/* Filters Bar */}
                 <div className='flex w-full justify-between items-baseline'>
                     <div className='flex w-full gap-2.5'>
                         {/* Select Box for pagination */}
                         <Select onValueChange={handleAgendasPerPageChange}>
-                            <SelectTrigger className="rounded-sm !w-fit !max-h-[30px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                            <SelectTrigger className='!h-10'>
                                 <SelectValue placeholder={`${agendasPerPage}/Page`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -267,15 +266,13 @@ const AllAgendas: React.FC = () => {
 
                         {/* Search By Name */}
                         <Input
-                            className='input !min-w-fit !max-w-fit !max-h-[30px] !p-2.5 !text-xs'
+                            className='input !min-w-80 h-10 !max-w-fit !p-2.5 !text-xs'
                             value={filters.title}
                             onChange={(e) => setFilters(prev => ({ ...prev, title: e.target.value }))}
                             placeholder='Search by title'
                         />
 
-                        <Button
-                            className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white'
-                        >
+                        <Button>
                             Delete
                         </Button>
                     </div>
@@ -283,7 +280,7 @@ const AllAgendas: React.FC = () => {
                 </div>
 
                 <Table className='mt-4'>
-                    <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                    <TableHeader className='!bg-accent !rounded-[10px]'>
                         <TableRow className='!text-base'>
                             <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
                             <TableHead className="text-left min-w-10 !max-w-96 !px-2">Title</TableHead>
@@ -296,13 +293,13 @@ const AllAgendas: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedAgendas.map((agenda, index) => (
-                            <TableRow key={agenda.id} className='!capitalize'>
+                            <TableRow key={agenda.id} className='!capitalize hover:bg-background/50'>
                                 <TableCell>{(currentPage - 1) * agendasPerPage + index + 1}</TableCell>
                                 <TableCell>{agenda.title}</TableCell>
                                 <TableCell>
-                                    {Array.isArray(agenda.speakers) && agenda.speakers.length > 0 
-                                        ? agenda.speakers.map(speaker => speaker.first_name || speaker.last_name 
-                                            ? `${speaker.first_name || ''} ${speaker.last_name || ''}`.trim() 
+                                    {Array.isArray(agenda.speakers) && agenda.speakers.length > 0
+                                        ? agenda.speakers.map(speaker => speaker.first_name || speaker.last_name
+                                            ? `${speaker.first_name || ''} ${speaker.last_name || ''}`.trim()
                                             : 'Unknown Speaker'
                                         ).filter(Boolean).join(', ')
                                         : 'No speakers assigned'}
@@ -314,29 +311,113 @@ const AllAgendas: React.FC = () => {
                                     {/* View Agenda */}
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <Eye width={20} height={20} className="cursor-pointer" />
+                                            <Eye width={20} height={20} className="cursor-pointer text-green-400 hover:text-green-500 transition-colors" />
                                         </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>{agenda.title}</DialogTitle>
-                                            </DialogHeader>
-                                            <div className="mt-4">
-                                                <p><strong>Speakers:</strong> {agenda.speakers ? agenda.speakers.map(speaker => speaker.first_name).join(', ') : ''}</p>
-                                                <p><strong>Event Date:</strong> {agenda.event_date}</p>
-                                                <p><strong>Time:</strong> {getStartEndTime(agenda)}</p>
-                                                <p><strong>Priority:</strong> {agenda.position}</p>
-                                                <p><strong>Description:</strong> {agenda.description}</p>
+                                        <DialogContent className="bg-muted p-0 rounded-lg shadow-blur max-w-2xl border-0 overflow-hidden">
+                                            {/* Header */}
+                                            <div className="bg-accent p-6 border-b">
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex-1">
+                                                        <DialogTitle className="text-xl font-bold mb-2 text-foreground">
+                                                            {agenda.title}
+                                                        </DialogTitle>
+                                                        <div className="flex items-center gap-3 mt-2">
+                                                            <Badge className="bg-brand-primary/10 text-brand-primary border-brand-primary/20 px-3 py-1">
+                                                                <CircleCheck className="w-3 h-3 mr-1" />
+                                                                Priority: {agenda.position}
+                                                            </Badge>
+                                                            <Badge className="bg-green-100 text-green-700 border-green-200 px-3 py-1">
+                                                                <Badge className="w-3 h-3 mr-1" />
+                                                                {agenda.speakers?.length || 0} Speakers
+                                                            </Badge>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Content */}
+                                            <div className="p-6 space-y-6 max-h-96 overflow-y-scroll">
+                                                {/* Information Grid */}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    {/* Speakers Card */}
+                                                    <div className="bg-background rounded-lg p-4 border border-border">
+                                                        <div className="flex items-center mb-3">
+                                                            <div className="bg-blue-100 p-2 rounded-full mr-3">
+                                                                <Badge className="w-5 h-5 text-blue-600" />
+                                                            </div>
+                                                            <h3 className="font-semibold text-foreground">Speakers</h3>
+                                                        </div>
+                                                        <p className="text-muted-foreground">
+                                                            {agenda.speakers && agenda.speakers.length > 0
+                                                                ? agenda.speakers.map(speaker =>
+                                                                    `${speaker.first_name || ''} ${speaker.last_name || ''}`.trim()
+                                                                ).filter(name => name).join(', ')
+                                                                : 'No speakers assigned'
+                                                            }
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Event Date Card */}
+                                                    <div className="bg-background rounded-lg p-4 border border-border">
+                                                        <div className="flex items-center mb-3">
+                                                            <div className="bg-green-100 p-2 rounded-full mr-3">
+                                                                <CircleCheck className="w-5 h-5 text-green-600" />
+                                                            </div>
+                                                            <h3 className="font-semibold text-foreground">Event Date</h3>
+                                                        </div>
+                                                        <p className="text-muted-foreground">{agenda.event_date}</p>
+                                                    </div>
+
+                                                    {/* Time Card */}
+                                                    <div className="bg-background rounded-lg p-4 border border-border">
+                                                        <div className="flex items-center mb-3">
+                                                            <div className="bg-purple-100 p-2 rounded-full mr-3">
+                                                                <Badge className="w-5 h-5 text-purple-600" />
+                                                            </div>
+                                                            <h3 className="font-semibold text-foreground">Time</h3>
+                                                        </div>
+                                                        <p className="text-muted-foreground">{getStartEndTime(agenda)}</p>
+                                                    </div>
+
+                                                    {/* Priority Card */}
+                                                    <div className="bg-background rounded-lg p-4 border border-border">
+                                                        <div className="flex items-center mb-3">
+                                                            <div className="bg-orange-100 p-2 rounded-full mr-3">
+                                                                <CircleCheck className="w-5 h-5 text-orange-600" />
+                                                            </div>
+                                                            <h3 className="font-semibold text-foreground">Priority Level</h3>
+                                                        </div>
+                                                        <p className="text-muted-foreground">Position {agenda.position || 'Not set'}</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Description Section */}
+                                                {agenda.description && (
+                                                    <div className="bg-background rounded-lg p-4 border border-border">
+                                                        <div className="flex items-center mb-3">
+                                                            <div className="bg-indigo-100 p-2 rounded-full mr-3">
+                                                                <FileInput className="w-5 h-5 text-indigo-600" />
+                                                            </div>
+                                                            <h3 className="font-semibold text-foreground">Description</h3>
+                                                        </div>
+                                                        <div className="prose prose-slate max-w-none">
+                                                            <p className="text-muted-foreground leading-relaxed">
+                                                                {agenda.description}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </DialogContent>
                                     </Dialog>
 
                                     {/* Edit Agenda */}
-                                    <Link to={`/all-agendas/${slug}/edit-agenda/${agenda.uuid}`} className=''><SquarePen width={20} height={20} /></Link>
+                                    <Link to={`/all-agendas/${slug}/edit-agenda/${agenda.uuid}`} className=''><SquarePen width={20} height={20} className='text-yellow-500' /></Link>
 
                                     {/* Delete Agenda */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <Trash width={20} height={20} className='fill-brand-secondary stroke-brand-secondary' />
+                                            <Trash width={20} height={20} className='text-destructive' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -347,7 +428,7 @@ const AllAgendas: React.FC = () => {
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => handleDeleteAgenda(agenda.uuid)}>Continue</AlertDialogAction>
+                                                <AlertDialogAction className='cursor-pointer bg-destructive hover:bg-destructive/80 duration-300 transition-all text-white' onClick={() => handleDeleteAgenda(agenda.uuid)}>Continue</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>

@@ -290,7 +290,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
         <GoBack /> <h1 className='text-xl font-semibold'>{event?.title}</h1>
       </div>
       <div className='mt-8 flex gap-4 h-full'>
-        <div className='bg-brand-background rounded-[10px] flex-1 w-full p-5 flex flex-col'>
+        <div className='bg-muted rounded-[10px] flex-1 w-full p-5 flex flex-col'>
           {/* SelectBoxes - Only show if not in-app message */}
           {!isInAppTemplate && (
             <>
@@ -301,7 +301,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                     id="all"
                     checked={allSelected}
                     onCheckedChange={handleAllChange}
-                    className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                    className='size-5'
                   />
                   <Label htmlFor="all" className='cursor-pointer'>All</Label>
                 </div>
@@ -311,7 +311,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                       id={role}
                       checked={selectedRoles.includes(role)}
                       onCheckedChange={() => handleRoleChange(role)}
-                      className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                      className='size-5'
                     />
                     <Label htmlFor={role} className='cursor-pointer'>{role}</Label>
                   </div>
@@ -334,7 +334,6 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                     <RadioGroupItem
                       value="email"
                       id="email"
-                      className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                     />
                     <Label htmlFor="email" className='cursor-pointer'>Email</Label>
                   </div>
@@ -344,7 +343,6 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
                     <RadioGroupItem
                       value="whatsapp"
                       id="whatsapp"
-                      className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                     />
                     <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
                   </div>
