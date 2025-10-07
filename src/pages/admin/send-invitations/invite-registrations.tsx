@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from '@/components/ui/textarea';
 import { MessageTemplateType } from '@/types';
 import { toast } from 'sonner';
-import { CircleX, CircleCheck, Info, Upload } from 'lucide-react';
+import { CircleX, CircleCheck, Info, Upload, Send } from 'lucide-react';
 import { inviteRegistrations } from '@/api/messageTemplates';
 import Wave from '@/components/Wave';
 import useAuthStore from '@/store/authStore';
@@ -593,7 +593,7 @@ const InviteRegistrations: React.FC = () => {
                 <GoBack /> <h1 className='text-xl font-semibold'>{event?.title}</h1>
             </div>
             <div className='mt-8 flex gap-4 h-full'>
-                <div className='bg-brand-background rounded-[10px] flex-1 w-full p-5 flex flex-col'>
+                <div className='bg-muted rounded-[10px] flex-1 w-full p-5 flex flex-col'>
                     {/* SelectBoxes */}
                     <h2 className='font-semibold'>Select Roles</h2>
                     <div className='flex gap-5 mt-[15px] flex-wrap'>
@@ -602,7 +602,7 @@ const InviteRegistrations: React.FC = () => {
                                 id="all"
                                 checked={allSelected}
                                 onCheckedChange={handleAllChange}
-                                className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                                className='size-5'
                             />
                             <Label htmlFor="all" className='cursor-pointer'>All</Label>
                         </div>
@@ -612,7 +612,7 @@ const InviteRegistrations: React.FC = () => {
                                     id={role}
                                     checked={selectedRoles.includes(role)}
                                     onCheckedChange={() => handleRoleChange(role)}
-                                    className='border cursor-pointer border-brand-dark-gray shadow-none data-[state=checked]:border-brand-primary size-5 data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                                    className='size-5'
                                 />
                                 <Label htmlFor={role} className='cursor-pointer'>{role}</Label>
                             </div>
@@ -630,7 +630,6 @@ const InviteRegistrations: React.FC = () => {
                             <RadioGroupItem
                                 value="email"
                                 id="email"
-                                className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                             />
                             <Label htmlFor="email" className='cursor-pointer'>Email</Label>
                         </div>
@@ -638,7 +637,6 @@ const InviteRegistrations: React.FC = () => {
                             <RadioGroupItem
                                 value="whatsapp"
                                 id="whatsapp"
-                                className='cursor-pointer border-brand-dark-gray text-white size-5 data-[state=checked]:bg-brand-primary'
                             />
                             <Label htmlFor="whatsapp" className='cursor-pointer'>Whatsapp</Label>
                         </div>
@@ -675,22 +673,22 @@ const InviteRegistrations: React.FC = () => {
                                         <div className='flex justify-end mt-4'>
                                             <Button className='btn !px-3 !py-1' onClick={handleRefreshTemplates}>Refresh templates</Button>
                                         </div>
-                                        <TabsList className="bg-white p-0 w-fit mx-auto mt-4 mb-2 !max-h-9">
+                                        <TabsList className="bg-background/50 p-0 w-fit mx-auto mt-4 mb-2 h-10">
                                             <TabsTrigger
                                                 value="template1"
-                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                                className='h-full cursor-pointer !px-4'
                                             >
                                                 Template 1
                                             </TabsTrigger>
                                             <TabsTrigger
                                                 value="template2"
-                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                                className='h-full cursor-pointer !px-4'
                                             >
                                                 Template 2
                                             </TabsTrigger>
                                             <TabsTrigger
                                                 value="template3"
-                                                className="max-h-9 px-4 h-full font-medium text-sm !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                                                className='h-full cursor-pointer !px-4'
                                             >
                                                 Template 3
                                             </TabsTrigger>
@@ -698,9 +696,9 @@ const InviteRegistrations: React.FC = () => {
 
                                         <TabsContent value="template1" className="flex-1 flex flex-col mt-0">
                                             <div className='flex-1 flex justify-center'>
-                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
-                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 1 Preview</h4>
-                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                <div>
+                                                    <h4 className='font-semibold mb-4 text-lg text-foreground'>Template 1 Preview</h4>
+                                                    <div className='bg-background/50 max-w-2xl  rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
                                                             <Label className="font-semibold mb-2 block">Subject</Label>
                                                             <Input
@@ -714,7 +712,7 @@ const InviteRegistrations: React.FC = () => {
                                                         <div className='mb-4 flex justify-center'>
                                                             <div
                                                                 onClick={triggerFileUpload}
-                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                className='w-full h-48 bg-background/50 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-background transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
                                                                 style={{ aspectRatio: '16/9' }}
                                                             >
                                                                 {uploadedBannerUrl ? (
@@ -760,9 +758,9 @@ const InviteRegistrations: React.FC = () => {
 
                                         <TabsContent value="template2" className="flex-1 flex flex-col mt-0">
                                             <div className='flex-1 flex justify-center'>
-                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
-                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 2 Preview</h4>
-                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                <div>
+                                                    <h4 className='font-semibold mb-4 text-lg text-foreground'>Template 2 Preview</h4>
+                                                    <div className='bg-background/50 max-w-2xl  rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
                                                             <Label className="font-semibold mb-2 block">Subject</Label>
                                                             <Input
@@ -776,7 +774,7 @@ const InviteRegistrations: React.FC = () => {
                                                         <div className='mb-4 flex justify-center'>
                                                             <div
                                                                 onClick={triggerFileUpload}
-                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                className='w-full h-48 bg-background/50 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-background transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
                                                                 style={{ aspectRatio: '16/9' }}
                                                             >
                                                                 {uploadedBannerUrl ? (
@@ -819,9 +817,9 @@ const InviteRegistrations: React.FC = () => {
 
                                         <TabsContent value="template3" className="flex-1 flex flex-col mt-0">
                                             <div className='flex-1 flex justify-center'>
-                                                <div className='w-full max-w-2xl bg-gray-50 rounded-[10px] p-6 border'>
-                                                    <h4 className='font-semibold mb-4 text-lg text-gray-700'>Template 3 Preview</h4>
-                                                    <div className='bg-white rounded-lg p-6 border text-sm'>
+                                                <div>
+                                                    <h4 className='font-semibold mb-4 text-lg text-foreground'>Template 3 Preview</h4>
+                                                    <div className='bg-background/50 max-w-2xl  rounded-lg p-6 border text-sm'>
                                                         <div className='mb-4 pb-3 border-b'>
                                                             <Label className="font-semibold mb-2 block">Subject</Label>
                                                             <Input
@@ -835,7 +833,7 @@ const InviteRegistrations: React.FC = () => {
                                                         <div className='mb-4 flex justify-center'>
                                                             <div
                                                                 onClick={triggerFileUpload}
-                                                                className='w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-300 transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
+                                                                className='w-full h-48 bg-background/50 rounded-lg flex items-center justify-center text-gray-500 cursor-pointer hover:bg-background transition-colors border-2 border-dashed border-gray-400 hover:border-gray-500'
                                                                 style={{ aspectRatio: '16/9' }}
                                                             >
                                                                 {uploadedBannerUrl ? (
@@ -888,24 +886,27 @@ const InviteRegistrations: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className='flex-1 flex flex-col'>
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-start gap-3">
+                                    <div className="bg-accent dark:bg-background/50 border border-primary rounded-lg p-4 mb-4 flex items-start gap-3">
                                         <Info className="text-blue-600 mt-0.5" size={20} />
                                         <p className="text-blue-700 text-sm">
                                             Please note: You need to send an email invitation first before sending WhatsApp messages. This ensures proper communication flow and tracking.
                                         </p>
                                     </div>
                                     <h3 className='font-semibold mb-[15px]'>Your Message</h3>
-                                    <div className='p-5 bg-white rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(whatsappMessage, event, user) }} />
+                                    <div className='p-5 bg-accent rounded-[10px] flex-1' dangerouslySetInnerHTML={{ __html: formatTemplateMessage(whatsappMessage, event, user) }} />
                                 </div>
                             )}
                         </div>
 
+
                         {/* Send Button */}
-                        <Button className='btn !mt-5 w-fit' onClick={handleSubmit}>Send</Button>
+                        <div className="text-right mt-5">
+                            <Button onClick={handleSubmit} className='!px-4'>Send <Send /></Button>
+                        </div>
                     </div>
                 </div>
 
-                <div className='w-[300px] flex flex-col gap-4 min-h-full bg-brand-background rounded-[10px] p-3'>
+                <div className='w-[300px] hidden lg:flex flex-col gap-4 min-h-full bg-muted rounded-[10px] p-3'>
                     <img src={getImageUrl(event?.image)} alt={event?.title} className='rounded-[10px]' />
                     <h3 className='font-semibold text-nowrap text-ellipsis overflow-hidden text-xl'>{event?.title}</h3>
                     <Separator className='bg-white w-full' />

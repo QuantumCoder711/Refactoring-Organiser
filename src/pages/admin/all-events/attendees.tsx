@@ -761,7 +761,7 @@ const Attendees: React.FC = () => {
           <div className="grid grid-cols-2 sm:flex gap-2.5">
             {/* Filter By Check-In */}
             <Select value={checkInFilter} onValueChange={setCheckInFilter}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
+              <SelectTrigger className="!w-full sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
                 <SelectValue placeholder="Checked-In">
                   {checkInFilter === 'all'
                     ? 'Checked-In'
@@ -781,7 +781,7 @@ const Attendees: React.FC = () => {
 
             {/* Filter By Not Invited */}
             <Select value={notInvitedFilter.toString()} onValueChange={(value) => setNotInvitedFilter(Number(value))}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
+              <SelectTrigger className="!w-full sm:!max-w-36 !text-sm cursor-pointer !text-foreground">
                 <SelectValue placeholder="Not Invited">
                   {notInvitedFilter === 2
                     ? 'All'
@@ -801,7 +801,7 @@ const Attendees: React.FC = () => {
 
             {/* Filter By Role */}
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="input sm:!max-w-36 !text-sm cursor-pointer text-foreground">
+              <SelectTrigger className="!w-full sm:!max-w-36 !text-sm cursor-pointer text-foreground">
                 <SelectValue placeholder="Role">
                   {roleFilter === 'all'
                     ? 'Role'

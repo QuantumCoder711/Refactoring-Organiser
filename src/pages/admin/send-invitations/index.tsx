@@ -364,13 +364,12 @@ const SendInvitations: React.FC = () => {
                         <div className="flex gap-2">
                             <Button
                                 onClick={() => handleExportToExcel(filteredAttendees.filter(attendee => selectedAttendees.has(attendee.id)))}
-                                className='btn !rounded-[10px] !px-3 !bg-green-600 hover:!bg-green-700 w-full sm:w-auto'
+                                className='bg-green-600 hover:bg-green-700 duration-300 transition-colors'
                             >
                                 Export Selected ({selectedAttendees.size})
                             </Button>
                             <Button
                                 onClick={() => handleExportToExcel()}
-                                className='btn !rounded-[10px] !px-3 w-full sm:w-auto'
                             >
                                 Export All
                             </Button>
@@ -378,7 +377,6 @@ const SendInvitations: React.FC = () => {
                     ) : (
                         <Button
                             onClick={() => handleExportToExcel()}
-                            className='btn !rounded-[10px] !px-3 w-full sm:w-auto'
                         >
                             Export Data
                         </Button>
@@ -389,16 +387,18 @@ const SendInvitations: React.FC = () => {
             <div className='flex flex-wrap items-center gap-3 sm:gap-5 mt-5 font-semibold'>
                 <Link
                     to={`/send-invitations/add-requested-attendee/${slug}`}
-                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-full sm:w-fit text-nowrap text-sm grid place-content-center"
                 >
-                    Add Requested Attendee
+                    <Button variant="outline" className='bg-muted hover:bg-muted'>
+                        Add Requested Attendee
+                    </Button>
                 </Link>
 
                 <Link
                     to={`/send-invitations/invite-registrations/${slug}`}
-                    className="btn !rounded-[10px] !px-3 !h-[30px] !bg-brand-background !text-black w-full sm:w-fit text-nowrap text-sm grid place-content-center"
                 >
-                    Invite Registrations
+                    <Button variant="outline" className='bg-muted hover:bg-muted'>
+                        Invite Registrations
+                    </Button>
                 </Link>
             </div>
 
@@ -406,7 +406,7 @@ const SendInvitations: React.FC = () => {
             <div className='grid grid-cols-1 min-[480px]:grid-cols-2 sm:flex flex-wrap w-full gap-2.5 mt-4'>
                 {/* Search By Name */}
                 <Input
-                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
+                    className='!text-xs'
                     placeholder='Search by name'
                     value={nameFilter}
                     onChange={(e) => setNameFilter(e.target.value)}
@@ -414,7 +414,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Search By Company */}
                 <Input
-                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
+                    className='!text-xs'
                     placeholder='Search by company'
                     value={companyFilter}
                     onChange={(e) => setCompanyFilter(e.target.value)}
@@ -422,7 +422,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Search By Email */}
                 <Input
-                    className='input !min-w-fit !max-w-full !p-2.5 !text-xs'
+                    className='!text-xs'
                     placeholder='Search by email'
                     value={emailFilter}
                     onChange={(e) => setEmailFilter(e.target.value)}
@@ -430,7 +430,7 @@ const SendInvitations: React.FC = () => {
 
                 {/* Filter By Status */}
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="input !w-full sm:!w-fit !h-[30px] !text-sm !font-semibold cursor-pointer !text-black">
+                    <SelectTrigger className='w-full'>
                         <SelectValue placeholder="Status">
                             {statusFilter === 'all' ? 'All Statuses' :
                                 statusFilter === 'delegate' ? 'Delegate' :
@@ -452,7 +452,6 @@ const SendInvitations: React.FC = () => {
 
                 {/* Get Contact Button */}
                 <Button
-                    className='btn !rounded-[10px] !p-2.5 !bg-blue-600 text-white hover:!bg-blue-700 w-full sm:w-auto'
                     onClick={handleGetContacts}
                     disabled={isLoadingContacts || selectedAttendees.size === 0}
                 >
@@ -460,7 +459,6 @@ const SendInvitations: React.FC = () => {
                 </Button>
 
                 <Button
-                    className='btn !rounded-[10px] !p-2.5 !bg-brand-secondary text-white w-full sm:w-auto'
                     onClick={handleDeleteSelected}
                     disabled={selectedAttendees.size === 0}
                 >
@@ -469,13 +467,13 @@ const SendInvitations: React.FC = () => {
             </div>
 
             {/* Table */}
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur overflow-x-auto'>
+            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur overflow-x-auto'>
 
                 {/* Details Row */}
-                <div className='flex flex-wrap gap-3.5 mb-2'>
+                <div className='flex flex-wrap items-center gap-3.5 mb-2'>
                     {/* Select Box for pagination */}
                     <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="rounded-sm !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                        <SelectTrigger>
                             <SelectValue placeholder={`${itemsPerPage}/Page`} />
                         </SelectTrigger>
                         <SelectContent>
@@ -490,11 +488,10 @@ const SendInvitations: React.FC = () => {
                 </div>
 
                 <Table className='mt-4'>
-                    <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                    <TableHeader className='bg-accent !rounded-[10px]'>
                         <TableRow className='!text-base'>
                             <TableHead className="text-left min-w-10 !px-2">
                                 <Checkbox
-                                    className='bg-white border-brand-dark-gray cursor-pointer'
                                     checked={filteredAttendees.length > 0 && selectedAttendees.size === filteredAttendees.length}
                                     onCheckedChange={handleSelectAll}
                                 />
@@ -518,10 +515,9 @@ const SendInvitations: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedAttendees.map((attendee) => (
-                            <TableRow key={attendee.id}>
+                            <TableRow key={attendee.id} className='hover:bg-background/50'>
                                 <TableCell>
                                     <Checkbox
-                                        className='bg-white border-brand-dark-gray cursor-pointer'
                                         checked={selectedAttendees.has(attendee.id)}
                                         onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
                                     />
@@ -555,44 +551,44 @@ const SendInvitations: React.FC = () => {
 
                                     {/* For Viewing the Event */}
                                     <Dialog>
-                                        <DialogTrigger className='cursor-pointer'><Eye size={20} /></DialogTrigger>
+                                        <DialogTrigger className='cursor-pointer'><Eye size={20} className='text-green-400'/></DialogTrigger>
                                         <DialogContent className="w-[90vw] max-w-md max-h-[80vh] overflow-y-auto p-4 sm:p-6">
                                             <DialogHeader className="space-y-2">
-                                                <DialogTitle className="text-2xl font-bold text-brand-primary">
+                                                <DialogTitle className="text-2xl font-bold text-primary">
                                                     Attendee Details
                                                 </DialogTitle>
-                                                <div className="h-1 w-12 bg-brand-primary rounded-full"></div>
+                                                <div className="h-1 w-12 bg-primary rounded-full"></div>
                                             </DialogHeader>
 
                                             <div className="mt-8 space-y-6">
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                                                        <p className="text-base font-medium text-gray-800">John Doe</p>
+                                                        <p className="text-base font-medium text-foreground">John Doe</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                                                        <p className="text-base font-medium text-gray-800">Software Engineer</p>
+                                                        <p className="text-base font-medium text-foreground">Software Engineer</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
-                                                        <p className="text-base font-medium text-gray-800">john.doe@example.com</p>
+                                                        <p className="text-base font-medium text-foreground">john.doe@example.com</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                                                        <p className="text-base font-medium text-gray-800">ABC Corporation</p>
+                                                        <p className="text-base font-medium text-foreground">ABC Corporation</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                                                        <p className="text-base font-medium text-gray-800">+1 1234567890</p>
+                                                        <p className="text-base font-medium text-foreground">+1 1234567890</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>
-                                                        <p className="text-base font-medium text-gray-800">john.doe2@example.com</p>
+                                                        <p className="text-base font-medium text-foreground">john.doe2@example.com</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</h3>
-                                                        <p className="text-base font-medium text-gray-800 capitalize">Confirmed</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">Confirmed</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -600,12 +596,12 @@ const SendInvitations: React.FC = () => {
                                     </Dialog>
 
                                     {/* Edit Event */}
-                                    <Link to={`/send-invitations/edit-requested-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen size={20} /></Link>
+                                    <Link to={`/send-invitations/edit-requested-attendee/${slug}/${attendee.uuid}`} className=''><SquarePen size={20} className='text-yellow-500'/></Link>
 
                                     {/* Delete Attendee */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <Trash size={20} className='fill-brand-secondary stroke-brand-secondary' />
+                                            <Trash size={20} className='text-destructive' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent className="w-[90vw] max-w-[425px] p-4 sm:p-6">
                                             <AlertDialogHeader>
@@ -617,7 +613,7 @@ const SendInvitations: React.FC = () => {
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
                                                 <AlertDialogAction
-                                                    className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white'
+                                                    className='cursor-pointer bg-destructive hover:bg-destructive/80 text-white'
                                                     onClick={handleSingleDelete(attendee.uuid)}
                                                 >
                                                     Continue

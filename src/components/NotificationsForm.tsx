@@ -453,7 +453,7 @@ const NotifcationsForm: React.FC<NotifcationsFormProps> = (props) => {
           </div>
         </div>
 
-        <div className='w-[300px] flex flex-col gap-4 min-h-full bg-muted rounded-[10px] p-3'>
+        <div className='w-[300px] hidden lg:flex flex-col gap-4 min-h-full bg-muted rounded-[10px] p-3'>
           <img src={getImageUrl(event?.image)} alt={event?.title} className='rounded-[10px]' />
           <h3 className='font-semibold text-nowrap text-ellipsis overflow-hidden text-xl'>{event?.title}</h3>
           <Separator className='bg-accent w-full' />

@@ -31,7 +31,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                         alt={imageAlt}
                         className='w-full h-60 object-cover rounded-t-xl'
                     />
-                    <div className='bottom-2 left-2 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black'>
+                    <div className='bottom-0 left-0 w-full absolute bg-gradient-to-b from-black/0 via-black/40 to-black p-2'>
                         <span className='rounded-full px-2.5 py-1.5 w-fit text-background dark:text-foreground border backdrop-blur-xs dark:border-foreground text-xs grid place-content-center'>
                             {formatDateTime(date)}
                         </span>

@@ -35,13 +35,13 @@ const CustomInput = React.memo(({ label, id, name, type, value, onChange, requir
 }) => (
     <div className="flex flex-col gap-2 w-full">
         <Label className="font-semibold" htmlFor={id}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Input
             id={id}
             name={name}
             type={type}
-            className='input !h-12 min-w-full text-base'
+            className='!h-12 min-w-full text-base'
             value={value}
             onChange={onChange}
         />
@@ -67,7 +67,7 @@ const CustomSelectSimple = React.memo(({
 }) => (
     <div className="flex flex-col gap-2">
         <Label className="font-semibold" htmlFor={label.toLowerCase().replace(/\s+/g, '_')}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Select
             value={value}
@@ -200,7 +200,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -212,7 +212,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                        className="w-full capitalize !h-12 text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -224,17 +224,17 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 min-w-4 min-h-4 text-secondary" />
                                     )}
                                 </div>
                             ))
@@ -503,13 +503,13 @@ const EditAttendee: React.FC = () => {
 
     return (
         <div className="">
-            <div className="max-w-2xl bg-brand-light-gray p-3 sm:p-7 rounded-[10px] mx-auto shadow-blur">
-                <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-lg font-semibold">Edit Attendee</h1>
+            <div>
+                <div className="flex items-center gap-5 mb-5">
                     <GoBack />
+                    <h1 className="text-lg font-semibold">Edit Attendee</h1>
                 </div>
 
-                <form onSubmit={handleSubmit} className="max-w-2xl mx-auto text-center">
+                <form onSubmit={handleSubmit} className="max-w-2xl rounded-[10px]  shadow-blur p-3 sm:p-7 bg-muted mx-auto text-center">
                     <div className="flex gap-3.5 flex-col sm:flex-row w-full">
                         <CustomInput
                             label="First Name"
@@ -536,8 +536,8 @@ const EditAttendee: React.FC = () => {
                             {/* Profile Picture */}
                             <div className="flex flex-col gap-2">
                                 <Label className="font-semibold" htmlFor="image">Profile Picture</Label>
-                                <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
-                                    <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
+                                <div className="input relative bg-background/50 rounded-md overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                                    <span className="w-full px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                     <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                         {formData.image instanceof File ? formData.image.name : formData.image ? 'Image Selected' : 'No file Chosen'}
                                     </p>

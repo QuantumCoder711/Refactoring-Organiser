@@ -37,7 +37,7 @@ const CustomInput = React.memo(({ label, id, name, type, value, onChange, requir
 }) => (
     <div className="flex flex-col gap-2 w-full">
         <Label className="font-semibold" htmlFor={id}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Input
             id={id}
@@ -159,7 +159,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -171,7 +171,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                        className="w-full capitalize !h-12 !text-sm pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -183,17 +183,17 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 min-w-4 min-h-4 text-secondary" />
                                     )}
                                 </div>
                             ))
@@ -234,7 +234,7 @@ const CustomSelectSimple = React.memo(({
 }) => (
     <div className="flex flex-col gap-2">
         <Label className="font-semibold" htmlFor={label.toLowerCase().replace(/\s+/g, '_')}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Select
             value={value}
@@ -526,26 +526,26 @@ const AddRequestedAttendee: React.FC = () => {
                 <h1 className='text-xl font-semibold'>{event?.title}</h1>
             </div>
 
-            <div className="w-[690px] bg-brand-light-gray p-7 rounded-[10px] mx-auto shadow-blur">
+            <div className="max-w-[690px] bg-muted p-5 lg:p-7 rounded-[10px] mx-auto shadow-blur">
                 <Tabs defaultValue="single" className="mx-auto">
-                    <TabsList className="bg-white p-0 max-w-[390px] mx-auto !max-h-9">
+                    <TabsList className="bg-background/50 p-0 max-w-[390px] mx-auto !max-h-9">
                         <TabsTrigger
                             value="single"
-                            className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="cursor-pointer"
                         >
-                            Add Attendee Details
+                            Add Attendee
                         </TabsTrigger>
                         <TabsTrigger
                             value="bulk"
-                            className="max-h-9 px-4 h-full font-medium text-xl !py-0 cursor-pointer data-[state=active]:text-white data-[state=active]:bg-brand-dark-gray"
+                            className="cursor-pointer"
                         >
                             Bulk Upload
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="single" className="mt-5">
-                        <form onSubmit={handleSubmit} className="w-[620px] mx-auto text-center">
-                            <div className="flex gap-3.5 w-full">
+                        <form onSubmit={handleSubmit} className="max-w-[620px] mx-auto text-center">
+                            <div className="flex flex-col sm:flex-row gap-3.5 w-full">
                                 <CustomInput
                                     label="First Name"
                                     id="first_name"
@@ -566,7 +566,7 @@ const AddRequestedAttendee: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="grid gap-3.5 grid-cols-2 mt-3.5 w-full">
+                            <div className="flex flex-col sm:flex-row gap-3.5 mt-3.5 w-full">
                                 <div className="flex flex-col gap-3.5 w-full">
                                     <CustomInput
                                         label="E-Mail"
@@ -655,30 +655,30 @@ const AddRequestedAttendee: React.FC = () => {
                             <span className="font-semibold">Upload File</span>
                             <Button
                                 onClick={downloadSampleFile}
-                                className="border border-brand-secondary bg-transparent hover:bg-transparent text-brand-secondary rounded-[5px] cursor-pointer h-5 text-sm"
+                                size="sm"
                             >
-                                <Download size={13} strokeWidth={1} /> Download Sample Excel CSV Sheet Format
+                                <Download size={20} /> Download Sample
                             </Button>
                         </div>
 
                         <div className="mt-1.5 w-full">
-                            <div {...getRootProps()} className={`border group duration-300 hover:border-brand-primary border-brand-light-gray shadow-blur rounded-lg bg-white p-6 cursor-pointer transition-colors ${isDragActive ? 'border-brand-secondary bg-brand-secondary/10' : 'border-gray-300'}`}>
+                            <div {...getRootProps()} className={`border group duration-300 hover:border-primary bg-background/50 border-accent shadow-blur rounded-lg p-6 cursor-pointer transition-colors ${isDragActive ? 'border-secondary bg-secondary/10' : 'border-accent'}`}>
                                 <input {...getInputProps()} />
                                 <div className="flex flex-col items-center justify-center gap-2 text-center">
-                                    <FileUp width={24} className="group-hover:stroke-brand-primary duration-300" />
+                                    <FileUp width={24} className="group-hover:stroke-primary duration-300" />
                                     {isDragActive ? (
-                                        <p className="text-brand-secondary font-medium">Drop the file here...</p>
+                                        <p className="text-secondary font-medium">Drop the file here...</p>
                                     ) : (
                                         <>
-                                            <p className="text-lg"><span className="text-brand-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
+                                            <p className="text-lg"><span className="text-primary font-semibold">Click Here</span> to Upload your File or Drag</p>
                                             <p className="">Supported file: <span className="font-semibold">.csv, .xlsx, .xls (Max 10MB)</span></p>
                                         </>
                                     )}
                                     {bulkFile && (
-                                        <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-md w-full">
-                                            <FileText className="size-5 text-brand-secondary" />
+                                        <div className="mt-4 flex items-center gap-2 p-2 bg-muted rounded-md w-full">
+                                            <FileText className="size-5 text-secondary" />
                                             <span className="text-sm font-medium truncate">{bulkFile.name}</span>
-                                            <span className="text-xs text-gray-500">({(bulkFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                                            <span className="text-xs text-muted">({(bulkFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
                                         </div>
                                     )}
                                 </div>
@@ -688,7 +688,6 @@ const AddRequestedAttendee: React.FC = () => {
                                 <Button
                                     onClick={handleBulkUpload}
                                     disabled={!bulkFile}
-                                    className="btn !bg-brand-secondary !text-white w-[200px] h-9"
                                 >
                                     Upload Excel Now
                                 </Button>

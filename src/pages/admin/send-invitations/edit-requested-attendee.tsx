@@ -35,13 +35,13 @@ const CustomInput = React.memo(({ label, id, name, type, value, onChange, requir
 }) => (
     <div className="flex flex-col gap-2 w-full">
         <Label className="font-semibold" htmlFor={id}>
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Input
             id={id}
             name={name}
             type={type}
-            className='input !h-12 min-w-full text-base'
+            className='input !h-12 min-w-full !text-sm'
             value={value}
             onChange={onChange}
             required={required}
@@ -70,14 +70,14 @@ const CustomSelect = React.memo(({
 }) => (
     <div className="flex flex-col w-full gap-2">
         <Label className="font-semibold">
-            {label} {required && <span className="text-brand-secondary">*</span>}
+            {label} {required && <span className="text-secondary">*</span>}
         </Label>
         <Select
             value={value}
             onValueChange={onValueChange}
             disabled={disabled}
         >
-            <SelectTrigger className="input !h-12 min-w-full text-base cursor-pointer">
+            <SelectTrigger className="input !h-12 min-w-full !text-sm cursor-pointer">
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -204,7 +204,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -216,7 +216,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                        className="w-full capitalize !h-12 !text-sm pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -228,17 +228,17 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 min-w-4 min-h-4 text-secondary" />
                                     )}
                                 </div>
                             ))
@@ -391,14 +391,14 @@ const EditRequestedAttendee: React.FC = () => {
 
     return (
         <div className="">
-            <div className="w-[690px] bg-brand-light-gray p-7 rounded-[10px] mx-auto shadow-blur">
-                <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-2xl font-semibold">Edit Requested Attendee</h1>
+            <div className="">
+                <div className="flex items-center gap-5 mb-5">
                     <GoBack />
+                    <h1 className="text-xl font-semibold">Edit Requested Attendee</h1>
                 </div>
 
-                <form onSubmit={handleSubmit} className="w-[620px] mx-auto text-center">
-                    <div className="flex gap-3.5 w-full">
+                <form onSubmit={handleSubmit} className="max-w-[620px] lg:p-7 p-5 rounded-[10px] shadow-blur bg-muted mx-auto text-center">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full">
                         <CustomInput
                             label="First Name"
                             id="first_name"
@@ -419,7 +419,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomComboBox
                             label="Job Title"
                             value={formData.job_title}
@@ -442,7 +442,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomInput
                             label="Email"
                             id="email_id"
@@ -463,7 +463,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomInput
                             label="Alternate Mobile Number"
                             id="alternate_mobile_number"
@@ -489,7 +489,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomSelect
                             label="Confirmed Status"
                             value={formData.confirmed_status}
@@ -510,7 +510,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomInput
                             label="Follow Up"
                             id="follow_up"
@@ -530,7 +530,7 @@ const EditRequestedAttendee: React.FC = () => {
                         />
                     </div>
 
-                    <div className="flex gap-3.5 w-full mt-3.5">
+                    <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">
                         <CustomInput
                             label="Remark"
                             id="remark"

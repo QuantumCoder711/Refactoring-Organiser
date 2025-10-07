@@ -279,36 +279,50 @@ const PendingUserRequest: React.FC = () => {
 
     return (
         <div>
-
-            <div className='flex items-center justify-between'>
+            {/* Header */}
+            <div className='flex lg:items-center gap-2.5 justify-between md:flex-row flex-col'>
                 <div className='flex items-center gap-5'>
                     <GoBack />
                     <h1 className='text-xl font-semibold'>{event?.title}</h1>
                 </div>
+                <div className='text-right'>
+                <Button
+                    onClick={exportToExcel}
+                    className='max-w-fit'
+                    disabled={paginatedAttendees.length === 0}
+                >
+                    <ArrowDownToLine className='mr-2 h-4 w-4' /> Download Excel
+                </Button>
+                </div>
             </div>
 
             {/* Table */}
-            <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
 
                 {/* Filters Bar */}
-                <div className='flex justify-between mt-4'>
-                    <div className='flex gap-2.5'>
+                <div className='flex justify-between items-center gap-4 mt-4'>
+                    <div className='flex gap-2.5 w-full flex-col lg:flex-row'>
                         {/* Select Box for pagination */}
-                        <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="rounded-sm !w-fit !h-[30px] border-1  border-brand-light-gray flex items-center justify-center text-sm">
-                                <SelectValue placeholder={`${itemsPerPage}/Page`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="25">25</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                                <SelectItem value="100">100</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className='flex justify-between items-center gap-2.5'>
+                            <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                                <SelectTrigger className="rounded-sm !w-fit !h-[30px] border flex items-center justify-center text-sm">
+                                    <SelectValue placeholder={`${itemsPerPage}/Page`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="25">25</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
+                                    <SelectItem value="100">100</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <p className='lg:hidden text-sm text-nowrap text-accent-foreground'>Requests: {pendingRequests.length}</p>
+                        </div>
+
 
                         {/* Search By Name */}
                         <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                            className='!min-w-fit !w-full !p-2.5 !text-xs'
                             placeholder='Search by name'
                             value={nameFilter}
                             onChange={(e) => setNameFilter(e.target.value)}
@@ -316,32 +330,25 @@ const PendingUserRequest: React.FC = () => {
 
                         {/* Search By Email */}
                         <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                            className='!min-w-fit !w-full !p-2.5 !text-xs'
                             placeholder='Search by email'
                         />
 
                         {/* Search By Company */}
                         <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
+                            className='!min-w-fit !w-full !p-2.5 !text-xs'
                             placeholder='Search by company'
                             value={companyFilter}
                             onChange={(e) => setCompanyFilter(e.target.value)}
                         />
 
-                        <Button
-                            className='btn !rounded-[10px] min-w-fit w-36 text-white bg-brand-primary hover:bg-brand-primary/90'
-                            onClick={exportToExcel}
-                            disabled={paginatedAttendees.length === 0}
-                        >
-                            <ArrowDownToLine className='mr-2 h-4 w-4' /> Download Excel
-                        </Button>
                     </div>
-                    <p className='font-semibold text-xl'>Pending Requests: {pendingRequests.length}</p>
+                    <p className='hidden lg:block text-sm text-nowrap text-accent-foreground'>Requests: {pendingRequests.length}</p>
                 </div>
 
                 <Table className='mt-4'>
                     {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                    <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
+                    <TableHeader className='bg-accent !rounded-[10px]'>
                         <TableRow className='!text-base'>
                             <TableHead className="text-left min-w-10 !px-2">Select</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">#</TableHead>
@@ -359,10 +366,10 @@ const PendingUserRequest: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-                            <TableRow key={attendee.id}>
+                            <TableRow key={attendee.id} className='hover:bg-background/50'>
                                 <TableCell className="text-left min-w-10">
                                     <Checkbox
-                                        className='bg-white border-brand-dark-gray cursor-pointer'
+                                        className='cursor-pointer'
                                         checked={selectedAttendees.has(attendee.id)}
                                         onCheckedChange={(checked) => handleSelectAttendee(attendee.id, checked as boolean)}
                                     />
@@ -401,7 +408,7 @@ const PendingUserRequest: React.FC = () => {
 
                                     {/* For Viewing the Event */}
                                     <Dialog>
-                                        <DialogTrigger className='cursor-pointer'><Eye width={13} height={9} className='size-4' /></DialogTrigger>
+                                        <DialogTrigger className='cursor-pointer'><Eye width={20} height={20} className='size-5 text-green-400' /></DialogTrigger>
                                         <DialogContent className="max-w-md p-6">
                                             <DialogHeader className="space-y-2">
                                                 <DialogTitle className="text-2xl font-bold text-brand-primary">
@@ -414,31 +421,31 @@ const PendingUserRequest: React.FC = () => {
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.first_name} {attendee.last_name}</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">{attendee.first_name} {attendee.last_name}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.job_title || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">{attendee.job_title || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.email_id || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.email_id || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.company_name || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">{attendee.company_name || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.phone_number || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.phone_number || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>
-                                                        <p className="text-base font-medium text-gray-800">{attendee.alternate_email || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.alternate_email || '-'}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</h3>
-                                                        <p className="text-base font-medium text-gray-800 capitalize">{attendee.status || '-'}</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">{attendee.status || '-'}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -448,7 +455,7 @@ const PendingUserRequest: React.FC = () => {
                                     {/* Approving or Disapproving */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <UserCheck width={9.78} height={9.5} className='size-4' />
+                                            <UserCheck width={20} height={20} className='size-5 text-primary' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -459,8 +466,8 @@ const PendingUserRequest: React.FC = () => {
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDisapprove(attendee.id)} className='cursor-pointer bg-brand-secondary transition-all hover:bg-brand-secondary/80 duration-300 text-white'>Disapprove</AlertDialogAction>
-                                                <AlertDialogAction onClick={() => handleApprove(attendee.id)} className='cursor-pointer bg-brand-primary transition-all hover:bg-brand-primary-dark duration-300 text-white'>Approve</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => handleDisapprove(attendee.id)} className='cursor-pointer bg-destructive transition-all hover:bg-destructive/80 duration-300 text-white'>Disapprove</AlertDialogAction>
+                                                <AlertDialogAction onClick={() => handleApprove(attendee.id)} className='cursor-pointer bg-primary transition-all hover:bg-primary/80 duration-300 text-white'>Approve</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
@@ -468,7 +475,7 @@ const PendingUserRequest: React.FC = () => {
                                     {/* Delete Attendee */}
                                     <AlertDialog>
                                         <AlertDialogTrigger className='cursor-pointer'>
-                                            <Trash width={9} height={11} className='fill-brand-secondary stroke-brand-secondary size-4' />
+                                            <Trash width={20} height={20} className='stroke-destructive size-5' />
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -479,7 +486,7 @@ const PendingUserRequest: React.FC = () => {
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel className='cursor-pointer'>Cancel</AlertDialogCancel>
-                                                <AlertDialogAction className='cursor-pointer bg-brand-secondary hover:bg-brand-secondary text-white' onClick={() => handleDeleteAttendee(attendee.id)}>Continue</AlertDialogAction>
+                                                <AlertDialogAction className='cursor-pointer bg-destructive hover:bg-destructive/80 duration-300 text-white' onClick={() => handleDeleteAttendee(attendee.id)}>Continue</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
