@@ -315,7 +315,7 @@ const AllAttendees: React.FC = () => {
                                     {attendee.alternate_email || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
-                                    {attendee.phone_number || "-"}
+                                    {`+${attendee.country_code} ${attendee.phone_number}` || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
                                     {attendee.alternate_mobile_number || "-"}

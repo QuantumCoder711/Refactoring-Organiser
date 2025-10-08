@@ -162,6 +162,7 @@ export interface AttendeeType {
     employee_size: string;
     company_turn_over: string;
     status: string;
+    country_code: string;
     created_at: string;
     updated_at: string;
     image: string | null;
