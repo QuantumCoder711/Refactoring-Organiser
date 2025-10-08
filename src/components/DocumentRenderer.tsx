@@ -28,7 +28,7 @@ const DocumentRenderer: React.FC<DocumentRendererProps> = ({ filePaths }) => {
     return (
         <Carousel className='h-full w-full rounded-xl'>
             <CarouselContent className='rounded-xl'>
-                {filePaths.map((file) => (
+                {filePaths?.map((file) => (
                     <CarouselItem key={file} className='h-96 overflow-hidden rounded-xl'>
                         <img src={`${sponsorPdfBucketUrl}/${file}`} className='w-full h-full object-contain object-center' />
                         {/* <img src={file} className='w-full h-full object-cover rounded-xl object-center' /> */}
