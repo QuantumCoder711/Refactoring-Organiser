@@ -3,7 +3,7 @@ import useAttendeeStore from '@/store/attendeeStore';
 import useAuthStore from '@/store/authStore';
 import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
-import { CircleX, CircleCheck } from 'lucide-react';
+import { CircleX, CircleCheck, Filter, Search } from 'lucide-react';
 import Wave from '@/components/Wave';
 
 import {
@@ -40,6 +40,22 @@ import GoBack from '@/components/GoBack';
 const AllAttendees: React.FC = () => {
     const { allEventsAttendees, loading, getAllEventsAttendees } = useAttendeeStore(state => state);
     const { token } = useAuthStore(state => state);
+
+    // Mobile states
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check screen size on mount and resize
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
     // Fetch all attendees when component mounts
     useEffect(() => {
@@ -134,7 +150,6 @@ const AllAttendees: React.FC = () => {
             'LinkedIn URL': attendee.linkedin_page_link || '-',
             'Role': attendee.status || '-',
             'Award Winner': attendee.award_winner === 1 ? 'Yes' : 'No',
-            // 'Check In': attendee.check_in === 1 ? (attendee.check_in_time ? formatDateTime(attendee.check_in_time) : 'Yes') : 'No',
         }));
 
         // Create workbook and worksheet
@@ -171,19 +186,46 @@ const AllAttendees: React.FC = () => {
         });
     };
 
+    // Clear all filters
+    const clearAllFilters = () => {
+        setNameFilter('');
+        setCompanyFilter('');
+        setDesignationFilter('');
+        setCheckInFilter('all');
+        setRoleFilter('all');
+    };
+
     if (loading) return <Wave />
 
     return (
         <div>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
                 <div className='flex items-center gap-2.5'>
                     <GoBack />
                     <h1 className='text-xl font-semibold'>All Attendees</h1>
                 </div>
 
-                <div className='flex items-center gap-5'>
+                <div className='flex items-center gap-3 flex-wrap'>
+                    {/* Mobile filter toggle */}
+                    {isMobile && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowMobileFilters(!showMobileFilters)}
+                            className="flex items-center gap-2"
+                        >
+                            <Filter className="h-4 w-4" />
+                            Filters
+                            {isFilterActive && (
+                                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                                    !
+                                </span>
+                            )}
+                        </Button>
+                    )}
+                    
                     <Button
-                        className='btn !rounded-[10px] !px-3'
+                        className='btn !rounded-[10px] !px-3 text-sm sm:text-base'
                         onClick={handleExportToExcel}
                     >
                         Export Data
@@ -191,154 +233,209 @@ const AllAttendees: React.FC = () => {
                 </div>
             </div>
 
-            {/* Table */}
-            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
+            {/* Table Container */}
+            <div className='bg-muted rounded-lg p-4 sm:p-5 mt-6 shadow-blur'>
 
                 {/* Details Row */}
-                <div className='flex gap-3.5'>
+                <div className='flex flex-col sm:flex-row gap-3.5 items-start sm:items-center justify-between'>
+                    <div className='flex items-center gap-3 flex-wrap'>
+                        {/* Select Box for pagination */}
+                        <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                            <SelectTrigger className="rounded-sm !w-fit !h-8 border flex items-center justify-center text-sm">
+                                <SelectValue placeholder={`${itemsPerPage}/Page`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Select Box for pagination */}
-                    <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                        <SelectTrigger className="rounded-sm !w-fit !h-8 border flex items-center justify-center text-sm">
-                            <SelectValue placeholder={`${itemsPerPage}/Page`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="25">25</SelectItem>
-                            <SelectItem value="50">50</SelectItem>
-                            <SelectItem value="100">100</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        <span className='text-sm'>Total: {allEventsAttendees.length}</span>
+                        {isFilterActive && (
+                            <span className='text-sm'>Search Result: {filteredAttendees.length}</span>
+                        )}
+                    </div>
 
-                    <span className='text-sm'>Total Attendees: {allEventsAttendees.length}</span>
-                    {isFilterActive && (
-                        <span className='text-sm'>Search Result: {filteredAttendees.length}</span>
+                    {/* Clear filters button - visible on mobile when filters are active */}
+                    {isMobile && isFilterActive && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearAllFilters}
+                            className="text-xs text-muted-foreground"
+                        >
+                            Clear Filters
+                        </Button>
                     )}
                 </div>
 
                 {/* Filters Bar */}
-                <div className='flex w-full gap-2.5 mt-4'>
-                    {/* Search By Name */}
-                    <Input
-                        className='!text-sm'
-                        placeholder='Search by name'
-                        value={nameFilter}
-                        onChange={(e) => setNameFilter(e.target.value)}
-                    />
+                <div className={`w-full mt-4 ${isMobile ? 'space-y-3' : 'flex gap-2.5'}`}>
+                    {/* Mobile search input */}
+                    {isMobile && (
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input
+                                className='!text-sm pl-10'
+                                placeholder='Search by name'
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        </div>
+                    )}
 
-                    {/* Search By Company */}
-                    <Input
-                        className='!text-sm'
-                        placeholder='Search by company'
-                        value={companyFilter}
-                        onChange={(e) => setCompanyFilter(e.target.value)}
-                    />
+                    {/* Desktop filters or expanded mobile filters */}
+                    <div className={`${isMobile ? (showMobileFilters ? 'grid grid-cols-1 gap-3' : 'hidden') : 'flex gap-2.5 flex-1 flex-wrap'}`}>
+                        {/* Search By Name - hidden on mobile when collapsed */}
+                        {!isMobile && (
+                            <Input
+                                className='!text-sm min-w-[150px] flex-1'
+                                placeholder='Search by name'
+                                value={nameFilter}
+                                onChange={(e) => setNameFilter(e.target.value)}
+                            />
+                        )}
 
-                    {/* Search By Designation */}
-                    <Input
-                        className='!text-sm'
-                        placeholder='Search by designation'
-                        value={designationFilter}
-                        onChange={(e) => setDesignationFilter(e.target.value)}
-                    />
+                        {/* Search By Company */}
+                        <Input
+                            className='!text-sm min-w-[150px] flex-1'
+                            placeholder='Search by company'
+                            value={companyFilter}
+                            onChange={(e) => setCompanyFilter(e.target.value)}
+                        />
 
-                    {/* Filter By Check-In */}
-                    <Select value={checkInFilter} onValueChange={setCheckInFilter}>
-                        <SelectTrigger className="cursor-pointer">
-                            <SelectValue placeholder="Checked-In">
-                                {checkInFilter === 'all' ? 'Checked-In' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Checked-In'}
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent className='!text-sm'>
-                            <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
-                            <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
-                            <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        {/* Search By Designation */}
+                        <Input
+                            className='!text-sm min-w-[150px] flex-1'
+                            placeholder='Search by designation'
+                            value={designationFilter}
+                            onChange={(e) => setDesignationFilter(e.target.value)}
+                        />
 
-                    {/* Filter By Role */}
-                    <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="cursor-pointer">
-                            <SelectValue placeholder="Role">
-                                {roleFilter === 'all' ? 'Role' :
-                                    roleFilter === 'delegate' ? 'Delegate' :
-                                        roleFilter === 'speaker' ? 'Speaker' :
-                                            roleFilter === 'sponsor' ? 'Sponsor' :
-                                                roleFilter === 'panelist' ? 'Panelist' :
-                                                    roleFilter === 'moderator' ? 'Moderator' : 'Role'}
-                            </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent className=''>
-                            <SelectItem value="all" className='cursor-pointer'>All Roles</SelectItem>
-                            <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
-                            <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
-                            <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
-                            <SelectItem value="panelist" className='cursor-pointer'>Panelist</SelectItem>
-                            <SelectItem value="moderator" className='cursor-pointer'>Moderator</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        {/* Filter By Check-In */}
+                        <Select value={checkInFilter} onValueChange={setCheckInFilter}>
+                            <SelectTrigger className="cursor-pointer min-w-[140px]">
+                                <SelectValue placeholder="Checked-In">
+                                    {checkInFilter === 'all' ? 'Checked-In' : checkInFilter === '1' ? 'Yes' : checkInFilter === '0' ? 'No' : 'Checked-In'}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent className='!text-sm'>
+                                <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
+                                <SelectItem value="1" className='cursor-pointer'>Yes</SelectItem>
+                                <SelectItem value="0" className='cursor-pointer'>No</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {/* Filter By Role */}
+                        <Select value={roleFilter} onValueChange={setRoleFilter}>
+                            <SelectTrigger className="cursor-pointer min-w-[140px]">
+                                <SelectValue placeholder="Role">
+                                    {roleFilter === 'all' ? 'Role' :
+                                        roleFilter === 'delegate' ? 'Delegate' :
+                                            roleFilter === 'speaker' ? 'Speaker' :
+                                                roleFilter === 'sponsor' ? 'Sponsor' :
+                                                    roleFilter === 'panelist' ? 'Panelist' :
+                                                        roleFilter === 'moderator' ? 'Moderator' : 'Role'}
+                                </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent className=''>
+                                <SelectItem value="all" className='cursor-pointer'>All Roles</SelectItem>
+                                <SelectItem value="delegate" className='cursor-pointer'>Delegate</SelectItem>
+                                <SelectItem value="speaker" className='cursor-pointer'>Speaker</SelectItem>
+                                <SelectItem value="sponsor" className='cursor-pointer'>Sponsor</SelectItem>
+                                <SelectItem value="panelist" className='cursor-pointer'>Panelist</SelectItem>
+                                <SelectItem value="moderator" className='cursor-pointer'>Moderator</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {/* Clear filters button - desktop */}
+                        {!isMobile && isFilterActive && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={clearAllFilters}
+                                className="text-sm text-muted-foreground whitespace-nowrap"
+                            >
+                                Clear Filters
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
-                <Table className='mt-4'>
-                    <TableHeader className='bg-accent !rounded-[10px]'>
-                        <TableRow className='!text-base'>
-                            <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">A. Email</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">A. Mobile</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">LinkedIn URL</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2">Award Winner</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
-                            <TableRow key={attendee.id} className="hover:bg-background/50">
-                                <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                <TableCell className="text-left min-w-10 !capitalize">
-                                    {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10 !capitalize">
-                                    {attendee.job_title || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10 !capitalize">
-                                    {attendee.company_name || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.email_id || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.alternate_email || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.phone_number || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.alternate_mobile_number || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.linkedin_page_link || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.status || "-"}
-                                </TableCell>
-                                <TableCell className="text-left min-w-10">
-                                    {attendee.award_winner !== null && attendee.award_winner !== undefined
-                                        ? (attendee.award_winner === 1 ? "Yes" : "No")
-                                        : "-"}
-                                </TableCell>
+                {/* Table Container with horizontal scroll */}
+                <div className="mt-4 overflow-x-auto">
+                    <Table className='min-w-[1200px]'>
+                        <TableHeader className='bg-accent'>
+                            <TableRow className='!text-base'>
+                                <TableHead className="text-left min-w-12 !px-2">Sr.No</TableHead>
+                                <TableHead className="text-left min-w-32 !px-2">Name</TableHead>
+                                <TableHead className="text-left min-w-32 !px-2">Designation</TableHead>
+                                <TableHead className="text-left min-w-32 !px-2">Company</TableHead>
+                                <TableHead className="text-left min-w-40 !px-2">Email</TableHead>
+                                <TableHead className="text-left min-w-40 !px-2">A. Email</TableHead>
+                                <TableHead className="text-left min-w-32 !px-2">Mobile</TableHead>
+                                <TableHead className="text-left min-w-32 !px-2">A. Mobile</TableHead>
+                                <TableHead className="text-left min-w-48 !px-2">LinkedIn URL</TableHead>
+                                <TableHead className="text-left min-w-24 !px-2">Role</TableHead>
+                                <TableHead className="text-left min-w-28 !px-2">Award Winner</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedAttendees.map((attendee: AttendeeType, index: number) => (
+                                <TableRow key={attendee.id} className="hover:bg-background/50">
+                                    <TableCell className="text-left min-w-12 font-medium">
+                                        {(currentPage - 1) * itemsPerPage + index + 1}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-32 !capitalize">
+                                        {attendee.first_name && attendee.last_name ? `${attendee.first_name} ${attendee.last_name}` : "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-32 !capitalize">
+                                        {attendee.job_title || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-32 !capitalize">
+                                        {attendee.company_name || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-40 break-all">
+                                        {attendee.email_id || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-40 break-all">
+                                        {attendee.alternate_email || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-32">
+                                        {attendee.phone_number || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-32">
+                                        {attendee.alternate_mobile_number || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-48 break-all">
+                                        {attendee.linkedin_page_link || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-24 capitalize">
+                                        {attendee.status || "-"}
+                                    </TableCell>
+                                    <TableCell className="text-left min-w-28">
+                                        {attendee.award_winner !== null && attendee.award_winner !== undefined
+                                            ? (attendee.award_winner === 1 ? "Yes" : "No")
+                                            : "-"}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {/* No results message */}
+                {paginatedAttendees.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                        No attendees found matching your filters.
+                    </div>
+                )}
 
                 {/* Pagination */}
-                <Pagination className='mt-[26px] flex justify-end'>
-                    <PaginationContent>
+                <Pagination className='mt-6 flex justify-center sm:justify-end'>
+                    <PaginationContent className="flex-wrap justify-center">
                         <PaginationItem>
                             <PaginationPrevious
                                 onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
@@ -346,78 +443,91 @@ const AllAttendees: React.FC = () => {
                             />
                         </PaginationItem>
 
-                        {/* Show first page */}
-                        {totalPages > 0 && (
-                            <PaginationItem>
-                                <PaginationLink
-                                    isActive={currentPage === 1}
-                                    onClick={() => handlePageChange(1)}
-                                    className="cursor-pointer"
-                                >
-                                    1
-                                </PaginationLink>
-                            </PaginationItem>
-                        )}
+                        {/* Simplified pagination for mobile */}
+                        {isMobile ? (
+                            <>
+                                <PaginationItem>
+                                    <PaginationLink className="cursor-pointer">
+                                        {currentPage} of {totalPages}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            </>
+                        ) : (
+                            <>
+                                {/* Show first page */}
+                                {totalPages > 0 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={currentPage === 1}
+                                            onClick={() => handlePageChange(1)}
+                                            className="cursor-pointer"
+                                        >
+                                            1
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
 
-                        {/* Show ellipsis if needed */}
-                        {currentPage > 3 && (
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                        )}
+                                {/* Show ellipsis if needed */}
+                                {currentPage > 3 && (
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                )}
 
-                        {/* Show current page and adjacent pages */}
-                        {totalPages > 1 && currentPage > 2 && (
-                            <PaginationItem>
-                                <PaginationLink
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    className="cursor-pointer"
-                                >
-                                    {currentPage - 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        )}
+                                {/* Show current page and adjacent pages */}
+                                {totalPages > 1 && currentPage > 2 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage - 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
 
-                        {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
-                            <PaginationItem>
-                                <PaginationLink
-                                    isActive={true}
-                                    className="cursor-pointer"
-                                >
-                                    {currentPage}
-                                </PaginationLink>
-                            </PaginationItem>
-                        )}
+                                {totalPages > 1 && currentPage > 1 && currentPage < totalPages && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={true}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
 
-                        {totalPages > 2 && currentPage < totalPages - 1 && (
-                            <PaginationItem>
-                                <PaginationLink
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    className="cursor-pointer"
-                                >
-                                    {currentPage + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        )}
+                                {totalPages > 2 && currentPage < totalPages - 1 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            className="cursor-pointer"
+                                        >
+                                            {currentPage + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
 
-                        {/* Show ellipsis if needed */}
-                        {currentPage < totalPages - 2 && (
-                            <PaginationItem>
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                        )}
+                                {/* Show ellipsis if needed */}
+                                {currentPage < totalPages - 2 && (
+                                    <PaginationItem>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                )}
 
-                        {/* Show last page */}
-                        {totalPages > 1 && (
-                            <PaginationItem>
-                                <PaginationLink
-                                    isActive={currentPage === totalPages}
-                                    onClick={() => handlePageChange(totalPages)}
-                                    className="cursor-pointer"
-                                >
-                                    {totalPages}
-                                </PaginationLink>
-                            </PaginationItem>
+                                {/* Show last page */}
+                                {totalPages > 1 && (
+                                    <PaginationItem>
+                                        <PaginationLink
+                                            isActive={currentPage === totalPages}
+                                            onClick={() => handlePageChange(totalPages)}
+                                            className="cursor-pointer"
+                                        >
+                                            {totalPages}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                )}
+                            </>
                         )}
 
                         <PaginationItem>
