@@ -199,20 +199,20 @@ const AllAgendas: React.FC = () => {
     return (
         <div>
 
-            <div className='flex items-center justify-between'>
+            <div className='flex sm:items-center gap-3 sm:gap-5 flex-col sm:flex-row justify-between'>
                 <div className='flex items-center gap-5'>
                     <GoBack />
                     <h1 className='text-xl font-semibold'>{event?.title}</h1>
                 </div>
 
-                <div className='flex items-center gap-5'>
+                <div className='flex flex-row items-center justify-end gap-3 sm:gap-5'>
                     <Link to={`/add-agenda/${slug}`}>
-                        <Button><Plus size={20} />Add Agenda</Button>
+                        <Button size="sm"><Plus size={20} />Add Agenda</Button>
                     </Link>
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button><FileInput size={20} />Import Agenda</Button>
+                            <Button size="sm"><FileInput size={20} />Import Agenda</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -249,34 +249,35 @@ const AllAgendas: React.FC = () => {
             <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
 
                 {/* Filters Bar */}
-                <div className='flex w-full justify-between items-baseline'>
-                    <div className='flex w-full gap-2.5'>
-                        {/* Select Box for pagination */}
-                        <Select onValueChange={handleAgendasPerPageChange}>
-                            <SelectTrigger className='!h-10'>
-                                <SelectValue placeholder={`${agendasPerPage}/Page`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="25">25</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                                <SelectItem value="100">100</SelectItem>
-                            </SelectContent>
-                        </Select>
+                <div className='flex sm:flex-row flex-col w-full justify-between gap-2.5 items-baseline'>
+                    <div className='flex sm:flex-row flex-col w-full gap-2.5'>
+                        <div className='flex justify-between items-center'>
+                            {/* Select Box for pagination */}
+                            <Select onValueChange={handleAgendasPerPageChange}>
+                                <SelectTrigger className='!h-10'>
+                                    <SelectValue placeholder={`${agendasPerPage}/Page`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="10">10</SelectItem>
+                                    <SelectItem value="25">25</SelectItem>
+                                    <SelectItem value="50">50</SelectItem>
+                                    <SelectItem value="100">100</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <p className='text-nowrap sm:hidden text-sm'>Total Agendas: {filteredAgendas.length}</p>
+                        </div>
 
                         {/* Search By Name */}
                         <Input
-                            className='input !min-w-80 h-10 !max-w-fit !p-2.5 !text-xs'
+                            className='input sm:max-w-80 h-10 w-full !p-2.5 !text-xs'
                             value={filters.title}
                             onChange={(e) => setFilters(prev => ({ ...prev, title: e.target.value }))}
                             placeholder='Search by title'
                         />
 
-                        <Button>
-                            Delete
-                        </Button>
                     </div>
-                    <p className='text-nowrap text-xl font-semibold'>Total Agendas: {filteredAgendas.length}</p>
+                    <p className='text-nowrap hidden sm:block text-sm'>Total Agendas: {filteredAgendas.length}</p>
                 </div>
 
                 <Table className='mt-4'>

@@ -229,7 +229,7 @@ const AddAgenda: React.FC = () => {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className='max-w-3xl flex flex-col gap-5 mt-8 p-8 mx-auto bg-muted rounded-[10px] w-full h-full'>
+            <form onSubmit={handleSubmit} className='max-w-3xl flex flex-col gap-5 mt-8 p-7 sm:p-5 mx-auto bg-muted rounded-[10px] w-full h-full'>
                 {/* Agenda Name */}
                 <div className="flex flex-col gap-2 w-full">
                     <Label className="font-semibold" htmlFor='title'>
@@ -264,7 +264,7 @@ const AddAgenda: React.FC = () => {
                 </div>
 
                 {/* Tag Speakers & Speakers List */}
-                <div className='flex gap-5 justify-between'>
+                <div className='flex gap-5 flex-col-reverse sm:flex-row justify-between'>
                     {/* Tagged Speakers */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold">
@@ -316,7 +316,7 @@ const AddAgenda: React.FC = () => {
                 </div>
 
                 {/* Event Date and Priority */}
-                <div className='flex gap-5 justify-between'>
+                <div className='flex gap-5 flex-col-reverse sm:flex-row justify-between'>
                     {/* Event Date */}
                     <div className='flex flex-col gap-2 w-full'>
                         <Label className='font-semibold' htmlFor='event_date'>
@@ -357,8 +357,9 @@ const AddAgenda: React.FC = () => {
                         {errors.position && <p className="text-destructive text-sm">{errors.position}</p>}
                     </div>
                 </div>
+
                 {/* Start Time & End Time */}
-                <div className='flex gap-5 justify-between'>
+                <div className='flex gap-5 flex-col-reverse sm:flex-row justify-between'>
                     {/* For Start Time */}
                     <div className="flex flex-col gap-2 w-full">
                         <Label className="font-semibold" htmlFor='start_time'>

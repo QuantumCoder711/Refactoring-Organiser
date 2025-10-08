@@ -403,7 +403,7 @@ const SendInvitations: React.FC = () => {
             </div>
 
             {/* Search and Filter Section */}
-            <div className='grid grid-cols-1 min-[480px]:grid-cols-2 sm:flex flex-wrap w-full gap-2.5 mt-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 w-full gap-2.5 mt-4'>
                 {/* Search By Name */}
                 <Input
                     className='!text-xs'
