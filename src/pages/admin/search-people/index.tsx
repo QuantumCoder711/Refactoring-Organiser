@@ -64,7 +64,18 @@ interface SearchPeopleType {
 const cities: string[] = [
     "Mumbai", "Delhi", "Bengaluru", "Gurgaon", "Chennai", "Pune",
     "Hyderabad", "Noida", "New Delhi", "Ahmedabad", "Jaipur", "Kolkata",
-    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali"
+    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali",
+    "cairo",
+    "riyadh",
+    "jeddah",
+    "south africa",
+    "kuwait",
+    "oman",
+    "egypt",
+    "bahrain",
+    "sharjah",
+    "ajman",
+    "ras al khaimah"
 ];
 
 const SearchPeople: React.FC = () => {
