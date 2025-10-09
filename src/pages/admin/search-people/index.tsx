@@ -64,7 +64,18 @@ interface SearchPeopleType {
 const cities: string[] = [
     "Mumbai", "Delhi", "Bengaluru", "Gurgaon", "Chennai", "Pune",
     "Hyderabad", "Noida", "New Delhi", "Ahmedabad", "Jaipur", "Kolkata",
-    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali"
+    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali",
+    "cairo",
+    "riyadh",
+    "jeddah",
+    "south africa",
+    "kuwait",
+    "oman",
+    "egypt",
+    "bahrain",
+    "sharjah",
+    "ajman",
+    "ras al khaimah"
 ];
 
 const SearchPeople: React.FC = () => {
@@ -260,7 +271,7 @@ const SearchPeople: React.FC = () => {
         setLoading(true);
         const response = await axios.post(`${appDomain}/api/mapping/v1/people/search-people`, {
             designation,
-            city: selectedCity
+            city: selectedCity.toLowerCase()
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -381,7 +392,7 @@ const SearchPeople: React.FC = () => {
                             value={selectedCity}
                             onValueChange={setSelectedCity}
                         >
-                            <SelectTrigger className="input max-w-[200px] text-base">
+                            <SelectTrigger className="input max-w-[200px] capitalize text-base">
                                 <SelectValue placeholder="Select a city" />
                             </SelectTrigger>
                             <SelectContent>
@@ -389,7 +400,7 @@ const SearchPeople: React.FC = () => {
                                     <SelectItem
                                         key={city}
                                         value={city}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer capitalize"
                                     >
                                         {city}
                                     </SelectItem>
