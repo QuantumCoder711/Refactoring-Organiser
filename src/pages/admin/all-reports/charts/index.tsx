@@ -194,15 +194,14 @@ const Charts: React.FC = () => {
   }
 
   return (
-    <div className='flex flex-col h-full gap-4 p-4'>
+    <div className='flex flex-col h-full gap-5'>
       <div className='flex justify-between items-center'>
         <GoBack />
         <Button onClick={handleExport}>Export Charts</Button>
       </div>
       <div
         ref={chartRef}
-        className='max-w-3xl mx-auto rounded-[10px] bg-muted p-6 shadow-lg space-y-8 print:shadow-none h-full print:p-2'
-        style={{ minWidth: '800px' }}
+        className='max-w-3xl mx-auto rounded-[10px] w-full bg-muted p-5 shadow-lg space-y-8 print:shadow-none h-full print:p-2'
       >
         <div className='flex justify-center w-full'>
           <div className='w-full max-w-2xl'>

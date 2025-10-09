@@ -328,11 +328,11 @@ const AiPhotos: React.FC = () => {
   
   return (
     <div className='relative w-full h-full'>
-      <div className='absolute top-0 left-0'>
+      <div className=''>
         <GoBack />
       </div>
 
-      <div className='max-w-3xl bg-muted mx-auto rounded-[10px] p-7'>
+      <div className='max-w-3xl mt-5 bg-muted mx-auto rounded-[10px] p-7'>
         <Tabs 
           defaultValue="upload" 
           className="mx-auto"

@@ -43,7 +43,6 @@ const templates = [
     { label: "Requested Attendees", value: "event_invitation" }
 ]
 
-
 const WhatsAppReport: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const { getEventBySlug } = useEventStore();
@@ -132,96 +131,137 @@ const WhatsAppReport: React.FC = () => {
 
     return (
         <div className='h-full w-full'>
-            <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-5'>
+            {/* Header Section */}
+            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6'>
+                <div className='flex items-center gap-4'>
                     <GoBack />
-                    <h1 className='text-xl font-semibold'>{event?.title}</h1>
+                    <h1 className='text-lg sm:text-xl font-semibold truncate'>{event?.title}</h1>
                 </div>
-                <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                    <SelectTrigger className="w-56 cursor-pointer">
-                        <SelectValue placeholder="Select Template" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {templates.map((template, key) => (
-                            <SelectItem key={key} value={template.value} className='cursor-pointer'>{template.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                
+                <div className='hidden sm:block'>
+                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                        <SelectTrigger className="w-full sm:w-56 cursor-pointer">
+                            <SelectValue placeholder="Select Template" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {templates.map((template, key) => (
+                                <SelectItem key={key} value={template.value} className='cursor-pointer'>{template.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
-            <div className='flex w-full gap-4 mt-11'>
+            {/* Status Cards */}
+            <div className='flex flex-wrap gap-3 mb-6'>
                 {whatsappLabels.map((card, index) => (
                     <div
                         key={index}
                         onClick={() => {setSelectedStatus(card.status as "sent" | "delivered" | "read" | "failed"); setCurrentPage(1);}}
-                        className={`min-w-40 w-full cursor-pointer duration-300 hover:bg-accent bg-muted rounded-lg h-10 px-4 flex justify-between items-center text-foreground ${selectedStatus === card.status ? 'bg-primary hover:bg-primary text-white' : ''}`}
+                        className={`flex-1 min-w-[120px] cursor-pointer duration-300 hover:bg-accent bg-muted rounded-lg h-10 px-3 sm:px-4 flex justify-between items-center text-foreground ${selectedStatus === card.status ? 'bg-primary hover:bg-primary text-white' : ''}`}
                     >
-                        <span>{card.title}</span>
-                        <span>{card.value}</span>
+                        <span className='text-xs sm:text-sm truncate'>{card.title}</span>
+                        <span className='text-sm font-medium ml-2'>{card.value}</span>
                     </div>
                 ))}
             </div>
 
-            <div className='bg-muted rounded-lg p-5 mt-6 shadow-blur'>
-                <div className='flex w-full justify-between items-baseline'>
-                    <div className='flex w-full gap-2.5'>
-                        <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="!w-fit cursor-pointer h-10 border border-accent flex items-center justify-center text-sm">
-                                <SelectValue placeholder={`${itemsPerPage}/Page`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[10, 25, 50, 100].map(value => (
-                                    <SelectItem key={value} value={value.toString()} className='cursor-pointer'>{value}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+            {/* Table Section */}
+            <div className='bg-muted rounded-lg p-4 sm:p-5 mt-6 shadow-blur'>
+                {/* Filters Section */}
+                <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6'>
+                    <div className='flex flex-col sm:flex-row gap-3 w-full'>
+                        <div className='flex gap-2 sm:flex-row flex-col flex-1'>
+                            
+                            <div className='flex gap-2'>
+                                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                                    <SelectTrigger className="w-fit cursor-pointer !min-h-10 border border-accent flex items-center justify-center text-sm">
+                                        <SelectValue placeholder={`${itemsPerPage}/Page`} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {[10, 25, 50, 100].map(value => (
+                                            <SelectItem key={value} value={value.toString()} className='cursor-pointer'>{value}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                        <Input
-                            className='!min-w-fit !max-w-60 h-10 !text-xs'
-                            placeholder='Search by name'
-                            value={filters.name}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, name: e.target.value }))}
-                        />
-                        <Input
-                            className='!min-w-fit !max-w-60 h-10 !text-xs'
-                            placeholder='Search by phone'
-                            value={filters.phone}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, phone: e.target.value }))}
-                        />
+                                <div className='sm:hidden w-full'>
+                                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                                        <SelectTrigger className="w-full sm:w-56 min-h-full cursor-pointer">
+                                            <SelectValue placeholder="Select Template" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {templates.map((template, key) => (
+                                                <SelectItem key={key} value={template.value} className='cursor-pointer'>{template.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+
+                            <Input
+                                className='flex-1 sm:max-w-60 !min-h-10 text-xs'
+                                placeholder='Search by name'
+                                value={filters.name}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                            />
+                            <Input
+                                className='flex-1 sm:max-w-60 !min-h-10 text-xs'
+                                placeholder='Search by phone'
+                                value={filters.phone}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, phone: e.target.value }))}
+                            />
+                        </div>
                     </div>
                 </div>
 
-                <Table className='mt-7'>
-                    <TableHeader className='bg-accent !rounded-[10px]'>
-                        <TableRow>
-                            <TableHead className="text-left min-w-10 !px-2 !font-semibold">S.No</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2 !font-semibold">Name</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2 !font-semibold">Phone No.</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2 !font-semibold">Message Status</TableHead>
-                            <TableHead className="text-left min-w-10 !px-2 !font-semibold">Date</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredAttendees.length === 0 ? (
+                {/* Table Container with Horizontal Scroll */}
+                <div className="overflow-x-auto">
+                    <Table className='w-full'>
+                        <TableHeader className='bg-accent'>
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center py-4">No data available</TableCell>
+                                <TableHead className="text-left px-2 sm:px-4 py-3 font-semibold text-xs sm:text-sm">S.No</TableHead>
+                                <TableHead className="text-left px-2 sm:px-4 py-3 font-semibold text-xs sm:text-sm">Name</TableHead>
+                                <TableHead className="text-left px-2 sm:px-4 py-3 font-semibold text-xs sm:text-sm">Phone No.</TableHead>
+                                <TableHead className="text-left px-2 sm:px-4 py-3 font-semibold text-xs sm:text-sm">Message Status</TableHead>
+                                <TableHead className="text-left px-2 sm:px-4 py-3 font-semibold text-xs sm:text-sm">Date</TableHead>
                             </TableRow>
-                        ) : (
-                            filteredAttendees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((message: WhatsAppMessage, index: number) => (
-                                <TableRow key={message._id} className='capitalize hover:bg-background/50'>
-                                    <TableCell className="text-left min-w-10">{index + 1 + (currentPage - 1) * itemsPerPage}</TableCell>
-                                    <TableCell className="text-left min-w-10">{message.firstName || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{message?.messageID?.customerPhoneNumber || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{message?.messageID?.messageStatus || "-"}</TableCell>
-                                    <TableCell className="text-left min-w-10">{formatDateTimeReport(message?.messageID?.timestamp) || "-"}</TableCell>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredAttendees.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                        No data available
+                                    </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            ) : (
+                                filteredAttendees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((message: WhatsAppMessage, index: number) => (
+                                    <TableRow key={message._id} className='capitalize hover:bg-background/50'>
+                                        <TableCell className="px-2 sm:px-4 py-3 text-xs sm:text-sm">
+                                            {index + 1 + (currentPage - 1) * itemsPerPage}
+                                        </TableCell>
+                                        <TableCell className="px-2 sm:px-4 py-3 text-xs sm:text-sm">
+                                            {message.firstName || "-"}
+                                        </TableCell>
+                                        <TableCell className="px-2 sm:px-4 py-3 text-xs sm:text-sm">
+                                            {message?.messageID?.customerPhoneNumber || "-"}
+                                        </TableCell>
+                                        <TableCell className="px-2 sm:px-4 py-3 text-xs sm:text-sm">
+                                            {message?.messageID?.messageStatus || "-"}
+                                        </TableCell>
+                                        <TableCell className="px-2 sm:px-4 py-3 text-xs sm:text-sm">
+                                            {formatDateTimeReport(message?.messageID?.timestamp) || "-"}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
 
-                <Pagination className='mt-[26px] flex justify-end'>
-                    <PaginationContent>
+                {/* Pagination */}
+                <Pagination className='mt-6 flex justify-center sm:justify-end'>
+                    <PaginationContent className='flex-wrap justify-center'>
                         <PaginationItem>
                             <PaginationPrevious
                                 onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
@@ -235,7 +275,7 @@ const WhatsAppReport: React.FC = () => {
                                 <PaginationLink
                                     isActive={currentPage === 1}
                                     onClick={() => handlePageChange(1)}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer text-xs sm:text-sm"
                                 >
                                     1
                                 </PaginationLink>
@@ -254,7 +294,7 @@ const WhatsAppReport: React.FC = () => {
                             <PaginationItem>
                                 <PaginationLink
                                     onClick={() => handlePageChange(currentPage - 1)}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer text-xs sm:text-sm"
                                 >
                                     {currentPage - 1}
                                 </PaginationLink>
@@ -265,7 +305,7 @@ const WhatsAppReport: React.FC = () => {
                             <PaginationItem>
                                 <PaginationLink
                                     isActive={true}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer text-xs sm:text-sm"
                                 >
                                     {currentPage}
                                 </PaginationLink>
@@ -276,7 +316,7 @@ const WhatsAppReport: React.FC = () => {
                             <PaginationItem>
                                 <PaginationLink
                                     onClick={() => handlePageChange(currentPage + 1)}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer text-xs sm:text-sm"
                                 >
                                     {currentPage + 1}
                                 </PaginationLink>
@@ -296,7 +336,7 @@ const WhatsAppReport: React.FC = () => {
                                 <PaginationLink
                                     isActive={currentPage === totalPages}
                                     onClick={() => handlePageChange(totalPages)}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer text-xs sm:text-sm"
                                 >
                                     {totalPages}
                                 </PaginationLink>

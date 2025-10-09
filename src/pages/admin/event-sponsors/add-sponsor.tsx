@@ -324,16 +324,16 @@ const AddSponsor: React.FC = () => {
 
                 {/* Company Logo */}
                 <div className="flex flex-col gap-2">
-                    <div className="flex items-center w-full gap-4">
+                    <div className="flex items-center sm:flex-row flex-col w-full gap-4">
                         <div className='size-28 min-w-28 min-h-28 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden'>
                             {/* Logo preview will be shown here */}
                             {formData.company_logo ? <div>
                                 <img src={URL.createObjectURL(formData.company_logo)} alt="Logo Preview" className="object-cover w-full h-full" />
                             </div> : <span className="text-primary text-sm font-medium">Logo</span>}
                         </div>
-                        <div className="gap-2 flex flex-col flex-1 overflow-hidden">
+                        <div className="gap-2 flex flex-col w-full flex-1 overflow-hidden">
                             <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-secondary'>*</span></Label>
-                            <div className='flex flex-1 overflow-hidden gap-4'>
+                            <div className='flex flex-1 w-full min-[480px]:flex-row flex-col overflow-hidden gap-4'>
                                 <div className="bg-background/50 rounded-md relative overflow-hidden !h-10 text-base cursor-pointer flex flex-1 items-center justify-between p-2 gap-4">
                                     <span className="max-w-fit text-nowrap px-2 rounded-md text-base font-normal flex items-center">Choose File</span>
                                     <p className="text-foreground/80 text-left text-nowrap overflow-hidden text-ellipsis">

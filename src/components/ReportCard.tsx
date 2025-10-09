@@ -23,9 +23,9 @@ const ReportCard: React.FC<ReportCardProps> = ({
 }) => {
 
     return (
-        <div className="w-full max-w-lg flex rounded-xl bg-muted shadow-blur-lg relative">
-            <div className="min-h-64 h-fit flex flex-col">
-                <div className='flex-1 overflow-hidden relative w-64'>
+        <div className="w-full max-w-lg flex flex-col sm:flex-row rounded-xl bg-muted shadow-blur-lg relative">
+            <div className="sm:min-h-64 h-fit flex flex-col">
+                <div className='flex-1 overflow-hidden relative sm:w-64'>
                     <img
                         src={image}
                         alt={imageAlt}
@@ -37,7 +37,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                         </span>
                     </div>
                 </div>
-                <div className='h-14 w-64 flex flex-col gap-1 bg-accent/50 rounded-b-xl p-1 px-2'>
+                <div className='sm:h-14 sm:w-64 flex flex-col gap-1 bg-accent/50 rounded-b-xl p-1 px-2'>
                     <h3 className='text-sm uppercase font-medium text-nowrap text-ellipsis overflow-hidden'>
                         {title}
                     </h3>
@@ -55,9 +55,9 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 </div>
             </div>
 
-            <div className='min-h-full w-full bg-muted rounded-xl rounded-l-none'>
+            <div className='sm:min-h-full w-full bg-muted rounded-xl rounded-l-none'>
 
-                <div className='flex flex-col gap-3 items-center justify-center h-full px-4 py-6'>
+                <div className='flex flex-col gap-3 items-center sm:justify-center h-fit px-3 sm:px-4 py-5 sm:py-6'>
                     <Link to={`mail-report/${slug}`} className='text-white flex bg-primary gap-2 px-3 h-[30px] py-2 items-center justify-center rounded-full w-full'>
                         <div className='flex gap-2 items-center max-w-36 w-full'>
                             <Mail /> Mail

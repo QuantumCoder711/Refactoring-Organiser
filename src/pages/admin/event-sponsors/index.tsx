@@ -15,11 +15,10 @@ const EventSponsors: React.FC = () => {
     return (
         <div>
             {/* Searchbar */}
-            <div className="relative max-w-fit mb-10 mx-auto">
+            <div className="relative max-w-80 mb-10 mx-auto">
                 <Input
                     type="text"
                     placeholder="Search for events..."
-                    className="input !min-w-80 !text-base !bg-brand-background/80"
                     value={searchTerm}
                     onChange={(e) => {
                         setSearchTerm(e.target.value);
@@ -31,12 +30,12 @@ const EventSponsors: React.FC = () => {
                         className="w-4 h-4 absolute cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" />
                 )}
             </div>
-            <div className='flex gap-5 flex-wrap'>
+            <div className='flex gap-5 justify-center flex-wrap'>
                 {
                     events.filter((event: EventType) => event.title.toLowerCase().includes(searchTerm.toLowerCase())).sort((a: any, b: any) => {
                         return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
                     }).map((event: EventType) => (
-                        <div key={event.id} className='w-80 p-2 bg-accent rounded-3xl'>
+                        <div key={event.id} className='max-w-80 w-full p-2 bg-accent rounded-3xl'>
                             <div className='relative h-48'>
                                 <img src={getImageUrl(event.image)} alt={event.title} className='rounded-2xl h-full w-full object-cover' />
                                 {/* Overlay */}
@@ -51,13 +50,13 @@ const EventSponsors: React.FC = () => {
                                     {event.title}
                                 </h3>
                                 <div hidden={event.event_mode == 1} className='text-xs text-nowrap opacity-60 dark:opacity-50 overflow-hidden text-ellipsis flex gap-1 items-center'>
-                                    <MapPin width={8} height={12} className='!size-5 fill-accent stroke-foreground' />
+                                    <MapPin width={20} height={20} className='!size-5 min-w-5 min-h-5 fill-accent stroke-foreground' />
                                     <span className='overflow-hidden text-ellipsis text-foreground'>
                                         {event.event_venue_name}
                                     </span>
                                 </div>
-                                <div hidden={event.event_mode == 0} className='text-xs text-nowrap overflow-hidden text-ellipsis flex gap-1 items-center'>
-                                    <Globe width={8} height={12} className='!size-5 fill-accent stroke-foreground' />
+                                <div hidden={event.event_mode == 0} className='text-xs text-nowrap opacity-60 dark:opacity-50 overflow-hidden text-ellipsis flex gap-1 items-center'>
+                                    <Globe width={20} height={20} className='!size-5 min-w-5 min-h-5 fill-accent stroke-foreground' />
                                     <span className='overflow-hidden text-ellipsis text-foreground'>
                                         Online
                                     </span>

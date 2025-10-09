@@ -125,11 +125,11 @@ const AiTranscriber: React.FC = () => {
 
   return (
     <div className='relative w-full h-full'>
-      <div className='absolute top-0 left-0'>
+      <div>
         <GoBack />
       </div>
 
-      <div className='max-w-3xl bg-muted mx-auto rounded-[10px] p-7'>
+      <div className='max-w-3xl bg-muted mt-5 mx-auto rounded-[10px] p-5 md:p-7'>
         <Tabs defaultValue="upload" className="mx-auto" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="p-0 min-w-fit bg-background mx-auto !max-h-10">
             <TabsTrigger

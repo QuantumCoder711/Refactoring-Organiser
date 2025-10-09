@@ -26,8 +26,8 @@ export function BarChartComponent(props: { hoursArray: { hour: string, totalChec
 
     return (
         <Card className="bg-transparent shadow-none border-none">
-            <CardContent>
-                <ChartContainer config={chartConfig}>
+            <CardContent className="overflow-y-scroll">
+                <ChartContainer config={chartConfig} className="min-h-96 max-w-fit">
                     <BarChart
                         accessibilityLayer
                         data={chartData}
