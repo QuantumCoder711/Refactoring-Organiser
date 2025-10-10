@@ -269,7 +269,7 @@ const AddRequestedAttendee: React.FC = () => {
         last_name: '',
         email_id: '',
         phone_number: '',
-        country_code: '+1',  // Add this line
+        country_code: '',  // Add this line
         linkedin_url: '',
         status: '',
         alternate_mobile_number: '',
@@ -420,6 +420,7 @@ const AddRequestedAttendee: React.FC = () => {
 
         // Validate the form
         if (!validateForm(formData, requiredFields)) {
+            setIsLoading(false);
             return;
         }
 
@@ -608,15 +609,13 @@ const AddRequestedAttendee: React.FC = () => {
                                 <div className="flex flex-col gap-3.5 w-full">
                                     <div className="flex gap-2 w-full">
                                         <div className="w-32">
-                                            <Label className="font-semibold">
-                                                Country Code <span className="text-brand-secondary">*</span>
-                                            </Label>
-                                            <Input
+                                        <CustomInput
+                                                label="Country Code"
+                                                id="country_code"
+                                                name="country_code"
                                                 type="text"
                                                 value={formData.country_code}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, country_code: e.target.value }))}
-                                                className="input !h-12 min-w-full text-base"
-                                                placeholder="+1"
+                                                onChange={handleInputChange}
                                                 required
                                             />
                                         </div>

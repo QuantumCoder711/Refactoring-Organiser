@@ -21,6 +21,7 @@ export interface UserType {
     company_logo: string | null;
     designation: string;
     pincode: string;
+    country_code: string;
     address: string;
     tnc: number;
     notifications: number;
