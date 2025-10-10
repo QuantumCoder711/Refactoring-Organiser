@@ -127,7 +127,7 @@ const UploadICP: React.FC = () => {
                     <h1 className='text-xl font-semibold'>ICP</h1>
                 </div>
 
-                <Button className='btn' onClick={downloadSampleFile}>
+                <Button onClick={downloadSampleFile}>
                     <Download className="mr-2 h-4 w-4" /> Get Template
                 </Button>
             </div>
@@ -136,12 +136,12 @@ const UploadICP: React.FC = () => {
                 <h2 className="text-lg font-semibold mb-6">Upload ICP</h2>
                 <div className="space-y-4">
                     <div>
-                        <Label htmlFor="sheetName">Name</Label>
+                        <Label htmlFor="sheetName">Name <span className="text-secondary">*</span></Label>
                         <Input
                             id="sheetName"
                             placeholder="Enter sheet name"
                             value={sheetName}
-                            className='mt-2'
+                            className='mt-2 h-12'
                             onChange={(e) => { 
                                 setSheetName(e.target.value); 
                                 if (e.target.value.trim()) setNameError(null); 
@@ -161,7 +161,7 @@ const UploadICP: React.FC = () => {
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                             onClick={handleBrowseClick}
-                            className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/40"
+                            className="border-2 border-dashed bg-background/50 hover:border-primary rounded-lg p-6 text-center cursor-pointer hover:bg-accent/40"
                         >
                             {selectedFile ? (
                                 <div className="text-sm">

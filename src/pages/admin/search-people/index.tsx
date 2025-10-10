@@ -60,7 +60,6 @@ interface SearchPeopleType {
     employeeSize: string;
 }
 
-
 const cities: string[] = [
     "Mumbai", "Delhi", "Bengaluru", "Gurgaon", "Chennai", "Pune",
     "Hyderabad", "Noida", "New Delhi", "Ahmedabad", "Jaipur", "Kolkata",
@@ -333,34 +332,49 @@ const SearchPeople: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
-            <div className='flex justify-between items-center'>
-                <div className='flex gap-5 items-center'>
+        <div>
+            {/* Header Section */}
+            <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4'>
+                <div className='flex gap-3 sm:gap-5 items-center'>
                     <GoBack />
-                    <h1 className='text-xl font-semibold'>Add People</h1>
+                    <h1 className='text-lg sm:text-xl font-semibold'>Add People</h1>
                 </div>
-                <div className='flex gap-3'>
-                    <Button onClick={() => {
-                        setDataLoaded(false);
-                        setPeople([]);
-                        setFilters({
-                            designation: "",
-                            company: "",
-                            city: "",
-                            companySize: "",
-                            industry: ""
-                        });
-                    }} hidden={!dataLoaded} className='btn'>Reset</Button>
+                <div className='flex gap-2 sm:gap-3'>
+                    <Button 
+                        onClick={() => {
+                            setDataLoaded(false);
+                            setPeople([]);
+                            setFilters({
+                                designation: "",
+                                company: "",
+                                city: "",
+                                companySize: "",
+                                industry: ""
+                            });
+                        }} 
+                        hidden={!dataLoaded} 
+                        className='btn text-xs sm:text-sm'
+                    >
+                        Reset
+                    </Button>
 
-                    {showButton && <Button onClick={handleExport} hidden={!dataLoaded} className='btn'>Download</Button>}
+                    {showButton && (
+                        <Button 
+                            onClick={handleExport} 
+                            hidden={!dataLoaded} 
+                            className='btn text-xs sm:text-sm'
+                        >
+                            Download
+                        </Button>
+                    )}
                 </div>
             </div>
 
             {/* Initial Search UI - Show when no data is loaded */}
             {!dataLoaded && (
-                <div className="flex flex-row max-w-2xl mx-auto items-end gap-4">
-                    <div className="flex flex-col gap-2 w-full">
-                        <Label className="font-semibold" htmlFor="designation">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 max-w-4xl mx-auto">
+                    <div className="flex flex-col gap-2 flex-1">
+                        <Label className="font-semibold text-sm sm:text-base" htmlFor="designation">
                             Designation
                         </Label>
                         <Input
@@ -368,20 +382,20 @@ const SearchPeople: React.FC = () => {
                             type="text"
                             value={designation}
                             onChange={(e) => setDesignation(e.target.value)}
-                            className="input max-w-[200px] text-base"
+                            className="input text-sm sm:text-base w-full"
                             placeholder="Enter designation"
                         />
                     </div>
 
-                    <div className="flex flex-col gap-2 w-full">
-                        <Label className="font-semibold" htmlFor="city">
+                    <div className="flex flex-col gap-2 flex-1">
+                        <Label className="font-semibold text-sm sm:text-base" htmlFor="city">
                             City
                         </Label>
                         <Select
                             value={selectedCity}
                             onValueChange={setSelectedCity}
                         >
-                            <SelectTrigger className="input max-w-[200px] text-base">
+                            <SelectTrigger className="input text-sm sm:text-base w-full">
                                 <SelectValue placeholder="Select a city" />
                             </SelectTrigger>
                             <SelectContent>
@@ -398,24 +412,25 @@ const SearchPeople: React.FC = () => {
                         </Select>
                     </div>
 
-                    <Button
-                        onClick={handleSearch}
-                        disabled={designation === '' || selectedCity === ''}
-                        className="w-fit btn"
-                    >
-                        Search
-                    </Button>
+                    <div className="flex items-end">
+                        <Button
+                            onClick={handleSearch}
+                            disabled={designation === '' || selectedCity === ''}
+                            className="w-full sm:w-fit btn text-sm sm:text-base"
+                        >
+                            Search
+                        </Button>
+                    </div>
                 </div>
             )}
 
             {/* Table UI - Show when data is loaded */}
             {dataLoaded && (
-                <div className='bg-brand-background rounded-lg p-5 mt-6 shadow-blur'>
+                <div className='bg-muted rounded-lg p-4 sm:p-5 lg:p-6 mt-4 sm:mt-6 shadow-blur'>
                     {/* Details Row */}
-                    <div className='flex gap-3.5'>
-                        {/* Select Box for pagination */}
+                    <div className='flex flex-wrap gap-2 sm:gap-3.5 items-center'>
                         <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="rounded-sm cursor-pointer !w-fit !h-[21px] border-1 border-brand-light-gray flex items-center justify-center text-sm">
+                            <SelectTrigger className="rounded-sm cursor-pointer !w-fit !h-8 sm:!h-[21px] border flex items-center justify-center text-xs sm:text-sm">
                                 <SelectValue placeholder={`${itemsPerPage}/Page`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -426,80 +441,94 @@ const SearchPeople: React.FC = () => {
                             </SelectContent>
                         </Select>
 
-                        <span className='font-semibold text-sm'>Total People: {people.length}</span>
+                        <span className='font-semibold text-xs sm:text-sm'>Total People: {people.length}</span>
                         {isFilterActive && (
-                            <span className='font-semibold text-sm'>Search Result: {filteredPeople.length}</span>
+                            <span className='font-semibold text-xs sm:text-sm'>Search Result: {filteredPeople.length}</span>
                         )}
-                        {selectedPeople && selectedPeople.length > 0 && <span>Selected People: {selectedPeople.length}</span>}
+                        {selectedPeople && selectedPeople.length > 0 && (
+                            <span className='text-xs sm:text-sm'>Selected People: {selectedPeople.length}</span>
+                        )}
                     </div>
 
                     {/* Filters Bar */}
-                    <div className='flex w-full gap-2.5 mt-4'>
-                        {/* Search By Designation */}
-                        <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-                            placeholder='Search by designation'
-                            value={filters.designation}
-                            onChange={(e) => setFilters(prev => ({ ...prev, designation: e.target.value }))}
-                        />
+                    <div className='flex flex-col w-full gap-2 sm:gap-2.5 mt-4'>
+                        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 flex-1'>
+                            {/* Search By Designation */}
+                            <Input
+                                className='input !p-2 !text-xs w-full'
+                                placeholder='Search by designation'
+                                value={filters.designation}
+                                onChange={(e) => setFilters(prev => ({ ...prev, designation: e.target.value }))}
+                            />
 
-                        {/* Search By Company */}
-                        <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-                            placeholder='Search by company'
-                            value={filters.company}
-                            onChange={(e) => setFilters(prev => ({ ...prev, company: e.target.value }))}
-                        />
+                            {/* Search By Company */}
+                            <Input
+                                className='input !p-2 !text-xs w-full'
+                                placeholder='Search by company'
+                                value={filters.company}
+                                onChange={(e) => setFilters(prev => ({ ...prev, company: e.target.value }))}
+                            />
 
-                        {/* Search By City */}
-                        <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-                            placeholder='Search by city'
-                            value={filters.city}
-                            onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-                        />
+                            {/* Search By City */}
+                            <Input
+                                className='input !p-2 !text-xs w-full'
+                                placeholder='Search by city'
+                                value={filters.city}
+                                onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
+                            />
 
-                        {/* Search By Company Size */}
-                        <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-                            placeholder='Search by company size'
-                            value={filters.companySize}
-                            onChange={(e) => setFilters(prev => ({ ...prev, companySize: e.target.value }))}
-                        />
+                            {/* Search By Company Size */}
+                            <Input
+                                className='input !p-2 !text-xs w-full'
+                                placeholder='Search by company size'
+                                value={filters.companySize}
+                                onChange={(e) => setFilters(prev => ({ ...prev, companySize: e.target.value }))}
+                            />
 
-                        {/* Search By Industry */}
-                        <Input
-                            className='input !min-w-fit !max-w-fit !p-2.5 !text-xs'
-                            placeholder='Search by industry'
-                            value={filters.industry}
-                            onChange={(e) => setFilters(prev => ({ ...prev, industry: e.target.value }))}
-                        />
+                            {/* Search By Industry */}
+                            <Input
+                                className='input !p-2 !text-xs w-full'
+                                placeholder='Search by industry'
+                                value={filters.industry}
+                                onChange={(e) => setFilters(prev => ({ ...prev, industry: e.target.value }))}
+                            />
+                        </div>
 
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button className='btn' disabled={selectedPeople.length === 0}>
+                                <Button className='btn text-xs sm:text-sm w-full sm:w-fit mt-2 sm:mt-0' disabled={selectedPeople.length === 0}>
                                     Add Selected People
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-[95vw] sm:max-w-2xl lg:max-w-3xl">
                                 <DialogHeader>
-                                    <DialogTitle>Select the event</DialogTitle>
+                                    <DialogTitle className="text-lg sm:text-xl">Select the event</DialogTitle>
                                 </DialogHeader>
 
-                                <div className='max-h-80 h-full space-y-3 overflow-y-scroll overflow-x-hidden'>
+                                <div className='max-h-60 sm:max-h-80 h-full space-y-3 overflow-y-auto overflow-x-hidden'>
                                     {upcomingEvents.map((event) => (
-                                        <div onClick={() => setSelectedEvent(event)} key={event.uuid} className={`p-2 border-2 border-white cursor-pointer hover:bg-brand-primary/20 rounded-md ${selectedEvent?.uuid === event.uuid ? '!border-brand-primary !bg-brand-primary/20' : 'border-white'}`}>
-                                            <div className='flex gap-2 w-full'>
-                                                <img src={getImageUrl(event.image)} alt="" width={80} height={80} className='w-20 h-20 object-cover rounded' />
-                                                <div className='flex flex-col gap-1 overflow-hidden overflow-ellipsis'>
-                                                    <p className='font-semibold text-lg text-nowrap overflow-hidden overflow-ellipsis'>{event.title}</p>
+                                        <div 
+                                            onClick={() => setSelectedEvent(event)} 
+                                            key={event.uuid} 
+                                            className={`p-2 border-2 cursor-pointer hover:bg-brand-primary/20 rounded-md ${
+                                                selectedEvent?.uuid === event.uuid ? '!border-brand-primary !bg-brand-primary/20' : 'border-gray-200'
+                                            }`}
+                                        >
+                                            <div className='flex gap-2 sm:gap-3 w-full'>
+                                                <img 
+                                                    src={getImageUrl(event.image)} 
+                                                    alt="" 
+                                                    className='w-16 h-16 sm:w-20 sm:h-20 object-cover rounded' 
+                                                />
+                                                <div className='flex flex-col gap-1 flex-1 min-w-0'>
+                                                    <p className='font-semibold text-sm sm:text-lg truncate'>{event.title}</p>
                                                     <div className='flex items-center gap-1'>
-                                                        <MapPin className='w-4 h-4' />
-                                                        <p className='text-sm text-nowrap overflow-hidden overflow-ellipsis'>{event.event_venue_address_2}</p>
+                                                        <MapPin className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
+                                                        <p className='text-xs sm:text-sm truncate'>{event.event_venue_address_2}</p>
                                                     </div>
                                                     <div className='flex items-center gap-1'>
-                                                        <Calendar className='w-4 h-4' />
-                                                        <p className='text-sm text-nowrap overflow-hidden overflow-ellipsis'>{formatDateTime(event.event_date)}</p>
+                                                        <Calendar className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
+                                                        <p className='text-xs sm:text-sm truncate'>{formatDateTime(event.event_date)}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -507,88 +536,91 @@ const SearchPeople: React.FC = () => {
                                     ))}
                                 </div>
                                 <DialogFooter>
-                                    <Button className='btn' onClick={handleAddSelectedPeople} disabled={!selectedEvent}>Add Selected People</Button>
+                                    <Button 
+                                        className='btn text-sm sm:text-base w-full sm:w-fit' 
+                                        onClick={handleAddSelectedPeople} 
+                                        disabled={!selectedEvent}
+                                    >
+                                        Add Selected People
+                                    </Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
                     </div>
 
-                    <Table className='mt-4'>
-                        <TableHeader className='bg-brand-light-gray !rounded-[10px]'>
-                            <TableRow className='!text-base'>
-                                <TableHead className="text-left min-w-10 !px-2">
-                                    <Checkbox
-                                        className='bg-white border-brand-dark-gray cursor-pointer'
-                                        checked={filteredPeople.length > 0 && selectedPeople.length === filteredPeople.length}
-                                        onCheckedChange={handleSelectAll}
-                                    />
-                                </TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Sr.No</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Name</TableHead>
-                                {/* <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Mobile Number</TableHead> */}
-                                <TableHead className="text-left min-w-10 !px-2">Designation</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Industry</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">City</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">Company Size</TableHead>
-                                <TableHead className="text-left min-w-10 !px-2">LinkedIn</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {paginatedPeople.map((person: SearchPeopleType, index: number) => (
-                                <TableRow key={person._id}>
-                                    <TableCell className="text-left min-w-10">
+                    {/* Table Container with Horizontal Scroll */}
+                    <div className="overflow-x-auto mt-4">
+                        <Table className='w-full min-w-[800px]'>
+                            <TableHeader className='bg-accent'>
+                                <TableRow className='text-sm sm:text-base'>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3">
                                         <Checkbox
-                                            className='bg-white border-brand-dark-gray cursor-pointer'
-                                            checked={selectedPeople.includes(person._id)}
-                                            onCheckedChange={(checked) => handleSelectPerson(person._id, checked as boolean)}
+                                            className='size-5'
+                                            checked={filteredPeople.length > 0 && selectedPeople.length === filteredPeople.length}
+                                            onCheckedChange={handleSelectAll}
                                         />
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.firstName && person.lastName ? `${person.firstName} ${person.lastName}` : "-"}
-                                    </TableCell>
-                                    {/* <TableCell className="text-left min-w-10 capitalize">
-                                        {person.email ? person.email : "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.mobileNumber ? person.mobileNumber : "-"}
-                                    </TableCell> */}
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.designation || "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.company || "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.industry || "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.city || "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10 capitalize">
-                                        {person.employeeSize || "-"}
-                                    </TableCell>
-                                    <TableCell className="text-left min-w-10">
-                                        {person.linkedinUrl ? (
-                                            <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                                                View Profile
-                                            </a>
-                                        ) : "-"}
-                                    </TableCell>
+                                    </TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Sr.No</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Name</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Designation</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Company</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Industry</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">City</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Company Size</TableHead>
+                                    <TableHead className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">LinkedIn</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {paginatedPeople.map((person: SearchPeopleType, index: number) => (
+                                    <TableRow key={person._id} className="hover:bg-background/50">
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3">
+                                            <Checkbox
+                                                className='size-5'
+                                                checked={selectedPeople.includes(person._id)}
+                                                onCheckedChange={(checked) => handleSelectPerson(person._id, checked as boolean)}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium">
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.firstName && person.lastName ? `${person.firstName} ${person.lastName}` : "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.designation || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.company || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.industry || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.city || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm capitalize">
+                                            {person.employeeSize || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-left px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
+                                            {person.linkedinUrl ? (
+                                                <a href={person.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs sm:text-sm">
+                                                    View Profile
+                                                </a>
+                                            ) : "-"}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
 
                     {/* Pagination */}
-                    <Pagination className='mt-[26px] flex justify-end'>
-                        <PaginationContent>
+                    <Pagination className='mt-4 sm:mt-6 flex justify-center sm:justify-end'>
+                        <PaginationContent className='flex-wrap justify-center'>
                             <PaginationItem>
                                 <PaginationPrevious
                                     onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer text-xs sm:text-sm'}
                                 />
                             </PaginationItem>
 
@@ -598,7 +630,7 @@ const SearchPeople: React.FC = () => {
                                     <PaginationLink
                                         isActive={currentPage === 1}
                                         onClick={() => handlePageChange(1)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer text-xs sm:text-sm"
                                     >
                                         1
                                     </PaginationLink>
@@ -617,7 +649,7 @@ const SearchPeople: React.FC = () => {
                                 <PaginationItem>
                                     <PaginationLink
                                         onClick={() => handlePageChange(currentPage - 1)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer text-xs sm:text-sm"
                                     >
                                         {currentPage - 1}
                                     </PaginationLink>
@@ -628,7 +660,7 @@ const SearchPeople: React.FC = () => {
                                 <PaginationItem>
                                     <PaginationLink
                                         isActive={true}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer text-xs sm:text-sm"
                                     >
                                         {currentPage}
                                     </PaginationLink>
@@ -639,7 +671,7 @@ const SearchPeople: React.FC = () => {
                                 <PaginationItem>
                                     <PaginationLink
                                         onClick={() => handlePageChange(currentPage + 1)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer text-xs sm:text-sm"
                                     >
                                         {currentPage + 1}
                                     </PaginationLink>
@@ -659,7 +691,7 @@ const SearchPeople: React.FC = () => {
                                     <PaginationLink
                                         isActive={currentPage === totalPages}
                                         onClick={() => handlePageChange(totalPages)}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer text-xs sm:text-sm"
                                     >
                                         {totalPages}
                                     </PaginationLink>
@@ -669,7 +701,7 @@ const SearchPeople: React.FC = () => {
                             <PaginationItem>
                                 <PaginationNext
                                     onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-                                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer text-xs sm:text-sm'}
                                 />
                             </PaginationItem>
                         </PaginationContent>

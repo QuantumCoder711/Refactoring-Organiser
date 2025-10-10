@@ -27,7 +27,6 @@ const Profile: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [paymentFormHtml, setPaymentFormHtml] = useState<string>('');
 
-
     const { user, token, getUserProfile } = useAuthStore(state => state);
 
     // Listen for profile update events
@@ -164,57 +163,73 @@ const Profile: React.FC = () => {
     }
 
     return (
-        <div className='relative h-full'>
-            <div className='absolute top-0 left-0'>
+        <div className='relative h-full sm:px-6 lg:px-8 py-4'>
+            <div className='absolute top-4 left-4 sm:top-6 sm:left-6'>
                 <GoBack />
             </div>
 
-            <div className='w-lg rounded-[10px] bg-muted h-full mx-auto px-[72px] pt-9 pb-[30px]'>
-                <div className='flex justify-between'>
-                    <div>
-                        <h3 className='font-bold'>Profile Picture</h3>
-                        <img width={165} height={165} className='rounded-[10px] bg-brand-light-gray shadow-blur size-[165px] mt-2.5' src={user?.image ? getImageUrl(user?.image) : UserAvatar} alt={user?.first_name + ' ' + user?.last_name} />
+            <div className='w-full max-w-lg mx-auto rounded-[10px] bg-muted h-fit px-4 sm:px-6 lg:px-[72px] pt-8 sm:pt-9 pb-6 sm:pb-[30px] mt-12 sm:mt-0'>
+                {/* Profile Images Section */}
+                <div className='flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-8'>
+                    <div className='text-center sm:text-left w-1/2 min-w-40 max-w-60 sm:max-w-1/2'>
+                        <h3 className='font-bold text-sm sm:text-base'>Profile Picture</h3>
+                        <img 
+                            className='rounded-[10px] bg-brand-light-gray shadow-blur w-full aspect-square object-cover mt-2.5 mx-auto sm:mx-0' 
+                            src={user?.image ? getImageUrl(user?.image) : UserAvatar} 
+                            alt={user?.first_name + ' ' + user?.last_name} 
+                        />
                     </div>
-                    <div>
-                        <h3 className='font-bold'>Company Logo</h3>
-                        <img width={165} height={165} className='rounded-[10px] bg-brand-light-gray object-contain shadow-blur size-[165px] mt-2.5' src={user?.company_logo ? getImageUrl(user?.company_logo) : UserAvatar} alt={user?.first_name + ' ' + user?.last_name} />
+                    <div className='text-center sm:text-left w-1/2 min-w-40 max-w-60 sm:max-w-1/2'>
+                        <h3 className='font-bold text-sm sm:text-base'>Company Logo</h3>
+                        <img 
+                            className='rounded-[10px] bg-brand-light-gray object-contain shadow-blur w-full aspect-square mt-2.5 mx-auto sm:mx-0' 
+                            src={user?.company_logo ? getImageUrl(user?.company_logo) : UserAvatar} 
+                            alt={user?.first_name + ' ' + user?.last_name} 
+                        />
                     </div>
                 </div>
 
-                <div className='text-center space-y-2.5 mt-7'>
-                    <h3 className='font-semibold'>{user?.first_name + ' ' + user?.last_name}</h3>
-                    <p>{user?.designation_name}</p>
-                    <p>{user?.company_name}</p>
-                    <p className='text-brand-dark-gray'>{user?.email}</p>
-                    <p className='text-brand-dark-gray'>{user?.mobile_number}</p>
-                    <p className='text-brand-dark-gray'>{user?.address + " " + user?.pincode}</p>
+                {/* User Info Section */}
+                <div className='text-center space-y-2 sm:space-y-2.5 mt-6 sm:mt-7'>
+                    <h3 className='font-semibold text-lg sm:text-xl'>{user?.first_name + ' ' + user?.last_name}</h3>
+                    <p className='text-sm sm:text-base'>{user?.designation_name}</p>
+                    <p className='text-sm sm:text-base'>{user?.company_name}</p>
+                    <p className='text-brand-dark-gray text-sm sm:text-base'>{user?.email}</p>
+                    <p className='text-brand-dark-gray text-sm sm:text-base'>{user?.mobile_number}</p>
+                    <p className='text-brand-dark-gray text-sm sm:text-base break-words'>
+                        {user?.address + " " + user?.pincode}
+                    </p>
                 </div>
 
-                {/* Credits */}
-                <div hidden={user?.feature_permission?.wallet === 0} className='p-3 rounded-md w-full flex justify-between bg-brand-primary/10'>
-                    <p className='flex items-center gap-2'>
-                        <img src={Coins} width={32} height={32} alt="Coins" className='inline-block' />
+                {/* Credits Section */}
+                <div hidden={user?.feature_permission?.wallet === 0} className='p-3 rounded-md w-full flex flex-col sm:flex-row justify-between items-center gap-3 bg-brand-primary/10 mt-6 sm:mt-8'>
+                    <p className='flex items-center gap-2 text-sm sm:text-base'>
+                        <img src={Coins} width={28} height={28} alt="Coins" className='inline-block' />
                         Credits: {user?.wallet_balance}
                     </p>
 
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className='btn !font-normal !text-base'>Upgrade</Button>
+                            <Button className='btn !font-normal !text-sm sm:!text-base w-full sm:w-auto'>
+                                Upgrade
+                            </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
+                        <DialogContent className="sm:max-w-md max-w-[95vw] mx-2">
                             <DialogHeader className="text-center">
-                                <DialogTitle className="text-2xl font-bold text-center">Upgrade Credits</DialogTitle>
+                                <DialogTitle className="text-xl sm:text-2xl font-bold text-center">
+                                    Upgrade Credits
+                                </DialogTitle>
                             </DialogHeader>
 
-                            <div className="space-y-6 py-4">
+                            <div className="space-y-4 sm:space-y-6 py-2 sm:py-4">
                                 {/* Credit rate */}
                                 <div className="text-center">
-                                    <p className="text-lg font-semibold">1 Credit = ₹8</p>
+                                    <p className="text-base sm:text-lg font-semibold">1 Credit = ₹8</p>
                                 </div>
 
                                 {/* Slider section */}
-                                <div className="space-y-4">
-                                    <p className="text-foreground font-medium">Select Credits Amount:</p>
+                                <div className="space-y-3 sm:space-y-4">
+                                    <p className="text-foreground font-medium text-sm sm:text-base">Select Credits Amount:</p>
 
                                     <div className="px-2">
                                         <Slider
@@ -225,7 +240,7 @@ const Profile: React.FC = () => {
                                             step={10}
                                             className="w-full bg-muted"
                                         />
-                                        <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                                        <div className="flex justify-between text-xs sm:text-sm text-muted-foreground mt-2">
                                             <span>₹80 (10 credits)</span>
                                             <span>₹8000 (1000 credits)</span>
                                         </div>
@@ -234,7 +249,7 @@ const Profile: React.FC = () => {
 
                                 {/* Credits input with increment/decrement */}
                                 <div className="flex items-center gap-2">
-                                    <label className="font-medium">Credits:</label>
+                                    <label className="font-medium text-sm sm:text-base">Credits:</label>
                                     <div className="flex items-center border rounded-md overflow-hidden">
                                         <Input
                                             type="number"
@@ -242,7 +257,7 @@ const Profile: React.FC = () => {
                                             onChange={handleInputChange}
                                             min={10}
                                             max={1000}
-                                            className="border-0 text-center w-20 focus-visible:ring-0"
+                                            className="border-0 text-center w-16 sm:w-20 focus-visible:ring-0 text-sm sm:text-base"
                                         />
                                         <div className="flex flex-col border-l">
                                             <button
@@ -264,23 +279,27 @@ const Profile: React.FC = () => {
                                 </div>
 
                                 {/* Total price */}
-                                <div className="bg-muted p-4 rounded-md">
+                                <div className="bg-muted p-3 sm:p-4 rounded-md">
                                     <div className="flex justify-between items-center">
-                                        <span className="font-semibold text-lg">Total Price:</span>
-                                        <span className="font-bold text-xl text-primary">₹{totalPrice.toLocaleString()}/-</span>
+                                        <span className="font-semibold text-base sm:text-lg">Total Price:</span>
+                                        <span className="font-bold text-lg sm:text-xl text-primary">
+                                            ₹{totalPrice.toLocaleString()}/-
+                                        </span>
                                     </div>
                                 </div>
 
                                 {/* Action buttons */}
-                                <div className="grid grid-cols-2 gap-4 pt-4">
+                                <div className="grid grid-cols-2 gap-3 sm:gap-4 pt-2 sm:pt-4">
                                     <Button
                                         onClick={handleCancel}
                                         variant="outline"
+                                        className="text-sm sm:text-base"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         onClick={handleUpgrade}
+                                        className="text-sm sm:text-base"
                                     >
                                         Upgrade
                                     </Button>
@@ -293,8 +312,11 @@ const Profile: React.FC = () => {
                     </Dialog>
                 </div>
 
-                <Link to="/update-profile">
-                    <Button className='btn !h-12 !text-base w-full mt-[30px]'>Edit Profile</Button>
+                {/* Edit Profile Button */}
+                <Link to="/update-profile" className="block w-full">
+                    <Button className='btn !h-10 sm:!h-12 !text-sm sm:!text-base w-full mt-6 sm:mt-[30px]'>
+                        Edit Profile
+                    </Button>
                 </Link>
             </div>
         </div>

@@ -207,3 +207,10 @@
 .shadow-blur-lg {
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
 }
+
+/* react-country-state-city dropdown panel */
+.stdropdown-menu {
+  background-color: var(--background) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

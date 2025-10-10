@@ -264,11 +264,11 @@ const UpdateProfile: React.FC = () => {
 
     return (
         <div className='w-full h-full relative'>
-            <div className='absolute top-0 left-0'>
+            <div>
                 <GoBack />
             </div>
 
-            <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-muted flex flex-col gap-5'>
+            <div className='max-w-3xl mt-5 mx-auto rounded-[10px] p-5 sm:p-7 bg-muted flex flex-col gap-5'>
                 {/* Name */}
                 <div className='flex gap-5 justify-between'>
                     {/* First Name */}
@@ -389,13 +389,13 @@ const UpdateProfile: React.FC = () => {
                 </div>
 
                 {/* Company Logo & Profile Picture */}
-                <div className='flex gap-5 justify-between'>
+                <div className='flex gap-5 sm:flex-row flex-col justify-between'>
                     {/* Company Image */}
                     <div className='flex gap-5 flex-col w-full'>
                         <div className="flex flex-col gap-2">
                             <Label className="font-semibold" htmlFor="company_logo">Company Logo <span className='text-secondary'>*</span></Label>
-                            <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
-                                <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
+                            <div className="input relative bg-accent rounded-md overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                                <span className="w-full px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                     {formData.company_logo ? (formData.company_logo instanceof File ? formData.company_logo.name : "File selected") : "No file Chosen"}
                                 </p>
@@ -423,8 +423,8 @@ const UpdateProfile: React.FC = () => {
                     <div className='flex gap-5 flex-col w-full'>
                         <div className="flex flex-col gap-2">
                             <Label className="font-semibold" htmlFor="image">Profile Picture <span className='text-secondary'>*</span></Label>
-                            <div className="input relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
-                                <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
+                            <div className="input bg-accent rounded-md relative overflow-hidden !h-12 min-w-full text-base cursor-pointer flex items-center justify-between p-2 gap-4">
+                                <span className="w-full px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
                                 <p className="w-full text-nowrap overflow-hidden text-ellipsis">
                                     {formData.image ? (formData.image instanceof File ? formData.image.name : "File selected") : "No file Chosen"}
                                 </p>
@@ -452,13 +452,12 @@ const UpdateProfile: React.FC = () => {
                 <div className='flex gap-5 justify-center mt-12'>
                     <Button
                         onClick={handleSubmit}
-                        className='btn !h-12 !text-base w-44'
                     >
                         Save
                     </Button>
                     <Button
                         onClick={() => window.history.back()}
-                        className='btn !bg-brand-dark-gray !h-12 !text-base w-44'
+                        variant="outline"
                     >
                         Cancel
                     </Button>

@@ -129,7 +129,7 @@ const CustomComboBox = React.memo(({
   return (
     <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
       <Label className="font-semibold">
-        {label} {required && <span className="text-brand-secondary">*</span>}
+        {label} {required && <span className="text-secondary">*</span>}
       </Label>
       <div className="relative">
 
@@ -142,7 +142,7 @@ const CustomComboBox = React.memo(({
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
             placeholder={placeholder}
-            className="w-full capitalize bg-white !h-12 text-base pr-10"
+            className="w-full capitalize !h-12 text-base pr-10"
           />
           <ChevronDown
             className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -157,9 +157,9 @@ const CustomComboBox = React.memo(({
         {isMulti && selectedValues.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-2">
             {selectedValues.map((val) => (
-              <Badge key={val} variant="secondary" className="flex items-center gap-1 px-2 py-1 rounded-full">
+              <Badge key={val} variant="default" className="flex items-center gap-1 px-2 py-1 rounded-full">
                 <span className="capitalize">{val}</span>
-                <button type="button" onClick={() => removeValue(val)} className="hover:text-red-600">
+                <button type="button" onClick={() => removeValue(val)} className="hover:text-destructive">
                   <X className="size-3 cursor-pointer" />
                 </button>
               </Badge>
@@ -168,29 +168,29 @@ const CustomComboBox = React.memo(({
         )}
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-muted/50 backdrop-blur-2xl border border-accent rounded-md shadow-lg max-h-60 overflow-y-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <div
                   key={option.id}
-                  className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                  className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
                   onClick={() => addValue(option.name)}
                 >
                   <span className="capitalize">{option.name}</span>
                   {!isMulti && typeof value === 'string' && value === option.name && (
-                    <Check className="size-4 text-brand-secondary" />
+                    <Check className="size-4 text-secondary" />
                   )}
                 </div>
               ))
             ) : searchTerm ? (
               <div
-                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-sm font-medium"
+                className="px-3 py-2 cursor-pointer hover:bg-background/50 text-sm font-medium"
                 onClick={() => addValue(searchTerm)}
               >
                 {searchTerm}
               </div>
             ) : (
-              <div className="px-3 py-2 text-gray-500 text-sm">No options found</div>
+              <div className="px-3 py-2 text-accent-foreground text-sm">No options found</div>
             )}
           </div>
         )}
@@ -313,7 +313,7 @@ const CreateICP: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Sheet Name */}
           <div className="flex flex-col gap-2">
-            <Label className="font-semibold">Sheet Name <span className="text-brand-secondary">*</span></Label>
+            <Label className="font-semibold">Sheet Name <span className="text-secondary">*</span></Label>
             <Input
               name="sheet_name"
               value={formData.sheet_name}
@@ -325,7 +325,7 @@ const CreateICP: React.FC = () => {
 
           {/* Employee Size (single select) */}
           <div className="flex flex-col gap-2 w-full">
-            <Label className="font-semibold">Employee Size <span className="text-brand-secondary">*</span></Label>
+            <Label className="font-semibold">Employee Size <span className="text-secondary">*</span></Label>
             <Select value={formData.employee_size} onValueChange={(v) => setFormData(prev => ({ ...prev, employee_size: v }))}>
               <SelectTrigger className="input !h-12 text-base cursor-pointer min-w-full">
                 <SelectValue placeholder="Select employee size" />
@@ -364,28 +364,53 @@ const CreateICP: React.FC = () => {
 
           {/* Country */}
           <div className="flex flex-col gap-2">
-            <Label className="font-semibold">Country <span className="text-brand-secondary">*</span></Label>
+            <Label className="font-semibold">Country <span className="text-secondary">*</span></Label>
             <CountrySelect
               placeHolder="Select Country"
               onChange={(val: any) => {
                 setCountryId(val?.id ?? null);
-                setFormData(prev => ({ ...prev, country_name: val?.name || '', state_name: '' }));
+                setFormData(prev => ({
+                  ...prev,
+                  country_name: val?.name || '',
+                  state_name: '',
+                }));
               }}
-              inputClassName="!h-12 !text-base !bg-white"
-              containerClassName="!w-full"
+              inputClassName="
+    w-full h-12 px-4 text-base
+    !bg-background
+    rounded-md
+    border border-input
+    placeholder:text-muted-foreground
+    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+    transition-colors
+    dark:bg-popover dark:text-popover-foreground
+  "
+              containerClassName="w-full"
             />
           </div>
 
           {/* State */}
           <div className="flex flex-col gap-2">
-            <Label className="font-semibold">State <span className="text-brand-secondary">*</span></Label>
+            <Label className="font-semibold">State <span className="text-secondary">*</span></Label>
             <StateSelect
               countryid={countryId as any}
               placeHolder={countryId ? 'Select State' : 'Select country first'}
-              onChange={(val: any) => setFormData(prev => ({ ...prev, state_name: val?.name || '' }))}
-              inputClassName="!h-12 !text-base !bg-white"
-              containerClassName="!w-full"
+              onChange={(val: any) =>
+                setFormData(prev => ({ ...prev, state_name: val?.name || '' }))
+              }
               disabled={!countryId}
+              inputClassName="
+    w-full h-12 px-4 text-base
+    bg-background
+    rounded-md
+    border border-input
+    placeholder:text-muted-foreground
+    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+    transition-colors
+    disabled:cursor-not-allowed disabled:opacity-50
+    dark:bg-popover dark:text-popover-foreground
+  "
+              containerClassName="w-full"
             />
           </div>
         </div>
