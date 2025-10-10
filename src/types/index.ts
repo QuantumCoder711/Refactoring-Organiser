@@ -306,6 +306,7 @@ export interface RequestedAttendeeType {
     follow_up: string | null;
     managed_by: string;
     remark: string | null;
+    country_code: string;
     linkedin_url: string;
     created_at: string;
     updated_at: string;
