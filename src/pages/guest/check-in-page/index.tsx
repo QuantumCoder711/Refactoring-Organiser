@@ -166,6 +166,7 @@ const CheckinPage: React.FC = () => {
         name: '',
         email: '',
         mobile: '',
+        country_code: '',
         designation: '',
         status: 'delegate',
         company: '',
@@ -244,11 +245,19 @@ const CheckinPage: React.FC = () => {
             return;
         }
 
+        if(!formData.country_code) {
+            toast("Please enter a valid country code", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleX className='size-5' />
+            });
+            return;
+        }
+
         try {
             setLoading(true);
             const response = await axios.post(
                 `${appDomain}/api/organiser/v1/event-checkin/send-otp`,
-                { mobileNumber: Number(formData.mobile) },
+                { mobileNumber: Number(formData.mobile), countryCode: Number(formData.country_code) },
                 {
                     headers: {
                         'Content-Type': 'application/json'
@@ -283,7 +292,8 @@ const CheckinPage: React.FC = () => {
                     mobileNumber: Number(formData.mobile),
                     otp: formData.otp,
                     eventOtp: event?.event_otp,
-                    eventID: event?.id
+                    eventID: event?.id,
+                    countryCode: Number(formData.country_code)
                 },
                 {
                     headers: {
@@ -307,7 +317,8 @@ const CheckinPage: React.FC = () => {
                     {
                         mobile: Number(formData.mobile),
                         eventID: event?.id,
-                        userID: event?.user_id
+                        userID: event?.user_id,
+                        countryCode: Number(formData.country_code)
                     },
                     {
                         headers: {
@@ -396,6 +407,7 @@ const CheckinPage: React.FC = () => {
                     name: '',
                     email: '',
                     mobile: '',
+                    country_code: '',
                     designation: '',
                     company: '',
                     otp: '',
@@ -448,7 +460,7 @@ const CheckinPage: React.FC = () => {
                 ? `${domain}/api/breakout_room_checkin`
                 : `${domain}/api/accept_decline_event_invitation`;
 
-            if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile || !formData.status) {
+            if (!formData.name || !formData.email || !formData.designation || !formData.company || !formData.mobile || !formData.country_code || !formData.status) {
                 toast("Please fill in all required fields", {
                     className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                     icon: <CircleX className='size-5' />
@@ -464,6 +476,7 @@ const CheckinPage: React.FC = () => {
                     email: formData.email,
                     phone_number: formData.mobile,
                     acceptance: '1',
+                    country_code: formData.country_code,
                     first_name: getFirstName(formData.name),
                     status: formData.status,
                     last_name: getLastName(formData.name),
@@ -478,6 +491,7 @@ const CheckinPage: React.FC = () => {
                     email: formData.email,
                     phone_number: formData.mobile,
                     acceptance: '1',
+                    country_code: formData.country_code,
                     first_name: getFirstName(formData.name),
                     status: formData.status,
                     last_name: getLastName(formData.name),
@@ -495,7 +509,7 @@ const CheckinPage: React.FC = () => {
             });
 
             if (response.data.status === 200) {
-                
+
                 // Updating the lastest event attendee
                 axios.post(`${appDomain}/api/organiser/v1/event-checkin/update-last-event-attendee`, {
                     mobileNumber: payload.phone_number,
@@ -530,7 +544,7 @@ const CheckinPage: React.FC = () => {
     }
 
     return (
-        <div className='min-h-screen w-full flex items-center justify-center p-8'>
+        <div className='min-h-screen w-full flex items-center justify-center p-5'>
             <div className='max-w-md w-full flex flex-col gap-3 text-center'>
                 <h1 className='text-2xl font-semibold'>Registration for {event?.title}</h1>
                 <p>Welcome to the {event?.title}, please verify your details to check-in at this session.</p>
@@ -546,16 +560,33 @@ const CheckinPage: React.FC = () => {
                     <>
                         {steps === 1 && <div>
                             <div className='flex mt-5 gap-2 flex-col'>
-                                <Label htmlFor="mobile_number" className='font-semibold'>Mobile Number</Label>
-                                <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                    <Input
-                                        id="mobile_number"
-                                        type="tel"
-                                        name='mobile_number'
-                                        value={formData.mobile}
-                                        onChange={e => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                                        className='input !h-full min-w-full absolute text-base z-10'
-                                    />
+                                <div className='flex gap-5'>
+                                    <div className='w-40 flex flex-col gap-2'>
+                                        <Label htmlFor="country_code" className='font-semibold sm:text-sm text-xs'>Country Code <span className="text-brand-secondary">*</span></Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                id="country_code"
+                                                type="tel"
+                                                name='country_code'
+                                                value={formData.country_code}
+                                                onChange={e => setFormData(prev => ({ ...prev, country_code: e.target.value.replace(/^\+/, '') }))}
+                                                className='input !h-full min-w-full absolute text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='w-full flex flex-col gap-2'>
+                                        <Label htmlFor="mobile_number" className='font-semibold sm:text-sm text-xs'>Mobile Number <span className="text-brand-secondary">*</span></Label>
+                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                            <Input
+                                                id="mobile_number"
+                                                type="tel"
+                                                name='mobile_number'
+                                                value={formData.mobile}
+                                                onChange={e => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                                                className='input !h-full min-w-full absolute text-base z-10'
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <Button onClick={sendOTP} className="btn !h-12 w-full mt-2">
                                     Send OTP
@@ -666,7 +697,7 @@ const CheckinPage: React.FC = () => {
                                     <Label className="font-semibold" htmlFor="status">
                                         Status
                                     </Label>
-                                    <Select 
+                                    <Select
                                         value={formData.status}
                                         onValueChange={(value: string) => setFormData(prev => ({ ...prev, status: value }))}
                                     >

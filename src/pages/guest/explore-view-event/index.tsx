@@ -241,6 +241,7 @@ const ExploreViewEvent: React.FC = () => {
         last_name: '',
         email_id: '',
         phone_number: '',
+        country_code: '',
         company_name: '',
         job_title: '',
         acceptance: '1'
@@ -253,6 +254,7 @@ const ExploreViewEvent: React.FC = () => {
             last_name: '',
             phone_number: '',
             email_id: '',
+            country_code: '',
             company_name: '',
             job_title: ''
         };
@@ -271,6 +273,16 @@ const ExploreViewEvent: React.FC = () => {
             errors.last_name = 'Last name is required';
             isValid = false;
             toast("Last name is required", {
+                className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+                icon: <CircleXIcon className='size-5' />
+            });
+            return;
+        }
+        
+        if (!userAccount.country_code.trim()) {
+            errors.country_code = 'Country code is required';
+            isValid = false;
+            toast("Country Code is required", {
                 className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
                 icon: <CircleXIcon className='size-5' />
             });
@@ -964,7 +976,7 @@ const ExploreViewEvent: React.FC = () => {
                                 </div>
 
                                 {/* Email & Mobile Number */}
-                                <div className='flex gap-5 justify-between mt-5'>
+                                <div className='flex gap-5 flex-col justify-between mt-5'>
                                     <div className='flex gap-2 flex-col w-full'>
                                         <Label className='font-semibold'>Email <span className='text-orange-500'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
@@ -977,15 +989,29 @@ const ExploreViewEvent: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Mobile Number <span className='text-orange-500'>*</span></Label>
-                                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                            <Input
-                                                value={userAccount.phone_number}
-                                                onChange={handleInputChange}
-                                                name='phone_number'
-                                                className='input !h-full min-w-full absolute right-0 text-base z-10'
-                                            />
+                                    <div className='flex gap-5'>
+                                        <div className='flex gap-2 flex-col w-40'>
+                                            <Label className='font-semibold'>Country Code <span className='text-orange-500'>*</span></Label>
+                                            <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                                <Input
+                                                    value={userAccount.country_code}
+                                                    onChange={handleInputChange}
+                                                    name='country_code'
+                                                    className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className='flex gap-2 flex-col w-full'>
+                                            <Label className='font-semibold'>Mobile Number <span className='text-orange-500'>*</span></Label>
+                                            <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                                                <Input
+                                                    value={userAccount.phone_number}
+                                                    onChange={handleInputChange}
+                                                    name='phone_number'
+                                                    className='input !h-full min-w-full absolute right-0 text-base z-10'
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

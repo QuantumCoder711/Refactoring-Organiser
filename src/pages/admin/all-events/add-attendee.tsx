@@ -280,6 +280,7 @@ const AddAttendee: React.FC = () => {
         image: null as File | null,
         alternate_mobile_number: '',
         alternate_email: '',
+        country_code: '',
         company_name: '',
         job_title: '',
         award_winner: '0',
@@ -483,6 +484,7 @@ const AddAttendee: React.FC = () => {
                     phone_number: '',
                     website: '',
                     linkedin_page_link: '',
+                    country_code: '',
                     employee_size: '',
                     company_turn_over: '',
                     status: '',
@@ -660,15 +662,29 @@ const AddAttendee: React.FC = () => {
                                     onChange={handleInputChange}
                                 />
 
-                                <CustomInput
-                                    label="Phone Number"
-                                    id="phone_number"
-                                    name="phone_number"
-                                    type="tel"
-                                    value={formData.phone_number}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                                <div className="flex gap-2 items-center w-full">
+                                    <div className="w-40">
+                                        <CustomInput
+                                            label="Country Code"
+                                            id="country_code"
+                                            name="country_code"
+                                            type="tel"
+                                            value={formData.country_code}
+                                            onChange={handleInputChange}
+                                            required
+                                        />
+                                    </div>
+
+                                    <CustomInput
+                                        label="Phone Number"
+                                        id="phone_number"
+                                        name="phone_number"
+                                        type="tel"
+                                        value={formData.phone_number}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
 
                                 <CustomInput
                                     label="Alternate Phone Number"
@@ -739,6 +755,7 @@ const AddAttendee: React.FC = () => {
                                         'job_title': 'CEO',
                                         'company_name': 'Digimantra',
                                         'email': 'johndoe@example.com',
+                                        'country_code': '91',
                                         'phone_number': '8709289369',
                                         'alternate_mobile_number': '7865656575',
                                         'website': 'www.digimantra.com',
@@ -760,6 +777,7 @@ const AddAttendee: React.FC = () => {
                                         { wch: 15 }, // job_title
                                         { wch: 15 }, // company_name
                                         { wch: 25 }, // email
+                                        { wch: 15 },  // country_code
                                         { wch: 15 }, // phone_number
                                         { wch: 20 }, // alternate_mobile_number
                                         { wch: 20 }, // website
@@ -815,7 +833,7 @@ const AddAttendee: React.FC = () => {
                                                 {bulkFile.name}
                                             </span>
                                             <span className="text-xs text-gray-500 sm:text-xs">
-                                                ({ (bulkFile.size / (1024 * 1024)).toFixed(2)} MB)
+                                                ({(bulkFile.size / (1024 * 1024)).toFixed(2)} MB)
                                             </span>
                                         </div>
                                     )}

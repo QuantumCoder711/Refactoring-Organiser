@@ -275,6 +275,7 @@ const EditAttendee: React.FC = () => {
         linkedin_page_link: '',
         employee_size: '',
         company_turn_over: '',
+        country_code: '',
         status: '',
         image: null as File | string | null,
         alternate_mobile_number: '',
@@ -323,6 +324,7 @@ const EditAttendee: React.FC = () => {
                     email_id: attendee.email_id || '',
                     phone_number: attendee.phone_number || '',
                     website: attendee.website || '',
+                    country_code: attendee.country_code || '',
                     linkedin_page_link: attendee.linkedin_page_link || '',
                     employee_size: attendee.employee_size || '',
                     company_turn_over: attendee.company_turn_over || '',
@@ -619,15 +621,28 @@ const EditAttendee: React.FC = () => {
                             onChange={handleInputChange}
                         />
 
-                        <CustomInput
-                            label="Phone Number"
-                            id="phone_number"
-                            name="phone_number"
-                            type="tel"
-                            value={formData.phone_number}
-                            onChange={handleInputChange}
-                            required
-                        />
+                        <div className="flex gap-3.5 w-full">
+                            <div className="w-40">
+                            <CustomInput
+                                label="Country Code"
+                                id="country_code"
+                                name="country_code"
+                                type="tel"
+                                value={formData.country_code}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            </div>
+                            <CustomInput
+                                label="Phone Number"
+                                id="phone_number"
+                                name="phone_number"
+                                type="tel"
+                                value={formData.phone_number}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
 
                         <CustomInput
                             label="Alternate Phone Number"

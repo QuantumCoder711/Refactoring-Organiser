@@ -186,7 +186,7 @@ const Profile: React.FC = () => {
                     <p>{user?.designation_name}</p>
                     <p>{user?.company_name}</p>
                     <p className='text-brand-dark-gray'>{user?.email}</p>
-                    <p className='text-brand-dark-gray'>{user?.mobile_number}</p>
+                    <p className='text-brand-dark-gray'>{user?.country_code as string + " " + user?.mobile_number as string}</p>
                     <p className='text-brand-dark-gray'>{user?.address + " " + user?.pincode}</p>
                 </div>
 

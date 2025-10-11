@@ -144,7 +144,6 @@ const CustomComboBox = React.memo(({
         </div>
     );
 });
-
 const UpdateProfile: React.FC = () => {
     const { user, setUser, token } = useAuthStore(state => state);
     const navigate = useNavigate();
@@ -155,6 +154,7 @@ const UpdateProfile: React.FC = () => {
         last_name: user?.last_name || '',
         email: user?.email || '',
         mobile_number: user?.mobile_number || '',
+        country_code: user?.country_code || '',
         company_name: user?.company_name || '',
         designation_name: user?.designation_name || '',
         address: user?.address || '',
@@ -163,9 +163,6 @@ const UpdateProfile: React.FC = () => {
         image: user?.image || null as File | string | null,
     });
 
-    // useEffect(() => {
-    //     if (companies.length === 0 || designations.length === 0) {
-    //         getAllCompanies().then((companies) => {
     //             setCompanies(companies);
     //         });
     //         getAllJobTitles().then((designations) => {
@@ -203,6 +200,7 @@ const UpdateProfile: React.FC = () => {
             'last_name',
             'email',
             'mobile_number',
+            'country_code',
             'company_name',
             'designation_name',
             'address',
@@ -316,19 +314,38 @@ const UpdateProfile: React.FC = () => {
                     />
                 </div>
 
-                {/* Mobile Number */}
-                <div className="flex flex-col gap-2 w-full">
-                    <Label className="font-semibold" htmlFor='mobile_number'>
-                        Phone No. <span className="text-brand-secondary">*</span>
-                    </Label>
-                    <Input
-                        id="mobile_number"
-                        name='mobile_number'
-                        type="text"
-                        value={formData.mobile_number}
-                        onChange={handleInputChange}
-                        className='input !h-12 min-w-full text-base'
-                    />
+                {/* Phone Number and Country Code */}
+                <div className="flex gap-2 w-full">
+                    <div className="w-32">
+                        <div className="flex flex-col gap-2">
+                            <Label className="font-semibold" htmlFor='country_code'>
+                                Country Code <span className="text-brand-secondary">*</span>
+                            </Label>
+                            <Input
+                                id="country_code"
+                                name='country_code'
+                                type="text"
+                                value={formData.country_code}
+                                onChange={handleInputChange}
+                                className='input !h-12 text-base'
+                            />
+                        </div>
+                    </div>
+                    <div className="flex flex-1">
+                        <div className="flex flex-col w-full flex-1 gap-2">
+                            <Label className="font-semibold" htmlFor='mobile_number'>
+                                Phone Number <span className="text-brand-secondary">*</span>
+                            </Label>
+                            <Input
+                                id="mobile_number"
+                                name='mobile_number'
+                                type="text"
+                                value={formData.mobile_number}
+                                onChange={handleInputChange}
+                                className='input !min-w-full !h-12 text-base'
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Company */}

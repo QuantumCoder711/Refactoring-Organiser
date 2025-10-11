@@ -917,7 +917,7 @@ const Attendees: React.FC = () => {
                   {attendee.alternate_email || "-"}
                 </TableCell>
                 <TableCell className="text-left min-w-10">
-                  {attendee.phone_number || "-"}
+                  {`+${attendee.country_code} ${attendee.phone_number}` || "-"}
                 </TableCell>
                 <TableCell className="text-left min-w-10">
                   {attendee.alternate_mobile_number || "-"}
@@ -1080,7 +1080,7 @@ const Attendees: React.FC = () => {
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                            <p className="text-sm sm:text-base font-medium text-gray-800">{attendee.phone_number || '-'}</p>
+                            <p className="text-sm sm:text-base font-medium text-gray-800">{`+${attendee.country_code} ${attendee.phone_number}` || '-'}</p>
                           </div>
                           <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>

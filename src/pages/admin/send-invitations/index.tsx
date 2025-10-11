@@ -242,6 +242,7 @@ const SendInvitations: React.FC = () => {
                 'Alternate Email': attendee.alternate_email || '',
                 'Company': attendee.company_name || '',
                 'Job Title': attendee.job_title || '',
+                'Country Code': attendee.country_code || '',
                 'Phone': attendee.phone_number || '',
                 'Alternate Phone Number': attendee.alternate_mobile_number || '',
                 'LinkedIn URL': attendee.linkedin_url || '',
@@ -259,6 +260,7 @@ const SendInvitations: React.FC = () => {
                 { wch: 30 }, // Email
                 { wch: 25 }, // Company
                 { wch: 25 }, // Job Title
+                { wch: 15 }, // Country Code
                 { wch: 20 }, // Phone
                 { wch: 40 }, // LinkedIn URL
                 { wch: 15 }, // Status
@@ -505,6 +507,7 @@ const SendInvitations: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Alternate Email</TableHead>
+                            <TableHead className="text-left min-w-10 !px-2">Country Code</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Alternate Mobile</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
@@ -543,6 +546,7 @@ const SendInvitations: React.FC = () => {
                                 <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
                                 <TableCell>{attendee.email_id || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_email || "-"}</TableCell>
+                                <TableCell>{attendee.country_code || "-"}</TableCell>
                                 <TableCell>{attendee.phone_number || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_mobile_number || "-"}</TableCell>
                                 <TableCell className='capitalize'>{attendee.status || "Delegate"}</TableCell>

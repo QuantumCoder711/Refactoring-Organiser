@@ -21,6 +21,7 @@ export interface UserType {
     company_logo: string | null;
     designation: string;
     pincode: string;
+    country_code: string;
     address: string;
     tnc: number;
     notifications: number;
@@ -162,6 +163,7 @@ export interface AttendeeType {
     employee_size: string;
     company_turn_over: string;
     status: string;
+    country_code: string;
     created_at: string;
     updated_at: string;
     image: string | null;
@@ -305,6 +307,7 @@ export interface RequestedAttendeeType {
     follow_up: string | null;
     managed_by: string;
     remark: string | null;
+    country_code: string;
     linkedin_url: string;
     created_at: string;
     updated_at: string;
