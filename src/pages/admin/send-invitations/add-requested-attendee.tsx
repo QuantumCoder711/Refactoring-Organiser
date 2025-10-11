@@ -483,8 +483,8 @@ const AddRequestedAttendee: React.FC = () => {
                 first_name: 'John',
                 last_name: 'Doe',
                 email_id: 'john.doe@example.com',
-                phone_number: '1234567890',
                 country_code: '+1',  // Add this line
+                phone_number: '1234567890',
                 status: 'Delegate',
                 alternate_mobile_number: '9876543210',
                 alternate_email: 'john.doe2@example.com',
@@ -496,8 +496,8 @@ const AddRequestedAttendee: React.FC = () => {
                 first_name: 'Jane',
                 last_name: 'Smith',
                 email_id: 'jane.smith@example.com',
-                phone_number: '9876543210',
                 country_code: '+44',  // Add this line
+                phone_number: '9876543210',
                 status: 'Delegate',
                 alternate_mobile_number: '',
                 alternate_email: 'jane.smith2@example.com',
