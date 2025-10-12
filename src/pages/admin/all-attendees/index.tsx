@@ -129,6 +129,7 @@ const AllAttendees: React.FC = () => {
             'Company': attendee.company_name || '-',
             'Email': attendee.email_id || '-',
             'Alternate Email': attendee.alternate_email || '-',
+            'Country Code': attendee.country_code || '-',
             'Mobile': attendee.phone_number || '-',
             'Alternate Mobile': attendee.alternate_mobile_number || '-',
             'LinkedIn URL': attendee.linkedin_page_link || '-',
@@ -149,6 +150,7 @@ const AllAttendees: React.FC = () => {
             { wch: 25 },  // Company
             { wch: 30 },  // Email
             { wch: 30 },  // Alternate Email
+            { wch: 15 },  // Country Code
             { wch: 15 },  // Mobile
             { wch: 15 },  // Alternate Mobile
             { wch: 40 },  // LinkedIn URL
