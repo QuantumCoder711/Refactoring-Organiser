@@ -242,6 +242,7 @@ const SendInvitations: React.FC = () => {
                 'Alternate Email': attendee.alternate_email || '',
                 'Company': attendee.company_name || '',
                 'Job Title': attendee.job_title || '',
+                'Country Code': attendee.country_code || '',
                 'Phone': attendee.phone_number || '',
                 'Alternate Phone Number': attendee.alternate_mobile_number || '',
                 'LinkedIn URL': attendee.linkedin_url || '',
@@ -259,6 +260,7 @@ const SendInvitations: React.FC = () => {
                 { wch: 30 }, // Email
                 { wch: 25 }, // Company
                 { wch: 25 }, // Job Title
+                { wch: 15 }, // Country Code
                 { wch: 20 }, // Phone
                 { wch: 40 }, // LinkedIn URL
                 { wch: 15 }, // Status
@@ -502,6 +504,7 @@ const SendInvitations: React.FC = () => {
                             <TableHead className="text-left min-w-10 !px-2">Company</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Email</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Alternate Email</TableHead>
+                            {/* <TableHead className="text-left min-w-10 !px-2">Country Code</TableHead> */}
                             <TableHead className="text-left min-w-10 !px-2">Mobile</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Alternate Mobile</TableHead>
                             <TableHead className="text-left min-w-10 !px-2">Role</TableHead>
@@ -539,7 +542,8 @@ const SendInvitations: React.FC = () => {
                                 <TableCell className='capitalize'>{attendee.company_name || "-"}</TableCell>
                                 <TableCell>{attendee.email_id || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_email || "-"}</TableCell>
-                                <TableCell>{attendee.phone_number || "-"}</TableCell>
+                                {/* <TableCell>{attendee.country_code || "-"}</TableCell> */}
+                                <TableCell>{(attendee.country_code || " ") + " " + (attendee.phone_number || " ") || "-"}</TableCell>
                                 <TableCell>{attendee.alternate_mobile_number || "-"}</TableCell>
                                 <TableCell className='capitalize'>{attendee.status || "Delegate"}</TableCell>
                                 <TableCell className='capitalize'>{attendee.confirmed_status || "-"}</TableCell>
@@ -564,31 +568,31 @@ const SendInvitations: React.FC = () => {
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name</h3>
-                                                        <p className="text-base font-medium text-foreground">John Doe</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.first_name + " " + attendee.last_name}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Job Title</h3>
-                                                        <p className="text-base font-medium text-foreground">Software Engineer</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.job_title}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</h3>
-                                                        <p className="text-base font-medium text-foreground">john.doe@example.com</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.email_id}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Company</h3>
-                                                        <p className="text-base font-medium text-foreground">ABC Corporation</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.company_name}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Phone</h3>
-                                                        <p className="text-base font-medium text-foreground">+1 1234567890</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.country_code + " " + attendee.phone_number}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Alternate Email</h3>
-                                                        <p className="text-base font-medium text-foreground">john.doe2@example.com</p>
+                                                        <p className="text-base font-medium text-foreground">{attendee.alternate_email}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</h3>
-                                                        <p className="text-base font-medium text-foreground capitalize">Confirmed</p>
+                                                        <p className="text-base font-medium text-foreground capitalize">{attendee.status}</p>
                                                     </div>
                                                 </div>
                                             </div>

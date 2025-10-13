@@ -277,6 +277,7 @@ const EditRequestedAttendee: React.FC = () => {
         company_name: '',
         email_id: '',
         phone_number: '',
+        country_code: '',
         alternate_mobile_number: '',
         status: '',
         confirmed_status: '',
@@ -286,7 +287,7 @@ const EditRequestedAttendee: React.FC = () => {
         remark: '',
     });
 
-    useEffect(()=>{
+    useEffect(() => {
         getCompanies(formData.company_name);
         getDesignations(formData.job_title);
     }, [formData.company_name, formData.job_title]);
@@ -313,6 +314,7 @@ const EditRequestedAttendee: React.FC = () => {
                         company_name: attendee.company_name || '',
                         email_id: attendee.email_id || '',
                         phone_number: attendee.phone_number || '',
+                        country_code: attendee.country_code || '',
                         alternate_mobile_number: attendee.alternate_mobile_number || '',
                         status: attendee.status || '',
                         confirmed_status: attendee.confirmed_status || '',
@@ -452,15 +454,31 @@ const EditRequestedAttendee: React.FC = () => {
                             onChange={handleInputChange}
                             required
                         />
-                        <CustomInput
-                            label="Phone Number"
-                            id="phone_number"
-                            name="phone_number"
-                            type="tel"
-                            value={formData.phone_number}
-                            onChange={handleInputChange}
-                            required
-                        />
+                    </div>
+
+                    <div className="flex gap-2 w-full mt-3.5">
+                        <div className="w-32">
+                            <CustomInput
+                                label="Country Code"
+                                id="country_code"
+                                name="country_code"
+                                type="text"
+                                value={formData.country_code}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="w-2/3">
+                            <CustomInput
+                                label="Phone Number"
+                                id="phone_number"
+                                name="phone_number"
+                                type="tel"
+                                value={formData.phone_number}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-3.5 w-full mt-3.5">

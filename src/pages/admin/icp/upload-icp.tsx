@@ -96,25 +96,25 @@ const UploadICP: React.FC = () => {
             {
                 company_name: 'Flipkart',
                 designation: 'CTO',
-                priority: 'P1',
+                priority: 'P3',
                 country_name: "India",
-                state_name: "Banglore, Chennai",
+                state_name: "Banglore",
                 employee_size: "10000+ people"
             },
             {
-                company_name: 'Flipkart',
-                designation: 'COO',
-                priority: 'P2',
+                company_name: 'Google',
+                designation: 'CEO, Marketing Director',
+                priority: 'P1',
                 country_name: "USA",
-                state_name: "Taxas",
+                state_name: "Texas",
                 employee_size: "10000+ people"
             }
         ];
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(sampleData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Sample ICP');
-        XLSX.writeFile(wb, 'sample_icp.xlsx');
+        XLSX.utils.book_append_sheet(wb, ws, 'Sample Sheet');
+        XLSX.writeFile(wb, 'sample_sheet.xlsx');
     };
 
     if (loading) return <Wave />;

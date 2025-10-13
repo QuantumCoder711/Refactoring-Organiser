@@ -189,6 +189,7 @@ const PendingUserRequest: React.FC = () => {
             'Last Name': attendee.last_name || '',
             'Email': attendee.email_id || '',
             'Alternate Email': attendee.alternate_email || '',
+            'Country Code': attendee.country_code || '',
             'Phone': attendee.phone_number || '',
             'Alternate Phone': attendee.alternate_mobile_number || '',
             'Designation': attendee.job_title || '',
@@ -208,6 +209,7 @@ const PendingUserRequest: React.FC = () => {
             { wch: 15 }, // Last Name
             { wch: 25 }, // Email
             { wch: 25 }, // Alternate Email
+            { wch: 15 }, // Country Code
             { wch: 15 }, // Phone
             { wch: 15 }, // Alternate Phone
             { wch: 20 }, // Designation
@@ -391,7 +393,7 @@ const PendingUserRequest: React.FC = () => {
                                     {attendee.alternate_email || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
-                                    {attendee.phone_number || "-"}
+                                    {`+${attendee.country_code} ${attendee.phone_number}` || "-"}
                                 </TableCell>
                                 <TableCell className="text-left min-w-10">
                                     {attendee.alternate_mobile_number || "-"}

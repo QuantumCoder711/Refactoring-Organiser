@@ -63,7 +63,68 @@ interface SearchPeopleType {
 const cities: string[] = [
     "Mumbai", "Delhi", "Bengaluru", "Gurgaon", "Chennai", "Pune",
     "Hyderabad", "Noida", "New Delhi", "Ahmedabad", "Jaipur", "Kolkata",
-    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali"
+    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali",
+    "cairo",
+    "riyadh",
+    "jeddah",
+    "south africa",
+    "kuwait",
+    "oman",
+    "egypt",
+    "bahrain",
+    "sharjah",
+    "ajman",
+    "ras al khaimah",
+    "jordan",
+    "qatar",
+    "uae",
+    "israel",
+    "singapore",
+    "united kingdom",
+    "Australia",
+    "France",
+    "Canada",
+    "Germany",
+    "United States",
+    "malaysia",
+    "phillippines",
+    "thailand",
+    "indonesia",
+    "Vietnam",
+    "South Korea",
+    "Japan",
+    "China",
+    "Hong Kong",
+    "Taiwan",
+    "New Zealand",
+    "Nigeria",
+    "Kenya",
+    "Brazil",
+    "Mexico",
+    "Argentina",
+    "Chile",
+    "Colombia",
+    "Peru",
+    "Netherlands",
+    "Belgium",
+    "Switzerland",
+    "Austria",
+    "Sweden",
+    "Norway",
+    "Denmark",
+    "Finland",
+    "Poland",
+    "Czech Republic",
+    "Ireland",
+    "Portugal",
+    "Spain",
+    "Italy",
+    "Turkey",
+    "Russia",
+    "Ukraine",
+    "Pakistan",
+    "Lebanon",
+    "Tanzania"
 ];
 
 const SearchPeople: React.FC = () => {
@@ -259,7 +320,7 @@ const SearchPeople: React.FC = () => {
         setLoading(true);
         const response = await axios.post(`${appDomain}/api/mapping/v1/people/search-people`, {
             designation,
-            city: selectedCity
+            city: selectedCity.toLowerCase()
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -403,7 +464,7 @@ const SearchPeople: React.FC = () => {
                                     <SelectItem
                                         key={city}
                                         value={city}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer capitalize"
                                     >
                                         {city}
                                     </SelectItem>

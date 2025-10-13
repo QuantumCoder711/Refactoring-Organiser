@@ -1,191 +1,146 @@
-import React, { useRef, useState } from 'react';
-import useExtrasStore from '@/store/extrasStore';
-import useICPStore from '@/store/icpStore';
-import { useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Check, ChevronDown, CircleCheck, XIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { X, ChevronDown, Loader2, CircleCheck, XIcon, Check } from 'lucide-react';
 import { CountrySelect, StateSelect } from 'react-country-state-city';
 import 'react-country-state-city/dist/react-country-state-city.css';
-import { toast } from 'sonner';
+import useExtrasStore from '@/store/extrasStore';
+import useICPStore from '@/store/icpStore';
 import useAuthStore from '@/store/authStore';
+import { appDomain } from '@/constants';
+import axios from 'axios';
+import { toast } from 'sonner';
 import GoBack from '@/components/GoBack';
 
-// Custom Combo Box Component (enhanced to support multi-select, keeps existing styles)
-const CustomComboBox = React.memo(({
+interface Company {
+  company_name: string;
+  designation: string[];
+  priority: "P1" | "P2" | "P3" | "P4";
+  employee_size: string;
+  industry: string;
+}
+
+interface ICPData {
+  sheet_name: string;
+  country_name: string;
+  state_name: string;
+  company: Company[];
+}
+
+interface FetchedCompany {
+  _id: string;
+  company: string;
+  industry: string;
+  companySize: string;
+}
+
+// Custom Multi-Select Component
+const MultiSelectDropdown = React.memo(({
   label,
   value,
   onValueChange,
   placeholder,
   options,
   required = false,
-  isMulti = false,
   onSearch,
+  loading = false,
 }: {
   label: string;
-  value: string | string[];
-  onValueChange: (value: string | string[]) => void;
+  value: string[];
+  onValueChange: (value: string[]) => void;
   placeholder: string;
-  options: { id: number; name: string }[];
+  options: { id: number; name: string; value?: string }[];
   required?: boolean;
-  isMulti?: boolean;
   onSearch?: (term: string) => void;
+  loading?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [inputValue, setInputValue] = useState(typeof value === 'string' ? value : '');
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const selectedValues = Array.isArray(value) ? value : [];
-
-  const filteredOptions = options
-    .filter(option => option.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter(option => !isMulti || !selectedValues.some(v => v.toLowerCase() === option.name.toLowerCase()));
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    if (!isMulti) {
-      setInputValue(term);
-      onValueChange(term);
-    }
-    setSearchTerm(term);
-    setIsOpen(true);
-    setSelectedIndex(-1);
-    onSearch?.(term);
-  };
-
-  const addValue = (name: string) => {
-    if (!isMulti) {
-      setInputValue(name);
-      onValueChange(name);
-    } else {
-      const exists = selectedValues.some(v => v.toLowerCase() === name.toLowerCase());
-      if (!exists) onValueChange([...selectedValues, name]);
-    }
-    setSearchTerm('');
-    setIsOpen(false);
-    setSelectedIndex(-1);
-    inputRef.current?.blur();
-  };
-
-  const removeValue = (name: string) => {
-    if (isMulti) {
-      onValueChange(selectedValues.filter(v => v.toLowerCase() !== name.toLowerCase()));
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (isOpen) {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex(prev => (prev > 0 ? prev - 1 : prev));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
-          addValue(filteredOptions[selectedIndex].name);
-        } else if (searchTerm) {
-          addValue(searchTerm);
-        }
-      }
-    } else if (e.key === 'Enter' && searchTerm) {
-      addValue(searchTerm);
-    }
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-        setSearchTerm('');
-        setSelectedIndex(-1);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (!isMulti && typeof value === 'string') setInputValue(value);
-  }, [value, isMulti]);
-
-  useEffect(() => {
-    if (selectedIndex >= 0 && dropdownRef.current) {
-      const selectedOption = dropdownRef.current.querySelectorAll('.option')[selectedIndex] as HTMLElement;
-      selectedOption?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    if (onSearch) {
+      onSearch(term);
     }
-  }, [selectedIndex]);
+  };
+
+  const handleOptionSelect = (option: { name: string; value?: string }) => {
+    const valueToUse = option.value || option.name;
+    if (!value.includes(valueToUse)) {
+      onValueChange([...value, valueToUse]);
+    } else {
+      onValueChange(value.filter(item => item !== valueToUse));
+    }
+    setSearchTerm('');
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    onValueChange(value.filter(item => item !== tagToRemove));
+  };
+
+  const filteredOptions = options.filter(option =>
+    option.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    !value.includes(option.name)
+  );
 
   return (
-    <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
+    <div className="flex flex-col gap-2 w-full" ref={dropdownRef}>
       <Label className="font-semibold">
         {label} {required && <span className="text-secondary">*</span>}
       </Label>
+
       <div className="relative">
-
-        <div className="relative">
-          <Input
-            ref={inputRef}
-            type="text"
-            value={isMulti ? searchTerm : inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
-            placeholder={placeholder}
-            className="w-full capitalize !h-12 text-base pr-10"
-          />
-          <ChevronDown
-            className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
-            onClick={() => {
-              setIsOpen(!isOpen);
-              inputRef.current?.focus();
-            }}
-          />
-        </div>
-
-        {/* Selected tags for multi */}
-        {isMulti && selectedValues.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {selectedValues.map((val) => (
-              <Badge key={val} variant="default" className="flex items-center gap-1 px-2 py-1 rounded-full">
-                <span className="capitalize">{val}</span>
-                <button type="button" onClick={() => removeValue(val)} className="hover:text-destructive">
-                  <X className="size-3 cursor-pointer" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
+        <Input
+          type="text"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={() => setIsOpen(true)}
+          placeholder={placeholder}
+          className="w-full capitalize bg-white h-12 text-base pr-10"
+        />
+        <ChevronDown
+          className={`absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''
+            }`}
+          onClick={() => setIsOpen(!isOpen)}
+        />
 
         {isOpen && (
           <div className="absolute z-50 w-full mt-1 bg-muted/50 backdrop-blur-2xl border border-accent rounded-md shadow-lg max-h-60 overflow-y-auto">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => (
+            {loading ? (
+              <div className="p-3 text-center">
+                <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              </div>
+            ) : filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
                 <div
                   key={option.id}
-                  className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
-                  onClick={() => addValue(option.name)}
+                  className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm option`}
+                  onClick={() => handleOptionSelect(option)}
                 >
-                  <span className="capitalize">{option.name}</span>
-                  {!isMulti && typeof value === 'string' && value === option.name && (
-                    <Check className="size-4 text-secondary" />
-                  )}
+                  {option.name}
+                  {value.includes(option.value || option.name) && <Check className="size-4 text-secondary" />}
                 </div>
               ))
             ) : searchTerm ? (
               <div
                 className="px-3 py-2 cursor-pointer hover:bg-background/50 text-sm font-medium"
-                onClick={() => addValue(searchTerm)}
+                onClick={() => handleOptionSelect({ name: searchTerm })}
               >
                 {searchTerm}
               </div>
@@ -195,187 +150,300 @@ const CustomComboBox = React.memo(({
           </div>
         )}
       </div>
+
+      {/* Selected Tags */}
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {value.map((item) => (
+            <Badge key={item} variant="secondary" className="group flex items-center gap-1">
+              <span className="capitalize">{item==="10000-1000000000" ? "More than 10,000" : item}</span>
+              <button
+                onClick={() => handleRemoveTag(item)}
+                className="focus:outline-none"
+              >
+                <X className="h-3 w-3 cursor-pointer group-hover:text-red-500" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
     </div>
   );
 });
 
 const CreateICP: React.FC = () => {
-  const id = useAuthStore(state => state?.user?.id);
-  const { designations, companies, getCompanies, getDesignations } = useExtrasStore(state => state);
+  const { designations, industries, getDesignations, getIndustries } = useExtrasStore();
+  const { createICP } = useICPStore();
+  const { user } = useAuthStore();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ICPData>({
     sheet_name: '',
-    employee_size: '',
-    designation: [] as string[],
-    company_name: [] as string[],
-    state_name: '',
     country_name: '',
+    state_name: '',
+    company: [],
   });
+
+  const [formFields, setFormFields] = useState({
+    designations: [] as string[],
+    employeeSizes: [] as string[],
+    industries: [] as string[],
+    priority: 'P4' as 'P1' | 'P2' | 'P3' | 'P4',
+  });
+
   const [countryId, setCountryId] = useState<string | number | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const employeeOptions = [
-    '0-10',
-    '10-50',
-    '50-100',
-    '100-500',
-    '500-1000',
-    '1000-5000',
-    '5000-10000',
-    'more than 10,000',
+    { display: '0-10', value: '0-10' },
+    { display: '10-50', value: '10-50' },
+    { display: '50-100', value: '50-100' },
+    { display: '100-500', value: '100-500' },
+    { display: '500-1000', value: '500-1000' },
+    { display: '1000-5000', value: '1000-5000' },
+    { display: '5000-10000', value: '5000-10000' },
+    { display: 'More than 10, 000', value: '10000-1000000000' }
   ];
-  const [rowPriorities, setRowPriorities] = useState<Record<string, 'P1' | 'P2' | 'P3' | 'P4'>>({});
-  useEffect(() => {
-    setRowPriorities(prev => {
-      const next: Record<string, 'P1' | 'P2' | 'P3' | 'P4'> = {};
-      formData.company_name.forEach(name => {
-        next[name] = prev[name] ?? 'P4';
-      });
-      return next;
-    });
-  }, [formData.company_name]);
 
   useEffect(() => {
-    getCompanies();
-    getDesignations();
+    getDesignations('');
+    getIndustries('');
   }, []);
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    console.log(name, value);
+  const handleFieldChange = (field: keyof typeof formFields, value: any) => {
+    setFormFields(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleCreateSheet = async () => {
-    // Validation: all fields mandatory
-    const isValid = Boolean(
-      formData.sheet_name.trim() &&
-      formData.employee_size &&
-      formData.designation.length > 0 &&
-      formData.company_name.length > 0 &&
-      formData.country_name.trim() &&
-      formData.state_name.trim()
-    );
+  const handleDesignationSearch = async (term: string) => {
+    await getDesignations(term);
+  };
 
-    if (!isValid) {
-      console.warn('Please fill all required fields before proceeding.');
+  const handleIndustrySearch = async (term: string) => {
+    await getIndustries(term);
+  };
+
+
+
+  const generateICPData = async () => {
+    if (!formData.sheet_name.trim()) {
+      toast.error('Please enter a sheet name');
       return;
     }
 
-    const payload = {
-      sheet_name: formData.sheet_name.trim(),
-      employee_size: formData.employee_size.trim(),
-      designation: formData.designation.map(d => d.trim()).filter(Boolean),
-      company_name: formData.company_name.map(c => c.trim()).filter(Boolean),
-      state_name: formData.state_name.trim(),
-      country_name: formData.country_name.trim(),
-      priority: formData.company_name.map(company => rowPriorities[company] ?? 'P4'),
-      user_id: id
-    };
+    if (!formData.country_name.trim()) {
+      toast.error('Please select a country');
+      return;
+    }
+
+    if (formFields.designations.length === 0) {
+      toast.error('Please select at least one job title');
+      return;
+    }
+
+    if (formFields.industries.length === 0) {
+      toast.error('Please select at least one industry');
+      return;
+    }
+
+    if (formFields.employeeSizes.length === 0) {
+      toast.error('Please select at least one employee size');
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const { success, message } = await useICPStore.getState().createICP(payload);
-      console.log(success, message);
-      if (success) {
-        toast.success(message || "ICP added successfully", {
-          className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
-          icon: <CircleCheck className='size-5' />
-        });
-      } else {
-        toast.error(message || "Error creating ICP", {
+      // First, fetch companies based on selected criteria
+      const response = await axios.post(
+        `${appDomain}/api/mapping/v1/company-master/get-companies-by-industry-and-size`,
+        {
+          industries: formFields.industries,
+          employeeSize: formFields.employeeSizes,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.data.status || !response.data.data || response.data.data.length === 0) {
+        toast('No companies found for the selected criteria', {
           className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
           icon: <XIcon className='size-5' />
         });
+        setLoading(false);
+        return;
       }
+
+      const companies = response.data.data;
+
+      // Generate ICP Data
+      const icpData = {
+        sheet_name: formData.sheet_name.trim(),
+        country_name: formData.country_name,
+        state_name: formData.state_name || '',
+        company: companies.map((company: FetchedCompany) => ({
+          company_name: company.company,
+          designation: formFields.designations,
+          priority: formFields.priority,
+          employee_size: company.companySize,
+          industry: company.industry,
+        })),
+        preferences: {
+          employee_size: formFields.employeeSizes,
+          industry: formFields.industries,
+          designation: formFields.designations,
+          country: formData.country_name,
+          state: formData.state_name || ''
+        }
+      };
+
+      // toast(`ICP data generated successfully with ${icpData.company.length} companies!`, {
+      //   className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+      //   icon: <CircleCheck className='size-5' />
+      // });
+
+      const data = {
+        ...icpData,
+        user_id: user?.id as number,
+      }
+
+      if (data) {
+        const result = await createICP(data);
+        if (result.success) {
+          // Reset form after successful save
+          toast(result.message || "ICP data saved successfully!", {
+            className: "!bg-green-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+            icon: <CircleCheck className='size-5' />
+          });
+          setFormData({
+            sheet_name: '',
+            country_name: '',
+            state_name: '',
+            company: [],
+          });
+          setFormFields({
+            designations: [],
+            employeeSizes: [],
+            industries: [],
+            priority: 'P4',
+          });
+          setCountryId(null);
+        } else {
+          toast(result.message || "Something Went Wrong", {
+            className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+            icon: <XIcon className='size-5' />
+          });
+        }
+      }
+
     } catch (error) {
-      toast.error("Failed to create ICP", {
-        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2"
+      console.error('Error generating ICP data:', error);
+      toast("Failed to generate ICP data", {
+        className: "!bg-red-800 !text-white !font-sans !font-regular tracking-wider flex items-center gap-2",
+        icon: <XIcon className='size-5' />
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isFormComplete = Boolean(
+  const isFormValid = Boolean(
     formData.sheet_name.trim() &&
-    formData.employee_size &&
-    formData.designation.length > 0 &&
-    formData.company_name.length > 0 &&
     formData.country_name.trim() &&
-    formData.state_name.trim()
+    formFields.designations.length > 0 &&
+    formFields.industries.length > 0 &&
+    formFields.employeeSizes.length > 0
   );
 
   return (
-    <div className="w-full">
-      <div className='flex items-center gap-3 mb-6'>
-        <GoBack />
-        <h1 className='text-xl font-semibold'>Create ICP</h1>
-      </div>
+    <div>
+      <GoBack />
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create ICP</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Sheet Name */}
+            <div className="flex flex-col gap-2">
+              <Label className="font-semibold">Sheet Name <span className="text-secondary">*</span></Label>
+              <Input
+                value={formData.sheet_name}
+                onChange={(e) => setFormData(prev => ({ ...prev, sheet_name: e.target.value }))}
+                placeholder="Enter sheet name"
+                className="!h-12 text-base"
+              />
+            </div>
 
-      <Card className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Sheet Name */}
-          <div className="flex flex-col gap-2">
-            <Label className="font-semibold">Sheet Name <span className="text-secondary">*</span></Label>
-            <Input
-              name="sheet_name"
-              value={formData.sheet_name}
-              onChange={handleChange}
-              placeholder="Enter sheet name"
-              className="!h-12 text-base"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Job Title */}
+              <MultiSelectDropdown
+                label="Job Title"
+                value={formFields.designations}
+                onValueChange={(val) => handleFieldChange('designations', val)}
+                placeholder="Type or select job titles"
+                options={designations.map((d, idx) => ({ id: idx + 1, name: d.designation }))}
+                onSearch={handleDesignationSearch}
+                required
+              />
 
-          {/* Employee Size (single select) */}
-          <div className="flex flex-col gap-2 w-full">
-            <Label className="font-semibold">Employee Size <span className="text-secondary">*</span></Label>
-            <Select value={formData.employee_size} onValueChange={(v) => setFormData(prev => ({ ...prev, employee_size: v }))}>
-              <SelectTrigger className="input !h-12 text-base cursor-pointer min-w-full">
-                <SelectValue placeholder="Select employee size" />
-              </SelectTrigger>
-              <SelectContent>
-                {employeeOptions.map(opt => (
-                  <SelectItem key={opt} value={opt} className="cursor-pointer">{opt}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              {/* Employee Size */}
+              <MultiSelectDropdown
+                label="Employee Size"
+                value={formFields.employeeSizes}
+                onValueChange={(val) => handleFieldChange('employeeSizes', val)}
+                placeholder="Select employee sizes"
+                options={employeeOptions.map((size, idx) => ({ id: idx + 1, name: size.display, value: size.value }))}
+                required
+              />
 
-          {/* Designations (CustomComboBox multi) */}
-          <CustomComboBox
-            label="Job Title"
-            isMulti
-            value={formData.designation}
-            onValueChange={(val) => setFormData(prev => ({ ...prev, designation: Array.isArray(val) ? val : (val ? [val] : []) }))}
-            placeholder="Type or select job title"
-            options={designations.map((d, index) => ({ id: index + 1, name: d.designation }))}
-            onSearch={(term) => getDesignations(term)}
-            required
-          />
+              {/* Industry */}
+              <MultiSelectDropdown
+                label="Industry"
+                value={formFields.industries}
+                onValueChange={(val) => handleFieldChange('industries', val)}
+                placeholder="Type or select industries"
+                options={industries.map((i, idx) => ({ id: idx + 1, name: String(i) }))}
+                onSearch={handleIndustrySearch}
+                required
+              />
 
-          {/* Company Names (CustomComboBox multi) */}
-          <CustomComboBox
-            label="Company Name"
-            isMulti
-            value={formData.company_name}
-            onValueChange={(val) => setFormData(prev => ({ ...prev, company_name: Array.isArray(val) ? val : (val ? [val] : []) }))}
-            placeholder="Type or select company"
-            options={companies.map((c, index) => ({ id: index + 1, name: c.company }))}
-            onSearch={(term) => getCompanies(term)}
-            required
-          />
+              {/* Priority */}
+              <div hidden className="flex flex-col gap-2">
+                <Label className="font-semibold w-full">
+                  Priority <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={formFields.priority}
+                  onValueChange={(val) => handleFieldChange('priority', val as 'P1' | 'P2' | 'P3' | 'P4')}
+                >
+                  <SelectTrigger className="!h-12 w-full">
+                    <SelectValue placeholder="Select priority" className='h-12' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {['P1', 'P2', 'P3', 'P4'].map(p => (
+                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          {/* Country */}
-          <div className="flex flex-col gap-2">
-            <Label className="font-semibold">Country <span className="text-secondary">*</span></Label>
-            <CountrySelect
-              placeHolder="Select Country"
-              onChange={(val: any) => {
-                setCountryId(val?.id ?? null);
-                setFormData(prev => ({
-                  ...prev,
-                  country_name: val?.name || '',
-                  state_name: '',
-                }));
-              }}
-              inputClassName="
+              {/* Country */}
+              <div className="flex flex-col gap-2">
+                <Label className="font-semibold">Country <span className="text-secondary">*</span></Label>
+                <div className="relative">
+                  <CountrySelect
+                    placeHolder="Select Country"
+                    onChange={(val: any) => {
+                      setCountryId(val?.id ?? null);
+                      setFormData(prev => ({
+                        ...prev,
+                        country_name: val?.name || '',
+                        state_name: ''
+                      }));
+                    }}
+                    inputClassName="
     w-full h-12 px-4 text-base
     !bg-background
     rounded-md
@@ -386,20 +454,19 @@ const CreateICP: React.FC = () => {
     dark:bg-popover dark:text-popover-foreground
   "
               containerClassName="w-full"
-            />
-          </div>
+                  />
+                </div>
+              </div>
 
-          {/* State */}
-          <div className="flex flex-col gap-2">
-            <Label className="font-semibold">State <span className="text-secondary">*</span></Label>
-            <StateSelect
-              countryid={countryId as any}
-              placeHolder={countryId ? 'Select State' : 'Select country first'}
-              onChange={(val: any) =>
-                setFormData(prev => ({ ...prev, state_name: val?.name || '' }))
-              }
-              disabled={!countryId}
-              inputClassName="
+              {/* State */}
+              <div className="flex flex-col gap-2">
+                <Label className="font-semibold">State</Label>
+                <div className="relative">
+                  <StateSelect
+                    countryid={countryId as any}
+                    placeHolder={countryId ? 'Select State' : 'Select country first'}
+                    onChange={(val: any) => setFormData(prev => ({ ...prev, state_name: val?.name || '' }))}
+                    inputClassName="
     w-full h-12 px-4 text-base
     bg-background
     rounded-md
@@ -411,62 +478,33 @@ const CreateICP: React.FC = () => {
     dark:bg-popover dark:text-popover-foreground
   "
               containerClassName="w-full"
-            />
-          </div>
-        </div>
-
-        {isFormComplete && (
-          <div className="pt-2">
-            <div className="overflow-x-auto rounded-md border bg-white">
-              <table className="min-w-full text-sm">
-                <thead className="bg-gray-50 text-gray-700">
-                  <tr>
-                    <th className="text-left px-4 py-3 font-semibold">Company Name</th>
-                    <th className="text-left px-4 py-3 font-semibold">Designations</th>
-                    <th className="text-left px-4 py-3 font-semibold">Country</th>
-                    <th className="text-left px-4 py-3 font-semibold">State</th>
-                    <th className="text-left px-4 py-3 font-semibold">Employee Size</th>
-                    <th className="text-left px-4 py-3 font-semibold">Priority</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formData.company_name.map((company) => (
-                    <tr key={company} className="border-t">
-                      <td className="px-4 py-3 capitalize">{company}</td>
-                      <td className="px-4 py-3 capitalize">{formData.designation.join(', ')}</td>
-                      <td className="px-4 py-3 capitalize">{formData.country_name}</td>
-                      <td className="px-4 py-3 capitalize">{formData.state_name}</td>
-                      <td className="px-4 py-3">{formData.employee_size}</td>
-                      <td className="px-4 py-3">
-                        <Select
-                          value={rowPriorities[company] ?? 'P4'}
-                          onValueChange={(v) => setRowPriorities(prev => ({ ...prev, [company]: v as 'P1' | 'P2' | 'P3' | 'P4' }))}
-                        >
-                          <SelectTrigger className="input !h-9 text-sm w-28">
-                            <SelectValue placeholder="P4" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {['P1', 'P2', 'P3', 'P4'].map(p => (
-                              <SelectItem key={p} value={p} className="cursor-pointer">{p}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                    disabled={!countryId}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        )}
 
-        <div className="pt-4 flex justify-end">
-          <Button onClick={handleCreateSheet} disabled={!isFormComplete} className="px-6 btn">Create ICP</Button>
-        </div>
-      </Card>
-    </div>
+            {/* Generate ICP Button */}
+            <div className="flex justify-end">
+              <Button
+                onClick={generateICPData}
+                disabled={!isFormValid || loading}
+                className="w-full md:w-auto btn"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving ICP Data...
+                  </>
+                ) : (
+                  'Save ICP'
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div></div>
   );
-
-}
+};
 
 export default CreateICP;

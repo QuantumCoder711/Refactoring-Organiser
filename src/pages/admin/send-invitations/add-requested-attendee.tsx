@@ -269,6 +269,7 @@ const AddRequestedAttendee: React.FC = () => {
         last_name: '',
         email_id: '',
         phone_number: '',
+        country_code: '',  // Add this line
         linkedin_url: '',
         status: '',
         alternate_mobile_number: '',
@@ -415,10 +416,11 @@ const AddRequestedAttendee: React.FC = () => {
         }
 
         // Define required fields
-        const requiredFields = ['first_name', 'last_name', 'email_id', 'company_name', 'status', 'job_title', 'phone_number'];
+        const requiredFields = ['first_name', 'last_name', 'email_id', 'company_name', 'status', 'job_title', 'phone_number', 'country_code'];
 
         // Validate the form
         if (!validateForm(formData, requiredFields)) {
+            setIsLoading(false);
             return;
         }
 
@@ -445,6 +447,7 @@ const AddRequestedAttendee: React.FC = () => {
                     last_name: '',
                     email_id: '',
                     phone_number: '',
+                    country_code: '+1',  // Add this line
                     linkedin_url: '',
                     status: '',
                     alternate_mobile_number: '',
@@ -480,6 +483,7 @@ const AddRequestedAttendee: React.FC = () => {
                 first_name: 'John',
                 last_name: 'Doe',
                 email_id: 'john.doe@example.com',
+                country_code: '+1',  // Add this line
                 phone_number: '1234567890',
                 status: 'Delegate',
                 alternate_mobile_number: '9876543210',
@@ -492,6 +496,7 @@ const AddRequestedAttendee: React.FC = () => {
                 first_name: 'Jane',
                 last_name: 'Smith',
                 email_id: 'jane.smith@example.com',
+                country_code: '+44',  // Add this line
                 phone_number: '9876543210',
                 status: 'Delegate',
                 alternate_mobile_number: '',
@@ -602,15 +607,30 @@ const AddRequestedAttendee: React.FC = () => {
                                 </div>
 
                                 <div className="flex flex-col gap-3.5 w-full">
-                                    <CustomInput
-                                        label="Phone Number"
-                                        id="phone_number"
-                                        name="phone_number"
-                                        type="tel"
-                                        value={formData.phone_number}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
+                                    <div className="flex gap-2 w-full">
+                                        <div className="w-32">
+                                        <CustomInput
+                                                label="Country Code"
+                                                id="country_code"
+                                                name="country_code"
+                                                type="text"
+                                                value={formData.country_code}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="w-2/3">
+                                            <CustomInput
+                                                label="Phone Number"
+                                                id="phone_number"
+                                                name="phone_number"
+                                                type="tel"
+                                                value={formData.phone_number}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
 
                                     <CustomInput
                                         label="Alternate Phone Number"

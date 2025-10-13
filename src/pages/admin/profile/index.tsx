@@ -195,7 +195,7 @@ const Profile: React.FC = () => {
                     <p className='text-sm sm:text-base'>{user?.designation_name}</p>
                     <p className='text-sm sm:text-base'>{user?.company_name}</p>
                     <p className='text-brand-dark-gray text-sm sm:text-base'>{user?.email}</p>
-                    <p className='text-brand-dark-gray text-sm sm:text-base'>{user?.mobile_number}</p>
+                    <p className='text-brand-dark-gray text-sm sm:text-base'>{user?.country_code as string + " " + user?.mobile_number as string}</p>
                     <p className='text-brand-dark-gray text-sm sm:text-base break-words'>
                         {user?.address + " " + user?.pincode}
                     </p>

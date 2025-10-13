@@ -217,6 +217,7 @@ const Attendees: React.FC = () => {
       { header: 'Company', key: 'company', width: 40 },
       { header: 'Email', key: 'email', width: 40 },
       { header: 'Alternate Email', key: 'alternateEmail', width: 40 },
+      { header: 'Country Code', key: 'country_code', width: 25 },
       { header: 'Mobile', key: 'mobile', width: 40 },
       { header: 'Alternate Mobile', key: 'alternateMobile', width: 40 },
       { header: 'Role', key: 'role', width: 10 },
@@ -245,6 +246,7 @@ const Attendees: React.FC = () => {
         company: attendee.company_name || '-',
         email: attendee.email_id || '-',
         alternateEmail: attendee.alternate_email || '-',
+        country_code: attendee.country_code || '-',
         mobile: attendee.phone_number || '-',
         alternateMobile: attendee.alternate_mobile_number || '-',
         role: attendee.status || '-',
@@ -919,7 +921,7 @@ const Attendees: React.FC = () => {
                     {attendee.alternate_email || "-"}
                   </TableCell>
                   <TableCell className="text-left min-w-10">
-                    {attendee.phone_number || "-"}
+                    {`+${attendee.country_code} ${attendee.phone_number}` || "-"}
                   </TableCell>
                   <TableCell className="text-left min-w-10">
                     {attendee.alternate_mobile_number || "-"}
@@ -1082,7 +1084,7 @@ const Attendees: React.FC = () => {
                             </div>
                             <div className="space-y-1">
                               <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Phone</h3>
-                              <p className="text-sm sm:text-base font-medium text-foreground">{attendee.phone_number || '-'}</p>
+                              <p className="text-sm sm:text-base font-medium text-foreground">{`+${attendee.country_code} ${attendee.phone_number}` || '-'}</p>
                             </div>
                             <div className="space-y-1">
                               <h3 className="text-xs font-semibold text-foreground/30 uppercase tracking-wider">Alternate Email</h3>
