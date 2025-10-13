@@ -150,8 +150,8 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({
         <div 
           className="w-full mx-auto overflow-hidden rounded flex flex-col justify-between flex-1"
           style={{
-            backgroundColor: colors?.backgroundColor || 'white',
-            color: colors?.textColor || 'inherit'
+            backgroundColor: colors?.backgroundColor || "var(--background)",
+            color: colors?.textColor || "var(--foreground)"
           }}
         >
           {image ? (
@@ -202,8 +202,8 @@ const PrintBadge: React.FC<PrintBadgeProps> = ({
         <div 
           className="w-full rotate-x-180 rotate-y-180 mx-auto overflow-hidden rounded hidden print:flex flex-col justify-between flex-1"
           style={{
-            backgroundColor: colors?.backgroundColor || 'white',
-            color: colors?.textColor || 'inherit'
+            backgroundColor: colors?.backgroundColor || "var(--background)",
+            color: colors?.textColor || "var(--foreground)"
           }}
         >
           {image ? (
