@@ -22,6 +22,19 @@ const Sidebar: React.FC = () => {
         if (item.label === "ICP" && user?.feature_permission?.icp === 0) {
             return false;
         }
+        
+        if(item.label === "ICP" && user?.role !== "admin") {
+            return false;
+        }
+        if(item.label === "Vendors" && user?.role !== "admin") {
+            return false;
+        }
+        if(item.label === "Event Sponsors" && user?.role !== "admin") {
+            return false;
+        }
+        if(item.label === "All Attendees" && user?.role !== "admin") {
+            return false;
+        }
         return true;
     });
 

@@ -183,10 +183,10 @@ const App: React.FC = () => {
         <Route path="organiser/change-password" element={<ChangePassword />} />
         <Route path="all-events" element={<AllEvents />} />
         {user?.role === "admin" && <Route path="add-event" element={<AddEvent />} />}
-        <Route path="all-attendees" element={<AllAttendees />} />
+        {user?.role === "admin" && <Route path="all-attendees" element={<AllAttendees />} />}
         <Route path="all-photos" element={<AllPhotos />} />
         <Route path="all-reports" element={<AllReports />} />
-        {hasFeatureAccess('icp') && (
+        {hasFeatureAccess('icp') && user?.role === "admin" && (
           <>
             <Route path="icp" element={<ICP />} />
             <Route path="icp/create" element={<CreateICP />} />
@@ -209,15 +209,15 @@ const App: React.FC = () => {
 
         {/* {hasFeatureAccess('vendor') && (
         )} */}
-        <Route path="event-sponsors">
+        {user?.role === "admin" && <Route path="event-sponsors">
           <Route index element={<EventSponsors />} />
           <Route path=":slug" element={<ViewEventSponsors />} />
           <Route path=":slug/sponsor-details/:id" element={<ViewEventSponsorDetails />} />
           <Route path=":slug/update-sponsor/:id" element={<UpdateSponsor />} />
           <Route path="add-sponsor/:slug" element={<AddSponsor />} />
-        </Route>
+        </Route>}
 
-        {hasFeatureAccess('vendor') && (
+        {hasFeatureAccess('vendor') && user?.role === "admin" && (
           <Route path='vendors'>
             <Route index element={<Vendors />} />
             <Route path="audience-acquisition" element={<AudienceAcquisition />} />
