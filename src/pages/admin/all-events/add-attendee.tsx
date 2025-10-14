@@ -720,7 +720,6 @@ const AddAttendee: React.FC = () => {
                                     placeholder="Select Status"
                                     options={[
                                         ...roles.map(status => ({ value: status, label: status })),
-                                        { value: 'others', label: 'Others' }
                                     ]}
                                     required
                                 />
