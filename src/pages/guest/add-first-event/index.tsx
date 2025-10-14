@@ -113,7 +113,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -147,13 +147,13 @@ const CustomComboBox = React.memo(({
                                 >
                                     <span className='capitalize'>{option.name}</span>
                                     {inputValue === option.name && (
-                                        <span className="size-4 text-brand-secondary">✔</span>
+                                        <span className="size-4 text-secondary">✔</span>
                                     )}
                                 </div>
                             ))
                         ) : searchTerm ? (
                             <div
-                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-brand-secondary text-sm font-medium"
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-50 text-secondary text-sm font-medium"
                                 onClick={handleCreateNew}
                             >
                                 Create "{searchTerm}"
@@ -794,9 +794,9 @@ const AddFirstEvent: React.FC = () => {
                 <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
                 <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
             </Helmet>
-            <div className='min-h-full min-w-full'>
+            <div className='min-h-full min-w-full p-3'>
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent className='bg-brand-light'>
+                    <DialogContent className='bg-muted'>
                         <DialogHeader>
                             <DialogTitle className='text-center text-2xl'>Create Account</DialogTitle>
 
@@ -962,315 +962,304 @@ const AddFirstEvent: React.FC = () => {
                     </DialogContent>
                 </Dialog>
 
-                <div className=''>
-                    <div className='max-w-[700px] mx-auto rounded-[10px] p-8 bg-brand-background'>
-                        <div className="flex flex-col gap-2 w-full">
-                            <Label className="font-semibold" htmlFor='title'>
-                                Event Name <span className="text-brand-secondary">*</span>
-                            </Label>
-                            <Input
-                                id="title"
-                                name='title'
-                                type="text"
-                                value={formData.title}
-                                onChange={handleInputChangeEventForm}
-                                className='input !h-12 min-w-full text-base'
-                            />
-                        </div>
+                <div className='max-w-[700px] rounded-[10px] !mx-auto p-5 lg:p-8 bg-muted mt-5'>
+                    {/* Event Name */}
+                    <div className="flex flex-col gap-2 w-full">
+                        <Label className="font-semibold" htmlFor='title'>
+                            Event Name <span className="text-secondary">*</span>
+                        </Label>
+                        <Input
+                            id="title"
+                            name='title'
+                            type="text"
+                            value={formData.title}
+                            onChange={handleInputChangeEventForm}
+                            className='h-12 min-w-full'
+                        />
+                    </div>
 
-                        <div className='flex gap-7 mt-5 items-center'>
-                            <div className='flex flex-col w-full gap-5'>
-                                <div className="flex flex-col gap-2 w-full">
-                                    <Label className="font-semibold" htmlFor='paid_event'>
-                                        Event Type <span className="text-brand-secondary">*</span>
-                                    </Label>
-                                    <div className='input !h-12 min-w-full flex items-center text-base pl-4 !py-1.5'>
-                                        <div className='flex gap-4 items-center text-brand-dark-gray'>
-                                            <Label htmlFor="paid_event" className='cursor-pointer'>Free</Label>
+                    {/* Event Type, Image, and Choose Banner Image Button */}
+                    <div className='flex sm:flex-row flex-col gap-7 mt-5 items-center'>
+                        <div className='flex flex-col w-full gap-5'>
+                            {/* Event Type */}
+                            <div className="flex flex-col gap-2 w-full">
+                                <Label className="font-semibold" htmlFor='paid_event'>
+                                    Event Type <span className="text-secondary">*</span>
+                                </Label>
+                                <div className='input !h-12 min-w-full flex items-center text-base !bg-background/50 rounded-md pl-4 !py-1.5'>
+                                    <div className='flex gap-4 items-center text-muted-foreground'>
+                                        <Label htmlFor="paid_event" className='cursor-pointer'>Free</Label>
 
-                                            <Switch
-                                                id="paid_event"
-                                                checked={formData.paid_event === 1}
-                                                onCheckedChange={(checked) => handleSwitchChange(checked, 'paid_event')}
-                                                className="data-[state=checked]:bg-brand-primary"
-                                            />
-
-                                            <Label htmlFor="paid_event" className='cursor-pointer'>Paid</Label>
-
-                                        </div>
-                                        {formData.paid_event === 1 && <div className='flex flex-1 border-l border-brand-dark-gray !ml-4'>
-                                            <div className='relative w-full'>
-                                                <Input
-                                                    id='event_fee'
-                                                    name='event_fee'
-                                                    type='number'
-                                                    value={formData.event_fee}
-                                                    placeholder='Event Fee'
-                                                    onChange={handleInputChangeEventForm}
-                                                    className='input !h-11 focus-visible:!ring-0 focus-visible:!ring-offset-0 w-full text-base'
-                                                />
-                                            </div>
-                                        </div>}
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col gap-2">
-                                    <Label className="font-semibold" htmlFor="image">Banner <span className='text-brand-secondary'>*</span></Label>
-                                    <div className={`input relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
-                                        <span className="w-full bg-brand-background px-2 h-[34px] rounded-md text-base font-normal flex items-center">Choose File</span>
-                                        <p className="w-full text-nowrap overflow-hidden text-ellipsis">
-                                            {formData.image
-                                                ? formData.image instanceof File
-                                                    ? (formData.image as File).name
-                                                    : typeof formData.image === 'string'
-                                                        ? "Template selected"
-                                                        : "No file Chosen"
-                                                : "No file Chosen"
-                                            }
-                                        </p>
-                                        <Input
-                                            id="image"
-                                            name="image"
-                                            type='file'
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            disabled={showTemplates}
-                                            className='input absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
+                                        <Switch
+                                            id="paid_event"
+                                            checked={formData.paid_event === 1}
+                                            onCheckedChange={(checked) => handleSwitchChange(checked, 'paid_event')}
+                                            
                                         />
+
+                                        <Label htmlFor="paid_event" className='cursor-pointer'>Paid</Label>
+
                                     </div>
+                                    {formData.paid_event === 1 && <div className='flex flex-1 border-l border-brand-dark-gray !ml-4'>
+                                        <div className='relative w-full'>
+                                            <Input
+                                                id='event_fee'
+                                                name='event_fee'
+                                                type='number'
+                                                value={formData.event_fee}
+                                                placeholder='Event Fee'
+                                                onChange={handleInputChangeEventForm}
+                                                className='h-12 border-l-0 rounded-l-none'
+                                            />
+                                        </div>
+                                    </div>}
                                 </div>
-
-                                <p className='font-semibold text-center -my-4'>Or</p>
-
-                                <button
-                                    onClick={toggleTemplates}
-                                    type="button"
-                                    className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'
-                                >
-                                    {showTemplates ? 'Hide Templates' : 'Create Event Banner'}
-                                </button>
                             </div>
 
-                            <div ref={imageRef} className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
-                                {formData.event_start_date && showTemplates && <p
-                                    style={{ color: textConfig.color }}
-                                    className='absolute top-0 w-11/12 bg-white/10 backdrop-blur-3xl mx-auto right-0 left-0 text-center p-1 rounded-b-full'>{beautifyDate(new Date(formData.event_start_date))}
-                                </p>}
+                            {/* Banner Image - Disabled when templates are showing */}
+                            <div className="flex flex-col gap-2">
+                                <Label className="font-semibold" htmlFor="image">Banner <span className='text-secondary'>*</span></Label>
+                                <div className={`!bg-background/50 rounded-md relative overflow-hidden !h-12 min-w-full text-base ${showTemplates ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex items-center justify-between p-2 gap-4`}>
+                                    <span className="w-full bg-muted px-2 h-9 rounded-md text-base font-normal flex items-center">Choose File</span>
+                                    <p className="w-full text-nowrap overflow-hidden text-ellipsis">
+                                        {formData.image
+                                            ? formData.image instanceof File
+                                                ? (formData.image as File).name
+                                                : typeof formData.image === 'string'
+                                                    ? "Template selected"
+                                                    : "No file Chosen"
+                                            : "No file Chosen"
+                                        }
+                                    </p>
+                                    <Input
+                                        id="image"
+                                        name="image"
+                                        type='file'
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        disabled={showTemplates}
+                                        className='input absolute left-0 top-0 opacity-0 !h-12 min-w-full text-base cursor-pointer'
+                                    />
+                                </div>
+                            </div>
 
-                                {showTemplates && <h3
-                                    style={{ fontSize: textConfig.size + 'px', color: textConfig.color }}
-                                    className='text-center w-11/12 text-xl leading-[1] font-semibold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>{formData.title}</h3>}
+                            <p className='font-semibold text-center'>Or</p>
+
+                            {/* Toggle Template Button */}
+                            <Button
+                                onClick={toggleTemplates}
+                                type="button"
+                                className='btn !h-12 !w-full !rounded-[10px] !font-semibold !text-base'
+                            >
+                                {showTemplates ? 'Hide Templates' : 'Create Event Banner'}
+                            </Button>
+                        </div>
+
+                        {/* Image Preview */}
+                        <div ref={imageRef} className='h-[237px] max-w-[237px] w-full rounded-[10px] relative'>
+                            {formData.event_start_date && showTemplates && <p
+                                style={{ color: textConfig.color }}
+                                className='absolute top-0 w-11/12 bg-white/10 backdrop-blur-3xl mx-auto right-0 left-0 text-center p-1 rounded-b-full'>{beautifyDate(new Date(formData.event_start_date))}
+                            </p>}
+
+                            {showTemplates && <h3
+                                style={{ fontSize: textConfig.size + 'px', color: textConfig.color }}
+                                className='text-center w-11/12 text-xl leading-[1] font-semibold absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>{formData.title}</h3>}
+                            <img
+                                src={
+                                    formData.image instanceof File
+                                        ? URL.createObjectURL(formData.image)
+                                        : typeof formData.image === 'string' && formData.image
+                                            ? formData.image
+                                            : UserAvatar
+                                }
+                                className='h-full w-full object-cover bg-brand-light-gray rounded-[10px]'
+                            />
+                        </div>
+                    </div>
+
+                    {/* Template Images Section */}
+                    {showTemplates && (
+                        <div className='flex justify-between gap-3 mt-5 w-full overflow-x-scroll'>
+                            {templates.map((template, index) => (
                                 <img
-                                    src={
-                                        formData.image instanceof File
-                                            ? URL.createObjectURL(formData.image)
-                                            : typeof formData.image === 'string' && formData.image
-                                                ? formData.image
-                                                : UserAvatar
-                                    }
-                                    className='h-full w-full object-cover bg-brand-light-gray rounded-[10px]'
+                                    onClick={() => handleTemplateSelect(template)}
+                                    key={index}
+                                    src={template}
+                                    alt={`template ${index + 1}`}
+                                    width={100}
+                                    height={100}
+                                    className={`size-24 object-cover rounded-[10px] cursor-pointer hover:border-2 hover:border-primary transition-all ${selectedTemplate === template ? 'border-2 border-primary' : ''}`}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Text Size and Color for Templates */}
+                    {showTemplates && (
+                        <div className='flex !flex-col sm:!flex-row w-full sm:justify-between sm:items-center mt-[26px] gap-4 sm:gap-9'>
+                            <div className='flex gap-[18px] w-full items-center'>
+                                <Label className='font-semibold text-nowrap'>Text Size: </Label>
+                                <Slider
+                                    defaultValue={[textConfig.size]}
+                                    value={[textConfig.size]}
+                                    onValueChange={(value) => setTextConfig(prev => ({ ...prev, size: value[0] }))}
+                                    className='cursor-pointer'
+                                    min={16}
+                                    max={48}
+                                    step={1}
                                 />
                             </div>
+                            <div className='w-fit flex gap-[18px]'>
+                                <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
+                                <Input type='color' value={textConfig.color} onChange={(e) => setTextConfig(prev => ({ ...prev, color: e.target.value }))} className='w-[75px] h-6 p-0 outline-0 border-0' />
+                            </div>
                         </div>
+                    )}
 
-                        {showTemplates && (
-                            <div className='flex justify-between mt-5'>
-                                {templates.map((template, index) => (
-                                    <img
-                                        onClick={() => handleTemplateSelect(template)}
-                                        key={index}
-                                        src={template}
-                                        alt={`template ${index + 1}`}
-                                        width={100}
-                                        height={100}
-                                        className={`bg-brand-light-gray size-24 object-cover rounded-[10px] cursor-pointer hover:border-2 hover:border-brand-primary transition-all ${selectedTemplate === template ? 'border-2 border-brand-primary' : ''}`}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                    {/* Description Box */}
+                    <div className='flex flex-col gap-2 mt-5'>
+                        <Label className="font-semibold" htmlFor='description'>
+                            Description <span className="text-secondary">*</span>
+                        </Label>
+                        <Textarea
+                            id="description"
+                            name='description'
+                            value={formData.description}
+                            onChange={handleInputChangeEventForm}
+                            className='min-w-full !h-32 text-base'
+                        />
+                    </div>
 
-                        {showTemplates && (
-                            <div className='flex justify-between items-center mt-[26px] gap-9'>
-                                <div className='flex gap-[18px] items-center flex-1'>
-                                    <Label className='font-semibold text-nowrap'>Text Size: </Label>
-                                    <Slider
-                                        defaultValue={[textConfig.size]}
-                                        value={[textConfig.size]}
-                                        onValueChange={(value) => setTextConfig(prev => ({ ...prev, size: value[0] }))}
-                                        className='cursor-pointer'
-                                        min={16}
-                                        max={48}
-                                        step={1}
-                                    />
-                                </div>
-                                <div className='w-fit flex gap-[18px]'>
-                                    <Label className='font-semibold text-nowrap'>Select Text Color: </Label>
-                                    <Input type='color' value={textConfig.color} onChange={(e) => setTextConfig(prev => ({ ...prev, color: e.target.value }))} className='w-[75px] h-6 p-0 outline-0 border-0' />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className='flex flex-col gap-2 mt-5'>
-                            <Label className="font-semibold" htmlFor='description'>
-                                Description <span className="text-brand-secondary">*</span>
+                    {/* Start Time & End Time */}
+                    <div className='flex flex-col sm:flex-row gap-5 w-full mt-5'>
+                        {/* Start Time */}
+                        <div className='flex flex-col gap-2 w-full'>
+                            <Label className='font-semibold'>
+                                Start Time <span className="text-secondary">*</span>
                             </Label>
-                            <Textarea
-                                id="description"
-                                name='description'
-                                value={formData.description}
-                                onChange={handleInputChangeEventForm}
-                                className='input min-w-full !h-32 text-base'
-                            />
-                        </div>
 
-                        <div className='flex gap-5 w-full mt-5'>
-                            <div className='flex flex-col gap-2 w-full'>
-                                <Label className='font-semibold'>
-                                    Start Time <span className="text-brand-secondary">*</span>
-                                </Label>
+                            <div className='w-full rounded-[10px] relative flex h-12 !bg-background/50 p-1'>
+                                {/* For Date */}
+                                <div className='h-full w-full relative rounded-l-md border-r'>
+                                    <Input
+                                        type='date'
+                                        name='event_start_date'
+                                        value={formData.event_start_date}
+                                        onChange={handleInputChangeEventForm}
+                                        className='w-full custom-input h-full absolute opacity-0'
+                                    />
+                                    <p className='h-full px-3 flex text-sm items-center'>
+                                        {formData.event_start_date ? beautifyDate(new Date(formData.event_start_date)) : 'DD/MM/YYYY'}
+                                    </p>
+                                </div>
 
-                                <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                                    <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
-                                        <Input
-                                            type='date'
-                                            name='event_start_date'
-                                            value={formData.event_start_date}
-                                            onChange={handleInputChangeEventForm}
-                                            className='w-full custom-input h-full absolute opacity-0'
-                                        />
-                                        <p className='h-full px-3 flex items-center'>
-                                            {formData.event_start_date ? beautifyDate(new Date(formData.event_start_date)) : 'DD/MM/YYYY'}
-                                        </p>
-                                    </div>
-
-                                    <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
-                                        <Input
-                                            type='time'
-                                            name='start_time'
-                                            value={
-                                                formData.start_time && formData.start_minute_time
-                                                    ? `${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`
-                                                    : '00:00 AM'
-                                            }
-                                            onChange={(e) => handleTimeChange(e, 'start')}
-                                            className='w-full custom-input h-full absolute opacity-0'
-                                        />
-                                        <p className='h-full px-3 flex items-center text-nowrap'>
-                                            {formData.start_time && formData.start_minute_time
+                                {/* For Time */}
+                                <div className='h-full w-28 relative rounded-r-md'>
+                                    <Input
+                                        type='time'
+                                        name='start_time'
+                                        value={
+                                            formData.start_time && formData.start_minute_time
                                                 ? `${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`
                                                 : '00:00 AM'
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='flex flex-col gap-2 w-full'>
-                                <Label className='font-semibold'>
-                                    End Time <span className="text-brand-secondary">*</span>
-                                </Label>
-
-                                <div className='w-full rounded-[10px] relative flex h-12 bg-white p-1'>
-                                    <div className='bg-brand-light h-full w-full relative rounded-l-md border-white border-r'>
-                                        <Input
-                                            type='date'
-                                            name='event_date'
-                                            value={formData.event_date}
-                                            onChange={handleInputChangeEventForm}
-                                            className='w-full custom-input h-full absolute opacity-0'
-                                        />
-                                        <p className='h-full px-3 flex items-center'>
-                                            {formData.event_date ? beautifyDate(new Date(formData.event_date)) : 'DD/MM/YYYY'}
-                                        </p>
-                                    </div>
-
-                                    <div className='bg-brand-light h-full w-28 relative rounded-r-md'>
-                                        <Input
-                                            type='time'
-                                            name='end_time'
-                                            value={
-                                                formData.end_time && formData.end_minute_time
-                                                    ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
-                                                    : '00:00 AM'
-                                            }
-                                            onChange={(e) => handleTimeChange(e, 'end')}
-                                            className='w-full custom-input h-full absolute opacity-0'
-                                        />
-                                        <p className='h-full px-3 flex items-center text-nowrap'>
-                                            {formData.end_time && formData.end_minute_time
-                                                ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
-                                                : '00:00 AM'
-                                            }
-                                        </p>
-                                    </div>
+                                        }
+                                        onChange={(e) => handleTimeChange(e, 'start')}
+                                        className='w-full custom-input h-full absolute opacity-0'
+                                    />
+                                    <p className='h-full px-3 flex text-sm items-center text-nowrap'>
+                                        {formData.start_time && formData.start_minute_time
+                                            ? `${formData.start_time}:${formData.start_minute_time} ${formData.start_time_type}`
+                                            : '00:00 AM'
+                                        }
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                            {/* Event Mode */}
-                            <div className='flex flex-col gap-2 w-full mt-5'>
-                                <Label className='font-semibold' htmlFor='event_mode'>Event Mode</Label>
-                                <Select
-                                    value={formData.event_mode.toString()}
-                                    onValueChange={(value) => {
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            event_mode: parseInt(value) as 0 | 1,
-                                        }));
-                                    }}
-                                >
-                                    <SelectTrigger className="input !h-12 cursor-pointer min-w-full">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="0" className='cursor-pointer'>In Person</SelectItem>
-                                            <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        {/* End Time */}
+                        <div className='flex flex-col gap-2 w-full'>
+                            <Label className='font-semibold'>
+                                End Time <span className="text-secondary">*</span>
+                            </Label>
 
-                            {/* Webinar Link */}
-                            <div hidden={formData.event_mode === 0} className='flex flex-col gap-2 mt-5'>
-                                <Label className='font-semibold' htmlFor='webinar_link'>
-                                    Webinar Link <span className="text-brand-secondary">*</span>
-                                </Label>
-                                <div className='relative'>
+                            <div className='w-full rounded-[10px] relative flex h-12 !bg-background/50 p-1'>
+                                {/* For Date */}
+                                <div className='h-full w-full relative rounded-l-md border-r'>
                                     <Input
-                                        id='webinar_link'
-                                        name='webinar_link'
-                                        type='text'
-                                        value={formData.webinar_link}
+                                        type='date'
+                                        name='event_date'
+                                        value={formData.event_date}
                                         onChange={handleInputChangeEventForm}
-                                        placeholder='Enter Webinar Link'
-                                        className='input !h-12 min-w-full text-base'
+                                        className='w-full custom-input h-full absolute opacity-0'
                                     />
+                                    <p className='h-full px-3 flex text-sm items-center'>
+                                        {formData.event_date ? beautifyDate(new Date(formData.event_date)) : 'DD/MM/YYYY'}
+                                    </p>
+                                </div>
+
+                                {/* For Time */}
+                                <div className='h-full w-28 relative rounded-r-md'>
+                                    <Input
+                                        type='time'
+                                        name='end_time'
+                                        value={
+                                            formData.end_time && formData.end_minute_time
+                                                ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
+                                                : '00:00 AM'
+                                        }
+                                        onChange={(e) => handleTimeChange(e, 'end')}
+                                        className='w-full custom-input h-full absolute opacity-0'
+                                    />
+                                    <p className='h-full px-3 flex text-sm items-center text-nowrap'>
+                                        {formData.end_time && formData.end_minute_time
+                                            ? `${formData.end_time}:${formData.end_minute_time} ${formData.end_time_type}`
+                                            : '00:00 AM'
+                                        }
+                                    </p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
+                    {/* Event Mode */}
+                    <div className='flex flex-col gap-2 mt-5'>
+                        <Label className='font-semibold' htmlFor='event_mode'>Event Mode</Label>
+                        <Select
+                            value={formData.event_mode.toString()}
+                            onValueChange={(value) => {
+                                setFormData(prev => ({ 
+                                    ...prev, 
+                                    event_mode: parseInt(value) as 0 | 1,
+                                    // Reset related fields when mode changes
+                                    // webinar_link: parseInt(value) === 1 ? "" : prev.webinar_link,
+                                    // google_map_link: parseInt(value) === 0 ? "" : prev.google_map_link,
+                                }));
+                            }}
+                        >
+                            <SelectTrigger className="w-full !h-12 !min-w-full cursor-pointer">
+                                <SelectValue placeholder="Select Event Mode" />
+                            </SelectTrigger>
+                            <SelectContent className='!bg-background/50'>
+                                <SelectGroup>
+                                    <SelectItem value="0" className='cursor-pointer'>In Person</SelectItem>
+                                    <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                        <div hidden={formData.event_mode === 1} className='flex flex-col gap-2 mt-5'>
-                            <Label className='font-semibold' htmlFor='google_map_link'>
-                                Location <span className="text-brand-secondary">*</span>
-                            </Label>
-                            <div className='relative'>
-                                {isLoaded ? (
-                                    <Autocomplete
-                                        onLoad={autocomplete => setAutocomplete(autocomplete)}
-                                        onPlaceChanged={handlePlaceSelect}
-                                    >
-                                        <Input
-                                            id='google_map_link'
-                                            name='google_map_link'
-                                            type='text'
-                                            value={formData.google_map_link}
-                                            onChange={handleInputChangeEventForm}
-                                            placeholder='Enter Location'
-                                            className='input !h-12 min-w-full text-base'
-                                        />
-                                    </Autocomplete>
-                                ) : (
+                    {/* Location */}
+                    <div hidden={formData.event_mode === 1} className='flex flex-col gap-2 mt-5'>
+                        <Label className='font-semibold' htmlFor='google_map_link'>
+                            Location <span className="text-secondary">*</span>
+                        </Label>
+                        <div className='relative'>
+                            {isLoaded ? (
+                                <Autocomplete
+                                    onLoad={autocomplete => setAutocomplete(autocomplete)}
+                                    onPlaceChanged={handlePlaceSelect}
+                                >
                                     <Input
                                         id='google_map_link'
                                         name='google_map_link'
@@ -1278,88 +1267,120 @@ const AddFirstEvent: React.FC = () => {
                                         value={formData.google_map_link}
                                         onChange={handleInputChangeEventForm}
                                         placeholder='Enter Location'
-                                        className='input !h-12 min-w-full text-base'
+                                        className='h-12 min-w-full'
                                     />
-                                )}
-                            </div>
+                                </Autocomplete>
+                            ) : (
+                                <Input
+                                    id='google_map_link'
+                                    name='google_map_link'
+                                    type='text'
+                                    value={formData.google_map_link}
+                                    onChange={handleInputChangeEventForm}
+                                    placeholder='Enter Location'
+                                    className='h-12 min-w-full'
+                                />
+                            )}
 
-                            <div className='w-full h-60'>
-                                <GoogleMap isLoaded={isLoaded} latitude={coords.lat} longitude={coords.lng} />
-                            </div>
                         </div>
 
-                        <div hidden={formData.event_mode === 1} className='flex items-center justify-between gap-5 mt-5'>
-                            <div className="flex flex-col gap-2 w-full">
-                                <Label className="font-semibold" htmlFor='printer_count'>
-                                    No. of Printers
-                                </Label>
-                                <Input
-                                    id="printer_count"
-                                    name='printer_count'
-                                    type="number"
-                                    min="0"
-                                    value={formData.printer_count || 0}
-                                    onChange={handleInputChangeEventForm}
-                                    className='input !h-12 min-w-full text-base'
-                                />
-                            </div>
+                        <div className='w-full h-60'>
+                            <GoogleMap isLoaded={isLoaded} latitude={coords.lat} longitude={coords.lng} />
+                        </div>
 
-                            <div className="flex flex-col gap-2 w-full">
-                                <Label className="font-semibold" htmlFor='break_out'>
-                                    Break Out
-                                </Label>
-                                <Input
-                                    id="break_out"
-                                    name='break_out'
-                                    type="number"
-                                    min="0"
-                                    value={formData.break_out || 0}
-                                    onChange={handleInputChangeEventForm}
-                                    className='input !h-12 min-w-full text-base'
-                                />
-                            </div>
+                    </div>
 
-                            <div className="flex flex-col gap-2 w-full">
-                                <Label className="font-semibold" htmlFor='view_agenda_by'>
-                                    View Agenda By <span className="text-brand-secondary">*</span>
-                                </Label>
-                                <div className='input !h-12 min-w-full flex items-center text-base px-4'>
-                                    <div className='flex gap-4 items-center text-brand-dark-gray'>
-                                        <Label htmlFor="view_agenda_by" className='cursor-pointer'>All</Label>
+                    {/* Webinar Link */}
+                    <div hidden={formData.event_mode === 0} className='flex flex-col gap-2 mt-5'>
+                        <Label className='font-semibold' htmlFor='webinar_link'>
+                            Webinar Link <span className="text-secondary">*</span>
+                        </Label>
+                        <div className='relative'>
+                            <Input
+                                id='webinar_link'
+                                name='webinar_link'
+                                type='text'
+                                value={formData.webinar_link}
+                                onChange={handleInputChangeEventForm}
+                                placeholder='Enter Webinar Link'
+                                className='bg-background h-12 min-w-full'
+                            />
 
-                                        <Switch
-                                            id="view_agenda_by"
-                                            checked={formData.view_agenda_by === 1}
-                                            onCheckedChange={(checked) => handleSwitchChange(checked, 'view_agenda_by')}
-                                            className="data-[state=checked]:bg-brand-primary"
-                                        />
+                        </div>
+                    </div>
 
-                                        <Label htmlFor="view_agenda_by" className='cursor-pointer'>Checked In</Label>
-                                    </div>
+                    {/* Printers Count, Breakout Rooms and View Agenda By */}
+                    <div hidden={formData.event_mode === 1} className='flex flex-col sm:flex-row items-center justify-between gap-5 mt-5'>
+                        <div className="flex flex-col gap-2 w-full">
+                            <Label className="font-semibold" htmlFor='printer_count'>
+                                No. of Printers
+                            </Label>
+                            <Input
+                                id="printer_count"
+                                name='printer_count'
+                                type="number"
+                                value={formData.printer_count !== null ? formData.printer_count.toString() : ''}
+                                onChange={handleInputChangeEventForm}
+                                className='bg-background h-12 min-w-full'
+                            />
+                        </div>
+
+                        {/* Breakout Rooms */}
+                        <div className="flex flex-col gap-2 w-full">
+                            <Label className="font-semibold" htmlFor='break_out'>
+                                Breakout Rooms
+                            </Label>
+                            <Input
+                                id="break_out"
+                                name='break_out'
+                                type="number"
+                                value={formData.break_out !== null ? formData.break_out : 0}
+                                onChange={handleInputChangeEventForm}
+                                className='bg-background h-12 min-w-full'
+                            />
+                        </div>
+
+                        {/* View Agenda By */}
+                        <div className="flex flex-col gap-2 w-full">
+                            <Label className="font-semibold" htmlFor='view_agenda_by'>
+                                View Agenda By
+                            </Label>
+                            <div className='!bg-background/50 rounded-md !h-12 min-w-full flex items-center text-base px-4'>
+                                <div className='flex gap-4 items-center'>
+                                    <Label htmlFor="view_agenda_by" className='cursor-pointer'>All</Label>
+
+                                    <Switch
+                                        id="view_agenda_by"
+                                        checked={formData.view_agenda_by === 1}
+                                        onCheckedChange={(checked) => handleSwitchChange(checked, 'view_agenda_by')}
+                                        
+                                    />
+
+                                    <Label htmlFor="view_agenda_by" className='cursor-pointer'>Checked In</Label>
                                 </div>
                             </div>
                         </div>
-
-                        <div hidden={formData.event_mode === 1} className='flex mt-5 gap-2 flex-col'>
-                            <Label className='font-semibold'>Event OTP</Label>
-                            <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
-                                <Input
-                                    value={formData.event_otp}
-                                    onChange={handleInputChangeEventForm}
-                                    name='event_otp'
-                                    className='input !h-full min-w-full absolute text-base z-10'
-                                />
-                                <Button
-                                    onClick={() => setFormData(prev => ({ ...prev, event_otp: getRandomOTP() }))}
-                                    className='btn-rounded !h-[40px] !rounded-[10px] z-20'
-                                >
-                                    Generate
-                                </Button>
-                            </div>
-                        </div>
-
-                        <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-80 mx-auto'>Submit</Button>
                     </div>
+
+                    <div hidden={formData.event_mode === 1} className='flex mt-5 gap-2 flex-col'>
+                        <Label className='font-semibold'>Event OTP</Label>
+                        <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
+                            <Input
+                                value={formData.event_otp}
+                                onChange={handleInputChangeEventForm}
+                                name='event_otp'
+                                className='input !h-full min-w-full absolute text-base z-10'
+                            />
+                            <Button
+                                onClick={() => setFormData(prev => ({ ...prev, event_otp: getRandomOTP() }))}
+                                className='btn-rounded !h-[40px] !rounded-[10px] z-20'
+                            >
+                                Generate
+                            </Button>
+                        </div>
+                    </div>
+
+                    <Button onClick={handleSubmit} className='btn !mt-9 flex !font-semibold justify-center !h-12 w-full max-w-80 mx-auto'>Submit</Button>
                 </div>
             </div>
         </React.Fragment>

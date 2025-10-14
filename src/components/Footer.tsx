@@ -100,11 +100,11 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
 
     return (
         type === "basic" ? <footer className='flex flex-col gap-3 md:flex-row md:items-center justify-between p-3'>
-            <img width={80} height={25} src={LogoFullWhite} className='invert hidden md:block' alt="logo" />
+            <img width={80} height={25} src={LogoFullWhite} className='invert hidden dark:invert-0 md:block' alt="logo" />
 
             <div className='md:hidden flex justify-between'>
-                <img width={80} height={25} src={LogoFullWhite} className='invert' alt="logo" />
-                <div className='flex items-center gap-4'>
+                <img width={80} height={25} src={LogoFullWhite} className='invert dark:invert-0' alt="logo" />
+                <div className='flex items-center gap-4 dark:invert'>
                     <Link target='_blank' to="https://www.facebook.com/thekloutclub">
                         <img src={Facebook} alt="facebook" />
                     </Link>
@@ -133,7 +133,7 @@ const Footer: React.FC<FooterProps> = ({ type = "basic" }) => {
                 </p>
             </div>
 
-            <div className='hidden md:flex items-center gap-4'>
+            <div className='hidden md:flex dark:invert items-center gap-4'>
                 <Link target='_blank' to="https://www.facebook.com/thekloutclub">
                     <img src={Facebook} alt="facebook" />
                 </Link>

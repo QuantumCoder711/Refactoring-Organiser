@@ -3,9 +3,12 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { domain } from '@/constants';
 import Wave from '@/components/Wave';
-import { Calendar, ChevronDown, Globe, MapPin } from 'lucide-react';
+import { Calendar, Globe, MapPin } from 'lucide-react';
 import { formatDateTime } from '@/lib/utils';
 import { Helmet } from 'react-helmet';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const ExploreAllEvents: React.FC = () => {
   const [allEvents, setAllEvents] = useState<any[]>([]);
@@ -33,7 +36,6 @@ const ExploreAllEvents: React.FC = () => {
           eventDate.setHours(0, 0, 0, 0);
           return eventDate >= today;
         }).sort((a: any, b: any) => {
-          // Sort by increasing date (ascending order)
           return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
         });
 
@@ -45,7 +47,6 @@ const ExploreAllEvents: React.FC = () => {
           return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
         });
 
-        // Extract unique cities from events and convert to lowercase
         const uniqueCities: any[] = Array.from(new Set(filteredEvents.map((event: any) => {
           return event?.city?.toLowerCase();
         })));
@@ -62,19 +63,17 @@ const ExploreAllEvents: React.FC = () => {
       });
   }, []);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedType(event.target.value);
-    // Reset appropriate page counter based on selected type
-    if (event.target.value === "upcoming") {
+  const handleSelectChange = (value: string) => {
+    setSelectedType(value);
+    if (value === "upcoming") {
       setUpcomingCurrentPage(1);
     } else {
       setPastCurrentPage(1);
     }
   };
 
-  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCity = event.target.value;
-    setSelectedCity(newCity);
+  const handleCityChange = (value: string) => {
+    setSelectedCity(value);
     setUpcomingCurrentPage(1);
     setPastCurrentPage(1);
   };
@@ -82,14 +81,12 @@ const ExploreAllEvents: React.FC = () => {
   const filterEvents = (events: any[]) => {
     let filtered = [...events];
 
-    // Filter by city
     if (selectedCity !== "all") {
       filtered = filtered.filter(event =>
         event?.city?.toLowerCase() === selectedCity.replace(/-/g, ' ')
       );
     }
 
-    // Filter by event mode (online/offline)
     if (selectedMode !== "all") {
       const modeValue = parseInt(selectedMode);
       filtered = filtered.filter(event => event.event_mode === modeValue);
@@ -98,7 +95,6 @@ const ExploreAllEvents: React.FC = () => {
     return filtered;
   };
 
-  // Get current events for pagination
   const getCurrentEvents = () => {
     const filteredEvents = filterEvents(selectedType === "upcoming" ? allEvents : pastEvents);
     const currentPage = selectedType === "upcoming" ? upcomingCurrentPage : pastCurrentPage;
@@ -117,7 +113,6 @@ const ExploreAllEvents: React.FC = () => {
     } else {
       setPastCurrentPage(pageNum);
     }
-    // Add smooth scroll to top when changing pages
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -138,95 +133,114 @@ const ExploreAllEvents: React.FC = () => {
         <meta name="title" content="Discover & Attend Top Business Events in India | Klout Club" />
         <meta name="description" content="Explore exclusive corporate events, business summits, networking meetups, and industry conferences in India with Klout Club. Find top business summits, connect with professionals, and enhance your event experience." />
       </Helmet>
-      <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-scroll'>
-
+      <div className='w-full min-h-screen'>
         {/* All events div */}
-        <div className='max-w-screen-lg mx-auto p-5'>
-          <div className='space-y-5'>
-            <h1 className='text-2xl font-semibold leading-none'>All Events</h1>
-            <p className='leading-none'>Explore popular events near you, browse by category, or check out some of the great community calendars.</p>
+        <div className='max-w-screen-lg mx-auto px-4 sm:px-6 lg:p-5'>
+          <div className='space-y-3 sm:space-y-5 py-4 sm:py-6'>
+            <h1 className='text-xl sm:text-2xl font-semibold leading-tight'>All Events</h1>
+            <p className='text-sm sm:text-base leading-relaxed text-accent-foreground'>
+              Explore popular events near you, browse by category, or check out some of the great community calendars.
+            </p>
           </div>
 
-          <div className='mt-10'>
-            <div className="mb-5 flex gap-4">
-              <div className="relative">
-                <select
-                  className="px-4 py-2 pr-10 border max-w-40 w-full border-gray-300 bg-gray-100 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none"
-                  value={selectedType}
-                  onChange={handleSelectChange}
-                >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="past">Past</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+          <div className='mt-6 sm:mt-10'>
+            {/* Filters - Responsive Stack */}
+            <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
+                <Select value={selectedType} onValueChange={handleSelectChange}>
+                  <SelectTrigger className="w-full h-10 cursor-pointer">
+                    <SelectValue placeholder="Event Sort By" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-background/50'>
+                    <SelectGroup>
+                      <SelectItem value="upcoming" className='cursor-pointer'>Upcoming</SelectItem>
+                      <SelectItem value="past" className='cursor-pointer'>Past</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Online / Offline */}
-              <div className="relative">
-                <select
-                  className="px-4 py-2 pr-10 border max-w-40 w-full border-gray-300 bg-gray-100 rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none"
+              <div className="flex-1 min-w-0">
+                <Select
                   value={selectedMode}
-                  onChange={(e) => {
-                    if (e.target.value === "1") {
+                  onValueChange={(value) => {
+                    if (value === "1") {
                       setSelectedCity("all");
                     }
-                    setSelectedMode(e.target.value);
+                    setSelectedMode(value);
                     setUpcomingCurrentPage(1);
                     setPastCurrentPage(1);
                   }}
                 >
-                  <option value="all">All Types</option>
-                  <option value="0">Offline</option>
-                  <option value="1">Online</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
+                  <SelectTrigger className="w-full h-10 cursor-pointer">
+                    <SelectValue placeholder="Select Event Mode" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-background/50'>
+                    <SelectGroup>
+                      <SelectItem value="all" className='cursor-pointer'>All</SelectItem>
+                      <SelectItem value="0" className='cursor-pointer'>Offline</SelectItem>
+                      <SelectItem value="1" className='cursor-pointer'>Online</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="relative">
-                <select
-                  className={`px-4 py-2 pr-10 border capitalize border-gray-300 bg-gray-100 max-w-40 w-full rounded-full focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none ${selectedMode === '1' ? 'bg-gray-300 cursor-not-allowed' : 'cursor-pointer'
-                    }`}
+              <div className="flex-1 min-w-0">
+                <Select
                   value={selectedCity.replace(/-/g, ' ')}
-                  onChange={handleCityChange}
+                  onValueChange={handleCityChange}
                   disabled={selectedMode === '1'}
                 >
-                  <option value="all">All Cities</option>
-                  {cities.map((city, index) => (
-                    <option key={index} value={city} className='capitalize'>{city}</option>
-                  ))}
-                </select>
-                <ChevronDown className={`absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none ${selectedMode === '1' ? 'text-gray-400' : ''
-                  }`} />
+                  <SelectTrigger className="w-full h-10 cursor-pointer">
+                    <SelectValue placeholder="All Cities" />
+                  </SelectTrigger>
+                  <SelectContent className='bg-background/50'>
+                    <SelectGroup>
+                      <SelectItem value="all" className='cursor-pointer capitalize'>All Cities</SelectItem>
+                      {cities.map((city, index) => (
+                        <SelectItem key={index} value={city} className='cursor-pointer capitalize'>{city}</SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
+
+            {/* Events Grid */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6'>
               {getCurrentEvents().map((event, index) => (
-                <Link to={`/events/${event.slug}`} key={index}>
-                  <div className='flex gap-3 max-h-24'>
-                    <img src={domain + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
-                    <div className='space-y-2 overflow-hidden'>
-                      <p className='text-sm text-brand-gray !leading-none truncate'>by {event?.company_name}</p>
-                      <h1 className='text-xl font-semibold leading-none truncate'>
-                        {event.title}
+                <Link to={`/events/${event.slug}`} key={index} className="group">
+                  <div className='flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg border border-muted hover transition-all duration-200 group-hover:shadow-md'>
+                    <img 
+                      src={domain + "/" + event.image} 
+                      alt="event" 
+                      className='w-20 h-20 sm:w-24 sm:h-24 rounded-md object-cover flex-shrink-0' 
+                    />
+                    <div className='flex-1 min-w-0 space-y-1 sm:space-y-2'>
+                      <p className='text-xs sm:text-sm text-gray-500 leading-none truncate'>
+                        by {event?.company_name}
+                      </p>
+                      <h1 className='text-base sm:text-lg font-semibold leading-tight flex items-center gap-2 truncate'>
+                        <span className="truncate">{event.title}</span>
                         {event.paid_event === 1 && (
-                          <span className='inline-block ml-2 text-white bg-brand-primary text-brand-text font-normal px-2 py-0.5 rounded-full text-xs'>
-                            Paid
-                          </span>
+                          <Badge className='rounded-full text-xs flex-shrink-0'>Paid</Badge>
                         )}
                       </h1>
                       <div className='flex gap-2 items-center'>
-                        <Calendar className='w-4 h-4 flex-shrink-0' />
-                        <p className='text-sm font-light text-brand-gray !leading-none truncate'>
+                        <Calendar className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-accent-foreground' />
+                        <p className='text-xs sm:text-sm font-light text-accent-foreground leading-none truncate'>
                           {formatDateTime(event.event_start_date)} | {event.start_time}:{event.start_minute_time} {event.start_time_type} - {event.end_time}:{event.end_minute_time} {event.end_time_type}
                         </p>
                       </div>
                       <div hidden={event.event_mode == 1} className='flex gap-2 items-center'>
-                        <MapPin className='w-4 h-4 text-brand-gray flex-shrink-0' />
-                        <p className='text-sm font-light text-brand-gray !leading-none truncate'>{event.event_venue_name}</p>
+                        <MapPin className='w-3 h-3 sm:w-4 sm:h-4 text-accent-foreground flex-shrink-0' />
+                        <p className='text-xs sm:text-sm font-light text-accent-foreground leading-none truncate'>
+                          {event.event_venue_name}
+                        </p>
                       </div>
                       <div hidden={event.event_mode == 0} className='flex gap-2 items-center'>
-                        <Globe className='w-4 h-4 text-brand-gray flex-shrink-0' />
-                        <p className='text-sm font-light text-brand-gray !leading-none truncate'>Online</p>
+                        <Globe className='w-3 h-3 sm:w-4 sm:h-4 text-accent-foreground flex-shrink-0' />
+                        <p className='text-xs sm:text-sm font-light text-accent-foreground leading-none truncate'>Online</p>
                       </div>
                     </div>
                   </div>
@@ -234,34 +248,58 @@ const ExploreAllEvents: React.FC = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-center gap-2 my-10">
-              <button
+            {/* Pagination - Responsive */}
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 my-8 sm:my-10">
+              <Button
                 onClick={() => handlePageChange(getCurrentPage() - 1)}
                 disabled={getCurrentPage() === 1}
-                className={`px-4 py-2 rounded-md ${getCurrentPage() === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-brand-primary text-white hover:bg-brand-primary/90'}`}
+                variant="outline"
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Previous
-              </button>
-              <div className="flex items-center gap-2">
+              </Button>
+              
+              <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2 mb-3 sm:mb-0">
                 {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map(pageNum => (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-8 h-8 rounded text-sm ${getCurrentPage() === pageNum ? 'bg-brand-primary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                    size="sm"
+                    variant={getCurrentPage() === pageNum ? "default" : "outline"}
+                    className="w-8 h-8 sm:w-10 sm:h-10 p-0 text-xs sm:text-sm"
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 ))}
               </div>
-              <button
+              
+              <Button
                 onClick={() => handlePageChange(getCurrentPage() + 1)}
                 disabled={getCurrentPage() === totalPages}
-                className={`px-4 py-2 rounded-md ${getCurrentPage() === totalPages ? 'bg-gray-200 cursor-not-allowed' : 'bg-brand-primary text-white hover:bg-brand-primary/90'}`}
+                variant="outline"
+                className="w-full sm:w-auto order-3"
               >
                 Next
-              </button>
+              </Button>
             </div>
+
+            {/* No Events Message */}
+            {getCurrentEvents().length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No events found matching your criteria.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => {
+                    setSelectedCity("all");
+                    setSelectedMode("all");
+                    setSelectedType("upcoming");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

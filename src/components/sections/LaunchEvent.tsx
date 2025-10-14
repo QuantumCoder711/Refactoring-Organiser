@@ -10,7 +10,8 @@ const LaunchEvent:React.FC = () => {
             <p className='text-center'>Host smarter events, empower professionals, and grow real communities — not just one-time gatherings.</p>
             <span className='text-center'>Get started free today.</span>
             <Link to="/add-first-event">
-            <Button className='btn rounded-full font-semibold lg:text-xl flex items-center gap-5 lg:w-[342px] !h-12'>Launch your free event today <ArrowUp className='rotate-45 size-5'/></Button>
+            {/* <Button className='btn rounded-full font-semibold lg:text-xl flex items-center gap-5 lg:w-[342px] !h-12'>Launch your free event today <ArrowUp className='rotate-45 size-5'/></Button> */}
+            <Button size={"lg"}>Launch your free event today <ArrowUp className='rotate-45 size-5'/></Button>
             </Link>
         </section>
     )

@@ -16,8 +16,8 @@ const Herosection: React.FC = () => {
             <div className='flex flex-col gap-9 w-full mt-[68px] lg:mt-0 lg:w-1/2 text-center lg:text-left'>
                 <h1 className='text-4xl sm:text-5xl font-bold'>Make Business Networking Effortless with <span className='text-brand-primary'>Klout Club</span></h1>
                 <p className='text-xl sm:text-2xl '>Klout Club helps you create smarter events — with instant QR check-in, real-time networking, AI photos, and professional connections that last beyond the event. Start free, set up in minutes.</p>
-                <Link to={"/add-first-event"}>
-                    <Button className='btn !rounded-full !max-w-fit !text-lg !font-semibold !h-12 mx-auto lg:mx-0'>Get Started -  It's Free</Button>
+                <Link to={"/add-first-event"} className='max-w-fit mx-auto lg:mx-0'>
+                    <Button size={'lg'} className='mx-auto lg:mx-0 w-fit'>Get Started -  It's Free</Button>
                 </Link>
             </div>
 

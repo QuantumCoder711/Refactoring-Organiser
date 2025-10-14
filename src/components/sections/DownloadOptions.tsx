@@ -8,6 +8,7 @@ import { CircleCheck, CircleX } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { domain } from '@/constants';
+import { Input } from '../ui/input';
 
 const DownloadOptions: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -85,7 +86,7 @@ const DownloadOptions: React.FC = () => {
       </h2>
 
       {/* Store Buttons */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
+      <div className="flex flex-col dark:invert sm:flex-row items-center gap-4 sm:gap-8">
         <AppleStore />
         <GooglePlay />
       </div>
@@ -110,7 +111,7 @@ const DownloadOptions: React.FC = () => {
           <h4 className="text-lg sm:text-xl md:text-2xl font-medium">
             Let us help you create unforgettable corporate experiences.
           </h4>
-          <p className="text-sm sm:text-base md:text-lg text-gray-600">
+          <p className="text-sm sm:text-base md:text-lg text-accent-foreground/50">
             Whether you're organizing a roundtable, awards night, or networking
             event - we're just a message away.
           </p>
@@ -133,40 +134,39 @@ const DownloadOptions: React.FC = () => {
         </div>
 
         {/* Right Form */}
-        <div className="w-full md:w-1/2 p-6 sm:p-8 bg-white rounded-lg shadow-md">
+        <div className="w-full md:w-1/2 p-5 sm:p-8 bg-accent rounded-lg shadow-md">
           <form className="flex flex-col gap-4 sm:gap-5 text-sm sm:text-base">
             {/* Input Fields */}
             {['name', 'email', 'phone', 'subject'].map((field, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 focus-within:border-brand-dark-gray transition"
+                // className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 focus-within:border-brand-dark-gray transition"
               >
-                <input
+                <Input
                   name={field}
                   value={(formData as any)[field]}
                   onChange={handleInputChange}
                   type="text"
+                  className='h-10'
                   placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                  className="w-full bg-transparent outline-none text-sm sm:text-base"
                 />
               </div>
             ))}
 
             {/* Message */}
-            <div className="border border-gray-300 rounded-md focus-within:border-brand-dark-gray transition">
+            <div>
               <Textarea
                 name="message"
                 value={formData.message}
                 onChange={handleInputChange}
                 rows={3}
                 placeholder="Write your message..."
-                className="w-full h-full bg-transparent outline-none text-sm sm:text-base"
               />
             </div>
           </form>
           <Button
             onClick={handleSubmit}
-            className="mt-6 w-full sm:w-auto bg-brand-primary hover:bg-brand-primary-dark duration-300 cursor-pointer transition-all px-8 h-12 sm:h-14 rounded-full font-semibold text-base sm:text-lg"
+            className='mt-5'
           >
             Send Message
           </Button>
@@ -174,7 +174,7 @@ const DownloadOptions: React.FC = () => {
       </div>
 
       {/* Footer Text */}
-      <h2 className="capitalize mt-16 md:mt-24 mb-16 md:mb-28 text-center text-base sm:text-xl md:text-2xl font-semibold leading-snug text-gray-700">
+      <h2 className="capitalize mt-16 md:mt-24 mb-16 md:mb-28 text-center text-base sm:text-xl md:text-2xl font-semibold leading-snug text-accent-foreground">
         Klout Club is free for basic events. Optional upgrades available for
         advanced insights and premium networking tools.
       </h2>

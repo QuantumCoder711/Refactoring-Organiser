@@ -136,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
 
   return (
     !isAuthenticated ?
-      <header className={`flex justify-between p-3 ${location.pathname === "/organiser" ? 'bg-black/10 backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
+      <header className={`flex justify-between p-3 ${location.pathname === "/organiser" ? 'bg-transparent backdrop-blur-xs absolute top-0 left-0 right-0 z-50 text-white' : ''}`}>
         <nav className='w-full flex justify-between items-center'>
           <Link to="/">
             <img width={152} src={location.pathname === "/organiser" ? WhiteLogo : Logo} alt="logo" />
@@ -201,7 +201,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
         </Link>
         <nav className='w-full h-full flex justify-between bg-muted backdrop-blur-xl items-center p-3 md:px-5 lg:px-10'>
           <h2 className='hidden md:block xl:text-xl font-semibold'>{heading}</h2>
-          <img src={Logo} width={72} height={40} className='w-28 md:hidden' />
+          <Link to="/">
+            <img src={Logo} width={72} height={40} className='w-28 md:hidden' />
+          </Link>
 
           {/* Desktop Rendering */}
           <ul className='hidden md:flex gap-5 items-center'>
@@ -272,7 +274,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 <DropdownMenuContent className='w-40'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {user?.role ===  "admin" && <Link to="/profile">
+                  {user?.role === "admin" && <Link to="/profile">
                     <DropdownMenuItem className='cursor-pointer'>Profile</DropdownMenuItem>
                   </Link>}
                   {user?.role === "admin" && <Link to="/sub-users">
@@ -324,7 +326,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated }) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
-            </ul>
+          </ul>
 
           {/* Mobile Rendering */}
           <ul className='md:hidden flex gap-3 items-center'>

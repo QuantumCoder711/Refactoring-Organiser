@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import useExtrasStore from '@/store/extrasStore';
 import { Helmet } from 'react-helmet';
 import DocumentRenderer from '@/components/DocumentRenderer';
+import { Badge } from '@/components/ui/badge';
 
 interface CompanySponsor {
     id: number;
@@ -143,7 +144,7 @@ const CustomComboBox = React.memo(({
     return (
         <div className="flex gap-2 flex-col w-full" ref={dropdownRef}>
             <Label className="font-semibold">
-                {label} {required && <span className="text-brand-secondary">*</span>}
+                {label} {required && <span className="text-secondary">*</span>}
             </Label>
             <div className="relative">
                 <div className="relative">
@@ -155,7 +156,7 @@ const CustomComboBox = React.memo(({
                         onKeyDown={handleKeyDown}
                         onFocus={() => setIsOpen(true)}
                         placeholder={placeholder}
-                        className="w-full capitalize bg-white !h-12 text-base pr-10"
+                        className="w-full capitalize !h-12 text-base pr-10"
                     />
                     <ChevronDown
                         className={`absolute right-3 top-1/2 transform -translate-y-1/2 size-4 opacity-50 transition-transform cursor-pointer ${isOpen ? 'rotate-180' : ''}`}
@@ -167,17 +168,17 @@ const CustomComboBox = React.memo(({
                 </div>
 
                 {isOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-background/70 border backdrop-blur-xl rounded-md shadow-lg max-h-60 overflow-y-auto">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option, index) => (
                                 <div
                                     key={option.id}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-gray-100' : ''} option`}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-accent flex items-center justify-between text-sm ${selectedIndex === index ? 'bg-accent' : ''} option`}
                                     onClick={() => handleOptionSelect(option)}
                                 >
                                     <span className="capitalize">{option.name}</span>
                                     {inputValue === option.name && (
-                                        <Check className="size-4 text-brand-secondary" />
+                                        <Check className="size-4 min-w-4 min-h-4 text-secondary" />
                                     )}
                                 </div>
                             ))
@@ -622,7 +623,7 @@ const ExploreViewEvent: React.FC = () => {
                 <meta property="og:type" content="website" />
             </Helmet>
 
-            <div className='w-full min-h-screen bg-brand-foreground text-black overflow-y-auto pb-12'>
+            <div className='w-full min-h-screen bg-background overflow-y-auto pb-12'>
                 <div
                     dangerouslySetInnerHTML={{ __html: form as unknown as string }}
                     style={{ opacity: 0 }}
@@ -630,26 +631,24 @@ const ExploreViewEvent: React.FC = () => {
 
                 <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto space-y-4 px-5'>
                     {/* Left Div */}
-                    <div className='space-y-4'>
+                    <div className='space-y-4 w-full'>
                         <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
-                        <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='inline-block ml-2 text-white bg-brand-primary text-brand-text font-normal px-2 py-0.5 rounded-full text-xs'>
-                            Paid
-                        </span>}</h1>
+                        <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <Badge className='rounded-full'>Paid</Badge>}</h1>
 
                         {/* Row for Start Date */}
                         <div className='flex gap-2'>
-                            <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                <p className='uppercase text-orange-500 font-semibold text-xs text-center'>
+                            <div className='rounded-md grid place-content-center size-10 bg-muted'>
+                                <p className='uppercase text-secondary font-semibold text-xs text-center'>
                                     {startTime ? new Date(startTime).toLocaleString('en-US', { weekday: 'short' }).toUpperCase() : ''}
                                 </p>
-                                <p className='text-2xl leading-none font-semibold text-brand-gray'>
+                                <p className='text-2xl leading-none font-semibold text-foreground'>
                                     {startTime ? new Date(startTime).getDate() : ''}
                                 </p>
                             </div>
                             <div>
                                 <h4 className='font-semibold'>{formatDateTime(startTime)}</h4>
-                                <p className='text-sm text-brand-gray'>{currentEvent?.start_time}:{currentEvent?.start_minute_time}  {currentEvent?.start_time_type} - {currentEvent?.end_time}:{currentEvent?.end_minute_time} {currentEvent?.end_time_type}</p>
+                                <p className='text-sm text-foreground'>{currentEvent?.start_time}:{currentEvent?.start_minute_time}  {currentEvent?.start_time_type} - {currentEvent?.end_time}:{currentEvent?.end_minute_time} {currentEvent?.end_time_type}</p>
                             </div>
                         </div>
 
@@ -658,19 +657,19 @@ const ExploreViewEvent: React.FC = () => {
                             <Link to={currentEvent?.event_mode === 1 ? currentEvent?.webinar_link : currentEvent?.google_map_link || ""} target="_blank" className='flex gap-2 items-center cursor-pointer'>
 
                                 {currentEvent?.event_mode === 0 ? <React.Fragment>
-                                    <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                        <MapPin size={30} className='text-brand-gray' />
+                                    <div className='rounded-md grid place-content-center size-10 bg-muted'>
+                                        <MapPin size={30} className='text-foreground' />
                                     </div>
 
                                     <div>
                                         <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <ArrowRight size={20} className='-rotate-45' /></h4>
-                                        <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
+                                        <p className='text-sm text-foreground'>{currentEvent?.city}, {currentEvent?.pincode}</p>
                                     </div>
                                 </React.Fragment>
                                     :
                                     <React.Fragment>
-                                        <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                            <Globe size={30} className='text-brand-gray' />
+                                        <div className='rounded-md grid place-content-center size-10 bg-muted'>
+                                            <Globe size={30} className='text-foreground' />
                                         </div>
 
                                         <div>
@@ -684,19 +683,19 @@ const ExploreViewEvent: React.FC = () => {
                         {/* Row for Event Fee */}
                         {currentEvent?.paid_event === 1 && <div className='flex gap-2'>
                             <div className='flex gap-2'>
-                                <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                    <IndianRupee size={30} className='text-brand-gray' />
+                                <div className='rounded-md grid place-content-center size-10 bg-muted'>
+                                    <IndianRupee size={30} className='text-foreground' />
                                 </div>
 
                                 <div>
                                     <h4 className='font-semibold flex items-center'>Event Fee</h4>
-                                    <p className='text-sm text-brand-primary font-bold'>{currentEvent?.event_fee} /-</p>
+                                    <p className='text-sm text-primary font-bold'>{currentEvent?.event_fee} /-</p>
                                 </div>
                             </div>
                         </div>}
 
                         {/* Row for Registration */}
-                        <div className='border border-white rounded-[10px]'>
+                        <div className='border border-accent rounded-[10px]'>
                             <p className='text-sm p-[10px]'>
                                 {isEventDatePassed() ?
                                     'Registration Closed' :
@@ -704,10 +703,10 @@ const ExploreViewEvent: React.FC = () => {
                                 }
                             </p>
 
-                            <div className={`rounded-b-[10px] bg-white ${isEventDatePassed() ? 'opacity-50' : ''}`}>
+                            <div className={`rounded-b-[10px] bg-muted ${isEventDatePassed() ? 'opacity-50' : ''}`}>
                                 <div className={`flex gap-2 p-[10px] border-b ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
-                                    <div className='rounded-md grid place-content-center size-10 bg-white'>
-                                        <UserRoundCheck size={30} className='text-brand-gray' />
+                                    <div className='rounded-md grid place-content-center size-10 bg-background/50'>
+                                        <UserRoundCheck size={30} className='text-foreground' />
                                     </div>
 
                                     <div className=''>
@@ -718,7 +717,7 @@ const ExploreViewEvent: React.FC = () => {
 
                                 <div className={`p-[10px] ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
                                     <p className='text-sm'>Welcome! Register below to request event access.</p>
-                                    <Button disabled={isEventDatePassed()} onClick={() => setOpen(true)} className='w-full mt-[10px] !py-6 text-base hover:bg-brand-primary-dark cursor-pointer duration-300 bg-brand-primary rounded-lg text-white'>
+                                    <Button disabled={isEventDatePassed()} onClick={() => setOpen(true)} className='w-full h-12 mt-4'>
                                         Get an Invite
                                     </Button>
                                 </div>
@@ -729,7 +728,7 @@ const ExploreViewEvent: React.FC = () => {
                         <div className='mt-6'>
                             <h3 className='font-semibold text-lg'>Event Details</h3>
                             <hr className='border-t-2 border-white my-[10px]' />
-                            <p className='text-brand-gray'>{currentEvent?.description}</p>
+                            <p className='text-foreground'>{currentEvent?.description}</p>
                         </div>
 
                         {/* Speakers */}
@@ -748,7 +747,7 @@ const ExploreViewEvent: React.FC = () => {
                                         <p className='text-wrap text-sm capitalize'>{speaker.job_title}</p>
                                         <p className='text-sm font-bold text-wrap capitalize'>{speaker.company_name}</p>
                                     </div>
-                                )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                                )) : <p className='text-foreground mb-10 text-nowrap'>No speakers available</p>}
                             </div>
                         </div>
 
@@ -769,7 +768,7 @@ const ExploreViewEvent: React.FC = () => {
                                         <p className='text-wrap text-sm capitalize'>{sponsor.job_title}</p>
                                         <p className='text-sm font-bold text-wrap capitalize'>{sponsor.company_name}</p>
                                     </div>
-                                )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                                )) : <p className='text-foreground mb-10 text-nowrap'>No speakers available</p>}
                             </div>
                         </div>
 
@@ -910,7 +909,7 @@ const ExploreViewEvent: React.FC = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                    )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
+                                    )) : <p className='text-foreground mb-10'>No agenda available</p>}
                                 </div>
                             </div>
                         </div>}
@@ -918,7 +917,7 @@ const ExploreViewEvent: React.FC = () => {
                         <div hidden={currentEvent?.event_mode == 1} className='mt-10 md:hidden md:mt-[5.8rem]'>
                             <h3 className='font-semibold text-lg'>Location</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
-                            <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
+                            <p className='text-foreground'><strong>{currentEvent?.event_venue_name}</strong> <br />
                                 {currentEvent?.event_venue_address_2}</p>
                             <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
                                 <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
@@ -933,7 +932,7 @@ const ExploreViewEvent: React.FC = () => {
                         <div hidden={currentEvent?.event_mode == 1} className='mt-10 hidden md:block md:mt-[5.8rem]'>
                             <h3 className='font-semibold text-lg'>Location</h3>
                             <hr className='border-t-2 border-white !my-[10px]' />
-                            <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
+                            <p className='text-foreground'><strong>{currentEvent?.event_venue_name}</strong> <br />
                                 {currentEvent?.event_venue_address_2}</p>
                             <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-80 md:h-80'>
                                 <GoogleMap latitude={center.lat} longitude={center.lng} isLoaded={true} zoom={18} />
@@ -943,7 +942,7 @@ const ExploreViewEvent: React.FC = () => {
                 </div>
 
                 <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogContent className='bg-brand-light'>
+                    <DialogContent className='bg-muted/80 backdrop-blur-2xl'>
                         <DialogHeader>
                             <DialogTitle className='text-center text-2xl'>Get an Invite</DialogTitle>
 
@@ -951,7 +950,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* First Name & Last Name */}
                                 <div className='flex gap-5 justify-between'>
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>First Name <span className='text-orange-500'>*</span></Label>
+                                        <Label className='font-semibold'>First Name <span className='text-secondary'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.first_name}
@@ -963,7 +962,7 @@ const ExploreViewEvent: React.FC = () => {
                                     </div>
 
                                     <div className='flex mt-5 gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Last Name <span className='text-orange-500'>*</span></Label>
+                                        <Label className='font-semibold'>Last Name <span className='text-secondary'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.last_name}
@@ -978,7 +977,7 @@ const ExploreViewEvent: React.FC = () => {
                                 {/* Email & Mobile Number */}
                                 <div className='flex gap-5 flex-col justify-between mt-5'>
                                     <div className='flex gap-2 flex-col w-full'>
-                                        <Label className='font-semibold'>Email <span className='text-orange-500'>*</span></Label>
+                                        <Label className='font-semibold'>Email <span className='text-secondary'>*</span></Label>
                                         <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                             <Input
                                                 value={userAccount.email_id}
@@ -991,7 +990,7 @@ const ExploreViewEvent: React.FC = () => {
 
                                     <div className='flex gap-5'>
                                         <div className='flex gap-2 flex-col w-40'>
-                                            <Label className='font-semibold'>Country Code <span className='text-orange-500'>*</span></Label>
+                                            <Label className='font-semibold'>Country Code <span className='text-secondary'>*</span></Label>
                                             <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                                 <Input
                                                     value={userAccount.country_code}
@@ -1003,7 +1002,7 @@ const ExploreViewEvent: React.FC = () => {
                                         </div>
 
                                         <div className='flex gap-2 flex-col w-full'>
-                                            <Label className='font-semibold'>Mobile Number <span className='text-orange-500'>*</span></Label>
+                                            <Label className='font-semibold'>Mobile Number <span className='text-secondary'>*</span></Label>
                                             <div className='input !h-12 !min-w-full relative !p-1 flex items-center justify-end'>
                                                 <Input
                                                     value={userAccount.phone_number}

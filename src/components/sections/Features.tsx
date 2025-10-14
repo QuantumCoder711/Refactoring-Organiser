@@ -58,7 +58,7 @@ const Features: React.FC = () => {
                 {features.map((feature, index) => (
                     <div
                         key={index}
-                        className={`bg-white overflow-clip rounded-md transition-all duration-300 ease-in-out p-5 h-[500px] relative cursor-pointer
+                        className={`bg-background dark:bg-accent overflow-clip rounded-md transition-all duration-300 ease-in-out p-5 h-[500px] relative cursor-pointer
                             ${activeIndex === index ? 'max-w-[530px]' : 'max-w-[120px]'}`}
                         onClick={() => setActiveIndex(index)}
                     >
