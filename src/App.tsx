@@ -79,12 +79,13 @@ import CreateBadge from '@/pages/admin/all-events/create-badge';
 import Careers from '@/pages/guest/careers';
 import UpdateSponsor from '@/pages/admin/event-sponsors/update-sponsor';
 import SubUsers from '@/pages/admin/profile/sub-users';
-import ICP from './pages/admin/icp';
-import CreateICP from './pages/admin/icp/create-icp';
-import UploadICP from './pages/admin/icp/upload-icp';
-import SavedICP from './pages/admin/icp/saved-icp';
-import AddEntry from './pages/admin/icp/add-entry';
-import UpdateICP from './pages/admin/icp/update-icp';
+import ICP from '@/pages/admin/icp';
+import CreateICP from '@/pages/admin/icp/create-icp';
+import UploadICP from '@/pages/admin/icp/upload-icp';
+import SavedICP from '@/pages/admin/icp/saved-icp';
+import AddEntry from '@/pages/admin/icp/add-entry';
+import UpdateICP from '@/pages/admin/icp/update-icp';
+import EventRating from '@/pages/guest/event-rating';
 
 const App: React.FC = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -108,6 +109,12 @@ const App: React.FC = () => {
       <Route element={<GuestLayout />}>
         <Route index element={<Homepage />} />
         <Route path="organiser" element={<ExploreEvents />} />
+        <Route
+          path="event/rating"
+          element={
+            <EventRating />
+          }
+        />
         <Route path="add-first-event" element={<AddFirstEvent />} />
         <Route path="events" element={<ExploreAllEvents />} />
         <Route path="events/:slug" element={<ExploreViewEvent />} />
