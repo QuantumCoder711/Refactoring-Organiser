@@ -13,11 +13,11 @@ const VendorCompanyCard: React.FC<{ company: VendorCompanyType }> = ({ company }
             </div>
 
             <h3 className="capitalize">{company.agency_name}</h3>
-            <div className="flex gap-3">
-                <Link to={company.agency_website} target="_blank" className="w-1/2">
+            <div className="grid grid-cols-2 gap-3">
+                <Link to={company.agency_website} target="_blank">
                     <Button>View Website <ArrowRight className='-rotate-45' /></Button>
                 </Link>
-                <Button disabled className="w-1/2">Submit Quote</Button>
+                <Button disabled>Submit Quote</Button>
             </div>
         </div>
     );

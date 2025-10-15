@@ -685,7 +685,6 @@ const EditAttendee: React.FC = () => {
                                         value: status.toLowerCase(),
                                         label: status
                                     })),
-                                { value: 'others', label: 'Others' }
                             ]}
                             required
                         />
